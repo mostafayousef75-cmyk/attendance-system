@@ -41,6 +41,19 @@
             --radius-md: 8px;
         }
 
+        /* السيمات */
+        body.theme-darkblue {
+            --bg-base: #080c14;
+            --bg-surface: #0f172a;
+            --bg-card: #050914;
+            --bg-sidebar: #0b1329;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+        }
+
         body.theme-amoled {
             --bg-base: #000000;
             --bg-surface: #0a0a0a;
@@ -53,14 +66,26 @@
             --primary-hover: #d97706;
         }
 
-        body.theme-darkblue {
-            --bg-base: #080c14;
-            --bg-surface: #0f172a;
-            --bg-card: #050914;
-            --bg-sidebar: #0b1329;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: #1e293b;
+        body.theme-gray {
+            --bg-base: #121214;
+            --bg-surface: #1a1a1e;
+            --bg-card: #0d0d0f;
+            --bg-sidebar: #151518;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+        }
+
+        body.theme-light {
+            --bg-base: #f1f5f9;
+            --bg-surface: #ffffff;
+            --bg-card: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
         }
@@ -91,8 +116,9 @@
             width: 270px; background-color: var(--bg-sidebar); color: #fff;
             display: flex; flex-direction: column; justify-content: space-between;
             padding: 20px 15px; position: fixed; top: 0; bottom: 0; right: 0; z-index: 3000;
-            box-shadow: -4px 0 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease; box-shadow: -4px 0 15px rgba(0,0,0,0.5);
         }
+
         .app-layout.sidebar-collapsed .sidebar { transform: translateX(100%); }
 
         .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -101,7 +127,7 @@
         .brand-text h2 { font-size: 1.1rem; font-weight: 700; }
         .brand-text p { font-size: 0.8rem; opacity: 0.7; color: var(--text-muted); }
 
-        .sidebar-menu { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
         .menu-item {
             display: flex; align-items: center; gap: 12px; color: var(--text-muted);
             text-decoration: none; padding: 12px 14px; border-radius: var(--radius-md);
@@ -113,12 +139,15 @@
             border: 1px solid var(--primary-color); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
 
-        .doctor-sub-menu { padding-right: 15px; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        .doctor-sub-menu { padding-right: 10px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
         .doctor-sub-item {
-            padding: 8px 12px; font-size: 0.82rem; border-radius: 6px; cursor: pointer;
+            padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; cursor: pointer;
             color: var(--text-muted); background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid transparent;
         }
-        .doctor-sub-item:hover, .doctor-sub-item.active { background: var(--primary-color); color: #000; font-weight: 700; }
+        .doctor-sub-item:hover, .doctor-sub-item.active {
+            background: var(--bg-surface); color: var(--primary-color); border-color: var(--primary-color); font-weight: 700;
+        }
 
         .main-wrapper { margin-right: 270px; flex: 1; display: flex; flex-direction: column; width: calc(100% - 270px); }
         .app-layout.sidebar-collapsed .main-wrapper { margin-right: 0; width: 100%; }
@@ -128,7 +157,13 @@
             padding: 12px 18px; display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 90;
         }
+        .header-title { display: flex; align-items: center; gap: 12px; }
         .header-title h1 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+
+        .theme-select {
+            background: var(--bg-base); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 5px 8px; border-radius: var(--radius-md); font-family: var(--font-family); font-size: 0.82rem; outline: none; cursor: pointer;
+        }
 
         .content-body { padding: 12px; display: flex; flex-direction: column; gap: 12px; width: 100%; }
         .page-view { display: flex; flex-direction: column; gap: 12px; width: 100%; }
@@ -136,30 +171,44 @@
 
         .dashboard-section {
             background-color: var(--bg-surface); border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg); padding: 12px; box-shadow: var(--shadow-sm); width: 100%;
+            border-radius: var(--radius-lg); padding: 10px 12px; box-shadow: var(--shadow-sm); width: 100%;
         }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
         .section-header h2 { font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
 
-        /* شريط التنبيهات العام */
+        /* التنبيهات */
         .clinic-announcements-box {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(124, 58, 237, 0.12));
             border: 1px solid var(--primary-color); border-radius: var(--radius-lg);
             padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
         }
         .announcement-card {
-            background: var(--bg-base); border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); padding: 8px 10px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md);
+            padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; border-right: 4px solid var(--warning-color);
+        }
+        .announcement-body-content { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .announcement-body-text { font-size: 0.85rem; color: var(--text-main); line-height: 1.35; white-space: pre-wrap; flex: 1; }
+        .announcement-thumbnail-wrapper {
+            width: 45px; height: 45px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; flex-shrink: 0; background: #000;
+        }
+        .announcement-thumbnail-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .announcement-file-btn {
+            display: inline-flex; align-items: center; gap: 5px; background: rgba(245, 158, 11, 0.18);
+            border: 1px solid rgba(245, 158, 11, 0.5); padding: 4px 8px; border-radius: 5px; color: #fff; font-size: 0.78rem; font-weight: 700; cursor: pointer;
         }
 
         .kpi-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
         .kpi-card {
-            background: var(--bg-surface); border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); padding: 8px 10px; display: flex; align-items: center; gap: 8px; border-right: 4px solid var(--primary-color);
+            background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md);
+            padding: 8px 10px; display: flex; align-items: center; gap: 8px; border-right: 4px solid var(--primary-color);
         }
         .kpi-icon-box { font-size: 1.1rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg-base); color: var(--text-main); }
         .kpi-info h3 { font-size: 0.72rem; color: var(--text-muted); }
         .kpi-value { font-size: 1rem; font-weight: 800; color: var(--text-main); }
+
+        .progress-box { background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 10px; }
+        .progress-bar-container { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--success-color)); width: 0%; transition: width 0.4s ease; }
 
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
         .input-field { display: flex; flex-direction: column; gap: 4px; }
@@ -175,7 +224,6 @@
             padding: 8px 14px; border-radius: var(--radius-md); font-family: var(--font-family);
             font-size: 0.9rem; font-weight: 700; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
-        .submit-btn:hover { background-color: var(--primary-hover); }
 
         .actions-toolbar { display: flex; gap: 6px; flex-wrap: wrap; }
         .action-btn {
@@ -184,34 +232,28 @@
         }
         .action-btn.excel { background-color: #107c41; }
         .action-btn.json { background-color: #6366f1; }
+        .action-btn.import { background-color: #0284c7; }
         .action-btn.copy-btn { background-color: #16a34a; }
         .action-btn.reset-copy-btn { background-color: #d97706; }
-        .action-btn.trash-btn { background-color: #7c3aed; }
 
-        .table-container { max-height: 550px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 1050px; }
+        .table-container { max-height: 600px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 1100px; }
         table th { background-color: var(--bg-base); color: var(--text-muted); font-weight: 700; position: sticky; top: 0; z-index: 10; padding: 6px; text-align: right; }
-        table td { padding: 6px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        table td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-main); vertical-align: middle; }
 
-        /* كروت صفحة الكشف */
+        .table-input { width: 100%; padding: 3px 5px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-base); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem; }
+        .admin-action-textarea { width: 220px; min-height: 32px; padding: 2px 5px; background: var(--bg-base); border-radius: 5px; border: 1px solid var(--border-color); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem; resize: vertical; }
+
         .client-report-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-        .client-card-wrapper {
-            background-color: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md);
-            padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
+        .client-card-wrapper { background-color: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
         .client-card-wrapper.is-copied { background-color: rgba(22, 163, 74, 0.06); border-color: rgba(22, 163, 74, 0.3); opacity: 0.85; }
-        .client-card-header { display: flex; align-items: center; justify-content: space-between; font-weight: 700; font-size: 0.85rem; }
-        .client-datetime-badge { font-size: 0.68rem; background: rgba(245, 158, 11, 0.2); padding: 2px 6px; border-radius: 4px; color: var(--primary-color); }
-        
-        .copied-btn {
-            background: #d97706; color: #fff; border: none; padding: 3px 8px; border-radius: 4px;
-            font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
-        }
+
+        .copied-btn { background: #d97706; color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
         .copied-btn.active { background: var(--success-color); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 4000; justify-content: center; align-items: center; padding: 15px; }
         .modal.open { display: flex; }
-        .modal-content { background: var(--bg-surface); border-radius: var(--radius-lg); width: 100%; max-width: 500px; padding: 18px; border: 1px solid var(--border-color); color: var(--text-main); }
+        .modal-content { background: var(--bg-surface); border-radius: var(--radius-lg); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 18px; border: 1px solid var(--border-color); color: var(--text-main); }
     </style>
 </head>
 <body class="theme-amoled">
@@ -225,7 +267,7 @@
                         <div class="brand-icon"><i class="fa-solid fa-hospital"></i></div>
                         <div class="brand-text">
                             <h2>مجمع ماجستي</h2>
-                            <p>التنسيق الطبي الموحد</p>
+                            <p>نظام الأطباء والتنسيق</p>
                         </div>
                     </div>
                 </div>
@@ -233,17 +275,15 @@
                 <nav class="sidebar-menu">
                     <div class="menu-item active" id="menu-dashboard" onclick="switchMainPage('dashboard')">
                         <i class="fa-solid fa-chart-line"></i>
-                        <span>مؤشر الأداء العام والمواعيد</span>
+                        <span>مؤشر الأداء والمواعيد</span>
                     </div>
                     <div class="menu-item" id="menu-intake" onclick="switchMainPage('intake')">
                         <i class="fa-solid fa-user-plus"></i>
-                        <span>تسجيل عميل جديد (توجيه للدكتور)</span>
+                        <span>تسجيل العملاء (توجيه أوتوماتيك)</span>
                     </div>
 
-                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin: 12px 10px 4px;">صفحات الأطباء (كشف ومواعيد):</div>
-                    <div class="doctor-sub-menu" id="sidebarDoctorList">
-                        <!-- يتم تعبئتها تلقائياً -->
-                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin: 10px 8px 4px;">صفحة الكشف لكل طبيب:</div>
+                    <div class="doctor-sub-menu" id="sidebarDoctorList"></div>
 
                     <div class="menu-item" id="menu-csguide" onclick="switchMainPage('csguide')">
                         <i class="fa-solid fa-book-bookmark"></i>
@@ -262,16 +302,25 @@
         <main class="main-wrapper">
             <header class="top-header">
                 <div class="header-title">
-                    <h1 id="pageTitle">مؤشر الأداء العام والمواعيد</h1>
+                    <h1 id="pageTitle">مؤشر الأداء والمواعيد</h1>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <span style="font-size: 0.8rem; color: var(--success-color); font-weight: 700;"><span class="online-dot" style="background:#22c55e;width:8px;height:8px;display:inline-block;border-radius:50%;"></span> متصل بالسحابة 🟢</span>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">السيم:</label>
+                        <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
+                            <option value="theme-amoled">OLED الأسود (Amoled)</option>
+                            <option value="theme-darkblue">الأزرق الغامق</option>
+                            <option value="theme-gray">الرصاصي الفحمي</option>
+                            <option value="theme-light">المضيء الفاتح</option>
+                        </select>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--success-color); font-weight: 700;">متصل بالسحابة 🟢</span>
                 </div>
             </header>
 
             <div class="content-body">
                 
-                <!-- 1. لوحة المتابعة العامة -->
+                <!-- 1. لوحة المتابعة العامة والمواعيد -->
                 <div id="page-dashboard" class="page-view">
                     <section class="clinic-announcements-box">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -279,15 +328,15 @@
                                 <i class="fa-solid fa-bullhorn"></i> تنبيهات وإشعارات العيادة العامة
                             </div>
                             <button class="action-btn copy-btn" onclick="openAddAnnouncementModal()" style="padding: 4px 8px; font-size: 0.75rem;">
-                                <i class="fa-solid fa-plus"></i> إضافة تنبيه
+                                <i class="fa-solid fa-plus"></i> إضافة تنبيه جديد
                             </button>
                         </div>
-                        <div id="announcementsListContainer" style="display:flex; flex-direction:column; gap:5px;"></div>
+                        <div id="announcementsListContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
                     </section>
 
                     <section class="dashboard-section">
                         <div class="section-header">
-                            <h2><i class="fa-solid fa-chart-pie"></i> ملخص مؤشرات الأداء الشاملة</h2>
+                            <h2><i class="fa-solid fa-chart-pie"></i> ملخص مؤشرات الأداء (KPIs) لكل العيادات</h2>
                         </div>
                         <div class="kpi-cards-grid">
                             <div class="kpi-card">
@@ -296,33 +345,73 @@
                             </div>
                             <div class="kpi-card" style="border-color: var(--accent-purple);">
                                 <div class="kpi-icon-box"><i class="fa-solid fa-star"></i></div>
-                                <div class="kpi-info"><h3>حالات مميزة (📌)</h3><span class="kpi-value" id="kpi-pinned">0</span></div>
+                                <div class="kpi-info"><h3>المميزون (📌)</h3><span class="kpi-value" id="kpi-pinned">0</span></div>
                             </div>
                             <div class="kpi-card" style="border-color: var(--success-color);">
-                                <div class="kpi-icon-box"><i class="fa-solid fa-check-double"></i></div>
-                                <div class="kpi-info"><h3>حالات تم نسخها</h3><span class="kpi-value" id="kpi-copied">0</span></div>
+                                <div class="kpi-icon-box"><i class="fa-solid fa-money-bill-wave"></i></div>
+                                <div class="kpi-info"><h3>تم الدفع</h3><span class="kpi-value" id="kpi-paid">0</span></div>
+                            </div>
+                            <div class="kpi-card" style="border-color: #0d9488;">
+                                <div class="kpi-icon-box"><i class="fa-solid fa-tooth"></i></div>
+                                <div class="kpi-info"><h3>حالات الزراعة</h3><span class="kpi-value" id="kpi-plants">0</span></div>
+                            </div>
+                            <div class="kpi-card" style="border-color: #c2410c;">
+                                <div class="kpi-icon-box"><i class="fa-solid fa-stethoscope"></i></div>
+                                <div class="kpi-info"><h3>حالات الخلع</h3><span class="kpi-value" id="kpi-extractions">0</span></div>
                             </div>
                         </div>
                     </section>
 
                     <section class="dashboard-section">
                         <div class="section-header">
-                            <h2><i class="fa-solid fa-list-check"></i> جدول كافة المواعيد والعملاء</h2>
-                            <input type="text" id="searchInput" oninput="renderMainTable()" placeholder="بحث سريع..." style="width: 220px; padding: 5px; background:var(--bg-base); color:#fff; border:1px solid var(--border-color); border-radius:6px; font-size:0.8rem;">
+                            <h2><i class="fa-solid fa-database"></i> تصدير واستيراد البيانات</h2>
                         </div>
+                        <div class="actions-toolbar">
+                            <button class="action-btn excel" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> تصدير Excel</button>
+                            <button class="action-btn json" onclick="exportToJSON()"><i class="fa-solid fa-file-code"></i> تصدير JSON</button>
+                            <label class="action-btn import">
+                                <i class="fa-solid fa-file-import"></i> استيراد ملفات (Excel / JSON)
+                                <input type="file" id="importFile" accept=".json,.xlsx,.xls" onchange="importData(event)" hidden>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-list-check"></i> جدول المواعيد الشامل (نفس خانات الكود القديم)</h2>
+                            <input type="text" id="searchInput" oninput="renderMainTable()" placeholder="بحث باسم العميل، الجوال..." style="width: 220px; padding: 5px; background:var(--bg-base); color:#fff; border:1px solid var(--border-color); border-radius:6px; font-size:0.8rem;">
+                        </div>
+
+                        <div class="progress-box">
+                            <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700;">
+                                <span><i class="fa-solid fa-chart-line"></i> نسبة الإنجاز اليومي للحالات</span>
+                                <span id="progressText">0% (0 من 0)</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="progressBarFill"></div>
+                            </div>
+                        </div>
+
                         <div class="table-container">
                             <table id="requestsTable">
                                 <thead>
                                     <tr>
                                         <th>م</th>
-                                        <th>وقت الإضافة</th>
-                                        <th>الطبيب المعالج</th>
-                                        <th>اسم العميل</th>
+                                        <th>وقت الإضافة / التعديل</th>
+                                        <th>الحالة والأولوية</th>
+                                        <th>العميل</th>
                                         <th>رقم الجوال</th>
                                         <th>رقم الملف</th>
+                                        <th>الهوية</th>
+                                        <th>الفرع</th>
+                                        <th>الطبيب</th>
                                         <th>نوع الإجراء</th>
-                                        <th>الخدمة / الطلب</th>
+                                        <th>حالة الدفع</th>
+                                        <th>طريقة التواصل</th>
+                                        <th>الخدمة / تفاصيل الطلب</th>
                                         <th>المنسق</th>
+                                        <th style="min-width: 140px;">تواصل الإدارة</th>
+                                        <th style="min-width: 220px;">إجراء الإدارة</th>
                                         <th>إجراءات</th>
                                     </tr>
                                 </thead>
@@ -332,18 +421,18 @@
                     </section>
                 </div>
 
-                <!-- 2. صفحة تسجيل وتوجيه العميل للطبيب -->
+                <!-- 2. صفحة إضافة العملاء للتوجيه أوتوماتيك للدكتور -->
                 <div id="page-intake" class="page-view hidden">
                     <section class="dashboard-section">
                         <div class="section-header">
-                            <h2><i class="fa-solid fa-user-plus"></i> تسجيل موعد وتوجيه تلقائي للطبيب</h2>
+                            <h2><i class="fa-solid fa-user-plus"></i> إضافة عميل جديد والتوجيه أوتوماتيك للطبيب</h2>
                         </div>
                         <form id="appointmentForm" onsubmit="saveNewAppointment(event)">
                             <div class="form-grid">
                                 <div class="input-field">
-                                    <label>اختر الطبيب المعالج (التوجيه التلقائي) *</label>
-                                    <select id="assignedDoctor" required>
-                                        <!-- تعبئة تلقائية -->
+                                    <label>اختر الطبيب المعالج (توجيه أوتوماتيك) *</label>
+                                    <select id="assignedDoctor" required onchange="handleDoctorSelectChange(this)">
+                                        <!-- تعبئة أوتوماتيكية بدون كتابة التخصص -->
                                     </select>
                                 </div>
                                 <div class="input-field">
@@ -363,71 +452,96 @@
                                     <input type="text" id="idNumber" placeholder="رقم الهوية">
                                 </div>
                                 <div class="input-field">
+                                    <label>الفرع *</label>
+                                    <select id="branch" required>
+                                        <option value="معشي">فرع معشي</option>
+                                        <option value="الوسام">فرع الوسام</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label>طريقة التواصل *</label>
+                                    <select id="contactMethod" required>
+                                        <option value="اتصال">اتصال هاتفي</option>
+                                        <option value="شات">واتساب / شات</option>
+                                        <option value="بالاستقبال">بالاستقبال</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
                                     <label>اسم المنسق *</label>
-                                    <input type="text" id="coordinatorName" required placeholder="اسم المنسق">
+                                    <input type="text" id="coordinatorName" required placeholder="اسم المنسق المسؤول">
                                 </div>
                                 <div class="input-field">
                                     <label>نوع الإجراء *</label>
                                     <select id="procedureType" required>
-                                        <option value="مراجعه">مراجعة</option>
                                         <option value="زراعة">زراعة</option>
                                         <option value="خلع">خلع</option>
                                         <option value="تقويم">تقويم</option>
                                         <option value="تركيبات">تركيبات</option>
+                                        <option value="جراحه">جراحه</option>
+                                        <option value="فك خياطه">فك خياطه</option>
+                                        <option value="مراجعه">مراجعه</option>
                                         <option value="استفسارات">استفسارات</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label>حالة الدفع</label>
+                                    <select id="paymentStatus">
+                                        <option value="">بدون تحديد</option>
+                                        <option value="تم الدفع">تم الدفع</option>
+                                        <option value="لم يتم الدفع">لم يتم الدفع</option>
                                     </select>
                                 </div>
                                 <div class="input-field full-width">
                                     <label>الخدمة المطلوبة / تفاصيل الموعد *</label>
-                                    <textarea id="serviceRequired" required placeholder="اكتب تفاصيل طلب العميل والموعد المطلوب..."></textarea>
+                                    <textarea id="serviceRequired" required placeholder="اكتب تفاصيل طلب العميل..."></textarea>
                                 </div>
                             </div>
-                            <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> حفظ وتوجيه العميل لطبيبه مباشرة</button>
+                            <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> حفظ العميل وتوجيهه لكشف الطبيب أوتوماتيك</button>
                         </form>
                     </section>
                 </div>
 
-                <!-- 3. صفحة الكشف والمواعيد الخاصة بكل طبيب (تتحدث ديناميكياً) -->
+                <!-- 3. صفحة الكشف والمواعيد الخاصة بكل طبيب -->
                 <div id="page-doctor-portal" class="page-view hidden">
                     <section class="dashboard-section">
                         <div class="section-header">
                             <h2 id="doctorPortalTitle"><i class="fa-solid fa-file-medical"></i> صفحة الكشف والمواعيد</h2>
                             <div class="actions-toolbar">
-                                <button class="action-btn copy-btn" onclick="copyDoctorClientReport()"><i class="fa-solid fa-copy"></i> نسخ كشف الدكتور مرتب</button>
+                                <button class="action-btn copy-btn" onclick="copyDoctorClientReport()"><i class="fa-solid fa-copy"></i> نسخ كشف الطبيب مرتباً</button>
                                 <button class="action-btn reset-copy-btn" onclick="resetDoctorCopiedStatus()"><i class="fa-solid fa-rotate-left"></i> إعادة ضبط النسخ</button>
                             </div>
                         </div>
 
-                        <!-- مؤشرات الأداء الخاصة بالطبيب المختار -->
-                        <div class="kpi-cards-grid" style="margin-bottom: 12px;">
+                        <!-- KPI الخاص بالطبيب المختار -->
+                        <div class="kpi-cards-grid" style="margin-bottom: 10px;">
                             <div class="kpi-card">
                                 <div class="kpi-icon-box"><i class="fa-solid fa-users"></i></div>
-                                <div class="kpi-info"><h3>حالات الدكتور</h3><span class="kpi-value" id="doc-kpi-total">0</span></div>
+                                <div class="kpi-info"><h3>إجمالي حالات الطبيب</h3><span class="kpi-value" id="doc-kpi-total">0</span></div>
                             </div>
                             <div class="kpi-card" style="border-color: var(--accent-purple);">
                                 <div class="kpi-icon-box"><i class="fa-solid fa-star"></i></div>
                                 <div class="kpi-info"><h3>المميزون لديه</h3><span class="kpi-value" id="doc-kpi-pinned">0</span></div>
                             </div>
                             <div class="kpi-card" style="border-color: var(--success-color);">
-                                <div class="kpi-icon-box"><i class="fa-solid fa-check-double"></i></div>
-                                <div class="kpi-info"><h3>المنسوخون لديه</h3><span class="kpi-value" id="doc-kpi-copied">0</span></div>
+                                <div class="kpi-icon-box"><i class="fa-solid fa-money-bill-wave"></i></div>
+                                <div class="kpi-info"><h3>حالات تم الدفع</h3><span class="kpi-value" id="doc-kpi-paid">0</span></div>
                             </div>
                         </div>
 
                         <div style="margin-bottom: 8px; display: flex; gap: 8px; align-items: center; background: var(--bg-base); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);">
                             <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
-                            <input type="text" id="docSearchInput" oninput="renderDoctorPortal()" placeholder="بحث في كشف هذا الطبيب..." style="width: 100%; background: transparent; border: none; outline: none; color: #fff; font-size: 0.85rem;">
+                            <input type="text" id="docSearchInput" oninput="renderDoctorPortal()" placeholder="بحث باسم العميل، رقم الجوال، الملف..." style="width: 100%; background: transparent; border: none; outline: none; color: #fff; font-size: 0.85rem;">
                         </div>
 
                         <div id="doctorClientReportList" class="client-report-container"></div>
                     </section>
                 </div>
 
-                <!-- 4. صفحة الدليل الشامل -->
+                <!-- 4. الدليل الشامل لخدمة العملاء -->
                 <div id="page-csguide" class="page-view hidden">
                     <section class="dashboard-section">
                         <div class="section-header">
-                            <h2><i class="fa-solid fa-book-bookmark"></i> الدليل الشامل لخدمة العملاء</h2>
+                            <h2><i class="fa-solid fa-book-bookmark"></i> الدليل الشامل لـ (خدمة العملاء)</h2>
                             <button class="action-btn copy-btn" onclick="openAddLinkModal()"><i class="fa-solid fa-plus"></i> إضافة رابط جديد</button>
                         </div>
                         <div id="linksGridContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:10px; margin-top:10px;"></div>
@@ -438,22 +552,63 @@
         </main>
     </div>
 
+    <!-- النافذة التنبيهية -->
+    <div class="modal" id="announcementModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 id="announcementModalTitle" style="color: var(--primary-color);"><i class="fa-solid fa-bullhorn"></i> إضافة تنبيه عام للعيادة</h3>
+                <button onclick="closeAnnouncementModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">&times;</button>
+            </div>
+            <form id="announcementForm" onsubmit="saveAnnouncementItem(event)">
+                <input type="hidden" id="editAnnouncementKey">
+                <input type="hidden" id="removeFileFlag" value="false">
+                
+                <div class="input-field" style="margin-bottom: 10px;">
+                    <label>نص التنبيه أو الإشعار *</label>
+                    <textarea id="announcementText" required rows="3" placeholder="اكتب نص التنبيه هنا..."></textarea>
+                </div>
+
+                <div class="input-field" style="margin-bottom: 12px;">
+                    <label><i class="fa-solid fa-paperclip"></i> إرفاق ملف أو صورة (PDF, صور, مستندات) (اختياري)</label>
+                    <div id="currentFileStatusWrapper" style="display: none; align-items: center; justify-content: space-between; background: rgba(245,158,11,0.1); border: 1px solid var(--primary-color); padding: 6px 10px; border-radius: 6px; margin-bottom: 6px;">
+                        <span id="currentFileNameLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);"></span>
+                        <button type="button" onclick="removeAttachedFileInModal()" style="background: var(--danger-color); color: #fff; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; cursor: pointer;">حذف الملف</button>
+                    </div>
+                    <input type="file" id="announcementFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,image/*">
+                </div>
+
+                <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> حفظ ونشر التنبيه</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة معاينة الصور المكبرة -->
+    <div class="modal" id="imagePreviewModal">
+        <div class="modal-content" style="max-width: 600px; text-align: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3>معاينة الصورة المرفقة</h3>
+                <button onclick="closeImagePreviewModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">&times;</button>
+            </div>
+            <img id="previewFullImageTag" src="" alt="صورة مرفقة" style="max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px;">
+        </div>
+    </div>
+
     <!-- نافذة إضافة طبيب جديد -->
     <div class="modal" id="addDoctorModal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="color: var(--primary-color);">إضافة طبيب جديد للعيادة</h3>
+                <h3 style="color: var(--primary-color);">إضافة طبيب جديد</h3>
                 <button onclick="closeAddDoctorModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">&times;</button>
             </div>
-            <div class="input-field" style="margin-bottom: 8px;">
-                <label>اسم الطبيب *</label>
-                <input type="text" id="newDocName" placeholder="مثال: د. محمد العتيبي">
+            <div class="input-field" style="margin-bottom: 10px;">
+                <label>اسم الطبيب بالكامل *</label>
+                <input type="text" id="newDocName" placeholder="مثال: د. خالد العتيبي">
             </div>
             <div class="input-field" style="margin-bottom: 12px;">
                 <label>التخصص *</label>
                 <input type="text" id="newDocSpec" placeholder="مثال: زراعة وتجميل">
             </div>
-            <button class="submit-btn" onclick="saveNewDoctor()">حفظ وإضافة الطبيب</button>
+            <button class="submit-btn" onclick="saveNewDoctor()">حفظ الطبيب وتفعيل كشفه</button>
         </div>
     </div>
 
@@ -461,12 +616,12 @@
     <div class="modal" id="linkModal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="color: var(--primary-color);">إضافة رابط جديد</h3>
+                <h3 style="color: var(--primary-color);">إضافة رابط لخدمة العملاء</h3>
                 <button onclick="closeLinkModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">&times;</button>
             </div>
-            <div class="input-field" style="margin-bottom: 8px;">
-                <label>عنوان الرابط *</label>
-                <input type="text" id="linkTitle" placeholder="اسم الخدمة أو النظام">
+            <div class="input-field" style="margin-bottom: 10px;">
+                <label>عنوان الموقع / النظام *</label>
+                <input type="text" id="linkTitle" placeholder="مثال: نظام Bevatel">
             </div>
             <div class="input-field" style="margin-bottom: 12px;">
                 <label>الرابط (URL) *</label>
@@ -476,23 +631,8 @@
         </div>
     </div>
 
-    <!-- نافذة تنبيهات العيادة -->
-    <div class="modal" id="announcementModal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="color: var(--primary-color);">إضافة تنبيه عام</h3>
-                <button onclick="closeAnnouncementModal()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">&times;</button>
-            </div>
-            <div class="input-field" style="margin-bottom: 12px;">
-                <label>نص التنبيه *</label>
-                <textarea id="announcementText" rows="3" placeholder="اكتب التنبيه هنا..."></textarea>
-            </div>
-            <button class="submit-btn" onclick="saveAnnouncementItem()">نشر التنبيه</button>
-        </div>
-    </div>
-
     <script>
-        // إعدادات Firebase السحابية بالرابط المطلوب
+        // إعدادات Firebase المباشرة
         const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -501,9 +641,9 @@
         const linksRef = database.ref('cs_links');
         const announcementsRef = database.ref('announcements');
 
-        // قائمة الأطباء الأساسية المطلوبة + القابلة للإضافة
+        // الأطباء الافتراضيون بدون عرض التخصص أمام الاسم
         let doctors = [
-            { id: 'sami', name: 'د. سامي', spec: 'عام / زراعة' },
+            { id: 'sami', name: 'د. سامي', spec: 'زراعة وخلع' },
             { id: 'abdullah', name: 'د. عبد الله', spec: 'تقويم' },
             { id: 'mahmoud', name: 'د. محمود', spec: 'تركيبات' }
         ];
@@ -511,18 +651,27 @@
         let records = [];
         let csLinks = [];
         let announcements = [];
-        let activeDoctorId = null; // الطبيب الحالي المعروض في صفحة الكشف الخاصة به
+        let activeDoctorId = null;
 
         let localClientStates = {};
         try {
-            localClientStates = JSON.parse(localStorage.getItem('localClientStates_v2') || '{}');
+            localClientStates = JSON.parse(localStorage.getItem('localClientStates_v4') || '{}');
         } catch(e) { localClientStates = {}; }
 
         function saveLocalStates() {
-            localStorage.setItem('localClientStates_v2', JSON.stringify(localClientStates));
+            localStorage.setItem('localClientStates_v4', JSON.stringify(localClientStates));
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'theme-amoled';
+        document.body.className = savedTheme;
+
+        function changeTheme(themeName) {
+            document.body.className = themeName;
+            localStorage.setItem('theme', themeName);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('themeSelect').value = savedTheme;
             loadInitialData();
             setupFirebaseSync();
         });
@@ -555,80 +704,75 @@
         }
 
         function setupFirebaseSync() {
-            // مزامنة المواعيد والعملاء
             dbRef.on('value', snapshot => {
                 const data = snapshot.val();
-                if (data) {
-                    records = Object.keys(data).map(key => ({ firebaseKey: key, ...data[key] }));
-                } else {
-                    records = [];
-                }
+                records = data ? Object.keys(data).map(k => ({ firebaseKey: k, ...data[k] })) : [];
                 saveToLocalStorage();
                 renderMainTable();
                 updateGlobalKPIs();
+                updateDailyProgress();
                 if (activeDoctorId) renderDoctorPortal();
             });
 
-            // مزامنة الأطباء
             doctorsRef.on('value', snapshot => {
                 const data = snapshot.val();
                 if (data) {
-                    doctors = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    doctors = Object.keys(data).map(k => ({ id: k, ...data[k] }));
                     saveToLocalStorage();
                     renderDoctorsUI();
                 }
             });
 
-            // مزامنة الروابط
             linksRef.on('value', snapshot => {
                 const data = snapshot.val();
-                if (data) {
-                    csLinks = Object.keys(data).map(key => ({ linkKey: key, ...data[key] }));
-                    saveToLocalStorage();
-                    renderLinks();
-                }
+                csLinks = data ? Object.keys(data).map(k => ({ linkKey: k, ...data[k] })) : [];
+                saveToLocalStorage();
+                renderLinks();
             });
 
-            // مزامنة التنبيهات
             announcementsRef.on('value', snapshot => {
                 const data = snapshot.val();
-                if (data) {
-                    announcements = Object.keys(data).map(key => ({ annKey: key, ...data[key] }));
-                    saveToLocalStorage();
-                    renderAnnouncements();
-                }
+                announcements = data ? Object.keys(data).map(k => ({ annKey: k, ...data[k] })) : [];
+                announcements.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+                saveToLocalStorage();
+                renderAnnouncements();
             });
         }
 
-        // تحديث واجهة الأطباء في القائمة الجانبية ونموذج الإضافة
+        // عرض أسماء الأطباء صافية بدون كتابة التخصص أمام الاسم
         function renderDoctorsUI() {
             const sidebarList = document.getElementById('sidebarDoctorList');
             const selectDoc = document.getElementById('assignedDoctor');
             
             if (sidebarList) sidebarList.innerHTML = '';
-            if (selectDoc) selectDoc.innerHTML = '<option value="">اختر الطبيب المعالج...</option>';
+            if (selectDoc) selectDoc.innerHTML = '<option value="">اختر الطبيب المعالج (توجيه أوتوماتيك)...</option>';
 
             doctors.forEach(doc => {
-                // إضافة للقائمة الجانبية لكل طبيب
                 if (sidebarList) {
                     const item = document.createElement('div');
                     item.className = `doctor-sub-item ${activeDoctorId === doc.id ? 'active' : ''}`;
-                    item.innerHTML = `<span><i class="fa-solid fa-user-doctor"></i> ${doc.name}</span> <span style="font-size:0.7rem; opacity:0.8;">${doc.spec || ''}</span>`;
+                    item.innerHTML = `<span><i class="fa-solid fa-user-doctor"></i> ${doc.name}</span>`;
                     item.onclick = () => openDoctorPortal(doc.id);
                     sidebarList.appendChild(item);
                 }
 
-                // إضافة لقائمة اختيار الطبيب عند تسجيل عميل جديد
                 if (selectDoc) {
                     const opt = document.createElement('option');
                     opt.value = doc.id;
-                    opt.text = `${doc.name} (${doc.spec || 'تخصص عام'})`;
+                    opt.text = `${doc.name}`; // الاسم فقط بدون تخصص
                     selectDoc.appendChild(opt);
                 }
             });
         }
 
-        // التنقل بين الصفحات الرئيسية
+        function handleDoctorSelectChange(selectEl) {
+            const procedureSelect = document.getElementById('procedureType');
+            const selectedDocId = selectEl.value;
+            if (selectedDocId === 'sami') procedureSelect.value = 'زراعة';
+            else if (selectedDocId === 'abdullah') procedureSelect.value = 'تقويم';
+            else if (selectedDocId === 'mahmoud') procedureSelect.value = 'تركيبات';
+        }
+
         function switchMainPage(pageName) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
@@ -639,19 +783,18 @@
             if (pageName === 'dashboard') {
                 document.getElementById('page-dashboard').classList.remove('hidden');
                 document.getElementById('menu-dashboard').classList.add('active');
-                document.getElementById('pageTitle').innerText = 'مؤشر الأداء العام والمواعيد';
+                document.getElementById('pageTitle').innerText = 'مؤشر الأداء والمواعيد';
             } else if (pageName === 'intake') {
                 document.getElementById('page-intake').classList.remove('hidden');
                 document.getElementById('menu-intake').classList.add('active');
-                document.getElementById('pageTitle').innerText = 'تسجيل موعد وتوجيه تلقائي للطبيب';
+                document.getElementById('pageTitle').innerText = 'تسجيل عميل جديد (توجيه أوتوماتيك)';
             } else if (pageName === 'csguide') {
                 document.getElementById('page-csguide').classList.remove('hidden');
                 document.getElementById('menu-csguide').classList.add('active');
-                document.getElementById('pageTitle').innerText = 'الدليل الشامل (خدمة العملاء)';
+                document.getElementById('pageTitle').innerText = 'الدليل الشامل لـ (خدمة العملاء)';
             }
         }
 
-        // فتح صفحة الكشف والمواعيد الخاصة بطبيب معين
         function openDoctorPortal(docId) {
             activeDoctorId = docId;
             document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
@@ -661,14 +804,13 @@
             
             const docObj = doctors.find(d => d.id === docId);
             const docName = docObj ? docObj.name : 'الطبيب';
-            document.getElementById('pageTitle').innerText = `كشف ومواعيد: ${docName}`;
-            document.getElementById('doctorPortalTitle').innerHTML = `<i class="fa-solid fa-file-medical"></i> صفحة كشف ${docName} (${docObj?.spec || ''})`;
+            document.getElementById('pageTitle').innerText = `صفحة كشف ومواعيد: ${docName}`;
+            document.getElementById('doctorPortalTitle').innerHTML = `<i class="fa-solid fa-file-medical"></i> صفحة كشف ${docName}`;
 
             renderDoctorsUI();
             renderDoctorPortal();
         }
 
-        // حفظ موعد جديد وتوجيهه أوتوماتيكياً للطبيب المختار
         function saveNewAppointment(e) {
             e.preventDefault();
             const docId = document.getElementById('assignedDoctor').value;
@@ -679,22 +821,26 @@
                 patientPhone: document.getElementById('patientPhone').value.trim(),
                 fileNumber: document.getElementById('fileNumber').value.trim() || '-',
                 idNumber: document.getElementById('idNumber').value.trim() || '-',
+                branch: document.getElementById('branch').value,
+                contactMethod: document.getElementById('contactMethod').value,
                 coordinatorName: document.getElementById('coordinatorName').value.trim(),
                 procedureType: document.getElementById('procedureType').value,
+                paymentStatus: document.getElementById('paymentStatus').value || '',
                 serviceRequired: document.getElementById('serviceRequired').value.trim(),
                 doctorId: docId,
                 doctorName: docObj ? docObj.name : 'طبيب عام',
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                actionTaken: '',
+                adminContactMethod: 'قيد الانتظار'
             };
 
             dbRef.push(newRec).then(() => {
-                alert(`✅ تم توجيه العميل بنجاح إلى كشف ومواعيد (${docObj ? docObj.name : 'الطبيب'})!`);
+                alert(`🚨 تم توجيه العميل أوتوماتيكياً إلى صفحة كشف (${docObj ? docObj.name : 'الطبيب'})!`);
                 document.getElementById('appointmentForm').reset();
-                switchMainPage('dashboard');
+                openDoctorPortal(docId);
             });
         }
 
-        // عرض الجدول العام
         function renderMainTable() {
             const tbody = document.getElementById('tableBody');
             if (!tbody) return;
@@ -712,16 +858,32 @@
 
             filtered.forEach((r, idx) => {
                 const tr = document.createElement('tr');
+                const timeStr = new Date(r.createdAt).toLocaleString('ar-EG');
+                
                 tr.innerHTML = `
                     <td>${idx + 1}</td>
-                    <td style="font-size:0.75rem;">${new Date(r.createdAt).toLocaleString('ar-EG')}</td>
-                    <td><strong style="color:var(--primary-color);">${r.doctorName || 'غير محدد'}</strong></td>
-                    <td>${r.patientName}</td>
+                    <td style="font-size:0.72rem; white-space:nowrap;">${timeStr}</td>
+                    <td><span style="background:rgba(245, 158, 11, 0.2); color:var(--primary-color); padding:2px 6px; border-radius:4px; font-size:0.72rem;">${r.adminContactMethod || 'قيد الانتظار'}</span></td>
+                    <td><strong>${r.patientName}</strong></td>
                     <td style="font-family:Arial;">${r.patientPhone}</td>
-                    <td>${r.fileNumber}</td>
+                    <td>${r.fileNumber || '-'}</td>
+                    <td>${r.idNumber || '-'}</td>
+                    <td>${r.branch || 'معشي'}</td>
+                    <td><strong style="color:var(--primary-color);">${r.doctorName || '-'}</strong></td>
                     <td>${r.procedureType}</td>
-                    <td>${r.serviceRequired}</td>
+                    <td>${r.paymentStatus || 'غير محدد'}</td>
+                    <td>${r.contactMethod || 'اتصال'}</td>
+                    <td><div style="max-width:200px; white-space:pre-wrap; font-size:0.78rem;">${r.serviceRequired}</div></td>
                     <td>${r.coordinatorName}</td>
+                    <td>
+                        <select class="table-input" onchange="updateAdminContact('${r.firebaseKey}', this.value)">
+                            <option value="قيد الانتظار" ${r.adminContactMethod==='قيد الانتظار'?'selected':''}>قيد الانتظار</option>
+                            <option value="قيد الإجراء" ${r.adminContactMethod==='قيد الإجراء'?'selected':''}>قيد الإجراء</option>
+                            <option value="تم التواصل" ${r.adminContactMethod==='تم التواصل'?'selected':''}>تم التواصل ✅</option>
+                            <option value="اعتذر" ${r.adminContactMethod==='اعتذر'?'selected':''}>اعتذر ❌</option>
+                        </select>
+                    </td>
+                    <td><textarea class="admin-action-textarea" onblur="updateAdminAction('${r.firebaseKey}', this.value)" placeholder="إجراء الإدارة...">${r.actionTaken || ''}</textarea></td>
                     <td>
                         <button onclick="deleteRecord('${r.firebaseKey}')" style="background:var(--danger-color); color:#fff; border:none; padding:3px 6px; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -730,7 +892,24 @@
             });
         }
 
-        // عرض صفحة الكشف الخاصة بالطبيب المختار
+        function updateAdminContact(key, val) { dbRef.child(key).update({ adminContactMethod: val }); }
+        function updateAdminAction(key, val) { dbRef.child(key).update({ actionTaken: val }); }
+
+        function updateDailyProgress() {
+            const now = new Date().toDateString();
+            const todayRecords = records.filter(r => new Date(r.createdAt).toDateString() === now);
+            const total = todayRecords.length;
+            if (total === 0) {
+                document.getElementById('progressText').innerText = '0% (0 من 0)';
+                document.getElementById('progressBarFill').style.width = '0%';
+                return;
+            }
+            const completed = todayRecords.filter(r => r.adminContactMethod === 'تم التواصل' || (r.actionTaken && r.actionTaken.trim() !== '')).length;
+            const pct = Math.round((completed / total) * 100);
+            document.getElementById('progressText').innerText = `${pct}% (${completed} من ${total} حالات مُنجزة اليوم)`;
+            document.getElementById('progressBarFill').style.width = `${pct}%`;
+        }
+
         function renderDoctorPortal() {
             if (!activeDoctorId) return;
             const container = document.getElementById('doctorClientReportList');
@@ -741,21 +920,20 @@
 
             const searchVal = document.getElementById('docSearchInput')?.value.toLowerCase() || '';
             if (searchVal) {
-                docRecords = docRecords.filter(r => r.patientName?.toLowerCase().includes(searchVal) || r.patientPhone?.includes(searchVal));
+                docRecords = docRecords.filter(r => r.patientName?.toLowerCase().includes(searchVal) || r.patientPhone?.includes(searchVal) || r.fileNumber?.includes(searchVal));
             }
 
             docRecords.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-            // تحديث مؤشرات أداء الطبيب
-            let pinnedCount = docRecords.filter(r => { let st = localClientStates[r.firebaseKey] || {}; return st.isPinned; }).length;
-            let copiedCount = docRecords.filter(r => { let st = localClientStates[r.firebaseKey] || {}; return st.isCopied; }).length;
+            let pinnedCount = docRecords.filter(r => localClientStates[r.firebaseKey]?.isPinned).length;
+            let paidCount = docRecords.filter(r => r.paymentStatus === 'تم الدفع').length;
 
             document.getElementById('doc-kpi-total').innerText = docRecords.length;
             document.getElementById('doc-kpi-pinned').innerText = pinnedCount;
-            document.getElementById('doc-kpi-copied').innerText = copiedCount;
+            document.getElementById('doc-kpi-paid').innerText = paidCount;
 
             if (docRecords.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد حالات موجهة لهذا الطبيب حالياً.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد حالات موجهة لصفحة هذا الطبيب حالياً.</div>';
                 return;
             }
 
@@ -775,8 +953,8 @@
                         <span>${index + 1}- ${item.patientName}${fileStr}</span>
                         <span class="client-datetime-badge"><i class="fa-regular fa-clock"></i> ${dateTimeStr}</span>
                     </div>
-                    <div style="font-size:0.8rem;"><strong>الجوال:</strong> ${item.patientPhone} | <strong>الإجراء:</strong> ${item.procedureType}</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">${item.serviceRequired}</div>
+                    <div style="font-size:0.8rem;"><strong>الجوال:</strong> ${item.patientPhone} | <strong>الإجراء:</strong> ${item.procedureType} ${item.paymentStatus ? `| <span style="color:var(--primary-color);">${item.paymentStatus}</span>` : ''}</div>
+                    <div style="font-size:0.82rem; color:var(--text-main); line-height:1.3;">${item.serviceRequired}</div>
                     <div style="display:flex; gap:6px; margin-top:4px;">
                         <button class="copied-btn" style="background:${isPinned?'#d97706':'#3f3f46'};" onclick="togglePin('${item.firebaseKey}')">
                             📌 ${isPinned?'مميز':'تثبيت'}
@@ -808,14 +986,11 @@
             updateGlobalKPIs();
         }
 
-        // نسخ كشف الطبيب المختار منظماً
         function copyDoctorClientReport() {
             if (!activeDoctorId) return;
             let docRecords = records.filter(r => r.doctorId === activeDoctorId && !(localClientStates[r.firebaseKey]?.isCopied));
 
-            if (docRecords.length === 0) {
-                return alert('لا توجد حالات جديدة غير منسوخة لهذا الطبيب!');
-            }
+            if (docRecords.length === 0) return alert(' جميع الحالات المتاحة تم وضع علامة تم النسخ عليها سابقاً!');
 
             const docObj = doctors.find(d => d.id === activeDoctorId);
             let text = `📋 **كشف مواعيد ${docObj?.name || 'الطبيب'}:**\n\n`;
@@ -833,9 +1008,7 @@
             renderDoctorPortal();
             updateGlobalKPIs();
 
-            navigator.clipboard.writeText(text.trim()).then(() => {
-                alert('✅ تم نسخ كشف الطبيب مرتباً بنجاح!');
-            });
+            navigator.clipboard.writeText(text.trim()).then(() => alert('✅ تم نسخ كشف الطبيب مرتباً بنجاح!'));
         }
 
         function resetDoctorCopiedStatus() {
@@ -846,18 +1019,101 @@
             saveLocalStates();
             renderDoctorPortal();
             updateGlobalKPIs();
-            alert('🔄 تم إعادة ضبط حالة النسخ لحالات هذا الطبيب.');
+            alert('🔄 تم إعادة ضبط حالة النسخ.');
         }
 
         function updateGlobalKPIs() {
             document.getElementById('kpi-total').innerText = records.length;
-            let pinned = records.filter(r => localClientStates[r.firebaseKey]?.isPinned).length;
-            let copied = records.filter(r => localClientStates[r.firebaseKey]?.isCopied).length;
-            document.getElementById('kpi-pinned').innerText = pinned;
-            document.getElementById('kpi-copied').innerText = copied;
+            document.getElementById('kpi-pinned').innerText = records.filter(r => localClientStates[r.firebaseKey]?.isPinned).length;
+            document.getElementById('kpi-paid').innerText = records.filter(r => r.paymentStatus === 'تم الدفع').length;
+            document.getElementById('kpi-plants').innerText = records.filter(r => r.procedureType && r.procedureType.includes('زراعة')).length;
+            document.getElementById('kpi-extractions').innerText = records.filter(r => r.procedureType && r.procedureType.includes('خلع')).length;
         }
 
-        // وظائف الأطباء الإضافية
+        // التصدير والاستيراد (Excel & JSON)
+        function exportToExcel() {
+            const exportData = records.map(r => ({
+                'اسم العميل': r.patientName || '',
+                'رقم الجوال': r.patientPhone || '',
+                'رقم الملف': r.fileNumber || '',
+                'رقم الهوية': r.idNumber || '',
+                'الفرع': r.branch || 'معشي',
+                'الطبيب المعالج': r.doctorName || '',
+                'نوع الإجراء': r.procedureType || '',
+                'حالة الدفع': r.paymentStatus || '',
+                'طريقة التواصل': r.contactMethod || '',
+                'تفاصيل الطلب': r.serviceRequired || '',
+                'اسم المنسق': r.coordinatorName || '',
+                'وقت الإضافة': r.createdAt || ''
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "المواعيد");
+            XLSX.writeFile(workbook, `Appointments_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function exportToJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
+            const a = document.createElement('a'); a.href = dataStr; a.download = `Appointments_Backup.json`; a.click();
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const fileName = file.name.toLowerCase();
+
+            if (fileName.endsWith('.json')) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    try {
+                        const imported = JSON.parse(evt.target.result);
+                        if (Array.isArray(imported)) {
+                            imported.forEach(item => {
+                                delete item.firebaseKey;
+                                dbRef.push(item);
+                            });
+                            alert('✅ تم استيراد وحفظ ملف JSON بالسحابة بنجاح!');
+                        }
+                    } catch(err) { alert('خطأ في قراءة ملف JSON'); }
+                };
+                reader.readAsText(file);
+            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    try {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonSheet = XLSX.utils.sheet_to_json(sheet);
+
+                        if (Array.isArray(jsonSheet) && jsonSheet.length > 0) {
+                            jsonSheet.forEach(row => {
+                                const newRec = {
+                                    patientName: row.patientName || row['اسم العميل'] || 'بدون اسم',
+                                    patientPhone: row.patientPhone || row['رقم الجوال'] || '-',
+                                    fileNumber: row.fileNumber || row['رقم الملف'] || '-',
+                                    idNumber: row.idNumber || row['رقم الهوية'] || '-',
+                                    branch: row.branch || row['الفرع'] || 'معشي',
+                                    doctorName: row.doctorName || row['الطبيب المعالج'] || 'طبيب عام',
+                                    procedureType: row.procedureType || row['نوع الإجراء'] || 'مراجعه',
+                                    paymentStatus: row.paymentStatus || row['حالة الدفع'] || '',
+                                    contactMethod: row.contactMethod || row['طريقة التواصل'] || 'اتصال',
+                                    serviceRequired: row.serviceRequired || row['تفاصيل الطلب'] || '-',
+                                    coordinatorName: row.coordinatorName || row['اسم المنسق'] || 'مسؤول',
+                                    createdAt: row.createdAt || row['وقت الإضافة'] || new Date().toISOString()
+                                };
+                                dbRef.push(newRec);
+                            });
+                            alert('✅ تم استيراد وحفظ ملف Excel بالسحابة بنجاح!');
+                        }
+                    } catch(err) { alert('خطأ في قراءة ملف Excel'); }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            e.target.value = false;
+        }
+
+        // الأطباء والتنبيهات والدليل
         function openAddDoctorModal() { document.getElementById('addDoctorModal').classList.add('open'); }
         function closeAddDoctorModal() { document.getElementById('addDoctorModal').classList.remove('open'); }
         function saveNewDoctor() {
@@ -866,14 +1122,101 @@
             if (!name) return alert('يرجى كتابة اسم الطبيب');
 
             doctorsRef.push({ name, spec }).then(() => {
-                alert('✨ تم إضافة الطبيب بنجاح وتفعيل كشفه الخاص!');
+                alert('✨ تم إضافة الطبيب وتفعيل كشفه الخاص!');
                 document.getElementById('newDocName').value = '';
                 document.getElementById('newDocSpec').value = '';
                 closeAddDoctorModal();
             });
         }
 
-        // الدليل الشامل
+        function openAddAnnouncementModal() {
+            document.getElementById('editAnnouncementKey').value = '';
+            document.getElementById('announcementText').value = '';
+            document.getElementById('announcementFile').value = '';
+            document.getElementById('removeFileFlag').value = 'false';
+            document.getElementById('currentFileStatusWrapper').style.display = 'none';
+            document.getElementById('announcementModal').classList.add('open');
+        }
+
+        function closeAnnouncementModal() { document.getElementById('announcementModal').classList.remove('open'); }
+
+        function saveAnnouncementItem(e) {
+            e.preventDefault();
+            const key = document.getElementById('editAnnouncementKey').value;
+            const textVal = document.getElementById('announcementText').value.trim();
+            const fileInput = document.getElementById('announcementFile');
+            const shouldRemoveFile = document.getElementById('removeFileFlag').value === 'true';
+
+            if (!textVal) return;
+
+            const processAndSave = (fileUrl, fileType, fileName) => {
+                const dataObj = { text: textVal, createdAt: new Date().toISOString() };
+                if (shouldRemoveFile) {
+                    dataObj.fileUrl = ''; dataObj.fileType = ''; dataObj.fileName = '';
+                } else if (fileUrl) {
+                    dataObj.fileUrl = fileUrl; dataObj.fileType = fileType; dataObj.fileName = fileName;
+                }
+
+                if (key) announcementsRef.child(key).update(dataObj);
+                else announcementsRef.push(dataObj);
+
+                closeAnnouncementModal();
+                alert('📢 تم حفظ ونشر التنبيه بنجاح!');
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = (evt) => processAndSave(evt.target.result, file.type, file.name);
+                reader.readAsDataURL(file);
+            } else {
+                processAndSave(null, null, null);
+            }
+        }
+
+        function renderAnnouncements() {
+            const container = document.getElementById('announcementsListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            announcements.forEach(a => {
+                const card = document.createElement('div');
+                card.className = 'announcement-card';
+
+                let fileHTML = '';
+                if (a.fileUrl) {
+                    if (a.fileType && a.fileType.startsWith('image/')) {
+                        fileHTML = `<div class="announcement-thumbnail-wrapper" onclick="openImagePreview('${a.fileUrl}')"><img src="${a.fileUrl}"></div>`;
+                    } else {
+                        fileHTML = `<a href="${a.fileUrl}" download="${a.fileName || 'file'}" class="announcement-file-btn"><i class="fa-solid fa-file-pdf"></i> ${a.fileName || 'تحميل الملف'}</a>`;
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="announcement-body-content">
+                        <div class="announcement-body-text">${a.text}</div>${fileHTML}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
+                        <span>${new Date(a.createdAt || Date.now()).toLocaleString('ar-EG')}</span>
+                        <button onclick="deleteAnnouncement('${a.annKey}')" style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-weight:700;">حذف</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteAnnouncement(key) {
+            if (confirm('هل أنت متأكد من حذف هذا التنبيه؟')) {
+                announcementsRef.child(key).remove();
+            }
+        }
+
+        function openImagePreview(url) {
+            document.getElementById('previewFullImageTag').src = url;
+            document.getElementById('imagePreviewModal').classList.add('open');
+        }
+        function closeImagePreviewModal() { document.getElementById('imagePreviewModal').classList.remove('open'); }
+
         function openAddLinkModal() { document.getElementById('linkModal').classList.add('open'); }
         function closeLinkModal() { document.getElementById('linkModal').classList.remove('open'); }
         function saveLinkItem() {
@@ -898,31 +1241,8 @@
             });
         }
 
-        // التنبيهات
-        function openAddAnnouncementModal() { document.getElementById('announcementModal').classList.add('open'); }
-        function closeAnnouncementModal() { document.getElementById('announcementModal').classList.remove('open'); }
-        function saveAnnouncementItem() {
-            const text = document.getElementById('announcementText').value.trim();
-            if (!text) return;
-            announcementsRef.push({ text, date: new Date().toISOString() }).then(() => {
-                closeAnnouncementModal();
-                document.getElementById('announcementText').value = '';
-            });
-        }
-        function renderAnnouncements() {
-            const container = document.getElementById('announcementsListContainer');
-            if (!container) return;
-            container.innerHTML = '';
-            announcements.forEach(a => {
-                const item = document.createElement('div');
-                item.className = 'announcement-card';
-                item.innerHTML = `<span><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i> ${a.text}</span><span style="font-size:0.7rem; color:var(--text-muted);">${new Date(a.date).toLocaleDateString('ar-EG')}</span>`;
-                container.appendChild(item);
-            });
-        }
-
         function deleteRecord(key) {
-            if (confirm('هل أنت متأكد من حذف هذا السجل نهائياً؟')) {
+            if (confirm('هل أنت متأكد من حذف هذا الموعد والعميل؟')) {
                 dbRef.child(key).remove();
             }
         }
