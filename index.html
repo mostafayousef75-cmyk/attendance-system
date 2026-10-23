@@ -3,162 +3,719 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام بصمة العمل عن بُعد - العيادة</title>
+    <title>مجمع ماجستي الطبي - النظام الإداري المطور للمواعيد والكشف</title>
+    
+    <!-- خط Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- المكتبات الخارجية: Excel + Firebase -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; direction: rtl; color: #333; }
-        .container { max-width: 950px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
-        .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; margin-bottom: 35px; }
-        .agent-card { background: #fafbfc; padding: 18px; border-radius: 10px; text-align: center; border: 1px solid #e1e8ed; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .agent-card h3 { margin-bottom: 10px; color: #007bff; font-size: 18px; }
-        .timer-display { font-size: 22px; font-weight: bold; color: #e67e22; margin: 12px 0; background: #fff5e6; padding: 8px; border-radius: 6px; }
-        button { width: 100%; background: #28a745; color: white; border: none; padding: 10px; margin: 5px 0; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; }
-        button.break { background: #ffc107; color: #333; }
-        button.back { background: #17a2b8; }
-        button.out { background: #dc3545; }
-        button:hover { opacity: 0.9; }
-        
-        .report-section { margin-top: 30px; }
-        .report-section h3 { border-bottom: 2px solid #007bff; padding-bottom: 8px; color: #2c3e50; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #e1e8ed; padding: 12px; text-align: center; font-size: 14px; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
+        :root {
+            --font-family: 'Tajawal', sans-serif;
+            --bg-base: #080c14;
+            --bg-surface: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #050811;
+            --border-color: #1e293b;
+            
+            --gold-primary: #f59e0b;
+            --gold-hover: #d97706;
+            --gold-light: rgba(245, 158, 11, 0.15);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+
+            --accent-purple: #8b5cf6;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+
+            --radius-lg: 14px;
+            --radius-md: 8px;
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        body.theme-gold {
+            --bg-base: #050505;
+            --bg-surface: #0d0d0d;
+            --bg-card: #141414;
+            --bg-sidebar: #000000;
+            --border-color: #262626;
+            --gold-primary: #d97706;
+            --gold-hover: #b45309;
+        }
+
+        body.theme-emerald {
+            --bg-base: #022c22;
+            --bg-surface: #064e3b;
+            --bg-card: #042f2e;
+            --bg-sidebar: #012019;
+            --border-color: #0f766e;
+            --gold-primary: #10b981;
+            --gold-hover: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            direction: rtl;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-primary); border-radius: 4px; }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 15px;
+            position: fixed;
+            top: 0; bottom: 0; right: 0;
+            z-index: 2000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-info { display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--gold-primary), #7c3aed);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; color: #fff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .brand-text h2 { font-size: 1.05rem; font-weight: 800; color: var(--text-main); }
+        .brand-text p { font-size: 0.75rem; color: var(--gold-primary); font-weight: 600; }
+
+        .sidebar-menu { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+        .menu-category { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin: 10px 8px 4px; }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 12px;
+            color: var(--text-muted); padding: 12px 14px;
+            border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; border: 1px solid transparent; text-decoration: none;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.04); color: var(--text-main); }
+        .menu-item.active {
+            background: linear-gradient(90deg, var(--gold-light), transparent);
+            color: var(--gold-primary); border-right: 4px solid var(--gold-primary);
+        }
+
+        .main-wrapper {
+            margin-right: 280px; flex: 1;
+            display: flex; flex-direction: column; width: calc(100% - 280px);
+        }
+
+        .top-header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px; display: flex;
+            justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .global-announcement-bar {
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), rgba(139, 92, 246, 0.15));
+            border: 1px solid var(--gold-primary);
+            border-radius: var(--radius-md);
+            padding: 10px 15px; margin: 12px 15px 0;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .announcement-text { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+        .content-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .page-view { display: flex; flex-direction: column; gap: 15px; }
+        .hidden { display: none !important; }
+
+        .card-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px; box-shadow: var(--shadow-glass);
+        }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .kpi-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 12px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .kpi-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: var(--gold-light); color: var(--gold-primary);
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        .kpi-val { font-size: 1.1rem; font-weight: 800; }
+        .kpi-lbl { font-size: 0.72rem; color: var(--text-muted); }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group.full { grid-column: 1 / -1; }
+        .input-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+        .input-group input, .input-group select, .input-group textarea {
+            background: var(--bg-base); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 8px 12px;
+            color: var(--text-main); font-family: var(--font-family); font-size: 0.85rem; outline: none;
+        }
+        .input-group input:focus, .input-group select:focus { border-color: var(--gold-primary); }
+
+        .btn {
+            padding: 8px 16px; border-radius: var(--radius-md); border: none;
+            font-family: var(--font-family); font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-gold { background: var(--gold-primary); color: #000; }
+        .btn-gold:hover { background: var(--gold-hover); }
+        .btn-dark { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-danger { background: var(--danger-color); color: #fff; }
+        .btn-success { background: var(--success-color); color: #fff; }
+
+        /* صفحة الكشف التفاعلية */
+        .doctor-tabs-header { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        .doc-tab {
+            padding: 8px 16px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-muted); font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+        }
+        .doc-tab.active { background: var(--gold-primary); color: #000; border-color: var(--gold-primary); }
+
+        .client-cards-container { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .client-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 10px 14px;
+            display: flex; flex-direction: column; gap: 6px; position: relative;
+        }
+        .client-card.is-copied { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.3); }
+        .client-card.is-pinned { border-right: 4px solid var(--gold-primary); }
+
+        .client-card-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .client-name { font-size: 0.9rem; font-weight: 800; color: var(--text-main); }
+        .client-time { font-size: 0.7rem; color: var(--gold-primary); background: var(--gold-light); padding: 2px 6px; border-radius: 4px; }
+
+        .client-card-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+        .client-actions { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+
+        /* الدليل الشامل */
+        .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+        .link-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:3000; justify-content:center; align-items:center; padding: 15px; }
+        .modal.open { display: flex; }
+        .modal-content { background: var(--bg-surface); border-radius: var(--radius-lg); width: 100%; max-width: 500px; padding: 20px; border: 1px solid var(--border-color); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-wrapper { margin-right: 0; width: 100%; }
+        }
     </style>
 </head>
-<body>
+<body class="theme-gold">
 
-<div class="container">
-    <h2>🌐 نظام بصمة العيادة عن بُعد (مع عداد الوقت الفعلي)</h2>
-    
-    <div class="agents-grid" id="agentsGrid">
-        <!-- كروت الموظفين -->
-    </div>
-
-    <div class="report-section">
-        <h3>📊 سجل الحركات والتقارير</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>التاريخ</th>
-                    <th>اسم الموظف</th>
-                    <th>الإجراء</th>
-                    <th>الوقت</th>
-                </tr>
-            </thead>
-            <tbody id="logTableBody">
-                <!-- السجلات -->
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    const agents = ["مصطفى", "أمينة", "مؤمن", "وهبة"];
-    let timers = JSON.parse(localStorage.getItem("remote_clinicTimers")) || {};
-    let logs = JSON.parse(localStorage.getItem("remote_clinicLogs")) || [];
-
-    const grid = document.getElementById("agentsGrid");
-    const logTable = document.getElementById("logTableBody");
-
-    function renderApp() {
-        grid.innerHTML = "";
-        agents.forEach(agent => {
-            let state = timers[agent] || { status: "مغادر", seconds: 0, active: false };
-            let timeFormatted = formatTime(state.seconds);
-
-            grid.innerHTML += `
-                <div class="agent-card">
-                    <h3>👤 ${agent}</h3>
-                    <div style="font-size: 13px; color: #555;">الحالة: <b>${state.status}</b></div>
-                    <div class="timer-display" id="timer_${agent}">${timeFormatted}</div>
-                    <button onclick="agentAction('${agent}', 'تسجيل حضور 🟢')">🟢 حضور</button>
-                    <button class="break" onclick="agentAction('${agent}', 'استراحة ☕')">☕ استراحة</button>
-                    <button class="back" onclick="agentAction('${agent}', 'عودة ↩️')">↩️ عودة</button>
-                    <button class="out" onclick="agentAction('${agent}', 'خروج نهائي 🔴')">🔴 خروج</button>
+    <div class="app-layout">
+        
+        <!-- القائمة الجانبية -->
+        <aside class="sidebar" id="sidebar">
+            <div>
+                <div class="sidebar-header">
+                    <div class="brand-info">
+                        <div class="brand-icon"><i class="fa-solid fa-hospital"></i></div>
+                        <div class="brand-text">
+                            <h2>مجمع ماجستي</h2>
+                            <p>النظام الإداري المطور</p>
+                        </div>
+                    </div>
                 </div>
-            `;
+
+                <div class="sidebar-menu">
+                    <div class="menu-category">الصفحات الرئيسية</div>
+                    <div class="menu-item active" id="nav-main" onclick="switchPage('main')">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>إضافة عميل وتوجيه</span>
+                    </div>
+                    <div class="menu-item" id="nav-examination" onclick="switchPage('examination')">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <span>صفحة الكشف الشاملة</span>
+                    </div>
+                    
+                    <div class="menu-category">الأطباء والعيادات</div>
+                    <div id="doctorsNavList"></div>
+                    
+                    <div class="menu-category">الموارد</div>
+                    <div class="menu-item" id="nav-csguide" onclick="switchPage('csguide')">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <span>الدليل الشامل CS</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-dark" onclick="openAddDoctorModal()" style="width: 100%;">
+                <i class="fa-solid fa-user-doctor"></i> إضافة طبيب جديد
+            </button>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-wrapper">
+            
+            <header class="top-header">
+                <button class="btn btn-dark" onclick="toggleSidebar()" style="display: none;" id="mobileToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 id="pageTitle" style="font-size: 1.1rem; font-weight: 800;">إضافة عميل وتوجيه تلقائي</h1>
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--success-color); font-weight: 700;">🟢 متصل بالسحابة</span>
+                </div>
+            </header>
+
+            <!-- شريط التنبيهات العام -->
+            <div class="global-announcement-bar">
+                <div class="announcement-text">
+                    <i class="fa-solid fa-bullhorn" style="color: var(--gold-primary);"></i>
+                    <span id="announcementNoticeText">تنبيه العيادة: يرجى تأكيد مواعيد المراجعات قبل الحضور بـ 24 ساعة.</span>
+                </div>
+                <button class="btn btn-dark" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openAnnouncementModal()">تعديل</button>
+            </div>
+
+            <div class="content-body">
+                
+                <!-- 1. صفحة الرئيسية وإضافة العميل -->
+                <div id="page-main" class="page-view">
+                    <div class="card-box">
+                        <h2 style="font-size: 1rem; margin-bottom: 12px; color: var(--gold-primary);"><i class="fa-solid fa-user-plus"></i> تسجيل عميل جديد والتوجيه للطبيب</h2>
+                        <form id="addPatientForm" onsubmit="saveNewPatient(event)">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label>اسم العميل بالكامل *</label>
+                                    <input type="text" id="pName" required placeholder="مثال: محمد أحمد العتيبي">
+                                </div>
+                                <div class="input-group">
+                                    <label>رقم الجوال *</label>
+                                    <input type="tel" id="pPhone" required placeholder="05xxxxxxxx">
+                                </div>
+                                <div class="input-group">
+                                    <label>الطبيب المعالج *</label>
+                                    <select id="pDoctor" required></select>
+                                </div>
+                                <div class="input-group">
+                                    <label>رقم الملف الطبي</label>
+                                    <input type="text" id="pFile" placeholder="رقم الملف">
+                                </div>
+                                <div class="input-group">
+                                    <label>رقم الهوية / الإقامة</label>
+                                    <input type="text" id="pId" placeholder="رقم الهوية">
+                                </div>
+                                <div class="input-group">
+                                    <label>نوع الإجراء</label>
+                                    <select id="pProcedure">
+                                        <option value="مراجعه">مراجعة</option>
+                                        <option value="زراعة">زراعة</option>
+                                        <option value="خلع">خلع</option>
+                                        <option value="تقويم">تقويم</option>
+                                        <option value="تركيبات">تركيبات</option>
+                                        <option value="استفسارات">استفسارات</option>
+                                    </select>
+                                </div>
+                                <div class="input-group full">
+                                    <label>الخدمة المطلوبة / تفاصيل الطلب *</label>
+                                    <textarea id="pService" required rows="2" placeholder="اكتب تفاصيل الطلب..."></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-gold" style="margin-top: 12px; width: 100%;">
+                                <i class="fa-solid fa-share-from-square"></i> حفظ وتوجيه كشف العميل تلقائياً
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card-box">
+                        <h2 style="font-size: 1rem; margin-bottom: 12px;"><i class="fa-solid fa-chart-pie"></i> إحصائيات النظام الشاملة</h2>
+                        <div class="kpi-grid">
+                            <div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-users"></i></div><div><div class="kpi-val" id="kpiTotal">0</div><div class="kpi-lbl">إجمالي العملاء</div></div></div>
+                            <div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-star"></i></div><div><div class="kpi-val" id="kpiPinned">0</div><div class="kpi-lbl">المميزون 📌</div></div></div>
+                            <div class="kpi-card"><div class="kpi-icon"><i class="fa-solid fa-check-double"></i></div><div><div class="kpi-val" id="kpiCopied">0</div><div class="kpi-lbl">المنسوخون ✅</div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. صفحة الكشف الشاملة -->
+                <div id="page-examination" class="page-view hidden">
+                    <div class="card-box">
+                        <div class="doctor-tabs-header" id="doctorTabsHeader"></div>
+                        
+                        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <input type="text" id="examSearch" oninput="renderExamReport()" placeholder="بحث في الكشف..." style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 0.82rem;">
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-gold" onclick="copyFormattedReport()"><i class="fa-solid fa-copy"></i> نسخ الكشف المنسق</button>
+                                <button class="btn btn-dark" onclick="resetCopiedState()"><i class="fa-solid fa-rotate-left"></i> إعادة ضبط النسخ</button>
+                            </div>
+                        </div>
+
+                        <div class="client-cards-container" id="examCardsList"></div>
+                    </div>
+                </div>
+
+                <!-- 3. صفحة الدليل الشامل -->
+                <div id="page-csguide" class="page-view hidden">
+                    <div class="card-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2 style="font-size: 1rem;"><i class="fa-solid fa-book-bookmark"></i> الدليل الشامل لخدمة العملاء (CS)</h2>
+                            <button class="btn btn-gold" onclick="openAddLinkModal()"><i class="fa-solid fa-plus"></i> إضافة رابط</button>
+                        </div>
+                        <div class="links-grid" id="csLinksGrid"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- نافذة إضافة طبيب -->
+    <div class="modal" id="addDoctorModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 12px; color: var(--gold-primary);">إضافة طبيب جديد</h3>
+            <div class="input-group" style="margin-bottom: 10px;">
+                <label>اسم الطبيب *</label>
+                <input type="text" id="newDocName" placeholder="مثال: د. خالد">
+            </div>
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>التخصص *</label>
+                <input type="text" id="newDocSpec" placeholder="مثال: جراحة / جراحه وعصب">
+            </div>
+            <button class="btn btn-gold" onclick="saveNewDoctor()" style="width: 100%;">حفظ الطبيب</button>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة رابط للدليل -->
+    <div class="modal" id="addLinkModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 12px; color: var(--gold-primary);">إضافة رابط للدليل الشامل</h3>
+            <div class="input-group" style="margin-bottom: 10px;">
+                <label>العنوان *</label>
+                <input type="text" id="linkTitleInput" placeholder="اسم الموقع أو الخدمة">
+            </div>
+            <div class="input-group" style="margin-bottom: 10px;">
+                <label>الرابط (URL) *</label>
+                <input type="url" id="linkUrlInput" placeholder="https://...">
+            </div>
+            <button class="btn btn-gold" onclick="saveCSLink()" style="width: 100%;">حفظ الرابط</button>
+        </div>
+    </div>
+
+    <script>
+        // إعدادات Firebase
+        const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let doctors = [
+            { id: 'sami', name: 'د. سامي', spec: 'عام / زراعة' },
+            { id: 'abdullah', name: 'د. عبد الله', spec: 'تقويم' },
+            { id: 'mahmoud', name: 'د. محمود', spec: 'تركيبات' }
+        ];
+
+        let patients = [];
+        let csLinks = [];
+        let currentDocFilter = 'all';
+
+        // تحميل البيانات الأولي
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDoctorsUI();
+            loadLocalData();
+            syncWithFirebase();
         });
-        renderLogs();
-    }
 
-    function formatTime(totalSeconds) {
-        let hours = Math.floor(totalSeconds / 3600);
-        let minutes = Math.floor((totalSeconds % 3600) / 60);
-        let seconds = totalSeconds % 60;
-        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-    }
+        function loadLocalData() {
+            const cachedP = localStorage.getItem('majesty_patients');
+            if (cachedP) patients = JSON.parse(cachedP);
 
-    function pad(val) {
-        return val > 9 ? val : "0" + val;
-    }
+            const cachedD = localStorage.getItem('majesty_doctors');
+            if (cachedD) doctors = JSON.parse(cachedD);
 
-    function agentAction(agent, action) {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ar-EG');
-        const dateStr = now.toLocaleDateString('ar-EG');
+            const cachedL = localStorage.getItem('majesty_links');
+            if (cachedL) csLinks = JSON.parse(cachedL);
 
-        if (!timers[agent]) {
-            timers[agent] = { seconds: 0, status: "مغادر", active: false };
+            renderDoctorsUI();
+            renderExamReport();
+            renderCSLinks();
+            updateKPIs();
         }
 
-        if (action.includes('حضور')) {
-            timers[agent].status = "يعمل 🟢";
-            timers[agent].active = true;
-        } else if (action.includes('استراحة')) {
-            timers[agent].status = "في استراحة ☕";
-            timers[agent].active = false;
-        } else if (action.includes('عودة')) {
-            timers[agent].status = "يعمل 🟢";
-            timers[agent].active = true;
-        } else if (action.includes('خروج')) {
-            timers[agent].status = "خارج الدوام 🔴";
-            timers[agent].active = false;
-            timers[agent].seconds = 0;
+        function saveData() {
+            localStorage.setItem('majesty_patients', JSON.stringify(patients));
+            localStorage.setItem('majesty_doctors', JSON.stringify(doctors));
+            localStorage.setItem('majesty_links', JSON.stringify(csLinks));
         }
 
-        logs.unshift({ date: dateStr, agent: agent, action: action, time: timeStr });
-        localStorage.setItem("remote_clinicTimers", JSON.stringify(timers));
-        localStorage.setItem("remote_clinicLogs", JSON.stringify(logs));
-        renderApp();
-    }
+        function syncWithFirebase() {
+            db.ref('patients').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    patients = Object.keys(data).map(key => ({ fbKey: key, ...data[key] }));
+                    saveData();
+                    renderExamReport();
+                    updateKPIs();
+                }
+            });
+        }
 
-    // عداد الثواني التلقائي
-    setInterval(() => {
-        let updated = false;
-        agents.forEach(agent => {
-            if (timers[agent] && timers[agent].active) {
-                timers[agent].seconds++;
-                updated = true;
-                let el = document.getElementById(`timer_${agent}`);
-                if (el) el.innerText = formatTime(timers[agent].seconds);
+        function renderDoctorsUI() {
+            // قائمة القائمة الجانبية
+            const nav = document.getElementById('doctorsNavList');
+            nav.innerHTML = '';
+            doctors.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'menu-item';
+                item.innerHTML = `<i class="fa-solid fa-user-doctor"></i> <span>${d.name} (${d.spec})</span>`;
+                item.onclick = () => {
+                    switchPage('examination');
+                    filterDoctorCards(d.id);
+                };
+                nav.appendChild(item);
+            });
+
+            // قائمة خيارات النموذج
+            const select = document.getElementById('pDoctor');
+            select.innerHTML = '<option value="">اختر الطبيب المعالج...</option>';
+            doctors.forEach(d => {
+                select.innerHTML += `<option value="${d.id}">${d.name} - ${d.spec}</option>`;
+            });
+
+            // تبويبات صفحة الكشف
+            const tabs = document.getElementById('doctorTabsHeader');
+            tabs.innerHTML = `<button class="doc-tab ${currentDocFilter==='all'?'active':''}" onclick="filterDoctorCards('all')">كل الدكاترة</button>`;
+            doctors.forEach(d => {
+                tabs.innerHTML += `<button class="doc-tab ${currentDocFilter===d.id?'active':''}" onclick="filterDoctorCards('${d.id}')">${d.name}</button>`;
+            });
+        }
+
+        function switchPage(page) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+            if (document.getElementById(`nav-${page}`)) {
+                document.getElementById(`nav-${page}`).classList.add('active');
             }
-        });
-        if (updated) {
-            localStorage.setItem("remote_clinicTimers", JSON.stringify(timers));
         }
-    }, 1000);
 
-    function renderLogs() {
-        logTable.innerHTML = "";
-        if (logs.length === 0) {
-            logTable.innerHTML = `<tr><td colspan="4" style="color: #777;">لا توجد سجلات بعد</td></tr>`;
-            return;
+        function saveNewPatient(e) {
+            e.preventDefault();
+            const newP = {
+                id: 'p_' + Date.now(),
+                name: document.getElementById('pName').value.trim(),
+                phone: document.getElementById('pPhone').value.trim(),
+                docId: document.getElementById('pDoctor').value,
+                file: document.getElementById('pFile').value.trim() || '-',
+                nationalId: document.getElementById('pId').value.trim() || '-',
+                procedure: document.getElementById('pProcedure').value,
+                service: document.getElementById('pService').value.trim(),
+                createdAt: new Date().toISOString(),
+                isPinned: false,
+                isCopied: false
+            };
+
+            patients.unshift(newP);
+            saveData();
+            db.ref('patients').push(newP);
+
+            alert('تم تسجيل العميل بنجاح وتوجيهه لصفحة الكشف!');
+            document.getElementById('addPatientForm').reset();
+            renderExamReport();
+            updateKPIs();
         }
-        logs.forEach(log => {
-            logTable.innerHTML += `
-                <tr>
-                    <td>${log.date}</td>
-                    <td><b>${log.agent}</b></td>
-                    <td>${log.action}</td>
-                    <td>${log.time}</td>
-                </tr>
-            `;
-        });
-    }
 
-    renderApp();
-</script>
+        function filterDoctorCards(docId) {
+            currentDocFilter = docId;
+            renderDoctorsUI();
+            renderExamReport();
+        }
 
+        function renderExamReport() {
+            const list = document.getElementById('examCardsList');
+            list.innerHTML = '';
+
+            let filtered = [...patients];
+            if (currentDocFilter !== 'all') {
+                filtered = filtered.filter(p => p.docId === currentDocFilter);
+            }
+
+            const searchVal = document.getElementById('examSearch').value.toLowerCase();
+            if (searchVal) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchVal) || p.phone.includes(searchVal));
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);">لا يوجد عملاء حالياً في هذا الكشف.</div>';
+                return;
+            }
+
+            filtered.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.className = `client-card ${p.isCopied?'is-copied':''} ${p.isPinned?'is-pinned':''}`;
+                
+                const docObj = doctors.find(d => d.id === p.docId);
+                const docName = docObj ? docObj.name : 'غير محدد';
+
+                card.innerHTML = `
+                    <div class="client-card-top">
+                        <span class="client-name">${index+1}- ${p.name} (ملف: ${p.file})</span>
+                        <span class="client-time">🕒 ${new Date(p.createdAt).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <div class="client-card-body">
+                        <div><strong>الجوال:</strong> ${p.phone} | <strong>الطبيب:</strong> ${docName}</div>
+                        <div><strong>الخدمة المطلوبة:</strong> ${p.service}</div>
+                    </div>
+                    <div class="client-actions">
+                        <button class="btn ${p.isPinned?'btn-gold':'btn-dark'}" style="padding: 3px 8px; font-size: 0.72rem;" onclick="togglePin('${p.id}')">
+                            📌 ${p.isPinned?'مثبت':'تثبيت'}
+                        </button>
+                        <button class="btn ${p.isCopied?'btn-success':'btn-dark'}" style="padding: 3px 8px; font-size: 0.72rem;" onclick="toggleCopied('${p.id}')">
+                            ${p.isCopied?'✅ تم النسخ':'تعليم كمنسوخ'}
+                        </button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function togglePin(id) {
+            const p = patients.find(item => item.id === id);
+            if (p) {
+                p.isPinned = !p.isPinned;
+                saveData();
+                renderExamReport();
+                updateKPIs();
+            }
+        }
+
+        function toggleCopied(id) {
+            const p = patients.find(item => item.id === id);
+            if (p) {
+                p.isCopied = !p.isCopied;
+                saveData();
+                renderExamReport();
+                updateKPIs();
+            }
+        }
+
+        function copyFormattedReport() {
+            let filtered = patients.filter(p => !p.isCopied);
+            if (currentDocFilter !== 'all') {
+                filtered = filtered.filter(p => p.docId === currentDocFilter);
+            }
+
+            if (filtered.length === 0) return alert('لا يوجد عملاء جدد للنسخ!');
+
+            let text = `📋 **كشف المواعيد والعملاء:**\n\n`;
+            filtered.forEach((p, idx) => {
+                text += `${idx+1}- ${p.name} (ملف: ${p.file})\nرقم الجوال: ${p.phone}\n${p.service}\n\n`;
+                p.isCopied = true;
+            });
+
+            navigator.clipboard.writeText(text);
+            saveData();
+            renderExamReport();
+            updateKPIs();
+            alert('تم نسخ الكشف المنسق بنجاح!');
+        }
+
+        function resetCopiedState() {
+            patients.forEach(p => p.isCopied = false);
+            saveData();
+            renderExamReport();
+            updateKPIs();
+            alert('تمت إعادة ضبط حالة النسخ لجميع العملاء!');
+        }
+
+        function updateKPIs() {
+            document.getElementById('kpiTotal').innerText = patients.length;
+            document.getElementById('kpiPinned').innerText = patients.filter(p => p.isPinned).length;
+            document.getElementById('kpiCopied').innerText = patients.filter(p => p.isCopied).length;
+        }
+
+        // إدراج طبيب جديد
+        function openAddDoctorModal() { document.getElementById('addDoctorModal').classList.add('open'); }
+        function saveNewDoctor() {
+            const name = document.getElementById('newDocName').value.trim();
+            const spec = document.getElementById('newDocSpec').value.trim();
+            if (!name) return;
+
+            doctors.push({ id: 'doc_' + Date.now(), name, spec });
+            saveData();
+            renderDoctorsUI();
+            document.getElementById('addDoctorModal').classList.remove('open');
+        }
+
+        // الدليل الشامل
+        function openAddLinkModal() { document.getElementById('addLinkModal').classList.add('open'); }
+        function saveCSLink() {
+            const title = document.getElementById('linkTitleInput').value.trim();
+            const url = document.getElementById('linkUrlInput').value.trim();
+            if (!title || !url) return;
+
+            csLinks.push({ title, url });
+            saveData();
+            renderCSLinks();
+            document.getElementById('addLinkModal').classList.remove('open');
+        }
+
+        function renderCSLinks() {
+            const grid = document.getElementById('csLinksGrid');
+            grid.innerHTML = '';
+            csLinks.forEach(l => {
+                grid.innerHTML += `
+                    <div class="link-card">
+                        <strong><i class="fa-solid fa-link" style="color:var(--gold-primary);"></i> ${l.title}</strong>
+                        <a href="${l.url}" target="_blank" class="btn btn-gold" style="font-size:0.75rem; text-decoration:none;">فتح الرابط</a>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    </script>
 </body>
 </html>
