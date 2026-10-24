@@ -599,11 +599,11 @@
             padding: 6px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-base); color: var(--text-main); outline: none; font-family: var(--font-family); font-size: 0.85rem; width: 100%;
         }
         
-        /* جعل كافة خانات التكست أريا حرة التكبير والتصغير أفقياً ورأسياً */
+        /* إلغاء السحب اليدوي نهائياً لمنع الأخطاء أثناء السكروِل */
         textarea {
-            resize: both !important;
-            min-height: 55px;
-            overflow: auto;
+            resize: none !important;
+            overflow: hidden;
+            min-height: 40px;
         }
 
         .priority-checkbox {
@@ -750,7 +750,7 @@
         }
 
         table th, table td { 
-            padding: 2px 6px !important; 
+            padding: 4px 6px !important; 
             text-align: right; 
             border-bottom: 1px solid var(--border-color); 
             vertical-align: middle; 
@@ -828,48 +828,23 @@
             width: 100%; padding: 3px 5px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-base); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem;
         }
         
-        /* جعل مربع عمود "الخدمة / تفاصيل الطلب" حراً ومتحركاً وقابلاً للتكبير والتصغير من الزاوية */
-        textarea.service-cell-textarea {
-            width: 240px;
-            min-width: 120px;
-            height: 48px;
-            min-height: 32px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            padding: 3px 5px;
+        /* أسلوب التمدد التلقائي للخانات في الجدول */
+        textarea.auto-expand-input {
+            width: 230px;
+            min-width: 180px;
+            min-height: 36px;
+            padding: 4px 6px;
             background: var(--bg-base);
             border-radius: 5px;
             border: 1px solid var(--border-color);
             font-size: 0.78rem;
-            line-height: 1.25;
+            line-height: 1.3;
             color: var(--text-main);
             font-family: var(--font-family);
-            resize: both !important;
-            overflow: auto;
+            resize: none !important;
+            overflow: hidden;
             box-sizing: border-box;
-        }
-
-        /* جعل مربع عمود "إجراء الإدارة" حراً ومتحركاً وقابلاً للتكبير والتصغير من الزاوية */
-        textarea.admin-action-textarea {
-            width: 240px;
-            min-width: 120px;
-            height: 48px;
-            min-height: 32px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            padding: 3px 5px;
-            background: var(--bg-base);
-            border-radius: 5px;
-            border: 1px solid var(--border-color);
-            font-size: 0.78rem;
-            line-height: 1.25;
-            color: var(--text-main);
-            font-family: var(--font-family);
-            resize: both !important;
-            overflow: auto;
-            box-sizing: border-box;
+            display: block;
         }
 
         .client-name-cell {
@@ -1419,7 +1394,7 @@
                                 </div>
                                 <div class="input-field full-width">
                                     <label>الخدمة المطلوبة / تفاصيل المشكلة والطلب *</label>
-                                    <textarea id="serviceRequired" required placeholder="اكتب تفاصيل طلب العميل المشكلة أو الموعد المطلوب..."></textarea>
+                                    <textarea id="serviceRequired" required placeholder="اكتب تفاصيل طلب العميل المشكلة أو الموعد المطلوب..." oninput="autoExpandTextarea(this)"></textarea>
                                 </div>
                                 <div class="input-field full-width">
                                     <label class="priority-checkbox">
@@ -1635,7 +1610,7 @@
                 <div class="form-grid">
                     <div class="input-field full-width">
                         <label>نص التنبيه أو الملاحظة *</label>
-                        <textarea id="announcementText" required placeholder="اكتب التنبيه أو التحديث الجديد للعيادة هنا..."></textarea>
+                        <textarea id="announcementText" required placeholder="اكتب التنبيه أو التحديث الجديد للعيادة هنا..." oninput="autoExpandTextarea(this)"></textarea>
                     </div>
                     
                     <div class="input-field full-width">
@@ -1690,7 +1665,7 @@
                     </div>
                     <div class="input-field full-width">
                         <label>وصف مختصر</label>
-                        <textarea id="linkDesc" placeholder="اكتب وصفاً مختصراً للرابط والهدف منه..."></textarea>
+                        <textarea id="linkDesc" placeholder="اكتب وصفاً مختصراً للرابط والهدف منه..." oninput="autoExpandTextarea(this)"></textarea>
                     </div>
                 </div>
                 <button type="submit" class="submit-btn" style="margin-top: 12px;"><i class="fa-solid fa-floppy-disk"></i> حفظ الرابط</button>
@@ -1832,7 +1807,7 @@
                     </div>
                     <div class="input-field full-width">
                         <label>الخدمة المطلوبة / تفاصيل المشكلة والطلب *</label>
-                        <textarea id="editServiceRequired" required></textarea>
+                        <textarea id="editServiceRequired" required oninput="autoExpandTextarea(this)"></textarea>
                     </div>
                     <div class="input-field full-width">
                         <label class="priority-checkbox">
@@ -1901,6 +1876,13 @@
             } else {
                 appLayout.classList.toggle('sidebar-collapsed');
             }
+        }
+
+        /* دالة التمدد التلقائي للمربعات بناءً على حجم النصوص */
+        function autoExpandTextarea(el) {
+            if (!el) return;
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
         }
 
         function switchPage(page) {
@@ -2289,6 +2271,7 @@
 
             document.getElementById('announcementModalTitle').innerHTML = '<i class="fa-solid fa-pen"></i> تعديل تنبيه العيادة';
             document.getElementById('announcementModal').classList.add('open');
+            setTimeout(() => { autoExpandTextarea(document.getElementById('announcementText')); }, 50);
         }
 
         function removeAttachedFileInModal() {
@@ -2498,6 +2481,7 @@
 
             this.reset();
             document.getElementById('customProcedureWrapper').style.display = 'none';
+            autoExpandTextarea(document.getElementById('serviceRequired'));
             
             playBeepAndShowToast('⚠️ تم إضافة العميل والموعد بنجاح!');
         });
@@ -2763,7 +2747,7 @@
                     <td><span class="proc-badge ${procClass}">${proc}</span></td>
                     <td>${paymentBadgeHTML}</td>
                     <td><span style="font-weight: 600; font-size:0.78rem; color: var(--text-main);">${contactMethodVal}</span></td>
-                    <td><textarea class="service-cell-textarea" id="service_${record.firebaseKey}" placeholder="تفاصيل الطلب...">${record.serviceRequired || ''}</textarea></td>
+                    <td><textarea class="auto-expand-input" id="service_${record.firebaseKey}" placeholder="تفاصيل الطلب..." oninput="autoExpandTextarea(this)">${record.serviceRequired || ''}</textarea></td>
                     <td style="font-size:0.78rem;">${record.coordinatorName}</td>
                     <td>
                         <select class="table-input" id="adminContact_${record.firebaseKey}" onchange="handleContactChange('${record.firebaseKey}')">
@@ -2776,7 +2760,7 @@
                         </select>
                         <input type="text" class="table-input" id="adminOther_${record.firebaseKey}" placeholder="التفاصيل..." value="${otherDetail}" style="margin-top: 2px; ${selectVal === 'أخرى' ? '' : 'display:none;'}">
                     </td>
-                    <td><textarea class="admin-action-textarea" id="action_${record.firebaseKey}" placeholder="اكتب إجراء الإدارة هنا...">${record.actionTaken || ''}</textarea></td>
+                    <td><textarea class="auto-expand-input" id="action_${record.firebaseKey}" placeholder="اكتب إجراء الإدارة هنا..." oninput="autoExpandTextarea(this)">${record.actionTaken || ''}</textarea></td>
                     <td>
                         <div style="display:flex; gap:3px; align-items:center;">
                             <button class="btn-pin-action ${isPinned ? 'pinned' : ''}" onclick="requestTogglePinRecord('${record.firebaseKey}')" title="${isPinned ? 'إلغاء التثبيت' : 'تثبيت العميل'}"><i class="fa-solid fa-thumbtack"></i></button>
@@ -2787,6 +2771,12 @@
                     </td>
                 `;
                 tbody.appendChild(tr);
+
+                // ضبط ارتفاع التكست أريا فور إنشاء الصف بناءً على محتواه
+                setTimeout(() => {
+                    autoExpandTextarea(tr.querySelector(`#service_${record.firebaseKey}`));
+                    autoExpandTextarea(tr.querySelector(`#action_${record.firebaseKey}`));
+                }, 0);
             });
             filterTable();
         }
@@ -2858,6 +2848,7 @@
             document.getElementById('editIsRepeatedRequest').checked = originalEditRepeatedState;
 
             document.getElementById('editModal').classList.add('open');
+            setTimeout(() => { autoExpandTextarea(document.getElementById('editServiceRequired')); }, 50);
         }
 
         function closeEditModal() {
@@ -3116,6 +3107,7 @@
                 document.getElementById('linkDesc').value = item.desc || '';
                 document.getElementById('linkModalTitle').innerHTML = '<i class="fa-solid fa-pen"></i> تعديل بيانات الرابط';
                 document.getElementById('linkModal').classList.add('open');
+                setTimeout(() => { autoExpandTextarea(document.getElementById('linkDesc')); }, 50);
             });
         }
 
