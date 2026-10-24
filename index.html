@@ -598,7 +598,13 @@
         .input-field input, .input-field select, .input-field textarea {
             padding: 6px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-base); color: var(--text-main); outline: none; font-family: var(--font-family); font-size: 0.85rem; width: 100%;
         }
-        .input-field textarea { resize: vertical; min-height: 55px; }
+        
+        /* جعل كافة خانات التكست أريا حرة التكبير والتصغير أفقياً ورأسياً */
+        textarea {
+            resize: both !important;
+            min-height: 55px;
+            overflow: auto;
+        }
 
         .priority-checkbox {
             display: flex; 
@@ -822,35 +828,16 @@
             width: 100%; padding: 3px 5px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-base); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem;
         }
         
-        .service-cell-box {
+        /* جعل مربع عمود "الخدمة / تفاصيل الطلب" حراً ومتحركاً وقابلاً للتكبير والتصغير من الزاوية */
+        textarea.service-cell-textarea {
             width: 240px;
-            min-width: 240px;
-            max-width: 240px;
-            height: auto !important;
-            min-height: unset !important;
+            min-width: 120px;
+            height: 48px;
+            min-height: 32px;
             white-space: pre-wrap;
             word-break: break-word;
             overflow-wrap: break-word;
-            padding: 2px 5px;
-            background: var(--bg-base);
-            border-radius: 5px;
-            border: 1px solid var(--border-color);
-            font-size: 0.78rem;
-            line-height: 1.25;
-            color: var(--text-main);
-            box-sizing: border-box;
-        }
-
-        textarea.admin-action-textarea {
-            width: 240px;
-            min-width: 240px;
-            max-width: 240px;
-            height: auto !important;
-            min-height: 32px !important;
-            white-space: pre-wrap;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            padding: 2px 5px;
+            padding: 3px 5px;
             background: var(--bg-base);
             border-radius: 5px;
             border: 1px solid var(--border-color);
@@ -858,7 +845,30 @@
             line-height: 1.25;
             color: var(--text-main);
             font-family: var(--font-family);
-            resize: vertical;
+            resize: both !important;
+            overflow: auto;
+            box-sizing: border-box;
+        }
+
+        /* جعل مربع عمود "إجراء الإدارة" حراً ومتحركاً وقابلاً للتكبير والتصغير من الزاوية */
+        textarea.admin-action-textarea {
+            width: 240px;
+            min-width: 120px;
+            height: 48px;
+            min-height: 32px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            padding: 3px 5px;
+            background: var(--bg-base);
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            font-size: 0.78rem;
+            line-height: 1.25;
+            color: var(--text-main);
+            font-family: var(--font-family);
+            resize: both !important;
+            overflow: auto;
             box-sizing: border-box;
         }
 
@@ -2753,7 +2763,7 @@
                     <td><span class="proc-badge ${procClass}">${proc}</span></td>
                     <td>${paymentBadgeHTML}</td>
                     <td><span style="font-weight: 600; font-size:0.78rem; color: var(--text-main);">${contactMethodVal}</span></td>
-                    <td><div class="service-cell-box">${record.serviceRequired}</div></td>
+                    <td><textarea class="service-cell-textarea" id="service_${record.firebaseKey}" placeholder="تفاصيل الطلب...">${record.serviceRequired || ''}</textarea></td>
                     <td style="font-size:0.78rem;">${record.coordinatorName}</td>
                     <td>
                         <select class="table-input" id="adminContact_${record.firebaseKey}" onchange="handleContactChange('${record.firebaseKey}')">
@@ -2795,6 +2805,7 @@
 
         function saveAdminUpdate(key) {
             const actionVal = document.getElementById(`action_${key}`).value;
+            const serviceVal = document.getElementById(`service_${key}`) ? document.getElementById(`service_${key}`).value : undefined;
             let adminContactSelect = document.getElementById(`adminContact_${key}`).value;
             const otherInputVal = document.getElementById(`adminOther_${key}`).value.trim();
 
@@ -2806,6 +2817,7 @@
             let rec = records.find(r => r.firebaseKey === key);
             if (rec) { 
                 rec.actionTaken = actionVal; 
+                if (serviceVal !== undefined) rec.serviceRequired = serviceVal;
                 rec.adminContactMethod = adminContactSelect; 
                 rec.updatedAt = nowIso;
                 saveLocal(); 
@@ -2816,7 +2828,9 @@
             }
 
             if (navigator.onLine && !key.startsWith('local_')) {
-                dbRef.child(key).update({ actionTaken: actionVal, adminContactMethod: adminContactSelect, updatedAt: nowIso });
+                const updateData = { actionTaken: actionVal, adminContactMethod: adminContactSelect, updatedAt: nowIso };
+                if (serviceVal !== undefined) updateData.serviceRequired = serviceVal;
+                dbRef.child(key).update(updateData);
             }
             alert('تم التحديث بنجاح وتسجيل وقت التعديل!');
         }
@@ -3571,7 +3585,6 @@
             });
 
             navigator.clipboard.writeText(reportText.trim()).then(() => {
-                // تحديث وتحويل المنسوخين تلقائياً إلى "تم النسخ"
                 keysToMarkAsCopied.forEach(k => {
                     let s = localClientStates[k] || {};
                     s.isCopied = true;
