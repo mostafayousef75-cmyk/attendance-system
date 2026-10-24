@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مجمع ماجستي الطبي - المنظومة الطبية الموحدة للأطباء</title>
+    <title>مجمع ماجستي الطبي - المنظومة الموحدة للأطباء وإدارة المواعيد</title>
     
     <!-- خط Tajawal الراقي -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
     <style>
         :root {
             --font-family: 'Tajawal', sans-serif;
-            --bg-base: #090d16;
+            --bg-base: #0a0e17;
             --bg-surface: #111827;
             --bg-card: #1f2937;
             --bg-sidebar: #030712;
@@ -29,8 +29,8 @@
             --text-muted: #9ca3af;
             --border-color: #1f2937;
             
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
             --accent-gold: #f59e0b;
             --accent-purple: #8b5cf6;
             --danger-color: #ef4444;
@@ -38,10 +38,10 @@
 
             --radius-lg: 12px;
             --radius-md: 8px;
-            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
         }
 
-        /* الثيمات الاحترافية الأربعة */
+        /* السيمات الأربعة الاحترافية */
         body.theme-amoled {
             --bg-base: #000000;
             --bg-surface: #0a0a0a;
@@ -90,12 +90,7 @@
             --primary-hover: #1d4ed8;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: all 0.2s ease;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.2s ease; }
 
         body {
             font-family: var(--font-family);
@@ -111,7 +106,7 @@
 
         .app-layout { display: flex; min-height: 100vh; width: 100%; }
 
-        /* القائمة الجانبية المنسقة */
+        /* القائمة الجانبية الاحترافية */
         .sidebar {
             width: 260px; background-color: var(--bg-sidebar); color: #fff;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -165,15 +160,20 @@
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
         .section-header h2 { font-size: 0.98rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
 
-        /* شريط التنبيهات والأخبار */
+        /* التنبيهات */
         .clinic-announcements-box {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.1));
             border: 1px solid var(--primary-color); border-radius: var(--radius-lg); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
         }
         .announcement-card {
             background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md);
             padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; border-right: 4px solid var(--accent-gold);
         }
+        .announcement-body-content { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .announcement-body-text { font-size: 0.85rem; color: var(--text-main); line-height: 1.35; white-space: pre-wrap; flex: 1; }
+        .announcement-thumbnail-wrapper { width: 45px; height: 45px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; flex-shrink: 0; background: #000; }
+        .announcement-thumbnail-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .announcement-file-btn { display: inline-flex; align-items: center; gap: 5px; background: rgba(37, 99, 235, 0.18); border: 1px solid rgba(37, 99, 235, 0.5); padding: 4px 8px; border-radius: 5px; color: #fff; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
 
         .kpi-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
         .kpi-card {
@@ -215,13 +215,20 @@
         .action-btn.copy-btn { background-color: #16a34a; }
         .action-btn.reset-copy-btn { background-color: #d97706; }
 
+        /* أزرار الإجراءات الفردية داخل الشيت والصفحات */
+        .icon-action-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .icon-action-btn:hover { background: var(--primary-color); color: #fff; }
+
         .table-container { max-height: 600px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
         table { width: 100%; border-collapse: collapse; font-size: 0.81rem; min-width: 1100px; }
         table th { background-color: var(--bg-base); color: var(--text-muted); font-weight: 800; position: sticky; top: 0; z-index: 10; padding: 6px; text-align: right; }
         table td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-main); vertical-align: middle; }
 
         .table-input { width: 100%; padding: 3px 5px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-base); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem; }
-        .admin-action-textarea { width: 220px; min-height: 30px; padding: 2px 5px; background: var(--bg-base); border-radius: 5px; border: 1px solid var(--border-color); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem; resize: vertical; }
+        .admin-action-textarea { width: 200px; min-height: 30px; padding: 2px 5px; background: var(--bg-base); border-radius: 5px; border: 1px solid var(--border-color); color: var(--text-main); font-family: var(--font-family); font-size: 0.78rem; resize: vertical; }
 
         .client-report-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .client-card-wrapper { background-color: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
@@ -388,7 +395,7 @@
                                         <th>الخدمة / تفاصيل الطلب</th>
                                         <th>المنسق</th>
                                         <th style="min-width: 140px;">تواصل الإدارة</th>
-                                        <th style="min-width: 220px;">إجراء الإدارة</th>
+                                        <th style="min-width: 200px;">إجراء الإدارة</th>
                                         <th>إجراءات</th>
                                     </tr>
                                 </thead>
@@ -405,11 +412,12 @@
                             <h2><i class="fa-solid fa-user-plus"></i> إضافة عميل جديد والتوجيه أوتوماتيك للطبيب</h2>
                         </div>
                         <form id="appointmentForm" onsubmit="saveNewAppointment(event)">
+                            <input type="hidden" id="editRecordKey">
                             <div class="form-grid">
                                 <div class="input-field">
                                     <label>اختر الطبيب المعالج (توجيه أوتوماتيك) *</label>
                                     <select id="assignedDoctor" required onchange="handleDoctorSelectChange(this)">
-                                        <!-- تعبئة أوتوماتيكية باسم الطبيب الصافي -->
+                                        <!-- تعبئة أوتوماتيكية -->
                                     </select>
                                 </div>
                                 <div class="input-field">
@@ -473,12 +481,12 @@
                                     <textarea id="serviceRequired" required placeholder="اكتب تفاصيل طلب العميل..."></textarea>
                                 </div>
                             </div>
-                            <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> حفظ العميل وتوجيهه لكشف الطبيب أوتوماتيك</button>
+                            <button type="submit" class="submit-btn" id="submitFormBtn"><i class="fa-solid fa-floppy-disk"></i> حفظ العميل وتوجيهه لكشف الطبيب أوتوماتيك</button>
                         </form>
                     </section>
                 </div>
 
-                <!-- 3. صفحة الكشف والمواعيد الخاصة بكل طبيب -->
+                <!-- 3. صفحة الكشف والمواعيد الخاصة بكل طبيب بكل تفاصيلها -->
                 <div id="page-doctor-portal" class="page-view hidden">
                     <section class="dashboard-section">
                         <div class="section-header">
@@ -497,7 +505,7 @@
                             </div>
                             <div class="kpi-card" style="border-color: var(--accent-purple);">
                                 <div class="kpi-icon-box"><i class="fa-solid fa-star"></i></div>
-                                <div class="kpi-info"><h3>المميزون لديه</h3><span class="kpi-value" id="doc-kpi-pinned">0</span></div>
+                                <div class="kpi-info"><h3>المميزون لديه (📌)</h3><span class="kpi-value" id="doc-kpi-pinned">0</span></div>
                             </div>
                             <div class="kpi-card" style="border-color: var(--success-color);">
                                 <div class="kpi-icon-box"><i class="fa-solid fa-money-bill-wave"></i></div>
@@ -547,7 +555,7 @@
 
                 <div class="input-field" style="margin-bottom: 12px;">
                     <label><i class="fa-solid fa-paperclip"></i> إرفاق ملف أو صورة (PDF, صور, مستندات) (اختياري)</label>
-                    <div id="currentFileStatusWrapper" style="display: none; align-items: center; justify-content: space-between; background: rgba(59,130,246,0.1); border: 1px solid var(--primary-color); padding: 6px 10px; border-radius: 6px; margin-bottom: 6px;">
+                    <div id="currentFileStatusWrapper" style="display: none; align-items: center; justify-content: space-between; background: rgba(37, 99, 235, 0.1); border: 1px solid var(--primary-color); padding: 6px 10px; border-radius: 6px; margin-bottom: 6px;">
                         <span id="currentFileNameLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);"></span>
                         <button type="button" onclick="removeAttachedFileInModal()" style="background: var(--danger-color); color: #fff; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; cursor: pointer;">حذف الملف</button>
                     </div>
@@ -609,7 +617,7 @@
     </div>
 
     <script>
-        // إعدادات Firebase المباشرة
+        // إعدادات Firebase المباشرة بالرابط الخاص بك
         const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -618,7 +626,7 @@
         const linksRef = database.ref('cs_links');
         const announcementsRef = database.ref('announcements');
 
-        // الأطباء الافتراضيون (عرض الاسم صافياً)
+        // الأطباء الافتراضيون
         let doctors = [
             { id: 'sami', name: 'د. سامي', spec: 'زراعة وخلع' },
             { id: 'abdullah', name: 'د. عبد الله', spec: 'تقويم' },
@@ -632,11 +640,11 @@
 
         let localClientStates = {};
         try {
-            localClientStates = JSON.parse(localStorage.getItem('localClientStates_v5') || '{}');
+            localClientStates = JSON.parse(localStorage.getItem('localClientStates_v6') || '{}');
         } catch(e) { localClientStates = {}; }
 
         function saveLocalStates() {
-            localStorage.setItem('localClientStates_v5', JSON.stringify(localClientStates));
+            localStorage.setItem('localClientStates_v6', JSON.stringify(localClientStates));
         }
 
         const savedTheme = localStorage.getItem('theme') || 'theme-amoled';
@@ -789,10 +797,11 @@
 
         function saveNewAppointment(e) {
             e.preventDefault();
+            const editKey = document.getElementById('editRecordKey').value;
             const docId = document.getElementById('assignedDoctor').value;
             const docObj = doctors.find(d => d.id === docId);
 
-            const newRec = {
+            const recordData = {
                 patientName: document.getElementById('patientName').value.trim(),
                 patientPhone: document.getElementById('patientPhone').value.trim(),
                 fileNumber: document.getElementById('fileNumber').value.trim() || '-',
@@ -804,17 +813,49 @@
                 paymentStatus: document.getElementById('paymentStatus').value || '',
                 serviceRequired: document.getElementById('serviceRequired').value.trim(),
                 doctorId: docId,
-                doctorName: docObj ? docObj.name : 'طبيب عام',
-                createdAt: new Date().toISOString(),
-                actionTaken: '',
-                adminContactMethod: 'قيد الانتظار'
+                doctorName: docObj ? docObj.name : 'طبيب عام'
             };
 
-            dbRef.push(newRec).then(() => {
-                alert(`🚨 تم توجيه العميل أوتوماتيكياً إلى صفحة كشف (${docObj ? docObj.name : 'الطبيب'})!`);
-                document.getElementById('appointmentForm').reset();
-                openDoctorPortal(docId);
-            });
+            if (editKey) {
+                dbRef.child(editKey).update(recordData).then(() => {
+                    alert('✅ تم تعديل الموعد والحالة بنجاح!');
+                    document.getElementById('editRecordKey').value = '';
+                    document.getElementById('submitFormBtn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ العميل وتوجيهه لكشف الطبيب أوتوماتيك`;
+                    document.getElementById('appointmentForm').reset();
+                    switchMainPage('dashboard');
+                });
+            } else {
+                recordData.createdAt = new Date().toISOString();
+                recordData.actionTaken = '';
+                recordData.adminContactMethod = 'قيد الانتظار';
+
+                dbRef.push(recordData).then(() => {
+                    alert(`🚨 تم توجيه العميل أوتوماتيكياً إلى صفحة كشف (${docObj ? docObj.name : 'الطبيب'})!`);
+                    document.getElementById('appointmentForm').reset();
+                    openDoctorPortal(docId);
+                });
+            }
+        }
+
+        function editRecord(key) {
+            const r = records.find(rec => rec.firebaseKey === key);
+            if (!r) return;
+
+            document.getElementById('editRecordKey').value = key;
+            document.getElementById('assignedDoctor').value = r.doctorId || '';
+            document.getElementById('patientName').value = r.patientName || '';
+            document.getElementById('patientPhone').value = r.patientPhone || '';
+            document.getElementById('fileNumber').value = r.fileNumber !== '-' ? r.fileNumber : '';
+            document.getElementById('idNumber').value = r.idNumber !== '-' ? r.idNumber : '';
+            document.getElementById('branch').value = r.branch || 'معشي';
+            document.getElementById('contactMethod').value = r.contactMethod || 'اتصال';
+            document.getElementById('coordinatorName').value = r.coordinatorName || '';
+            document.getElementById('procedureType').value = r.procedureType || 'مراجعه';
+            document.getElementById('paymentStatus').value = r.paymentStatus || '';
+            document.getElementById('serviceRequired').value = r.serviceRequired || '';
+
+            document.getElementById('submitFormBtn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> تحديث بيانات الموعد`;
+            switchMainPage('intake');
         }
 
         function renderMainTable() {
@@ -861,7 +902,10 @@
                     </td>
                     <td><textarea class="admin-action-textarea" onblur="updateAdminAction('${r.firebaseKey}', this.value)" placeholder="إجراء الإدارة...">${r.actionTaken || ''}</textarea></td>
                     <td>
-                        <button onclick="deleteRecord('${r.firebaseKey}')" style="background:var(--danger-color); color:#fff; border:none; padding:3px 6px; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        <div style="display:flex; gap:4px;">
+                            <button class="icon-action-btn" onclick="editRecord('${r.firebaseKey}')" title="تعديل"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="icon-action-btn" style="color:var(--danger-color);" onclick="deleteRecord('${r.firebaseKey}')" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -899,7 +943,13 @@
                 docRecords = docRecords.filter(r => r.patientName?.toLowerCase().includes(searchVal) || r.patientPhone?.includes(searchVal) || r.fileNumber?.includes(searchVal));
             }
 
-            docRecords.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            // ترتيب الملاحظات: المميزون أولاً ثم الأحدث
+            docRecords.sort((a,b) => {
+                const aPinned = localClientStates[a.firebaseKey]?.isPinned ? 1 : 0;
+                const bPinned = localClientStates[b.firebaseKey]?.isPinned ? 1 : 0;
+                if (aPinned !== bPinned) return bPinned - aPinned;
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
 
             let pinnedCount = docRecords.filter(r => localClientStates[r.firebaseKey]?.isPinned).length;
             let paidCount = docRecords.filter(r => r.paymentStatus === 'تم الدفع').length;
@@ -925,19 +975,29 @@
                 const dateTimeStr = new Date(item.createdAt).toLocaleString('ar-EG');
 
                 card.innerHTML = `
-                    <div class="client-card-header">
-                        <span>${index + 1}- ${item.patientName}${fileStr}</span>
-                        <span class="client-datetime-badge"><i class="fa-regular fa-clock"></i> ${dateTimeStr}</span>
+                    <div class="client-card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><strong style="color:var(--primary-color);">${index + 1}- ${item.patientName}</strong>${fileStr}</span>
+                        <span style="font-size:0.72rem; background:rgba(37,99,235,0.2); color:var(--primary-color); padding:2px 6px; border-radius:4px;"><i class="fa-regular fa-clock"></i> ${dateTimeStr}</span>
                     </div>
-                    <div style="font-size:0.8rem;"><strong>الجوال:</strong> ${item.patientPhone} | <strong>الإجراء:</strong> ${item.procedureType} ${item.paymentStatus ? `| <span style="color:var(--primary-color);">${item.paymentStatus}</span>` : ''}</div>
-                    <div style="font-size:0.82rem; color:var(--text-main); line-height:1.3;">${item.serviceRequired}</div>
-                    <div style="display:flex; gap:6px; margin-top:4px;">
-                        <button class="copied-btn" style="background:${isPinned?'#d97706':'#3f3f46'};" onclick="togglePin('${item.firebaseKey}')">
-                            📌 ${isPinned?'مميز':'تثبيت'}
-                        </button>
-                        <button class="copied-btn ${isCopied?'active':''}" onclick="toggleCopied('${item.firebaseKey}')">
-                            <i class="fa-solid ${isCopied?'fa-circle-check':'fa-check'}"></i> ${isCopied?'تم النسخ':'تعليم كمنسوخ'}
-                        </button>
+                    <div style="font-size:0.8rem; margin-top:2px;">
+                        <strong>الجوال:</strong> ${item.patientPhone} | <strong>الإجراء:</strong> ${item.procedureType} 
+                        ${item.paymentStatus ? `| <span style="color:var(--success-color); font-weight:700;">${item.paymentStatus}</span>` : ''}
+                        | <strong>المنسق:</strong> ${item.coordinatorName}
+                    </div>
+                    <div style="font-size:0.83rem; color:var(--text-main); line-height:1.35; margin-top:2px;">${item.serviceRequired}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; border-top:1px solid var(--border-color); padding-top:6px;">
+                        <div style="display:flex; gap:6px;">
+                            <button class="copied-btn" style="background:${isPinned?'#d97706':'#3f3f46'};" onclick="togglePin('${item.firebaseKey}')">
+                                📌 ${isPinned?'مميز':'تثبيت'}
+                            </button>
+                            <button class="copied-btn ${isCopied?'active':''}" onclick="toggleCopied('${item.firebaseKey}')">
+                                <i class="fa-solid ${isCopied?'fa-circle-check':'fa-check'}"></i> ${isCopied?'تم النسخ':'تعليم كمنسوخ'}
+                            </button>
+                        </div>
+                        <div style="display:flex; gap:4px;">
+                            <button class="icon-action-btn" onclick="editRecord('${item.firebaseKey}')"><i class="fa-solid fa-pen-to-square"></i> تعديل</button>
+                            <button class="icon-action-btn" style="color:var(--danger-color);" onclick="deleteRecord('${item.firebaseKey}')"><i class="fa-solid fa-trash"></i> مسح</button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -966,7 +1026,7 @@
             if (!activeDoctorId) return;
             let docRecords = records.filter(r => r.doctorId === activeDoctorId && !(localClientStates[r.firebaseKey]?.isCopied));
 
-            if (docRecords.length === 0) return alert('جميع الحالات تم نسخها سابقاً!');
+            if (docRecords.length === 0) return alert('جميع الحالات المتاحة تم وضع علامة تم النسخ عليها سابقاً!');
 
             const docObj = doctors.find(d => d.id === activeDoctorId);
             let text = `📋 **كشف مواعيد ${docObj?.name || 'الطبيب'}:**\n\n`;
