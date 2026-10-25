@@ -1,356 +1,847 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="blue">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام إدارة الكول سنتر والمواعيد</title>
+  <title>مؤشر الأداء والمواعيد - الكول سنتر</title>
+  
   <!-- Bootstrap 5 RTL CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts - Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    /* الثيمات الأربعة المطلوبة */
+    /* CSS Variables & Themes Configuration */
     :root[data-theme="blue"] {
       --bg-main: #0B132B;
       --bg-card: #1C2541;
+      --bg-hover: #26345A;
       --text-main: #FFFFFF;
+      --text-muted: #A0AEC0;
       --accent-color: #3A86FF;
-      --border-color: #3A506B;
+      --accent-hover: #2563EB;
+      --border-color: #2A385B;
+      --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      --badge-bg: #2B3A67;
     }
     :root[data-theme="amoled"] {
       --bg-main: #000000;
       --bg-card: #121212;
+      --bg-hover: #1E1E1E;
       --text-main: #FFFFFF;
+      --text-muted: #9E9E9E;
       --accent-color: #00E676;
+      --accent-hover: #00B252;
       --border-color: #272727;
+      --card-shadow: 0 8px 24px rgba(0, 230, 118, 0.05);
+      --badge-bg: #1C2B22;
     }
     :root[data-theme="charcoal"] {
       --bg-main: #18191A;
       --bg-card: #242526;
+      --bg-hover: #3A3B3C;
       --text-main: #E4E6EB;
+      --text-muted: #B0B3B8;
       --accent-color: #4589FF;
+      --accent-hover: #2B6CB0;
       --border-color: #3E4042;
+      --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --badge-bg: #303336;
     }
     :root[data-theme="light"] {
       --bg-main: #F4F6F9;
       --bg-card: #FFFFFF;
-      --text-main: #212529;
+      --bg-hover: #F8F9FA;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
       --accent-color: #0D6EFD;
-      --border-color: #DEE2E6;
+      --accent-hover: #0B5ED7;
+      --border-color: #E2E8F0;
+      --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --badge-bg: #E2E8F0;
+    }
+
+    * {
+      font-family: 'Cairo', sans-serif;
     }
 
     body {
       background-color: var(--bg-main);
       color: var(--text-main);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      padding-bottom: 40px;
     }
-    .card {
+
+    /* Header Nav Styling */
+    .top-header {
       background-color: var(--bg-card);
+      border-bottom: 2px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .theme-select {
+      background-color: var(--bg-main);
       color: var(--text-main);
       border: 1px solid var(--border-color);
       border-radius: 8px;
+      padding: 6px 12px;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .nav-tabs .nav-link {
+    .theme-select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    /* Main Container & Cards */
+    .app-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.25s ease;
+      overflow: hidden;
+    }
+
+    /* Tabs Customization */
+    .nav-pills .nav-link {
       color: var(--text-main);
-      border-color: var(--border-color);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      margin-left: 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      padding: 10px 20px;
+      transition: all 0.2s ease;
     }
-    .nav-tabs .nav-link.active {
+
+    .nav-pills .nav-link:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .nav-pills .nav-link.active {
       background-color: var(--accent-color);
-      color: #fff;
+      color: #FFFFFF !important;
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    .btn-custom {
+
+    /* Form Inputs Customization */
+    .form-control, .form-select {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+    }
+
+    /* Buttons */
+    .btn-accent {
       background-color: var(--accent-color);
-      color: white;
+      color: #FFFFFF;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      padding: 8px 18px;
+      transition: background-color 0.2s ease;
     }
-    .time-stamp {
-      font-size: 0.8rem;
-      opacity: 0.75;
+    .btn-accent:hover {
+      background-color: var(--accent-hover);
+      color: #FFFFFF;
+    }
+
+    /* Custom Notification Item */
+    .alert-card {
+      border-right: 5px solid var(--accent-color);
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      border-left: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      transition: transform 0.2s ease;
+    }
+    .alert-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .time-badge {
+      background-color: var(--badge-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    /* Table styling */
+    .custom-table {
+      color: var(--text-main);
+      background-color: var(--bg-card);
+    }
+    .custom-table th {
+      background-color: var(--bg-main);
+      color: var(--accent-color);
+      border-bottom: 2px solid var(--border-color);
+      padding: 14px;
+      font-weight: 700;
+    }
+    .custom-table td {
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 14px;
+      vertical-align: middle;
+    }
+    .custom-table tbody tr:hover {
+      background-color: var(--bg-hover);
+    }
+
+    /* Doctors Data Grid Cards */
+    .doctor-card {
+      height: 100%;
+      border-top: 4px solid var(--accent-color);
+    }
+    .price-badge {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      background: var(--badge-bg);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .preview-image {
+      max-width: 120px;
+      max-height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-content {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
     }
   </style>
 </head>
 <body>
 
-  <!-- القائمة العلوية واختيار السيمات -->
-  <nav class="navbar navbar-expand-lg border-bottom px-3 mb-4" style="background-color: var(--bg-card);">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-white" href="#"><i class="fa-solid fa-headset me-2"></i>مؤشر الأداء والمواعيد</a>
+  <!-- 1. Header Bar with Theme Selector -->
+  <header class="top-header mb-4">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <h4 class="m-0 fw-bold text-accent"><i class="fa-solid fa-headset me-2"></i>مؤشر الأداء والمواعيد</h4>
+        <span class="badge bg-secondary d-none d-md-inline-block">الكول سنتر وخدمة العملاء</span>
+      </div>
       
-      <div class="d-flex align-items-center">
-        <label class="me-2 text-nowrap fw-bold" for="themeSelect">السيم:</label>
-        <select id="themeSelect" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="changeTheme(this.value)">
-          <option value="blue" selected>الأزرق الغامق</option>
+      <div class="d-flex align-items-center gap-2">
+        <label for="themeSelect" class="fw-bold mb-0 text-nowrap"><i class="fa-solid fa-palette me-1"></i>السيم:</label>
+        <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
+          <option value="blue">الأزرق الغامق</option>
           <option value="amoled">OLED الأسود (Amoled)</option>
           <option value="charcoal">الرصاصي الفحمي</option>
           <option value="light">المضيء الفاتح</option>
         </select>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <div class="container-fluid px-4">
-    <!-- شريط البحث المتقدم -->
+  <div class="container-fluid px-3 px-md-4">
+    
+    <!-- Live Search Bar -->
     <div class="row mb-4">
-      <div class="col-md-12">
-        <div class="input-group input-group-lg">
-          <span class="input-group-text bg-secondary text-white"><i class="fa-solid fa-magnifying-glass"></i></span>
-          <input type="text" id="globalSearch" class="form-control" placeholder="بحث متقدم في كافة التنبيهات، المواعيد، استفسارات العملاء والمنسقين..." onkeyup="filterAllData()">
+      <div class="col-12">
+        <div class="app-card p-2">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-0 text-muted"><i class="fa-solid fa-magnifying-glass fs-5"></i></span>
+            <input type="text" id="globalSearch" class="form-control border-0 bg-transparent fs-5" placeholder="بحث متقدم حي في التنبيهات، مواعيد الأطباء، تسليم العملاء والخدمات..." onkeyup="filterLiveContent()">
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- تبويبات النظام -->
-    <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
-      <li class="nav-item">
-        <button class="nav-link active" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button">
-          <i class="fa-solid fa-bullhorn me-1"></i> التنبيهات والإشعارات العامة
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-pills mb-4 flex-column flex-sm-row gap-2" id="mainTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active w-100" id="tab-alerts" data-bs-toggle="pill" data-bs-target="#content-alerts" type="button">
+          <i class="fa-solid fa-bullhorn me-2"></i>تنبيهات وإشعارات العيادة العامة
         </button>
       </li>
-      <li class="nav-item">
-        <button class="nav-link" id="handover-tab" data-bs-toggle="tab" data-bs-target="#handover" type="button">
-          <i class="fa-solid fa-users-rectangle me-1"></i> تسليم ومتابعة العملاء
+      <li class="nav-item" role="presentation">
+        <button class="nav-link w-100" id="tab-handover" data-bs-toggle="pill" data-bs-target="#content-handover" type="button">
+          <i class="fa-solid fa-users-gear me-2"></i>متابعة وتسليم العملاء
         </button>
       </li>
-      <li class="nav-item">
-        <button class="nav-link" id="sheet-data-tab" data-bs-toggle="tab" data-bs-target="#sheetData" type="button">
-          <i class="fa-solid fa-table me-1"></i> مواعيد الأطباء والخدمات (الشيت)
+      <li class="nav-item" role="presentation">
+        <button class="nav-link w-100" id="tab-schedule" data-bs-toggle="pill" data-bs-target="#content-schedule" type="button">
+          <i class="fa-solid fa-calendar-days me-2"></i>جدول الأطباء والعروض والخدمات
         </button>
       </li>
     </ul>
 
-    <!-- محتوى التبويبات -->
+    <!-- Tab Contents -->
     <div class="tab-content" id="mainTabsContent">
 
-      <!-- 1. التنبيهات والإشعارات -->
-      <div class="tab-pane fade show active" id="alerts" role="tabpanel">
-        <div class="card p-3 mb-4">
-          <h5 class="card-title mb-3"><i class="fa-solid fa-plus-circle me-1"></i> إضافة تنبيه جديد</h5>
-          <form id="alertForm">
-            <div class="row g-2">
-              <div class="col-md-8">
-                <textarea id="alertText" class="form-control" rows="2" placeholder="اكتب التنبيه أو المعلومة الجديدة..." required></textarea>
+      <!-- ==================== TAB 1: ALERTS & NOTIFICATIONS ==================== -->
+      <div class="tab-pane fade show active" id="content-alerts" role="tabpanel">
+        
+        <!-- Add Alert Card -->
+        <div class="app-card p-3 p-md-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-circle-plus me-2 text-warning"></i>إضافة إشعار أو تنبيه جديد</h5>
+          <form id="addAlertForm">
+            <input type="hidden" id="alertEditKey" value="">
+            <div class="row g-3">
+              <div class="col-12 col-md-8">
+                <textarea id="alertContent" class="form-control" rows="3" placeholder="اكتب التنبيه أو التحديث الجديد هنا (مثال: د.تبيان من يوم السبت متواجدة في فرع معشي من 2-10)..." required></textarea>
               </div>
-              <div class="col-md-4">
-                <input type="file" id="alertFile" class="form-control mb-2" accept="image/*,.pdf,.doc,.docx">
-                <button type="submit" class="btn btn-custom w-100"><i class="fa-solid fa-paper-plane me-1"></i> نشر التنبيه</button>
+              <div class="col-12 col-md-4 d-flex flex-column justify-content-between gap-2">
+                <div>
+                  <label class="form-label small fw-bold text-muted mb-1"><i class="fa-solid fa-paperclip me-1"></i>مرفق (صورة أو ملف DataURL):</label>
+                  <input type="file" id="alertFile" class="form-control" accept="image/*,.pdf,.doc,.docx">
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" id="alertSubmitBtn" class="btn btn-accent flex-grow-1"><i class="fa-solid fa-paper-plane me-1"></i>نشر التنبيه</button>
+                  <button type="button" id="alertCancelBtn" class="btn btn-outline-secondary d-none" onclick="cancelAlertEdit()"><i class="fa-solid fa-xmark"></i> إلغاء</button>
+                </div>
               </div>
             </div>
           </form>
         </div>
 
-        <div id="alertsContainer" class="d-flex flex-column gap-3">
-          <!-- يتم تحميل الإشعارات والتنبيهات ديناميكياً من Firebase -->
+        <!-- Alerts List Container -->
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-list-check me-2"></i>جدول الإشعارات والتنبيهات المعتمدة</h5>
+        <div id="alertsContainer">
+          <div class="text-center py-5 text-muted"><i class="fa-solid fa-spinner fa-spin fs-3"></i><p class="mt-2">جاري تحميل البيانات من السحابة...</p></div>
         </div>
       </div>
 
-      <!-- 2. تسليم ومتابعة العملاء -->
-      <div class="tab-pane fade" id="handover" role="tabpanel">
-        <div class="card p-3 mb-4">
-          <h5 class="card-title mb-3"><i class="fa-solid fa-user-plus me-1"></i> تسليم عميل للورادية التالية</h5>
+      <!-- ==================== TAB 2: CLIENT HANDOVER ==================== -->
+      <div class="tab-pane fade" id="content-handover" role="tabpanel">
+        
+        <!-- Add Handover Card -->
+        <div class="app-card p-3 p-md-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-plus me-2 text-info"></i>تسليم حالة عميل جديدة للوردية</h5>
           <form id="handoverForm">
-            <div class="row g-2">
-              <div class="col-md-3">
-                <input type="text" id="clientName" class="form-control" placeholder="اسم العميل" required>
+            <input type="hidden" id="handoverEditKey" value="">
+            <div class="row g-3">
+              <div class="col-12 col-md-3">
+                <label class="form-label small fw-bold">اسم العميل</label>
+                <input type="text" id="clientName" class="form-control" placeholder="أدخل اسم العميل" required>
               </div>
-              <div class="col-md-3">
-                <input type="text" id="clientPhone" class="form-control" placeholder="رقم الهاتف" required>
+              <div class="col-12 col-md-3">
+                <label class="form-label small fw-bold">رقم الهاتف</label>
+                <input type="text" id="clientPhone" class="form-control" placeholder="05xxxxxxx" required>
               </div>
-              <div class="col-md-4">
-                <input type="text" id="clientStatus" class="form-control" placeholder="تفاصيل الطلب / حالة المتابعة" required>
+              <div class="col-12 col-md-4">
+                <label class="form-label small fw-bold">تفاصيل المتابعة / الاستفسار</label>
+                <input type="text" id="clientStatus" class="form-control" placeholder="ماذا حدث مع العميل وما المطلوب من الوردية التالية؟" required>
               </div>
-              <div class="col-md-2">
-                <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-floppy-disk me-1"></i> حفظ العميل</button>
+              <div class="col-12 col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" id="handoverSubmitBtn" class="btn btn-accent w-100"><i class="fa-solid fa-floppy-disk me-1"></i>حفظ العميل</button>
+                <button type="button" id="handoverCancelBtn" class="btn btn-outline-secondary d-none" onclick="cancelHandoverEdit()"><i class="fa-solid fa-xmark"></i></button>
               </div>
             </div>
           </form>
         </div>
 
-        <div class="table-responsive">
-          <table class="table table-dark table-hover border">
-            <thead>
-              <tr>
-                <th>اسم العميل</th>
-                <th>رقم الهاتف</th>
-                <th>حالة المتابعة</th>
-                <th>وقت التحديث</th>
-                <th>الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="handoverTableBody">
-              <!-- تحميل بيانات التسليم dynamic -->
-            </tbody>
-          </table>
+        <!-- Handover Table -->
+        <div class="app-card p-3">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-table-list me-2"></i>سجل المتابعات والتسليم الحي</h5>
+          <div class="table-responsive">
+            <table class="table custom-table mb-0">
+              <thead>
+                <tr>
+                  <th>اسم العميل</th>
+                  <th>رقم الهاتف</th>
+                  <th>تفاصيل المتابعة والطلب</th>
+                  <th>آخر توقيت تعديل</th>
+                  <th class="text-center">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="handoverTableBody">
+                <tr><td colspan="5" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- 3. بيانات الشيت والمواعيد -->
-      <div class="tab-pane fade" id="sheetData" role="tabpanel">
-        <div class="card p-3">
-          <h5><i class="fa-solid fa-calendar-check me-2"></i> جدول المواعيد والخدمات</h5>
-          <p class="text-muted small">يمكنك ربط الشيت إما عبر استيراد CSV أو مزامنة حقول Google Sheets مباشرةً عبر Firebase SDK.</p>
-          <div id="sheetContentContainer">
-            <!-- تعرض هنا صفحات الشيت الـ 6 -->
+      <!-- ==================== TAB 3: DOCTORS SCHEDULE & SERVICES ==================== -->
+      <div class="tab-pane fade" id="content-schedule" role="tabpanel">
+        
+        <!-- Controls & Categories Filter -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+          <div class="btn-group flex-wrap" role="group" id="doctorCategoryFilter">
+            <button type="button" class="btn btn-outline-secondary active" onclick="filterDoctorSection('all')">الكل</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterDoctorSection('جدول المواعيد')">جدول المواعيد</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterDoctorSection('العروض والخصومات')">العروض والخصومات</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterDoctorSection('الخدمات والأسعار')">الخدمات والأسعار</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterDoctorSection('المنسقين والأقسام')">المنسقين والأقسام</button>
           </div>
+          <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#doctorModal" onclick="openDoctorModalForAdd()">
+            <i class="fa-solid fa-plus me-1"></i>إضافة خدمة / موعد دكتور
+          </button>
+        </div>
+
+        <!-- Cards Display Grid -->
+        <div class="row g-3" id="doctorsGridContainer">
+          <!-- Cards populated via Firebase/JS -->
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- Modal for Adding/Editing Doctor & Service Item -->
+  <div class="modal fade" id="doctorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="doctorModalTitle"><i class="fa-solid fa-user-doctor me-2"></i>إضافة/تعديل بيانات العيادة</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="doctorForm">
+            <input type="hidden" id="docEditKey" value="">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">القسم / الفئة</label>
+                <select id="docCategory" class="form-select" required>
+                  <option value="جدول المواعيد">جدول المواعيد</option>
+                  <option value="العروض والخصومات">العروض والخصومات</option>
+                  <option value="الخدمات والأسعار">الخدمات والأسعار</option>
+                  <option value="المنسقين والأقسام">المنسقين والأقسام</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">اسم الطبيب / الخدمة / المنسق</label>
+                <input type="text" id="docTitle" class="form-control" placeholder="مثال: د.تبيان / عروض الليزر" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">الفرع / المواعيد / التفاصيل</label>
+                <input type="text" id="docSchedule" class="form-control" placeholder="مثال: فرع معشي - يومياً من 2 إلى 10 مساءً" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">السعر / التكلفة (اختياري)</label>
+                <input type="text" id="docPrice" class="form-control" placeholder="مثال: 150 ريال">
+              </div>
+              <div class="col-md-12">
+                <label class="form-label small fw-bold">ملاحظات واستفسارات إضافية للكول سنتر</label>
+                <textarea id="docNotes" class="form-control" rows="3" placeholder="أي تفاصيل خاصة بالجهاز، الشروط، المنسق المسؤول..."></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="button" class="btn btn-accent" onclick="saveDoctorData()"><i class="fa-solid fa-check me-1"></i>حفظ البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK Compatible Versions -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
   <script>
-    // 1. تهيئة Firebase باستخدام الرابط الخاص بك
+    // 1. Firebase Initialization with your Realtime Database URL
     const firebaseConfig = {
       databaseURL: "https://monasqen-default-rtdb.firebaseio.com/"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 2. تغيير السيمات
+    // 2. Format Timestamp helper function (e.g. 02:55:35PM , 24/10/2026)
+    function getCurrentFormattedTime() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // convert 0 to 12
+      const formattedHours = String(hours).padStart(2, '0');
+
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+
+      return `${formattedHours}:${minutes}:${seconds}${ampm} , ${day}/${month}/${year}`;
+    }
+
+    // 3. Theme Management
     function changeTheme(themeName) {
       document.documentElement.setAttribute('data-theme', themeName);
-      localStorage.setItem('selectedTheme', themeName);
+      localStorage.setItem('cc_theme', themeName);
     }
-    // استرجاع السيم المحفوظ
-    const savedTheme = localStorage.getItem('selectedTheme') || 'blue';
+    const savedTheme = localStorage.getItem('cc_theme') || 'blue';
     document.getElementById('themeSelect').value = savedTheme;
     changeTheme(savedTheme);
 
-    // 3. التعامل مع الإشعارات والتنبيهات
-    const alertForm = document.getElementById('alertForm');
-    alertForm.addEventListener('submit', (e) => {
+    // ==================== ALERTS ENGINE ====================
+    const addAlertForm = document.getElementById('addAlertForm');
+    addAlertForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const text = document.getElementById('alertText').value;
+      const editKey = document.getElementById('alertEditKey').value;
+      const text = document.getElementById('alertContent').value;
       const fileInput = document.getElementById('alertFile');
-      const timeStamp = new Date().toLocaleString('ar-EG');
+      const timestamp = getCurrentFormattedTime();
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = function(evt) {
-          saveAlert(text, timeStamp, evt.target.result, file.name);
+          commitAlert(editKey, text, timestamp, evt.target.result, file.name, file.type);
         };
         reader.readAsDataURL(file);
       } else {
-        saveAlert(text, timeStamp, null, null);
+        commitAlert(editKey, text, timestamp, null, null, null);
       }
     });
 
-    function saveAlert(text, time, fileData, fileName) {
-      db.ref('alerts').push({
+    function commitAlert(key, text, timestamp, fileData, fileName, fileType) {
+      const alertData = {
         text: text,
-        time: time,
-        fileData: fileData || '',
-        fileName: fileName || ''
-      }).then(() => {
-        alertForm.reset();
-      });
+        timestamp: timestamp
+      };
+
+      if (fileData) {
+        alertData.fileData = fileData;
+        alertData.fileName = fileName;
+        alertData.fileType = fileType;
+      }
+
+      if (key) {
+        // Edit existing
+        db.ref('alerts/' + key).update(alertData).then(() => {
+          cancelAlertEdit();
+        });
+      } else {
+        // Create new
+        db.ref('alerts').push(alertData).then(() => {
+          addAlertForm.reset();
+        });
+      }
     }
 
-    // استماع للتنبيهات الفورية من Firebase
+    // Realtime alerts listener
     db.ref('alerts').on('value', (snapshot) => {
       const container = document.getElementById('alertsContainer');
       container.innerHTML = '';
       const data = snapshot.val();
-      if (data) {
-        Object.keys(data).reverse().forEach(key => {
-          const item = data[key];
-          let fileHtml = '';
-          if (item.fileData) {
-            fileHtml = `<div class="mt-2">
-              <a href="${item.fileData}" download="${item.fileName}" class="btn btn-sm btn-outline-info">
-                <i class="fa-solid fa-paperclip me-1"></i> تحميل/عرض الملف: ${item.fileName}
-              </a>
-            </div>`;
-          }
-          container.innerHTML += `
-            <div class="card p-3 border-start border-4 border-warning alert-item">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <div><i class="fa-solid fa-clock me-1 text-warning"></i><span class="time-stamp">${item.time}</span></div>
-                <div>
-                  <button onclick="deleteAlert('${key}')" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> حذف</button>
-                </div>
-              </div>
-              <p class="mb-1 text-content">${item.text}</p>
-              ${fileHtml}
-            </div>
-          `;
-        });
+      
+      if (!data) {
+        container.innerHTML = '<div class="app-card p-4 text-center text-muted">لا يوجد إشعارات أو تنبيهات حالياً.</div>';
+        return;
       }
+
+      Object.keys(data).reverse().forEach(key => {
+        const item = data[key];
+        let fileMarkup = '';
+
+        if (item.fileData) {
+          if (item.fileType && item.fileType.startsWith('image/')) {
+            fileMarkup = `<div class="mt-2"><img src="${item.fileData}" class="preview-image" alt="مرفق صورة"><br><a href="${item.fileData}" download="${item.fileName || 'image'}" class="btn btn-sm btn-outline-info mt-1"><i class="fa-solid fa-download me-1"></i>تحميل الصورة</a></div>`;
+          } else {
+            fileMarkup = `<div class="mt-2"><a href="${item.fileData}" download="${item.fileName || 'file'}" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-arrow-down me-1"></i>تحميل الملف المرفق: ${item.fileName || 'ملف'}</a></div>`;
+          }
+        }
+
+        container.innerHTML += `
+          <div class="alert-card alert-searchable-item" id="alert-item-${key}">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <span class="time-badge"><i class="fa-regular fa-clock me-1"></i>${item.timestamp}</span>
+              <div class="d-flex gap-2">
+                <button onclick="editAlert('${key}', \`${escapeJS(item.text)}\`)" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i> تعديل</button>
+                <button onclick="deleteAlert('${key}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> حذف</button>
+              </div>
+            </div>
+            <p class="fs-5 fw-bold mb-1" style="white-space: pre-line;">${item.text}</p>
+            ${fileMarkup}
+          </div>
+        `;
+      });
+      filterLiveContent();
     });
 
     function deleteAlert(key) {
-      if (confirm("هل أنت تأكد من حذف هذا التنبيه؟")) {
+      if (confirm('هل أنت تأكد من إزالة هذا التنبيه؟')) {
         db.ref('alerts/' + key).remove();
       }
     }
 
-    // 4. تسليم ومتابعة العملاء
+    function editAlert(key, text) {
+      document.getElementById('alertEditKey').value = key;
+      document.getElementById('alertContent').value = text;
+      document.getElementById('alertSubmitBtn').innerHTML = '<i class="fa-solid fa-rotate me-1"></i>تحديث التنبيه';
+      document.getElementById('alertCancelBtn').classList.remove('d-none');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelAlertEdit() {
+      document.getElementById('alertEditKey').value = '';
+      document.getElementById('addAlertForm').reset();
+      document.getElementById('alertSubmitBtn').innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i>نشر التنبيه';
+      document.getElementById('alertCancelBtn').classList.add('d-none');
+    }
+
+    // ==================== HANDOVER ENGINE ====================
     const handoverForm = document.getElementById('handoverForm');
     handoverForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      const editKey = document.getElementById('handoverEditKey').value;
       const name = document.getElementById('clientName').value;
       const phone = document.getElementById('clientPhone').value;
       const status = document.getElementById('clientStatus').value;
-      const timeStamp = new Date().toLocaleString('ar-EG');
+      const timestamp = getCurrentFormattedTime();
 
-      db.ref('handover').push({
+      const payload = {
         name: name,
         phone: phone,
         status: status,
-        time: timeStamp
-      }).then(() => handoverForm.reset());
+        timestamp: timestamp
+      };
+
+      if (editKey) {
+        db.ref('handover/' + editKey).update(payload).then(() => cancelHandoverEdit());
+      } else {
+        db.ref('handover').push(payload).then(() => handoverForm.reset());
+      }
     });
 
     db.ref('handover').on('value', (snapshot) => {
       const tbody = document.getElementById('handoverTableBody');
       tbody.innerHTML = '';
       const data = snapshot.val();
-      if (data) {
-        Object.keys(data).reverse().forEach(key => {
-          const item = data[key];
-          tbody.innerHTML += `
-            <tr class="handover-row">
-              <td>${item.name}</td>
-              <td>${item.phone}</td>
-              <td>${item.status}</td>
-              <td><span class="badge bg-secondary">${item.time}</span></td>
-              <td>
-                <button onclick="deleteHandover('${key}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          `;
-        });
+
+      if (!data) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">لا يوجد سجل متابعة عملاء حالياً.</td></tr>';
+        return;
       }
+
+      Object.keys(data).reverse().forEach(key => {
+        const item = data[key];
+        tbody.innerHTML += `
+          <tr class="handover-searchable-row">
+            <td class="fw-bold">${item.name}</td>
+            <td class="text-nowrap" dir="ltr">${item.phone}</td>
+            <td>${item.status}</td>
+            <td><span class="time-badge">${item.timestamp}</span></td>
+            <td class="text-center text-nowrap">
+              <button onclick="editHandover('${key}', \`${escapeJS(item.name)}\`, \`${escapeJS(item.phone)}\`, \`${escapeJS(item.status)}\`)" class="btn btn-sm btn-outline-primary me-1"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="deleteHandover('${key}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      filterLiveContent();
     });
 
     function deleteHandover(key) {
-      if (confirm("هل تم إنهاء متابعة هذا العميل؟")) {
+      if (confirm('هل ترغب بحذف هذا العميل من سجل التسليم؟')) {
         db.ref('handover/' + key).remove();
       }
     }
 
-    // 5. وظيفة البحث المتقدم الحي
-    function filterAllData() {
-      const query = document.getElementById('globalSearch').value.toLowerCase();
-      
-      // تصفية التنبيهات
-      document.querySelectorAll('.alert-item').forEach(el => {
-        const text = el.innerText.toLowerCase();
-        el.style.display = text.includes(query) ? 'block' : 'none';
-      });
+    function editHandover(key, name, phone, status) {
+      document.getElementById('handoverEditKey').value = key;
+      document.getElementById('clientName').value = name;
+      document.getElementById('clientPhone').value = phone;
+      document.getElementById('clientStatus').value = status;
+      document.getElementById('handoverSubmitBtn').innerHTML = '<i class="fa-solid fa-rotate me-1"></i>تحديث';
+      document.getElementById('handoverCancelBtn').classList.remove('d-none');
+    }
 
-      // تصفية صفوف تسليم العملاء
-      document.querySelectorAll('.handover-row').forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
+    function cancelHandoverEdit() {
+      document.getElementById('handoverEditKey').value = '';
+      handoverForm.reset();
+      document.getElementById('handoverSubmitBtn').innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i>حفظ العميل';
+      document.getElementById('handoverCancelBtn').classList.add('d-none');
+    }
+
+    // ==================== DOCTORS & SERVICES ENGINE ====================
+    let currentDoctorCategoryFilter = 'all';
+
+    function openDoctorModalForAdd() {
+      document.getElementById('docEditKey').value = '';
+      document.getElementById('doctorForm').reset();
+      document.getElementById('doctorModalTitle').innerText = 'إضافة خدمة / موعد جديد';
+    }
+
+    function saveDoctorData() {
+      const editKey = document.getElementById('docEditKey').value;
+      const category = document.getElementById('docCategory').value;
+      const title = document.getElementById('docTitle').value;
+      const schedule = document.getElementById('docSchedule').value;
+      const price = document.getElementById('docPrice').value;
+      const notes = document.getElementById('docNotes').value;
+      const timestamp = getCurrentFormattedTime();
+
+      if (!title || !schedule) {
+        alert('يرجى تعبئة الحقول الأساسية على الأقل');
+        return;
+      }
+
+      const payload = {
+        category: category,
+        title: title,
+        schedule: schedule,
+        price: price || '',
+        notes: notes || '',
+        timestamp: timestamp
+      };
+
+      if (editKey) {
+        db.ref('doctors/' + editKey).update(payload);
+      } else {
+        db.ref('doctors').push(payload);
+      }
+
+      const modalEl = document.getElementById('doctorModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+    }
+
+    // Default Seed Data from Sheets if empty database
+    const initialSeedData = [
+      { category: "جدول المواعيد", title: "د. تبيان (جلدية وتجميل)", schedule: "فرع معشي: السبت، الإثنين، الأربعاء (2:00 م - 10:00 م)", price: "كشف: 100 ريال", notes: "جهاز الليزر المستخدم: جنتل ماكس برو." },
+      { category: "جدول المواعيد", title: "د. سارة علي (أسنان)", schedule: "فرع الرئيسي: يومياً عدا الجمعة (9:00 ص - 5:00 م)", price: "كشف: مجاناً", notes: "حجوزات التركيبات والتقويم بحجز مسبق." },
+      { category: "العروض والخصومات", title: "عرض الليزر كربوني للوجه", schedule: "متاح طوال شهر أكتوبر في جميع الفروع", price: "199 ريال بدلاً من 350", notes: "يشمل جلسة رتوش مجانية خلال 14 يوم." },
+      { category: "الخدمات والأسعار", title: "تنظيف الأسنان وإزالة الجير", schedule: "قسم الأسنان - جميع الأيام", price: "99 ريال", notes: "مع تلميع الأسنان مجاناً." },
+      { category: "المنسقين والأقسام", title: "منسقة قسم التجميل (أ. ريم)", schedule: "المتابعة والواتساب: 0501234567", price: "-", notes: "مسؤولة عن تنسيق مواعيد حالات العمليات والجراحة التجميلية." }
+    ];
+
+    db.ref('doctors').on('value', (snapshot) => {
+      const container = document.getElementById('doctorsGridContainer');
+      container.innerHTML = '';
+      const data = snapshot.val();
+
+      if (!data) {
+        // Seed database if empty
+        initialSeedData.forEach(item => {
+          item.timestamp = getCurrentFormattedTime();
+          db.ref('doctors').push(item);
+        });
+        return;
+      }
+
+      Object.keys(data).reverse().forEach(key => {
+        const item = data[key];
+        container.innerHTML += `
+          <div class="col-12 col-md-6 col-lg-4 doctor-card-wrapper" data-category="${item.category}">
+            <div class="app-card doctor-card p-3 d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="badge bg-primary fs-6">${item.category}</span>
+                  ${item.price ? `<span class="price-badge">${item.price}</span>` : ''}
+                </div>
+                <h5 class="fw-bold text-accent mb-2">${item.title}</h5>
+                <p class="mb-2"><i class="fa-solid fa-clock text-warning me-1"></i> <strong>المواعيد والفرع:</strong> ${item.schedule}</p>
+                ${item.notes ? `<p class="small text-muted mb-2"><i class="fa-solid fa-info-circle me-1"></i> ${item.notes}</p>` : ''}
+              </div>
+              <div class="pt-2 border-top border-secondary d-flex justify-content-between align-items-center mt-3">
+                <span class="time-badge">${item.timestamp}</span>
+                <div>
+                  <button onclick="editDoctor('${key}', \`${escapeJS(item.category)}\`, \`${escapeJS(item.title)}\`, \`${escapeJS(item.schedule)}\`, \`${escapeJS(item.price)}\`, \`${escapeJS(item.notes)}\`)" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></button>
+                  <button onclick="deleteDoctor('${key}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      filterDoctorSection(currentDoctorCategoryFilter);
+      filterLiveContent();
+    });
+
+    function deleteDoctor(key) {
+      if (confirm('هل تريد حذف هذه الخدمة/الموعد؟')) {
+        db.ref('doctors/' + key).remove();
+      }
+    }
+
+    function editDoctor(key, category, title, schedule, price, notes) {
+      document.getElementById('docEditKey').value = key;
+      document.getElementById('docCategory').value = category;
+      document.getElementById('docTitle').value = title;
+      document.getElementById('docSchedule').value = schedule;
+      document.getElementById('docPrice').value = price;
+      document.getElementById('docNotes').value = notes;
+      document.getElementById('doctorModalTitle').innerText = 'تعديل البيانات السريعة';
+
+      const modal = new bootstrap.Modal(document.getElementById('doctorModal'));
+      modal.show();
+    }
+
+    function filterDoctorSection(cat) {
+      currentDoctorCategoryFilter = cat;
+      const buttons = document.querySelectorAll('#doctorCategoryFilter button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      
+      const cards = document.querySelectorAll('.doctor-card-wrapper');
+      cards.forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-category') === cat) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
       });
     }
+
+    // ==================== LIVE GLOBAL SEARCH ====================
+    function filterLiveContent() {
+      const q = document.getElementById('globalSearch').value.toLowerCase().trim();
+
+      // Search in Alerts
+      document.querySelectorAll('.alert-searchable-item').forEach(el => {
+        const text = el.innerText.toLowerCase();
+        el.style.display = text.includes(q) ? 'block' : 'none';
+      });
+
+      // Search in Handover
+      document.querySelectorAll('.handover-searchable-row').forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+
+      // Search in Doctors Grid
+      document.querySelectorAll('.doctor-card-wrapper').forEach(card => {
+        const text = card.innerText.toLowerCase();
+        const matchesCategory = currentDoctorCategoryFilter === 'all' || card.getAttribute('data-category') === currentDoctorCategoryFilter;
+        if (text.includes(q) && matchesCategory) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Escape special characters for string inline parameters
+    function escapeJS(str) {
+      if (!str) return '';
+      return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    }
   </script>
-  
+
+  <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
