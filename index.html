@@ -3,156 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة إدارة مواعيد وأبديتات الكول سنتر</title>
-    <!-- Tailwind CSS للتصميم السريع والجميل -->
+    <title>منظومة الكول سنتر - مجمع ماجستي الطبي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; }
+        body { font-family: 'Cairo', sans-serif; transition: background 0.3s, color 0.3s; }
+        
+        /* Themes Definitions */
+        body.theme-dark-blue { background-color: #0b1329; color: #e2e8f0; }
+        body.theme-dark-blue header, body.theme-dark-blue nav, body.theme-dark-blue .card-bg { background-color: #111c44; border-color: #1e293b; }
+        
+        body.theme-oled { background-color: #000000; color: #f8fafc; }
+        body.theme-oled header, body.theme-oled nav, body.theme-oled .card-bg { background-color: #0a0a0a; border-color: #222222; }
+
+        body.theme-charcoal { background-color: #1e2022; color: #f1f3f4; }
+        body.theme-charcoal header, body.theme-charcoal nav, body.theme-charcoal .card-bg { background-color: #2c2f33; border-color: #3f4147; }
+
+        body.theme-light { background-color: #f4f6f8; color: #1f2937; }
+        body.theme-light header { background-color: #2563eb; color: #ffffff; }
+        body.theme-light nav, body.theme-light .card-bg { background-color: #ffffff; border-color: #e5e7eb; color: #1f2937; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="theme-dark-blue">
 
-    <!-- Header & Search -->
-    <header class="bg-blue-600 text-white shadow-md">
-        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 class="text-xl font-bold">🏥 نظام الكول سنتر - مواعيد ماجستي والخدمات</h1>
+    <!-- Header & Controls -->
+    <header class="shadow-md border-b">
+        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between">
+                <h1 class="text-lg font-bold">🏥 نظام ماجستي الطبي - كول سنتر</h1>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold">السيم:</label>
+                    <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-gray-800 text-white text-xs border rounded px-2 py-1 focus:outline-none">
+                        <option value="theme-dark-blue">الأزرق الغامق</option>
+                        <option value="theme-oled">OLED الأسود</option>
+                        <option value="theme-charcoal">الرصاصي الفحمي</option>
+                        <option value="theme-light">المضيء الفاتح</option>
+                    </select>
+                </div>
+            </div>
             <div class="w-full md:w-1/3">
-                <input type="text" id="globalSearch" placeholder="بحث سريع عن طبيب، خدمة، فرع، أو تنبيه..." 
-                    class="w-full px-4 py-2 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <input type="text" id="globalSearch" placeholder="بحث سريع في الشيتات والتنبيهات..." 
+                    class="w-full px-4 py-2 rounded-lg bg-black/20 border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
         </div>
     </header>
 
     <!-- Navigation Tabs -->
-    <nav class="bg-white shadow border-b">
-        <div class="container mx-auto px-4 flex overflow-x-auto gap-2 py-2">
+    <nav class="shadow border-b">
+        <div class="container mx-auto px-4 flex overflow-x-auto gap-2 py-2 text-sm">
             <button onclick="switchTab('updates')" class="tab-btn px-4 py-2 rounded-lg font-semibold bg-blue-600 text-white whitespace-nowrap">📢 التنبيهات والأبديتات</button>
-            <button onclick="switchTab('tab1')" class="tab-btn px-4 py-2 rounded-lg font-semibold text-gray-600 hover:bg-gray-100 whitespace-nowrap">الواجهة</button>
-            <button onclick="switchTab('tab2')" class="tab-btn px-4 py-2 rounded-lg font-semibold text-gray-600 hover:bg-gray-100 whitespace-nowrap">الأقسام والخدمات</button>
-            <button onclick="switchTab('tab3')" class="tab-btn px-4 py-2 rounded-lg font-semibold text-gray-600 hover:bg-gray-100 whitespace-nowrap">دوام الأطباء</button>
-            <button onclick="switchTab('tab4')" class="tab-btn px-4 py-2 rounded-lg font-semibold text-gray-600 hover:bg-gray-100 whitespace-nowrap">العروض</button>
-            <button onclick="switchTab('tab5')" class="tab-btn px-4 py-2 rounded-lg font-semibold text-gray-600 hover:bg-gray-100 whitespace-nowrap">الاستفسارات</button>
-            <button onclick="switchTab('tab6')" class="tab-btn px-4 py-2 rounded-lg font-semibold text-gray-600 hover:bg-gray-100 whitespace-nowrap">المنسقين</button>
+            <button onclick="switchTab('handover')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">🔄 تسليم الشفتات (متابعة العملاء)</button>
+            <button onclick="switchTab('tab1')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">الواجهة</button>
+            <button onclick="switchTab('tab2')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">الأقسام والخدمات</button>
+            <button onclick="switchTab('tab3')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">دوام الأطباء</button>
+            <button onclick="switchTab('tab4')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">العروض</button>
+            <button onclick="switchTab('tab5')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">الاستفسارات</button>
+            <button onclick="switchTab('tab6')" class="tab-btn px-4 py-2 rounded-lg font-semibold whitespace-nowrap">المنسقين</button>
         </div>
     </nav>
 
-    <!-- Main Container -->
+    <!-- Main Content -->
     <main class="container mx-auto px-4 py-6">
 
-        <!-- Updates / Announcements Section -->
+        <!-- 1. Updates Section -->
         <section id="section-updates" class="space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-lg font-bold mb-4 text-blue-600">➕ إضافة تحديث أو تنبيه جديد</h2>
+            <div class="card-bg p-6 rounded-xl shadow-md border">
+                <h2 class="text-lg font-bold mb-4 text-blue-400">➕ إضافة تنبيه أو إشعار جديد</h2>
                 <form id="updateForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-1">عنوان التنبيه / التحديث</label>
-                        <input type="text" id="upTitle" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                        <label class="block text-xs font-semibold mb-1">عنوان التنبيه</label>
+                        <input type="text" id="upTitle" required class="w-full border rounded-lg px-3 py-2 bg-transparent text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">التفاصيل والملاحظات</label>
-                        <textarea id="upDesc" rows="3" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"></textarea>
+                        <label class="block text-xs font-semibold mb-1">تفاصيل التنبيه / الأبديت</label>
+                        <textarea id="upDesc" rows="3" required class="w-full border rounded-lg px-3 py-2 bg-transparent text-sm"></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">إرفاق صورة أو ملف (اختياري)</label>
-                        <input type="file" id="upFile" class="w-full border rounded-lg px-3 py-2 bg-gray-50">
+                        <label class="block text-xs font-semibold mb-1">إرفاق صورة أو ملف</label>
+                        <input type="file" id="upFile" class="w-full border rounded-lg px-3 py-2 text-xs">
                     </div>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700">نشر التنبيه</button>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold text-sm hover:bg-blue-700">نشر التنبيه</button>
                 </form>
             </div>
-
-            <!-- Feed -->
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <h2 class="text-lg font-bold mb-4">📜 سجل التنبيهات والأبديتات الحالية</h2>
-                <div id="updatesList" class="space-y-4">
-                    <!-- Dynamic Items -->
-                </div>
+            <div class="card-bg p-6 rounded-xl shadow-md border">
+                <h2 class="text-lg font-bold mb-4">📢 سجل التنبيهات والإشعارات العامة</h2>
+                <div id="updatesList" class="space-y-4"></div>
             </div>
         </section>
 
-        <!-- Sheets Content Section (Tabs 1 to 6) -->
-        <section id="section-sheets" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md flex justify-between items-center">
-                <h2 id="currentTabTitle" class="text-xl font-bold text-blue-600">اسم الصفحة</h2>
-                <button onclick="saveCurrentSheetData()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700">💾 حفظ التعديلات</button>
+        <!-- 2. Handover / Customer Follow-up Section -->
+        <section id="section-handover" class="hidden space-y-6">
+            <div class="card-bg p-6 rounded-xl shadow-md border">
+                <h2 class="text-lg font-bold mb-4 text-green-400">📝 تسجيل عميل جديد للمتابعة وتسليم الشفتات</h2>
+                <form id="handoverForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">اسم العميل ورقم الاتصال</label>
+                        <input type="text" id="custName" required class="w-full border rounded-lg px-3 py-2 bg-transparent text-sm" placeholder="مثال: أحمد محمد - 05xxxxxxxx">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">الفرع المطلوب</label>
+                        <select id="custBranch" class="w-full border rounded-lg px-3 py-2 bg-transparent text-sm">
+                            <option value="فرع معشي">فرع معشي</option>
+                            <option value="فرع الوسام">فرع الوسام</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">تفاصيل الحالة / المطلوب متابعته / هل تم الدفع؟</label>
+                        <textarea id="custDetails" rows="2" required class="w-full border rounded-lg px-3 py-2 bg-transparent text-sm" placeholder="اكتب التفاصيل ليراها الزميل في الشفت القادم..."></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold text-sm hover:bg-green-700">حفظ وإضافة للقائمة</button>
+                    </div>
+                </form>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
-                <textarea id="sheetEditor" rows="12" class="w-full font-mono text-sm border rounded-lg p-3 focus:ring-2 focus:ring-blue-400" placeholder="يمكنك تعديل بيانات هذه الصفحة مباشرة هنا..."></textarea>
+
+            <div class="card-bg p-6 rounded-xl shadow-md border">
+                <h2 class="text-lg font-bold mb-4">👥 قائمة العملاء الحاليين (تسليم وتسلم الشفتات)</h2>
+                <div id="handoverList" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- 3. Sheets Content Sections (Tabs 1 to 6) -->
+        <section id="section-sheets" class="hidden space-y-6">
+            <div class="card-bg p-6 rounded-xl shadow-md border flex justify-between items-center">
+                <h2 id="currentTabTitle" class="text-xl font-bold text-blue-400">اسم الصفحة</h2>
+                <button onclick="saveCurrentSheetData()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-emerald-700">💾 حفظ التعديلات</button>
+            </div>
+            <div class="card-bg p-6 rounded-xl shadow-md border overflow-x-auto">
+                <textarea id="sheetEditor" rows="14" class="w-full font-mono text-xs border rounded-lg p-3 bg-transparent" placeholder="بيانات الشيت..."></textarea>
             </div>
         </section>
 
     </main>
 
-    <!-- Firebase Configuration & Logic -->
+    <!-- Script Logic -->
     <script>
-        // إعدادات جافاسكريبت للاتصال بـ Firebase Realtime Database الخاصة بك
-        const firebaseConfig = {
-            databaseURL: "https://monasqen-default-rtdb.firebaseio.com/"
-        };
+        const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         let activeTab = 'updates';
 
+        // Theme Manager
+        function changeTheme(themeName) {
+            document.body.className = themeName;
+            localStorage.setItem('majestty_theme', themeName);
+        }
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('majestty_theme') || 'theme-dark-blue';
+            document.body.className = savedTheme;
+            document.getElementById('themeSelect').value = savedTheme;
+            loadUpdates();
+            loadHandover();
+        };
+
         function switchTab(tab) {
             activeTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('text-gray-600', 'hover:bg-gray-100');
             });
             event.target.classList.add('bg-blue-600', 'text-white');
-            event.target.classList.remove('text-gray-600', 'hover:bg-gray-100');
+
+            document.getElementById('section-updates').classList.add('hidden');
+            document.getElementById('section-handover').classList.add('hidden');
+            document.getElementById('section-sheets').classList.add('hidden');
 
             if(tab === 'updates') {
                 document.getElementById('section-updates').classList.remove('hidden');
-                document.getElementById('section-sheets').classList.add('hidden');
                 loadUpdates();
+            } else if(tab === 'handover') {
+                document.getElementById('section-handover').classList.remove('hidden');
+                loadHandover();
             } else {
-                document.getElementById('section-updates').classList.add('hidden');
                 document.getElementById('section-sheets').classList.remove('hidden');
                 loadSheetData(tab);
             }
         }
 
-        // تحميل وتخزين التنبيهات
-        const updateForm = document.getElementById('updateForm');
-        updateForm.addEventListener('submit', (e) => {
+        // Updates Logic
+        document.getElementById('updateForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const title = document.getElementById('upTitle').value;
             const desc = document.getElementById('upDesc').value;
             const fileInput = document.getElementById('upFile');
-            
-            const newUpdateRef = db.ref('updates').push();
-            
+            const newRef = db.ref('updates').push();
+
             if(fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    newUpdateRef.set({
-                        title: title,
-                        desc: desc,
-                        fileData: event.target.result,
-                        fileName: file.name,
-                        timestamp: Date.now()
-                    }, () => {
-                        updateForm.reset();
+                reader.onload = (e) => {
+                    newRef.set({ title, desc, fileData: e.target.result, fileName: file.name, timestamp: Date.now() }, () => {
+                        document.getElementById('updateForm').reset();
                         loadUpdates();
                     });
                 };
                 reader.readAsDataURL(file);
             } else {
-                newUpdateRef.set({
-                    title: title,
-                    desc: desc,
-                    fileData: null,
-                    fileName: null,
-                    timestamp: Date.now()
-                }, () => {
-                    updateForm.reset();
+                newRef.set({ title, desc, fileData: null, fileName: null, timestamp: Date.now() }, () => {
+                    document.getElementById('updateForm').reset();
                     loadUpdates();
                 });
             }
@@ -163,68 +213,97 @@
                 const list = document.getElementById('updatesList');
                 list.innerHTML = '';
                 const data = snapshot.val();
-                if(!data) {
-                    list.innerHTML = '<p class="text-gray-500">لا توجد تنبيهات حالياً.</p>';
-                    return;
-                }
+                if(!data) { list.innerHTML = '<p class="text-xs opacity-60">لا توجد تنبيهات حالياً.</p>'; return; }
                 Object.keys(data).reverse().forEach(key => {
                     const item = data[key];
-                    let fileHtml = item.fileName ? `<div class="mt-2"><a href="${item.fileData}" download="${item.fileName}" class="text-blue-500 underline text-sm">📎 تنزيل الملف المرفق: ${item.fileName}</a></div>` : '';
-                    
+                    let fileHtml = item.fileName ? `<div class="mt-2"><a href="${item.fileData}" download="${item.fileName}" class="text-blue-400 underline text-xs">📎 ${item.fileName}</a></div>` : '';
                     list.innerHTML += `
-                        <div class="border p-4 rounded-lg bg-gray-50 relative">
-                            <h3 class="font-bold text-lg text-blue-700">${item.title}</h3>
-                            <p class="text-gray-700 mt-1 whitespace-pre-line">${item.desc}</p>
+                        <div class="border p-4 rounded-lg bg-black/10 relative space-y-1">
+                            <h3 class="font-bold text-sm text-blue-400">${item.title}</h3>
+                            <p class="text-xs opacity-90 whitespace-pre-line">${item.desc}</p>
                             ${fileHtml}
-                            <div class="flex justify-between items-center mt-3 text-xs text-gray-400">
+                            <div class="flex justify-between items-center pt-2 text-[10px] opacity-50">
                                 <span>${new Date(item.timestamp).toLocaleString('ar-EG')}</span>
-                                <button onclick="deleteUpdate('${key}')" class="text-red-500 hover:text-red-700 font-bold">🗑️ حذف</button>
+                                <button onclick="deleteData('updates', '${key}')" class="text-red-400 hover:text-red-600 font-bold">🗑️ حذف</button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             });
         }
 
-        function deleteUpdate(key) {
-            if(confirm('هل أنت متأكد من حذف هذا التنبيه؟')) {
-                db.ref('updates/' + key).remove();
-            }
+        // Handover Logic (تسليم الشفتات)
+        document.getElementById('handoverForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('custName').value;
+            const branch = document.getElementById('custBranch').value;
+            const details = document.getElementById('custDetails').value;
+            db.ref('handover').push({ name, branch, details, timestamp: Date.now() }, () => {
+                document.getElementById('handoverForm').reset();
+                loadHandover();
+            });
+        });
+
+        function loadHandover() {
+            db.ref('handover').on('value', (snapshot) => {
+                const list = document.getElementById('handoverList');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if(!data) { list.innerHTML = '<p class="text-xs opacity-60">لا توجد عملاء مسجلين حالياً للتسليم.</p>'; return; }
+                Object.keys(data).reverse().forEach(key => {
+                    const item = data[key];
+                    list.innerHTML += `
+                        <div class="border p-4 rounded-lg bg-black/10 relative space-y-1 border-green-500/30">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-sm text-green-400">👤 ${item.name}</h3>
+                                <span class="bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-[10px]">${item.branch}</span>
+                            </div>
+                            <p class="text-xs opacity-90 whitespace-pre-line">${item.details}</p>
+                            <div class="flex justify-between items-center pt-2 text-[10px] opacity-50">
+                                <span>${new Date(item.timestamp).toLocaleString('ar-EG')}</span>
+                                <button onclick="deleteData('handover', '${key}')" class="text-red-400 hover:text-red-600 font-bold">🗑️ تم المتابعة / حذف</button>
+                            </div>
+                        </div>`;
+                });
+            });
         }
 
-        // إدارة صفحات الشيت الـ 6
-        const tabNames = {
-            'tab1': 'الواجهة',
+        // Delete universal function
+        function deleteData(path, key) {
+            if(confirm('هل أنت متأكد من الحذف؟')) db.ref(path + '/' + key).remove();
+        }
+
+        // Sheets Content Manager (البيانات الفعلية للصفحات الـ 6)
+        const sheetNames = {
+            'tab1': 'الواجهة وملاحظات عامة',
             'tab2': 'الأقسام والخدمات',
-            'tab3': 'دوام الأطباء',
-            'tab4': 'العروض',
-            'tab5': 'الاستفسارات',
-            'tab6': 'المنسقين'
+            'tab3': 'دوام الأطباء (معشى والوسام)',
+            'tab4': 'العروض (ليزر، تقويم، زراعة)',
+            'tab5': 'الاستفسارات والتعليمات',
+            'tab6': 'المنسقين وأرقام التواصل'
+        };
+
+        const defaultSheetData = {
+            'tab1': `فرع معشي: 9ص-12م و 4:30م-9:30م\nفرع الوسام: 2م-10م\nملاحظة هامة: ينفع تحجز جلسة ليزر بدون كشفية ودخول على الدكتورة مباشرة.`,
+            'tab2': `جنتل ماكس برو (ازالة شعر)\nكلاريتي تو (ازالة شعر)\nسبيكترا (ليزر كربوني - تشقير - ازالة تاتو)\nهايدرا تاتش (تنظيف بشرة عميق)\nجهاز البيزو للزراعة وتوسيع العظم`,
+            'tab3': `د. سامى الدبعي - جراحة وجه وفكين (معشي)\nد. إيهاب هاشم - أسنان عام (الوسام)\nد. محمود اللبان - تركبيات وزراعة (معشي)\nد. تبيان - أسنان عام (الوسام)\nد. عبدالله اسبيناتي - تقويم (معشي)\nد. نازك قيناوي - جلدية (معشي)`,
+            'tab4': `عروض أكتوبر:\n- جلسة ليزر بدون كشفية\n- عرض الزراعة والتقويم (المبلغ غير قابل للاسترداد إذا اصر العميل بالحجز مباشرة، ويُعمل انتظار كشفيه لمدة أسبوع).`,
+            'tab5': `- في حال أحد سأل عن عرض الزراعة أو التقويم يتم توضيح أن المبلغ غير قابل للاسترداد.\n- عدم عمل أي انتظار أبداً يوم الخميس مع د. مروان عوني.`,
+            'tab6': `أرقام التواصل بماجستى: (920031480) - (966127372722)\nتنسيق المواعيد بين معشى والوسام.`
         };
 
         function loadSheetData(tabKey) {
-            document.getElementById('currentTabTitle').innerText = tabNames[tabKey];
+            document.getElementById('currentTabTitle').innerText = sheetNames[tabKey];
             db.ref('sheets/' + tabKey).once('value', (snapshot) => {
-                document.getElementById('sheetEditor').value = snapshot.val() || '';
+                document.getElementById('sheetEditor').value = snapshot.val() || defaultSheetData[tabKey];
             });
         }
 
         function saveCurrentSheetData() {
             const content = document.getElementById('sheetEditor').value;
             db.ref('sheets/' + activeTab).set(content, () => {
-                alert('✅ تم حفظ التعديلات بنجاح في السحابة!');
+                alert('✅ تم حفظ تعديلات الشيت في السحابة بنجاح!');
             });
         }
-
-        // محرك البحث العام (يبحث في التنبيهات ومحتوى الشيتات)
-        document.getElementById('globalSearch').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            if(!query) return;
-            // يمكن توسيع البحث حسب الرغبة
-        });
-
-        // التشغيل الأولي
-        loadUpdates();
     </script>
 </body>
 </html>
