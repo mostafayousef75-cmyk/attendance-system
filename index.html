@@ -1,510 +1,217 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام خدمة العملاء ومركز الاتصال المتكامل</title>
+    <title>مؤشر الأداء والمواعيد - عيادات ماجستي</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { cairo: ['Cairo', 'sans-serif'] },
-                    colors: {
-                        theme: {
-                            bg: 'var(--bg-main)',
-                            card: 'var(--bg-card)',
-                            text: 'var(--text-main)',
-                            accent: 'var(--accent-color)',
-                            border: 'var(--border-color)'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <style>
-        :root[data-theme="dark"] {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --text-main: #f8fafc;
-            --accent-color: #3b82f6;
-            --border-color: #334155;
-        }
-        :root[data-theme="light"] {
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --accent-color: #2563eb;
-            --border-color: #e2e8f0;
-        }
-        :root[data-theme="ocean"] {
-            --bg-main: #06b6d4;
-            --bg-card: #0891b2;
-            --text-main: #ffffff;
-            --accent-color: #facc15;
-            --border-color: #22d3ee;
-        }
-        :root[data-theme="emerald"] {
-            --bg-main: #064e3b;
-            --bg-card: #047857;
-            --text-main: #ecfdf5;
-            --accent-color: #10b981;
-            --border-color: #059669;
-        }
+        body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
 
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            transition: all 0.3s ease;
-        }
+        /* Themes Configuration */
+        .theme-dark-blue { background-color: #0d1322; color: #e2e8f0; }
+        .theme-dark-blue .card { background-color: #151d30; border-color: #1e293b; }
+        .theme-dark-blue .header-bg { background-color: #1e293b; }
 
-        .card-custom {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-        }
+        .theme-oled { background-color: #000000; color: #ffffff; }
+        .theme-oled .card { background-color: #0f0f0f; border-color: #262626; }
+        .theme-oled .header-bg { background-color: #121212; }
+
+        .theme-charcoal { background-color: #1a1a1a; color: #e5e5e5; }
+        .theme-charcoal .card { background-color: #262626; border-color: #404040; }
+        .theme-charcoal .header-bg { background-color: #333333; }
+
+        .theme-light { background-color: #f8fafc; color: #0f172a; }
+        .theme-light .card { background-color: #ffffff; border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .theme-light .header-bg { background-color: #ffffff; border-bottom: 1px solid #e2e8f0; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="theme-dark-blue min-h-screen">
 
-    <!-- Navbar -->
-    <header class="card-custom sticky top-0 z-40 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+    <!-- Header Navigation Bar -->
+    <header class="header-bg sticky top-0 z-50 p-4 border-b border-gray-700 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <i class="fa-solid fa-headset text-3xl text-blue-500"></i>
-                <div>
-                    <h1 class="font-bold text-xl">منظومة خدمة العملاء والعمليات</h1>
-                    <p class="text-xs opacity-75">إدارة المواعيد، التنبيهات، والعروض والعملاء</p>
-                </div>
+                <button onclick="toggleSidebar()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-bars"></i> القائمة
+                </button>
+                <h1 class="text-xl font-bold tracking-wide">مؤشر الأداء والمواعيد - عيادات ماجستي</h1>
             </div>
 
-            <!-- Theme Switcher & Actions -->
-            <div class="flex items-center gap-3">
-                <span class="text-xs font-semibold">السيم (المظهر):</span>
-                <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-gray-700 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none">
-                    <option value="dark">🌙 داكن (Dark)</option>
-                    <option value="light">☀️ فاتح (Light)</option>
-                    <option value="ocean">🌊 المحيط (Ocean)</option>
-                    <option value="emerald">🌿 الزمردي (Emerald)</option>
+            <!-- Theme Selector -->
+            <div class="flex items-center gap-2">
+                <label class="font-bold text-sm">السيم:</label>
+                <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-blue-900 border border-blue-600 text-white rounded-lg px-3 py-1.5 focus:outline-none">
+                    <option value="theme-dark-blue">الأزرق الغامق</option>
+                    <option value="theme-oled">OLED الأسود (Amoled)</option>
+                    <option value="theme-charcoal">الرصاصي الفحمي</option>
+                    <option value="theme-light">المضيء الفاتح</option>
                 </select>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-8">
-
-        <!-- Global Search Bar -->
-        <section class="card-custom p-4 rounded-xl shadow-md">
-            <div class="relative">
-                <i class="fa-solid fa-search absolute right-4 top-3.5 text-gray-400 text-lg"></i>
-                <input type="text" id="globalSearch" oninput="handleSearch()" placeholder="بحث متقدم في كافة المواعيد، التنبيهات، الاستفسارات، الأطباء والعروض..." class="w-full pr-12 pl-4 py-3 rounded-lg bg-black/10 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-        </section>
-
-        <!-- Quick Tabs Navigation -->
-        <div class="flex flex-wrap gap-2 border-b border-gray-700 pb-2">
-            <button onclick="switchTab('notices')" id="tab-notices" class="px-5 py-2.5 rounded-lg font-bold text-sm transition bg-blue-600 text-white">
-                <i class="fa-solid fa-bell ml-1"></i> التنبيهات والإشعارات
-            </button>
-            <button onclick="switchTab('handover')" id="tab-handover" class="px-5 py-2.5 rounded-lg font-bold text-sm transition bg-gray-700 hover:bg-gray-600">
-                <i class="fa-solid fa-user-check ml-1"></i> تسليم العملاء (Handover)
-            </button>
-            <button onclick="switchTab('schedules')" id="tab-schedules" class="px-5 py-2.5 rounded-lg font-bold text-sm transition bg-gray-700 hover:bg-gray-600">
-                <i class="fa-solid fa-calendar-days ml-1"></i> المواعيد والأطباء
-            </button>
-            <button onclick="switchTab('services')" id="tab-services" class="px-5 py-2.5 rounded-lg font-bold text-sm transition bg-gray-700 hover:bg-gray-600">
-                <i class="fa-solid fa-tags ml-1"></i> العروض والخدمات والأسعار
-            </button>
+    <!-- Global Advanced Search Bar -->
+    <div class="max-w-7xl mx-auto p-4">
+        <div class="relative">
+            <input type="text" id="globalSearch" onkeyup="filterData()" placeholder="بحث سريع في العملاء، المواعيد، الأطباء، الفروع، أو العروض والاستفسارات..." class="w-full card p-3 pr-10 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none">
+            <i class="fa-solid fa-magnifying-glass absolute top-4 left-4 text-gray-400"></i>
         </div>
+    </div>
 
-        <!-- Section 1: Notices & Announcements -->
-        <section id="section-notices" class="space-y-4">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-bullhorn text-yellow-500"></i> التنبيهات والتعليمات الجديدة
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto p-4 space-y-8">
+
+        <!-- 1. General Notifications Section (شاشة التنبيهات والإشعارات) -->
+        <section class="card p-5 rounded-xl border">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn"></i> تنبيهات وإشارات العيادة العامة
                 </h2>
-                <button onclick="openNoticeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> إضافة تنبيه جديد
+                <button onclick="openNotificationModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold">
+                    <i class="fa-solid fa-plus"></i> إضافة إشعار جديد
                 </button>
             </div>
-
-            <div id="noticesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Loaded dynamically from Firebase -->
+            
+            <div id="notificationsContainer" class="space-y-4">
+                <!-- Data populated dynamically via Firebase -->
             </div>
         </section>
 
-        <!-- Section 2: Customer Handover -->
-        <section id="section-handover" class="space-y-4 hidden">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-users-gear text-emerald-400"></i> متابعة وتسليم العملاء بين الشيفتات
+        <!-- 2. Handover & Client Tracking Table (جدول تسليم العملاء المكثف) -->
+        <section class="card p-5 rounded-xl border">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> تسليم ومتابعة العملاء اليومية
                 </h2>
-                <button onclick="openHandoverModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> إضافة عميل للمتابعة
+                <button onclick="openClientModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold">
+                    <i class="fa-solid fa-user-plus"></i> إضافة عميل جديد
                 </button>
             </div>
 
-            <div class="card-custom rounded-xl overflow-x-auto">
-                <table class="w-full text-sm text-right">
-                    <thead class="bg-black/20 font-bold border-b border-gray-700">
-                        <tr>
-                            <th class="p-3">اسم العميل</th>
-                            <th class="p-3">رقم الهاتف</th>
-                            <th class="p-3">القسم / الخدمة</th>
-                            <th class="p-3">حالة المتابعة</th>
-                            <th class="p-3">الملاحظات</th>
-                            <th class="p-3">الموظف المسؤول</th>
-                            <th class="p-3">التحديث</th>
-                            <th class="p-3 text-center">إجراءات</th>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-800 text-gray-300 text-sm">
+                            <th class="p-2 border border-gray-700">العميل</th>
+                            <th class="p-2 border border-gray-700">الهاتف</th>
+                            <th class="p-2 border border-gray-700">الفرع</th>
+                            <th class="p-2 border border-gray-700">الدكتور / الخدمة</th>
+                            <th class="p-2 border border-gray-700">الموعد</th>
+                            <th class="p-2 border border-gray-700">الحالة</th>
+                            <th class="p-2 border border-gray-700">ملاحظات والتفاصيل</th>
+                            <th class="p-2 border border-gray-700">إجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="handoverTableBody">
-                        <!-- Loaded dynamically -->
+                    <tbody id="clientsTableBody" class="text-sm">
+                        <!-- Dynamic rows -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Section 3: Schedules & Doctors -->
-        <section id="section-schedules" class="space-y-4 hidden">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-user-doctor text-indigo-400"></i> جدول مواعيد الأطباء والمنسقين
-                </h2>
-                <button onclick="openScheduleModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> إضافة موعد طبيب
-                </button>
-            </div>
+        <!-- 3. Doctors Schedule Breakdown (جدول دوام الأطباء بالفروع) -->
+        <section class="card p-5 rounded-xl border">
+            <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-user-nurse"></i> جدول دوام الأطباء والمناوبات
+            </h2>
 
-            <div class="card-custom rounded-xl overflow-x-auto">
-                <table class="w-full text-sm text-right">
-                    <thead class="bg-black/20 font-bold border-b border-gray-700">
-                        <tr>
-                            <th class="p-3">الطبيب / المنسق</th>
-                            <th class="p-3">الفرع / التخصص</th>
-                            <th class="p-3">أيام التواجد</th>
-                            <th class="p-3">ساعات العمل</th>
-                            <th class="p-3">ملاحظات الحجز</th>
-                            <th class="p-3">آخر تعديل</th>
-                            <th class="p-3 text-center">إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="schedulesTableBody">
-                        <!-- Loaded dynamically -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Branch: Maashi -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-blue-300 border-b border-blue-500 pb-1">🏢 فرع معشي</h3>
+                    <div class="space-y-2 text-sm" id="maashiDoctors">
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. سامي الدبعي (جراحة وزراعة)</div>
+                            <div>الأيام: يومياً ما عدا السبت (نصف دوام 1 م - 10 م)</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. محمود اللبان (تركيبات وزراعة)</div>
+                            <div>الأيام: 9ص-12م / 4:30م-9:30م (الخميس 10ص - 2م)</div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Section 4: Services & Offers -->
-        <section id="section-services" class="space-y-4 hidden">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-percent text-purple-400"></i> العروض والأسعار والاستفسارات
-                </h2>
-                <button onclick="openServiceModal()" class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> إضافة عرض / خدمة
-                </button>
-            </div>
-
-            <div id="servicesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Loaded dynamically -->
+                <!-- Branch: Al Wesam -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-green-300 border-b border-green-500 pb-1">🏢 فرع الوسام</h3>
+                    <div class="space-y-2 text-sm" id="wesamDoctors">
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. إيهاب هاشم (أسنان عام)</div>
+                            <div>الأيام: يومياً 9ص - 12م | 4:30م - 9:30م (الجمعة/السبت 4م-8م)</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. تبيان (أسنان عام)</div>
+                            <div>الأيام: السبت إلى الأربعاء (2م - 10م)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
-
     </main>
 
-    <!-- Modals -->
-    <!-- Notice Modal -->
-    <div id="noticeModal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
-        <div class="card-custom max-w-lg w-full rounded-xl p-6 space-y-4">
-            <h3 class="font-bold text-lg border-b border-gray-700 pb-2" id="noticeModalTitle">إضافة تنبيه جديد</h3>
-            <form onsubmit="saveNotice(event)" class="space-y-3">
-                <input type="hidden" id="noticeId">
-                <div>
-                    <label class="block text-xs font-semibold mb-1">عنوان التنبيه</label>
-                    <input type="text" id="noticeTitle" required class="w-full p-2.5 rounded bg-black/20 border border-gray-600 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">تفاصيل التنبيه</label>
-                    <textarea id="noticeContent" rows="3" required class="w-full p-2.5 rounded bg-black/20 border border-gray-600 text-sm"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">رابط الصورة (اختياري)</label>
-                    <input type="url" id="noticeImage" placeholder="https://..." class="w-full p-2.5 rounded bg-black/20 border border-gray-600 text-sm">
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('noticeModal')" class="px-4 py-2 rounded bg-gray-600 text-sm">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-sm font-bold">حفظ التنبيه</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Handover Modal -->
-    <div id="handoverModal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
-        <div class="card-custom max-w-lg w-full rounded-xl p-6 space-y-4">
-            <h3 class="font-bold text-lg border-b border-gray-700 pb-2" id="handoverModalTitle">إضافة عميل للمتابعة</h3>
-            <form onsubmit="saveHandover(event)" class="space-y-3">
-                <input type="hidden" id="handoverId">
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">اسم العميل</label>
-                        <input type="text" id="clientName" required class="w-full p-2 rounded bg-black/20 border border-gray-600 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">رقم الهاتف</label>
-                        <input type="text" id="clientPhone" required class="w-full p-2 rounded bg-black/20 border border-gray-600 text-sm">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">القسم / الخدمة</label>
-                    <input type="text" id="clientService" class="w-full p-2 rounded bg-black/20 border border-gray-600 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">الملاحظات والحالة</label>
-                    <textarea id="clientNotes" rows="2" class="w-full p-2 rounded bg-black/20 border border-gray-600 text-sm"></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">الموظف المسؤول</label>
-                        <input type="text" id="agentName" required class="w-full p-2 rounded bg-black/20 border border-gray-600 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">حالة الطلب</label>
-                        <select id="clientStatus" class="w-full p-2 rounded bg-black/20 border border-gray-600 text-sm">
-                            <option value="قيد المتابعة">قيد المتابعة</option>
-                            <option value="تم التواصل">تم التواصل</option>
-                            <option value="مكتمل">مكتمل</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('handoverModal')" class="px-4 py-2 rounded bg-gray-600 text-sm">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 rounded bg-emerald-600 text-sm font-bold">حفظ البيانات</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Image Preview Modal -->
-    <div id="imageModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50" onclick="closeModal('imageModal')">
-        <img id="previewImage" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl">
-    </div>
-
-    <!-- JS Logic -->
+    <!-- Firebase Logic JavaScript -->
     <script>
-        // Firebase Config
+        // Firebase Configuration
         const firebaseConfig = {
             databaseURL: "https://monasqen-default-rtdb.firebaseio.com/"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Local State
-        let noticesData = {};
-        let handoverData = {};
-        let schedulesData = {};
-        let servicesData = {};
-
-        // Theme Switcher
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('app-theme', theme);
+        // Theme Switcher Logic
+        function changeTheme(themeClass) {
+            document.body.className = `${themeClass} min-h-screen`;
+            localStorage.setItem('selectedTheme', themeClass);
         }
 
-        const savedTheme = localStorage.getItem('app-theme') || 'dark';
-        document.getElementById('themeSelect').value = savedTheme;
-        changeTheme(savedTheme);
+        // Load Saved Theme
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark-blue';
+            document.getElementById('themeSelect').value = savedTheme;
+            changeTheme(savedTheme);
+            listenNotifications();
+            listenClients();
+        };
 
-        // Tab Switcher
-        function switchTab(tab) {
-            ['notices', 'handover', 'schedules', 'services'].forEach(t => {
-                document.getElementById(`section-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).className = "px-5 py-2.5 rounded-lg font-bold text-sm transition bg-gray-700 hover:bg-gray-600";
-            });
-            document.getElementById(`section-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).className = "px-5 py-2.5 rounded-lg font-bold text-sm transition bg-blue-600 text-white";
-        }
-
-        // Firebase Listeners
-        db.ref('notices').on('value', snapshot => {
-            noticesData = snapshot.val() || {};
-            renderNotices();
-        });
-
-        db.ref('handover').on('value', snapshot => {
-            handoverData = snapshot.val() || {};
-            renderHandover();
-        });
-
-        db.ref('schedules').on('value', snapshot => {
-            schedulesData = snapshot.val() || {};
-            renderSchedules();
-        });
-
-        db.ref('services').on('value', snapshot => {
-            servicesData = snapshot.val() || {};
-            renderServices();
-        });
-
-        // Render Functions
-        function renderNotices() {
-            const container = document.getElementById('noticesContainer');
-            container.innerHTML = '';
-            Object.keys(noticesData).forEach(key => {
-                const item = noticesData[key];
-                container.innerHTML += `
-                    <div class="card-custom p-4 rounded-xl space-y-3 relative flex flex-col justify-between">
-                        <div>
-                            ${item.image ? `<img src="${item.image}" onclick="openImage('${item.image}')" class="w-full h-40 object-cover rounded-lg mb-2 cursor-pointer hover:opacity-90">` : ''}
-                            <h4 class="font-bold text-base text-blue-400">${item.title}</h4>
-                            <p class="text-xs mt-1 opacity-90 leading-relaxed">${item.content}</p>
-                        </div>
-                        <div class="border-t border-gray-700/50 pt-2 flex justify-between items-center text-[11px] opacity-75">
-                            <span><i class="fa-regular fa-clock ml-1"></i>${item.updatedAt || item.createdAt}</span>
-                            <div class="flex gap-2">
-                                <button onclick="editNotice('${key}')" class="text-yellow-400 hover:underline"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteItem('notices', '${key}')" class="text-red-400 hover:underline"><i class="fa-solid fa-trash"></i></button>
+        // Firebase Realtime Notifications Handler
+        function listenNotifications() {
+            db.ref('notifications').on('value', (snapshot) => {
+                const container = document.getElementById('notificationsContainer');
+                container.innerHTML = '';
+                snapshot.forEach((child) => {
+                    const item = child.val();
+                    const id = child.key;
+                    container.innerHTML += `
+                        <div class="card p-4 rounded-xl border border-yellow-600 relative">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-yellow-400">${item.title}</h3>
+                                <span class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> ${item.timestamp}</span>
+                            </div>
+                            <p class="mt-2 text-sm">${item.details}</p>
+                            ${item.imageUrl ? `<img src="${item.imageUrl}" class="mt-3 max-h-48 rounded-lg border border-gray-700">` : ''}
+                            <div class="mt-3 flex gap-2">
+                                <button onclick="deleteNotification('${id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded">حذف <i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                });
             });
         }
 
-        function renderHandover() {
-            const body = document.getElementById('handoverTableBody');
-            body.innerHTML = '';
-            Object.keys(handoverData).forEach(key => {
-                const item = handoverData[key];
-                body.innerHTML += `
-                    <tr class="border-b border-gray-700/50 hover:bg-black/10">
-                        <td class="p-3 font-semibold">${item.name}</td>
-                        <td class="p-3">${item.phone}</td>
-                        <td class="p-3">${item.service || '-'}</td>
-                        <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${item.status === 'مكتمل' ? 'bg-green-600' : 'bg-yellow-600'} text-white">${item.status}</span></td>
-                        <td class="p-3 text-xs">${item.notes || '-'}</td>
-                        <td class="p-3">${item.agent}</td>
-                        <td class="p-3 text-[11px] opacity-75">${item.updatedAt}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="deleteItem('handover', '${key}')" class="text-red-400 px-2"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function renderSchedules() {
-            const body = document.getElementById('schedulesTableBody');
-            body.innerHTML = '';
-            Object.keys(schedulesData).forEach(key => {
-                const item = schedulesData[key];
-                body.innerHTML += `
-                    <tr class="border-b border-gray-700/50 hover:bg-black/10">
-                        <td class="p-3 font-semibold text-indigo-400">${item.doctor}</td>
-                        <td class="p-3">${item.branch}</td>
-                        <td class="p-3">${item.days}</td>
-                        <td class="p-3">${item.hours}</td>
-                        <td class="p-3 text-xs">${item.notes || '-'}</td>
-                        <td class="p-3 text-[11px] opacity-75">${item.updatedAt}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="deleteItem('schedules', '${key}')" class="text-red-400 px-2"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function renderServices() {
-            const container = document.getElementById('servicesContainer');
-            container.innerHTML = '';
-            Object.keys(servicesData).forEach(key => {
-                const item = servicesData[key];
-                container.innerHTML += `
-                    <div class="card-custom p-4 rounded-xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-purple-400">${item.title}</h4>
-                            <span class="text-sm font-extrabold text-green-400">${item.price || ''}</span>
-                        </div>
-                        <p class="text-xs leading-relaxed opacity-90">${item.details}</p>
-                        <div class="text-[11px] opacity-75 pt-2 border-t border-gray-700/50 flex justify-between">
-                            <span>تحديث: ${item.updatedAt}</span>
-                            <button onclick="deleteItem('services', '${key}')" class="text-red-400"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // Modals Logic & CRUD
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function openNoticeModal() { document.getElementById('noticeModal').classList.remove('hidden'); }
-        function openHandoverModal() { document.getElementById('handoverModal').classList.remove('hidden'); }
-        function openImage(url) { 
-            document.getElementById('previewImage').src = url; 
-            document.getElementById('imageModal').classList.remove('hidden'); 
-        }
-
-        function getCurrentTime() {
-            const now = new Date();
-            return now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
-        }
-
-        function saveNotice(e) {
-            e.preventDefault();
-            const id = document.getElementById('noticeId').value || db.ref('notices').push().key;
-            db.ref(`notices/${id}`).set({
-                title: document.getElementById('noticeTitle').value,
-                content: document.getElementById('noticeContent').value,
-                image: document.getElementById('noticeImage').value,
-                updatedAt: getCurrentTime()
-            });
-            closeModal('noticeModal');
-            e.target.reset();
-        }
-
-        function saveHandover(e) {
-            e.preventDefault();
-            const id = db.ref('handover').push().key;
-            db.ref(`handover/${id}`).set({
-                name: document.getElementById('clientName').value,
-                phone: document.getElementById('clientPhone').value,
-                service: document.getElementById('clientService').value,
-                notes: document.getElementById('clientNotes').value,
-                agent: document.getElementById('agentName').value,
-                status: document.getElementById('clientStatus').value,
-                updatedAt: getCurrentTime()
-            });
-            closeModal('handoverModal');
-            e.target.reset();
-        }
-
-        function deleteItem(path, key) {
-            if(confirm('هل انت متاكد من حذف هذا العنصر؟')) {
-                db.ref(`${path}/${key}`).remove();
+        function deleteNotification(id) {
+            if(confirm('هل أنت تأكد من إزالة التنبيه؟')) {
+                db.ref('notifications/' + id).remove();
             }
-        }
-
-        function handleSearch() {
-            const query = document.getElementById('globalSearch').value.toLowerCase();
-            document.querySelectorAll('tbody tr, #noticesContainer > div, #servicesContainer > div').forEach(el => {
-                const text = el.innerText.toLowerCase();
-                el.style.display = text.includes(query) ? '' : 'none';
-            });
         }
     </script>
 </body>
