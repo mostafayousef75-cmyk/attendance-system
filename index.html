@@ -32,18 +32,18 @@
 <body class="theme-dark-blue min-h-screen">
 
     <!-- Header -->
-    <header class="header-bg sticky top-0 z-50 p-4 border-b shadow-md flex justify-between items-center">
+    <header class="header-bg sticky top-0 z-50 p-4 border-b shadow-md flex justify-between items-center flex-wrap gap-4">
         <div class="flex items-center gap-3">
             <button onclick="toggleSidebar()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
                 <i class="fa-solid fa-bars"></i> القائمة
             </button>
-            <h1 class="text-xl font-bold">عيادات ماجستي - الكول سنتر</h1>
+            <h1 class="text-xl font-bold">عيادات ماجستي - نظام الكول سنتر الشامل</h1>
         </div>
         <div class="flex items-center gap-2">
             <label class="font-bold text-sm">السيم:</label>
-            <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-blue-900 border border-blue-600 text-white rounded-lg px-3 py-1.5 outline-none">
+            <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-blue-900 border border-blue-600 text-white rounded-lg px-3 py-1.5 outline-none text-sm">
                 <option value="theme-dark-blue">الأزرق الغامق</option>
-                <option value="theme-oled">OLED الأسود</option>
+                <option value="theme-oled">OLED الأسود (Amoled)</option>
                 <option value="theme-charcoal">الرصاصي الفحمي</option>
                 <option value="theme-light">المضيء الفاتح</option>
             </select>
@@ -53,7 +53,7 @@
     <!-- Sidebar Drawer -->
     <div id="sidebar" class="fixed inset-y-0 right-0 w-72 card border-l shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
         <div class="p-4 border-b flex justify-between items-center">
-            <h2 class="font-bold text-lg text-blue-400"><i class="fa-solid fa-sliders"></i> لوحة التحكم والتحدث</h2>
+            <h2 class="font-bold text-lg text-blue-400"><i class="fa-solid fa-sliders"></i> لوحة التحكم والنسخ الاحتياطي</h2>
             <button onclick="toggleSidebar()" class="text-red-500 font-bold text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="p-4 space-y-4 flex-1 overflow-y-auto">
@@ -67,43 +67,150 @@
         </div>
     </div>
 
+    <!-- Global Advanced Search Bar -->
+    <div class="max-w-7xl mx-auto p-4">
+        <div class="relative">
+            <input type="text" id="globalSearch" onkeyup="filterAllData()" placeholder="بحث متقدم شامل (اسم عميل، دكتور، خدمة، فرع، استفسار)..." class="w-full card p-3 pr-10 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+            <i class="fa-solid fa-magnifying-glass absolute top-3.5 right-4 text-gray-400"></i>
+        </div>
+    </div>
+
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-4 space-y-8">
+    <main class="max-w-7xl mx-auto p-4 space-y-8 searchable-container">
         
-        <!-- Notifications Section -->
-        <section class="card p-5 rounded-xl border">
+        <!-- 1. General Notifications Section -->
+        <section class="card p-5 rounded-xl border search-item" data-text="تنبيهات إشعارات عامة">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-blue-400"><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات</h2>
+                <h2 class="text-xl font-bold text-blue-400"><i class="fa-solid fa-bullhorn"></i> تنبيهات وإشعارات العيادة العامة</h2>
                 <button onclick="openNotificationModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold">
-                    <i class="fa-solid fa-plus"></i> إضافة تنبيه
+                    <i class="fa-solid fa-plus"></i> إضافة تنبيه وصورة
                 </button>
             </div>
             <div id="notificationsContainer" class="space-y-4"></div>
         </section>
 
-        <!-- Client Handover Section -->
-        <section class="card p-5 rounded-xl border">
+        <!-- 2. Client Handover & Tracking Table -->
+        <section class="card p-5 rounded-xl border search-item" data-text="تسليم ومتابعة العملاء اليومية">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-users"></i> تسليم ومتابعة العملاء</h2>
+                <h2 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-users"></i> تسليم ومتابعة العملاء (بين الموظفين)</h2>
                 <button onclick="openClientModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold">
-                    <i class="fa-solid fa-user-plus"></i> إضافة عميل
+                    <i class="fa-solid fa-user-plus"></i> تسجيل عميل جديد
                 </button>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-right border-collapse">
+                <table class="w-full text-right border-collapse text-sm">
                     <thead>
-                        <tr class="bg-gray-800 text-gray-300 text-sm">
-                            <th class="p-2 border">العميل</th>
+                        <tr class="bg-gray-800 text-gray-300">
+                            <th class="p-2 border">اسم العميل</th>
                             <th class="p-2 border">الهاتف</th>
                             <th class="p-2 border">الفرع</th>
-                            <th class="p-2 border">الدكتور/الخدمة</th>
+                            <th class="p-2 border">الدكتور / الخدمة</th>
                             <th class="p-2 border">الموعد</th>
-                            <th class="p-2 border">الحالة</th>
-                            <th class="p-2 border">إجراءات</th>
+                            <th class="p-2 border">الملاحظات والتفاصيل</th>
+                            <th class="p-2 border">وقت التعديل/الإضافة</th>
+                            <th class="p-2 border text-center">إجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="clientsTableBody" class="text-sm"></tbody>
+                    <tbody id="clientsTableBody"></tbody>
                 </table>
+            </div>
+        </section>
+
+        <!-- 3. Doctors Schedule (Maashi & Wesam Branches) -->
+        <section class="card p-5 rounded-xl border search-item" data-text="دوام الاطباء فرع معشي فرع الوسام الاسنان الجلدية">
+            <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-user-doctor"></i> دوام الأطباء والمناوبات في الفرعين (معشي والوسام)[cite: 1]
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Maashi Branch -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-blue-300 border-b border-blue-500 pb-1">🏢 فرع معشي</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. سامي الدبعي (استشاري جراحة وجه وفكين وزراعة)</div>
+                            <div>الأيام: يومياً ما عدا السبت (نصف دوام 1 م - 10 م) | الكشفية: 100</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. محمود اللبان (أخصائي تركيبات وزراعة)</div>
+                            <div>الأيام: 9ص-12م / 4:30م-9:30م (الخميس 10ص - 2م) | الكشفية: 100</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. عبدالله اسبيناتي (أخصائي تقويم أسنان)</div>
+                            <div>الأيام: 1م - 9م يومياً (ما عدا الخميس 10ص - 2م) | الكشفية: 75</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. نازك قيناوي (أخصائية جلدية)</div>
+                            <div>الأيام: الأحد، الإثنين، الثلاثاء، الأربعاء، الخميس (2م - 10م) | الكشفية: 75</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. مروان عوني (أخصائي جذور وعصب)</div>
+                            <div>الأيام: 1م - 9م (ما عدا الخميس 10ص - 2م - لا سنتر انتظار يوم الخميس) | الكشفية: 100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wesam Branch -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-green-300 border-b border-green-500 pb-1">🏢 فرع الوسام</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. إيهاب هاشم (طبيب أسنان عام)</div>
+                            <div>الأيام: السبت للخميس 9ص-12م ومن 4:30م-9:30م (الجمعة/السبت 4م-8م) | الكشفية: 75 (الجمعة 100 مع تنظيف جير)</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. تبيان (طبيب أسنان عام)</div>
+                            <div>الأيام: السبت للأربعاء (2م - 10م) - الأوف الخميس | الكشفية: 75</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. فؤاد بهجت (طبيب عام / طوارئ)</div>
+                            <div>الأيام: من 2م إلى 10م | الكشفية: 75</div>
+                        </div>
+                        <div class="card p-3 rounded-lg border">
+                            <div class="font-bold text-yellow-400">د. منال العلي (طبيب أسنان عام)</div>
+                            <div>الأيام: 8:30ص - 12:30ظ / 5م - 9م (إجازة حتى إشعار آخر) | الكشفية: 75</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Services, Devices & Departments -->
+        <section class="card p-5 rounded-xl border search-item" data-text="الأقسام والخدمات الأجهزة جنتل كلاريتي هيليوس سبيكترا">
+            <h2 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-laptop-medical"></i> الأقسام، الخدمات، والأجهزة الطبية[cite: 1]
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6 text-sm">
+                <div class="card p-4 rounded-lg border space-y-2">
+                    <h3 class="font-bold text-blue-300 text-base">فرع معشي</h3>
+                    <p><b>الجلدية:</b> جهاز جنتل ماكس برو، كلاريتي تو، هيليوس (ليزر كربوني وتشجير وتاتو)، هايدرا تاتش (تنظيف بشرة عميق)، فراكشنال CO2.</p>
+                    <p><b>الأسنان:</b> مايكروسكوب (علاج العصب)، البيزو للزراعة، سكنر (ابتسامة ومقاسات)، ليزر قص اللثة، تبييض الزوم، بانوراما، بري أبيلكال.</p>
+                </div>
+                <div class="card p-4 rounded-lg border space-y-2">
+                    <h3 class="font-bold text-green-300 text-base">فرع الوسام</h3>
+                    <p><b>الجلدية:</b> سبيكترا (ليزر كربوني، تشقير، إزالة تاتو، توريد الشفايف)، جنتل ماكس برو لإزالة الشعر.</p>
+                    <p><b>الأسنان:</b> تبييض الزوم، ليزر قص اللثة، أشعة بانوراما، سيفالومتريك، بري أبيلكال، الأشعة ثلاثية الأبعاد.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. General Instructions & FAQs -->
+        <section class="card p-5 rounded-xl border search-item" data-text="الاستفسارات الشائعة العروض الدفع تابي تمارا الرتوش الكشفية">
+            <h2 class="text-xl font-bold text-amber-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-circle-question"></i> الاستفسارات الشائعة وتعليمات الكول سنتر[cite: 1]
+            </h2>
+            <div class="space-y-3 text-sm">
+                <div class="card p-3 rounded-lg border">
+                    <b>سياسة الدفع عبر تابي (Tabby) وتمارا (Tamara):</b> تُرسل بيانات العميل ورقم الملف في الجروب الرئيسي لعمل رابط الدفع، مع التأكد من الاسم الرباعي وتاريخ الميلاد والهوية ورقم الجوال لتأكيد السداد.
+                </div>
+                <div class="card p-3 rounded-lg border">
+                    <b>مواعيد الرتوش:</b> الأفضل خلال 14 يوماً من الجلسة، وبحد أقصى 16 يوماً، ولا تقل عن 12 يوماً. والفترة بين الجلسة والأخرى هي شهر.
+                </div>
+                <div class="card p-3 rounded-lg border">
+                    <b>صلاحية الكشفية:</b> كشفية الدكتور سارية لمدة 3 أشهر، وفتح الملف للعميل مجاني[cite: 1].
+                </div>
+                <div class="card p-3 rounded-lg border">
+                    <b>حجز الليزر والتشقير:</b> في معشي يمكن للعميل الذهاب مباشرة للتشقير دون حجز مسبق، أما في الوسام فيلزم حجز مسبق أو العرض على د. نازك لتحديد درجة الحرارة المناسبة.
+                </div>
             </div>
         </section>
     </main>
@@ -112,15 +219,15 @@
     <div id="notifModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
         <div class="card p-6 rounded-2xl w-full max-w-lg space-y-4 border">
             <h3 class="text-lg font-bold text-blue-400">إضافة تنبيه أو إشعار جديد</h3>
-            <input type="text" id="notifTitle" placeholder="عنوان التنبيه..." class="w-full card p-2.5 rounded-lg border outline-none">
-            <textarea id="notifDetails" placeholder="تفاصيل التنبيه..." class="w-full card p-2.5 rounded-lg border outline-none h-24"></textarea>
+            <input type="text" id="notifTitle" placeholder="عنوان التنبيه (مثال: عروض أكتوبر)..." class="w-full card p-2.5 rounded-lg border outline-none text-sm">
+            <textarea id="notifDetails" placeholder="تفاصيل التنبيه..." class="w-full card p-2.5 rounded-lg border outline-none h-24 text-sm"></textarea>
             <div>
                 <label class="block text-sm mb-1 text-gray-400">إرفاق صورة (اختياري):</label>
                 <input type="file" id="notifImage" accept="image/*" class="w-full text-sm">
             </div>
             <div class="flex justify-end gap-2">
-                <button onclick="closeNotificationModal()" class="bg-gray-600 px-4 py-2 rounded-lg text-white">إلغاء</button>
-                <button onclick="saveNotification()" class="bg-blue-600 px-4 py-2 rounded-lg text-white font-bold">حفظ ونشر</button>
+                <button onclick="closeNotificationModal()" class="bg-gray-600 px-4 py-2 rounded-lg text-white text-sm">إلغاء</button>
+                <button onclick="saveNotification()" class="bg-blue-600 px-4 py-2 rounded-lg text-white font-bold text-sm">حفظ ونشر</button>
             </div>
         </div>
     </div>
@@ -129,18 +236,18 @@
     <div id="clientModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
         <div class="card p-6 rounded-2xl w-full max-w-lg space-y-4 border">
             <h3 class="text-lg font-bold text-amber-400">تسجيل عميل جديد للمتابعة</h3>
-            <input type="text" id="clientName" placeholder="اسم العميل الرباعي..." class="w-full card p-2.5 rounded-lg border outline-none">
-            <input type="text" id="clientPhone" placeholder="رقم الهاتف..." class="w-full card p-2.5 rounded-lg border outline-none">
-            <select id="clientBranch" class="w-full card p-2.5 rounded-lg border outline-none">
+            <input type="text" id="clientName" placeholder="اسم العميل الرباعي..." class="w-full card p-2.5 rounded-lg border outline-none text-sm">
+            <input type="text" id="clientPhone" placeholder="رقم الهاتف..." class="w-full card p-2.5 rounded-lg border outline-none text-sm">
+            <select id="clientBranch" class="w-full card p-2.5 rounded-lg border outline-none text-sm">
                 <option value="فرع معشي">فرع معشي</option>
                 <option value="فرع الوسام">فرع الوسام</option>
             </select>
-            <input type="text" id="clientDoctor" placeholder="الدكتور أو الخدمة المطلوبة..." class="w-full card p-2.5 rounded-lg border outline-none">
-            <input type="text" id="clientDate" placeholder="موعد الحجز (مثال: 2026/10/26)" class="w-full card p-2.5 rounded-lg border outline-none">
-            <textarea id="clientNotes" placeholder="ملاحظات وتفاصيل..." class="w-full card p-2.5 rounded-lg border outline-none"></textarea>
+            <input type="text" id="clientDoctor" placeholder="الدكتور أو الخدمة المطلوبة..." class="w-full card p-2.5 rounded-lg border outline-none text-sm">
+            <input type="text" id="clientDate" placeholder="موعد الحجز (مثال: 2026/10/26)" class="w-full card p-2.5 rounded-lg border outline-none text-sm">
+            <textarea id="clientNotes" placeholder="ملاحظات وتفاصيل المكالمة..." class="w-full card p-2.5 rounded-lg border outline-none text-sm"></textarea>
             <div class="flex justify-end gap-2">
-                <button onclick="closeClientModal()" class="bg-gray-600 px-4 py-2 rounded-lg text-white">إلغاء</button>
-                <button onclick="saveClient()" class="bg-amber-600 px-4 py-2 rounded-lg text-white font-bold">حفظ العميل</button>
+                <button onclick="closeClientModal()" class="bg-gray-600 px-4 py-2 rounded-lg text-white text-sm">إلغاء</button>
+                <button onclick="saveClient()" class="bg-amber-600 px-4 py-2 rounded-lg text-white font-bold text-sm">حفظ العميل</button>
             </div>
         </div>
     </div>
@@ -151,8 +258,7 @@
         const db = firebase.database();
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('translate-x-full');
+            document.getElementById('sidebar').classList.toggle('translate-x-full');
         }
 
         function changeTheme(themeClass) {
@@ -167,20 +273,16 @@
             loadData();
         };
 
-        // Modals Control
         function openNotificationModal() { document.getElementById('notifModal').classList.remove('hidden'); }
         function closeNotificationModal() { document.getElementById('notifModal').classList.add('hidden'); }
         function openClientModal() { document.getElementById('clientModal').classList.remove('hidden'); }
         function closeClientModal() { document.getElementById('clientModal').classList.add('hidden'); }
 
-        // Save Notification with Image Support
         function saveNotification() {
             const title = document.getElementById('notifTitle').value;
             const details = document.getElementById('notifDetails').value;
             const imageFile = document.getElementById('notifImage').files[0];
-
             if(!title) { alert('الرجاء كتابة عنوان التنبيه'); return; }
-
             const timestamp = new Date().toLocaleString('ar-EG');
             
             if(imageFile) {
@@ -204,7 +306,6 @@
             document.getElementById('notifImage').value = '';
         }
 
-        // Save Client
         function saveClient() {
             const name = document.getElementById('clientName').value;
             const phone = document.getElementById('clientPhone').value;
@@ -229,9 +330,7 @@
             document.getElementById('clientNotes').value = '';
         }
 
-        // Load Data from Firebase
         function loadData() {
-            // Notifications Listener
             db.ref('notifications').on('value', (snapshot) => {
                 const container = document.getElementById('notificationsContainer');
                 container.innerHTML = '';
@@ -239,10 +338,10 @@
                     const item = child.val();
                     const id = child.key;
                     container.innerHTML += `
-                        <div class="card p-4 rounded-xl border relative space-y-2">
+                        <div class="card p-4 rounded-xl border relative space-y-2 search-item" data-text="${item.title} ${item.details}">
                             <div class="flex justify-between items-start">
                                 <h3 class="font-bold text-lg text-yellow-400">${item.title}</h3>
-                                <span class="text-xs text-gray-400">${item.timestamp}</span>
+                                <span class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> ${item.timestamp}</span>
                             </div>
                             <p class="text-sm">${item.details}</p>
                             ${item.imageUrl ? `<img src="${item.imageUrl}" class="mt-2 max-h-48 rounded-lg border">` : ''}
@@ -254,7 +353,6 @@
                 });
             });
 
-            // Clients Listener
             db.ref('clients').on('value', (snapshot) => {
                 const tbody = document.getElementById('clientsTableBody');
                 tbody.innerHTML = '';
@@ -262,13 +360,14 @@
                     const item = child.val();
                     const id = child.key;
                     tbody.innerHTML += `
-                        <tr class="border-b border-gray-800">
-                            <td class="p-2 border">${item.name}</td>
+                        <tr class="border-b border-gray-800 search-item" data-text="${item.name} ${item.phone} ${item.branch} ${item.doctor} ${item.notes}">
+                            <td class="p-2 border font-bold">${item.name}</td>
                             <td class="p-2 border">${item.phone}</td>
                             <td class="p-2 border">${item.branch}</td>
                             <td class="p-2 border">${item.doctor}</td>
                             <td class="p-2 border">${item.date}</td>
                             <td class="p-2 border">${item.notes}</td>
+                            <td class="p-2 border text-xs text-gray-400">${item.timestamp}</td>
                             <td class="p-2 border text-center">
                                 <button onclick="deleteItem('clients', '${id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                             </td>
@@ -284,7 +383,20 @@
             }
         }
 
-        // Export Data Function
+        // Global Search Filter
+        function filterAllData() {
+            const query = document.getElementById('globalSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.search-item');
+            items.forEach(item => {
+                const text = (item.getAttribute('data-text') + ' ' + item.innerText).toLowerCase();
+                if(text.includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
         function exportData() {
             db.ref().once('value', (snapshot) => {
                 const data = snapshot.val();
@@ -297,7 +409,6 @@
             });
         }
 
-        // Import Data Function
         function importData(event) {
             const file = event.target.files[0];
             if(!file) return;
