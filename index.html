@@ -92,10 +92,16 @@
             font-size: 1.3rem;
             font-weight: 800;
             color: var(--primary-color);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             display: flex;
             align-items: center;
             gap: 0.6rem;
+        }
+
+        .json-tools {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
         }
 
         .nav-links {
@@ -313,7 +319,7 @@
             font-weight: 600;
         }
 
-        /* Alerts Grid 50/50 */
+        /* Alerts 2 Column Grid */
         .alerts-2col-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -341,14 +347,7 @@
             flex-shrink: 0;
         }
 
-        .alert-content-block p {
-            font-size: 0.88rem;
-            font-weight: 400;
-            line-height: 1.35;
-            color: var(--text-main);
-        }
-
-        /* Coordinators Grid */
+        /* Drag & Drop Coordinators */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -366,6 +365,11 @@
             line-height: 1.5;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             position: relative;
+            cursor: grab;
+        }
+
+        .doc-sheet-card:active {
+            cursor: grabbing;
         }
 
         .doc-sheet-card h3 {
@@ -379,8 +383,9 @@
         .card-red { background-color: #b71c1c; }
         .card-darkblue { background-color: #1a237e; }
         .card-gold { background-color: #e65100; }
+        .card-green { background-color: #1b5e20; }
 
-        /* Offers Tabs */
+        /* Offers */
         .offers-tabs {
             display: flex;
             gap: 0.5rem;
@@ -432,7 +437,7 @@
             display: inline-block;
         }
 
-        /* Modals */
+        /* Fix Modal Height and Scrollbar */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -441,6 +446,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 1rem;
         }
 
         .modal-overlay.active { display: flex; }
@@ -450,11 +456,13 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 550px;
+            max-width: 600px;
+            max-height: 85vh; /* ارتفاع آمن مع التمرير الداخلي */
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            overflow-y: auto;
         }
 
         .form-control {
@@ -467,6 +475,24 @@
             outline: none;
         }
 
+        .days-checklist {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .day-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+        }
+
         .lightbox-img {
             max-width: 90vw;
             max-height: 85vh;
@@ -477,12 +503,20 @@
 </head>
 <body class="theme-amoled">
 
-    <!-- الشريط الجانبي (تم إضافة الأقسام والأطباء وتغيير الاسم لـ التنبيهات والإشعارات) -->
+    <!-- الشريط الجانبي -->
     <aside class="sidebar">
         <div class="brand-title">
             <i class="fa-solid fa-headset"></i>
             <span>لوحة الكول سنتر</span>
         </div>
+
+        <!-- أدوات JSON -->
+        <div class="json-tools">
+            <button class="btn btn-secondary" style="flex:1; font-size:0.75rem; padding:0.4rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير JSON</button>
+            <button class="btn btn-secondary" style="flex:1; font-size:0.75rem; padding:0.4rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد JSON</button>
+            <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
+        </div>
+
         <ul class="nav-links">
             <li><a class="nav-link active" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> مواعيد الأطباء</a></li>
             <li><a class="nav-link" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات</a></li>
@@ -528,15 +562,15 @@
                     </div>
                 </div>
 
-                <!-- شريط المناوبة والقائمة الحالية للأطباء المتواجدين اليوم -->
+                <!-- شريط التواجد اليومي ومناوبة الجمعة -->
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.8rem 1rem; border-radius:8px; margin-bottom:0.8rem; display:flex; flex-direction:column; gap:0.5rem; font-size:0.88rem;">
                     <div style="display:flex; gap:1.5rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
                     </div>
                     <div style="display:flex; gap:1.5rem; color:#60a5fa;">
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الأطباء المتواجدين اليوم (معشي):</strong> <span id="todayDocsMashy" style="color:#fff;">جاري التحميل...</span></span>
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الأطباء المتواجدين اليوم (الوسام):</strong> <span id="todayDocsWissam" style="color:#fff;">جاري التحميل...</span></span>
+                        <span><i class="fa-solid fa-user-check"></i> <strong>الأطباء المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - فرع معشي:</strong> <span id="todayDocsMashy" style="color:#fff;">-</span></span>
+                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:#fff;">-</span></span>
                     </div>
                 </div>
 
@@ -597,27 +631,31 @@
             <!-- 2. صفحة التنبيهات والإشعارات -->
             <section id="alerts-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
-                    <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العيادة العامة</h2>
+                    <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
                     <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث سريع في نص التنبيهات والإشعارات..." oninput="renderAlerts(this.value)">
+                    <input type="text" placeholder="بحث سريع في نص التنبيهات..." oninput="renderAlerts(this.value)">
                 </div>
 
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. صفحة الأقسام والأطباء الجديدة بالكامل (مطابقة للشيت صورة 4) -->
+            <!-- 3. صفحة الأقسام والأطباء (تعديل كامل للخدمات والملاحظات) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
-                    <h2>أقسام وفروع وخدمات ماجستي (دليل الأجهزة والخدمات الشامل)</h2>
+                    <h2>أقسام وفروع وخدمات العيادات</h2>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> إضافة جهاز/خدمة للجدول</button>
+                        <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة مهمة</button>
+                    </div>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث داخلي في الأجهزة، الأقسام، أو الخدمات المتاحة بالفروع..." oninput="renderDeptsAndDocs(this.value)">
+                    <input type="text" placeholder="بحث داخلي في جدول الأجهزة والخدمات بالفروع..." oninput="renderDeptsAndDocs(this.value)">
                 </div>
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1.2rem;">
@@ -629,56 +667,27 @@
                                     <tr style="background:#1e293b; color:#fff;">
                                         <th colspan="2" style="text-align:center; border-left:1px solid #334155;">فرع معشي</th>
                                         <th colspan="2" style="text-align:center;">فرع الوسام</th>
+                                        <th>الإجراءات</th>
                                     </tr>
                                     <tr>
-                                        <th>قسم الجلدية (الجهاز - الخدمة)</th>
-                                        <th style="border-left:1px solid #334155;">قسم الأسنان (الجهاز - الخدمة)</th>
-                                        <th>قسم الجلدية (الجهاز - الخدمة)</th>
-                                        <th>قسم الأسنان (الجهاز - الخدمة)</th>
+                                        <th>الجلدية (الجهاز/الخدمة)</th>
+                                        <th style="border-left:1px solid #334155;">الأسنان (الجهاز/الخدمة)</th>
+                                        <th>الجلدية (الجهاز/الخدمة)</th>
+                                        <th>الأسنان (الجهاز/الخدمة)</th>
+                                        <th>إدارة</th>
                                     </tr>
                                 </thead>
-                                <tbody id="deptsDocsTableBody">
-                                    <tr>
-                                        <td>جنتل ماكس برو / إزالة الشعر</td>
-                                        <td style="border-left:1px solid #334155;">مايكروسكوب / علاج العصب</td>
-                                        <td>سبيكترا / ليزر كربوني وتشقير</td>
-                                        <td>تبييض الزوم / تبييض أسنان</td>
-                                    </tr>
-                                    <tr>
-                                        <td>كلاريتي 2 / إزالة الشعر</td>
-                                        <td style="border-left:1px solid #334155;">البيزو / توسيع العظم والزراعة</td>
-                                        <td>سبيكترا / التشقير وتوريد شفايف</td>
-                                        <td>جهاز ليزر / قص اللثة</td>
-                                    </tr>
-                                    <tr>
-                                        <td>هيليوس / ليزر كربوني وتشقير</td>
-                                        <td style="border-left:1px solid #334155;">سكنر / مقاسات وابتسامة</td>
-                                        <td>جنتل ماكس برو / إزالة الشعر</td>
-                                        <td>أشعة بانوراما وسيفالومتريك</td>
-                                    </tr>
-                                    <tr>
-                                        <td>فراكشنال CO2 / الندبات والتغييرات</td>
-                                        <td style="border-left:1px solid #334155;">أشعة بانوراما وسيفالومتريك</td>
-                                        <td>هايدرا تتش / تنظيف بشرة عميق</td>
-                                        <td>بري أيبكال / أشعة ثلاثية الأبعاد</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="deptsDocsTableBody"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- كارت الملحوظات المهمة (من الشيت) -->
-                    <div class="doc-sheet-card card-gold">
-                        <h3><i class="fa-solid fa-note-sticky"></i> ملحوظات مهمة جداً (من الشيت)</h3>
-                        <p><strong>1/ فرع الوسام:</strong> حجز مواعيد ليزر إزالة الشعر، تنظيف البشرة، والتشقير يتم على (جنتل ماكس برو الوسام) ويكتب ملاحظة أيش نوع الخدمة.</p>
-                        <p><strong>2/ الأخصائية بإجازة:</strong> لحين إشعار آخر في حالة الحجز على كايزن بنفتح الجهازين كلاريتي وجنتل وبنحجز الموعد ونحجب الوقت بالجهاز الآخر.</p>
-                        <p><strong>3/ التشقير في فرع الوسام:</strong> وتنظيف البشرة وليز إزالة الشعر ضروري جدولة موعد مسبق مافي انتظار.</p>
-                        <p><strong>4/ ليزر إزالة الشعر في الوسام:</strong> وتنظيف البشرة حجز المواعيد لمدة ساعة كاملة.</p>
-                    </div>
+                    <!-- كروت الملحوظات المهمة المخصصة -->
+                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
                 </div>
             </section>
 
-            <!-- 4. صفحة دليل المنسقين -->
+            <!-- 4. صفحة دليل المنسقين (مع Drag & Drop واختيار اللون) -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
@@ -702,7 +711,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في قائمة العروض والأسعار أو الخدمة..." oninput="renderOffers(this.value)">
+                    <input type="text" placeholder="بحث في قائمة العروض والأسعار..." oninput="renderOffers(this.value)">
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -741,8 +750,9 @@
         </div>
     </main>
 
-    <!-- Modals -->
-    <!-- Modal 1: Doctor Schedule Modal -->
+    <!-- MODALS -->
+
+    <!-- Modal 1: Doctor Schedule Modal (مع تحديد الأيام والمواعيد) -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -777,10 +787,31 @@
                     <option value="الوسام">فرع الوسام</option>
                 </select>
             </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.2rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
                 <input type="checkbox" id="docIsJoint" style="width:18px; height:18px;">
                 <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين (إظهار علامة مميزة)</label>
             </div>
+
+            <!-- محدد الأيام المطور لمعرفة المتواجدين تلقائياً -->
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label style="font-weight:700; color:#60a5fa;">أيام دوام الطبيب في العيادة (لتحديد المتواجدين اليوم تلقائياً):</label>
+                <div class="days-checklist">
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="السبت"> السبت</label>
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الأحد"> الأحد</label>
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الإثنين"> الإثنين</label>
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الثلاثاء"> الثلاثاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الأربعاء"> الأربعاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الخميس"> الخميس</label>
+                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الجمعة"> الجمعة</label>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>ساعات الدوام اليومية (نص توضيحي)</label>
+                <input type="text" id="docTiming" class="form-control" placeholder="من 12.30 م - 8.30 م">
+            </div>
+
+            <!-- مناوبة الجمعة -->
             <div style="display:flex; flex-direction:column; gap:0.4rem; border:1px solid var(--border-color); padding:0.6rem; border-radius:6px; background:rgba(255,255,255,0.02);">
                 <div style="display:flex; align-items:center; gap:0.5rem;">
                     <input type="checkbox" id="docIsFridayDuty" style="width:18px; height:18px;" onchange="toggleFridayBranchBox(this.checked)">
@@ -794,19 +825,16 @@
                     </select>
                 </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>أيام ومواعيد الدوام</label>
-                <input type="text" id="docTiming" class="form-control" placeholder="من 12.30 م - 8.30 م">
-            </div>
+
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>ملاحظات وتنويهات للطبيب (المناوبات القادمة / الكشفية)</label>
-                <textarea id="docNotes" class="form-control" rows="2" placeholder="أدخل الملاحظات والتنويهات..."></textarea>
+                <textarea id="docNotes" class="form-control" rows="2" placeholder="أدخل الملاحظات..."></textarea>
             </div>
             <button class="btn btn-green" onclick="saveDoctor()">حفظ البيانات</button>
         </div>
     </div>
 
-    <!-- Modal 2: Alert Modal (تم إصلاح زر نشر التنبيه كاملاً) -->
+    <!-- Modal 2: Alert Modal (مع مضغوط الصورة لتفادي التعليق) -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -820,7 +848,7 @@
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 <label>إرفاق صورة التنبيه</label>
-                <input type="file" id="alertFileInput" class="form-control" accept="image/*" onchange="previewSelectedImage(this)">
+                <input type="file" id="alertFileInput" class="form-control" accept="image/*" onchange="previewAndCompressImage(this)">
                 <input type="hidden" id="alertImageBase64">
                 <div id="imagePreviewContainer" style="display:none; position:relative; margin-top:0.5rem;">
                     <img id="alertPreviewImg" style="height:70px; border-radius:6px; object-fit:cover;">
@@ -831,7 +859,81 @@
         </div>
     </div>
 
-    <!-- Modal 3: Friday Schedule Modal (جدولة المناوبات بالتاريخ) -->
+    <!-- Modal 3: Dept Service Modal -->
+    <div class="modal-overlay" id="deptServiceModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>إضافة صف أجهزة وخدمات</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptServiceModal')"></i>
+            </div>
+            <input type="hidden" id="deptRowId">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>معشي - جلدية (جهاز / خدمة)</label>
+                <input type="text" id="mDerm" class="form-control">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>معشي - أسنان (جهاز / خدمة)</label>
+                <input type="text" id="mDent" class="form-control">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الوسام - جلدية (جهاز / خدمة)</label>
+                <input type="text" id="wDerm" class="form-control">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الوسام - أسنان (جهاز / خدمة)</label>
+                <input type="text" id="wDent" class="form-control">
+            </div>
+            <button class="btn btn-green" onclick="saveDeptService()">حفظ الصف</button>
+        </div>
+    </div>
+
+    <!-- Modal 4: Dept Note Modal -->
+    <div class="modal-overlay" id="deptNoteModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>إضافة ملحوظة مهمة جديدة</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptNoteModal')"></i>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>نص الملحوظة</label>
+                <textarea id="deptNoteText" class="form-control" rows="4"></textarea>
+            </div>
+            <button class="btn btn-green" onclick="saveDeptNote()">حفظ الملحوظة</button>
+        </div>
+    </div>
+
+    <!-- Modal 5: Coordinator Modal (مع اختيار لون الكارت) -->
+    <div class="modal-overlay" id="coordModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="coordModalTitle">إضافة / تعديل تعليمات الطبيب للمنسقين</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('coordModal')"></i>
+            </div>
+            <input type="hidden" id="coordId">
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>اسم الطبيب / القسم</label>
+                <input type="text" id="coordName" class="form-control">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>لون الكارت</label>
+                <select id="coordColor" class="form-control">
+                    <option value="card-teal">أزرق ملكي</option>
+                    <option value="card-maroon">بنفسجي غامق</option>
+                    <option value="card-red">أحمر مارون</option>
+                    <option value="card-darkblue">كحلي</option>
+                    <option value="card-gold">برتقالي ذهبي</option>
+                    <option value="card-green">أخضر زيتي</option>
+                </select>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>التفاصيل والشروط (كل نقطة في سطر جديد)</label>
+                <textarea id="coordRules" class="form-control" rows="5"></textarea>
+            </div>
+            <button class="btn btn-green" onclick="saveCoordinator()">حفظ التعليمات</button>
+        </div>
+    </div>
+
+    <!-- Modal 6: Friday Modal -->
     <div class="modal-overlay" id="fridayModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -851,13 +953,13 @@
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 <label>الطبيب المناوب</label>
-                <input type="text" id="fridayDocName" class="form-control" placeholder="اسم الطبيب المناوب...">
+                <input type="text" id="fridayDocName" class="form-control" placeholder="اسم الطبيب...">
             </div>
             <button class="btn btn-green" onclick="saveFridayDutySchedule()">تسجيل المناوبة</button>
         </div>
     </div>
 
-    <!-- Modal 4: Offer Modal -->
+    <!-- Modal 7: Offer Modal -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -876,52 +978,32 @@
                 </select>
             </div>
             <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.4rem;">
-                <label>اسم القسم أو العرض الجديد</label>
-                <input type="text" id="offCustomCategory" class="form-control" placeholder="أدخل اسم القسم الجديد...">
+                <label>اسم القسم الجديد</label>
+                <input type="text" id="offCustomCategory" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 <label>اسم الخدمة / العرض</label>
-                <input type="text" id="offName" class="form-control" placeholder="تقويم اسنان معدني">
+                <input type="text" id="offName" class="form-control">
             </div>
             <div style="display:flex; gap:0.5rem;">
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.3rem;">
                     <label>جهاز جنتل ماكس برو</label>
-                    <input type="text" id="offGentle" class="form-control" placeholder="188 ريال">
+                    <input type="text" id="offGentle" class="form-control">
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.3rem;">
                     <label>جهاز كلاريتي 2</label>
-                    <input type="text" id="offClarity" class="form-control" placeholder="199 ريال">
+                    <input type="text" id="offClarity" class="form-control">
                 </div>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 <label>السعر العام للخدمه</label>
-                <input type="text" id="offPrice" class="form-control" placeholder="996 ريال">
+                <input type="text" id="offPrice" class="form-control">
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
         </div>
     </div>
 
-    <!-- Modal 5: Coordinator Modal -->
-    <div class="modal-overlay" id="coordModal">
-        <div class="modal">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="coordModalTitle">إضافة / تعديل تعليمات الطبيب للمنسقين</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('coordModal')"></i>
-            </div>
-            <input type="hidden" id="coordId">
-            <div style="display:flex; flex-direction:column; gap:0.4rem;">
-                <label>اسم الطبيب / القسم</label>
-                <input type="text" id="coordName" class="form-control">
-            </div>
-            <div style="display:flex; flex-direction:column; gap:0.4rem;">
-                <label>التفاصيل والشروط (كل نقطة في سطر جديد)</label>
-                <textarea id="coordRules" class="form-control" rows="5"></textarea>
-            </div>
-            <button class="btn btn-green" onclick="saveCoordinator()">حفظ التعليمات</button>
-        </div>
-    </div>
-
-    <!-- Modal 6: Inquiry Modal -->
+    <!-- Modal 8: Inquiry Modal -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -948,28 +1030,37 @@
 
     <script>
         // --- DATA STORES ---
-        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v4')) || [
-            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isFriday: true, fridayBranch: "معشي", timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة القادمة بفرع معشي" },
-            { id: 2, name: "د. سارة محمود", nationality: "سعودية", specialty: "جلدية وليزر", fee: "100 ريال", branch: "الوسام", isJoint: false, isFriday: true, fridayBranch: "الوسام", timing: "يومياً: 2:00 م - 9:00 م", notes: "مناوبة الجمعة بفرع الوسام" }
+        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v5')) || [
+            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], isFriday: true, fridayBranch: "معشي", timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة القادمة بفرع معشي" },
+            { id: 2, name: "د. سارة محمود", nationality: "سعودية", specialty: "جلدية وليزر", fee: "100 ريال", branch: "الوسام", isJoint: false, days: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"], isFriday: true, fridayBranch: "الوسام", timing: "يومياً: 2:00 م - 9:00 م", notes: "مناوبة الجمعة بفرع الوسام" }
         ];
 
         let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore')) || [];
 
-        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v4')) || [
-            { id: 1, content: "عرض خاص للعسكريين فقط 58 نود التنويه بأن هذا العرض مخصص للعسكريين فقط ويشترط إبراز البطاقة العسكرية للاستفادة.", image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300&auto=format&fit=crop&q=60", time: "PM 5:10:44 ,10/26/2026" }
+        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v5')) || [
+            { id: 1, content: "عرض خاص للعسكريين فقط 58 نود التنويه بأن هذا العرض مخصص للعسكريين فقط ويشترط إبراز البطاقة العسكرية للاستفادة.", image: "", time: "PM 5:10:44 ,10/26/2026" }
         ];
 
-        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v4')) || [
+        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v5')) || [
             { id: 1, name: "الدكتور سامي", color: "card-teal", rules: ["الكشفيه والمراجعه بعد الخلع او بعد الزراعه او فتح الخيط مدتها 30 دقيقة.", "❌ لا نضع ربع ساعة في الجدول نهائياً"] }
         ];
 
-        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v4')) || [
-            { id: 1, category: "عروض اسنان", name: "تقويم اسنان معدني", gentle: "-", clarity: "-", price: "996 ريال" },
-            { id: 2, category: "عروض ليزر نساء", name: "جلسة واحدة جسم كامل", gentle: "188 ريال", clarity: "199 ريال", price: "666 ريال" }
+        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v5')) || [
+            { id: 1, mDerm: "جنتل ماكس برو / إزالة الشعر", mDent: "مايكروسكوب / علاج العصب", wDerm: "سبيكترا / ليزر كربوني وتشقير", wDent: "تبييض الزوم / تبييض أسنان" },
+            { id: 2, mDerm: "كلاريتي 2 / إزالة الشعر", mDent: "البيزو / توسيع العظم والزراعة", wDerm: "سبيكترا / التشقير وتوريد شفايف", wDent: "جهاز ليزر / قص اللثة" }
         ];
 
-        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v4')) || [
-            { id: 1, question: "متى يؤخذ رتوش الليزر؟", answer: "تاخذ 14 يوم بعد الجلسة ويمكن إتاحة حجز يوم قبل أو بعد." }
+        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v5')) || [
+            "1/ فرع الوسام: حجز مواعيد ليزر إزالة الشعر، تنظيف البشرة، والتشقير يتم على (جنتل ماكس برو الوسام) ويكتب ملاحظة أيش نوع الخدمة.",
+            "2/ الأخصائية بإجازة: لحين إشعار آخر في حالة الحجز على كايزن بنفتح الجهازين كلاريتي وجنتل وبنحجز الموعد ونحجب الوقت بالجهاز الآخر."
+        ];
+
+        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v5')) || [
+            { id: 1, category: "عروض اسنان", name: "تقويم اسنان معدني", gentle: "-", clarity: "-", price: "996 ريال" }
+        ];
+
+        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v5')) || [
+            { id: 1, question: "متى تؤخذ رتوش الليزر؟", answer: "تاخذ 14 يوم بعد الجلسة ويمكن إتاحة حجز يوم قبل أو بعد." }
         ];
 
         let selectedOfferTab = "عروض اسنان";
@@ -979,6 +1070,7 @@
             changeTheme(savedTheme);
             renderDoctors();
             renderAlerts();
+            renderDeptsAndDocs();
             renderCoordinators();
             renderOffersTabs();
             renderOffers();
@@ -1006,25 +1098,74 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // --- 1. DOCTORS & FRIDAY DUTIES ---
+        // --- JSON IMPORT / EXPORT ---
+        function exportJSON() {
+            const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `callcenter_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerImportJSON() {
+            document.getElementById('jsonFileInput').click();
+        }
+
+        function importJSON(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.doctorsData) doctorsData = data.doctorsData;
+                        if (data.alertsData) alertsData = data.alertsData;
+                        if (data.coordinatorsData) coordinatorsData = data.coordinatorsData;
+                        if (data.deptServicesData) deptServicesData = data.deptServicesData;
+                        if (data.deptNotesData) deptNotesData = data.deptNotesData;
+                        if (data.offersData) offersData = data.offersData;
+                        if (data.inquiriesData) inquiriesData = data.inquiriesData;
+
+                        localStorage.setItem('docDataStore_v5', JSON.stringify(doctorsData));
+                        localStorage.setItem('alertsDataStore_v5', JSON.stringify(alertsData));
+                        localStorage.setItem('coordDataStore_v5', JSON.stringify(coordinatorsData));
+                        localStorage.setItem('deptServicesStore_v5', JSON.stringify(deptServicesData));
+                        localStorage.setItem('deptNotesStore_v5', JSON.stringify(deptNotesData));
+                        localStorage.setItem('offersDataStore_v5', JSON.stringify(offersData));
+                        localStorage.setItem('inquiriesDataStore_v5', JSON.stringify(inquiriesData));
+
+                        alert("تم استيراد البيانات بنجاح!");
+                        location.reload();
+                    } catch (err) {
+                        alert("حدث خطأ في ملف الـ JSON!");
+                    }
+                };
+                reader.readAsText(input.files[0]);
+            }
+        }
+
+        // --- 1. DOCTORS & DAYS COMPUTATION ---
+        function getArabicDayName() {
+            const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+            return days[new Date().getDay()];
+        }
+
         function toggleFridayBranchBox(checked) {
             document.getElementById('fridayBranchSelectBox').style.display = checked ? 'flex' : 'none';
         }
 
-        function openFridayScheduleModal() {
-            document.getElementById('fridayModal').classList.add('active');
-        }
+        function openFridayScheduleModal() { document.getElementById('fridayModal').classList.add('active'); }
 
         function saveFridayDutySchedule() {
             const dateVal = document.getElementById('fridayDate').value;
             const branchVal = document.getElementById('fridayBranch').value;
             const docVal = document.getElementById('fridayDocName').value;
-
-            if (!dateVal || !docVal) return alert("يرجى ملء كافة البيانات!");
-
+            if (!dateVal || !docVal) return alert("يرجى ملء البيانات!");
             fridaySchedules.push({ date: dateVal, branch: branchVal, doc: docVal });
             localStorage.setItem('fridayScheduleStore', JSON.stringify(fridaySchedules));
-            alert("تم تسكيل المناوبة بالتاريخ بنجاح!");
+            alert("تم تسجيل المناوبة!");
             renderDoctors();
             closeModal('fridayModal');
         }
@@ -1037,29 +1178,34 @@
             let fridayMashyName = "لم يُحدد";
             let fridayWissamName = "لم يُحدد";
 
+            const currentDay = getArabicDayName();
+            document.getElementById('todayDayName').innerText = currentDay;
+
             let todayMashyDocs = [];
             let todayWissamDocs = [];
 
             doctorsData.filter(d => d.name.includes(search) || d.specialty.includes(search) || (d.notes && d.notes.includes(search))).forEach(doc => {
-                // تتبع مناوب الجمعة المخصص للفرع
                 if (doc.isFriday) {
                     if (doc.fridayBranch === "معشي") fridayMashyName = doc.name;
                     if (doc.fridayBranch === "الوسام") fridayWissamName = doc.name;
                 }
 
-                // إضافة للأطباء المتواجدين اليوم
-                if (doc.branch === "معشي" || doc.isJoint) todayMashyDocs.push(doc.name);
-                if (doc.branch === "الوسام" || doc.isJoint) todayWissamDocs.push(doc.name);
+                // فحص تواجد الطبيب اليوم
+                if (doc.days && doc.days.includes(currentDay)) {
+                    if (doc.branch === "معشي" || doc.isJoint) todayMashyDocs.push(doc.name);
+                    if (doc.branch === "الوسام" || doc.isJoint) todayWissamDocs.push(doc.name);
+                }
 
                 const jointBadge = doc.isJoint ? `<br><span class="tag-joint">⭐ طبيب مشترك بالفرعين</span>` : '';
                 const fridayBadge = doc.isFriday ? `<br><span style="color:#60a5fa; font-size:0.75rem;"><i class="fa-solid fa-star"></i> مناوب الجمعة (${doc.fridayBranch || doc.branch})</span>` : '';
-                
+                const daysListStr = doc.days ? doc.days.join(' ، ') : '';
+
                 const rowHtml = `
                     <tr>
                         <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small>${jointBadge}${fridayBadge}</td>
                         <td>${doc.specialty}</td>
                         <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                        <td>${doc.timing}</td>
+                        <td><strong>${doc.timing}</strong><br><small style="color:#9ca3af;">الأيام: ${daysListStr}</small></td>
                         <td style="color:#f59e0b; font-size:0.85rem;">${doc.notes || '-'}</td>
                         <td>
                             <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1077,8 +1223,8 @@
             document.getElementById('fridayDocMashy').innerText = fridayMashyName;
             document.getElementById('fridayDocWissam').innerText = fridayWissamName;
 
-            document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد';
-            document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد';
+            document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
+            document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
         }
 
         function openDoctorModal() {
@@ -1091,6 +1237,7 @@
             document.getElementById('docNotes').value = "";
             document.getElementById('docIsJoint').checked = false;
             document.getElementById('docIsFridayDuty').checked = false;
+            document.querySelectorAll('.doc-day-chk').forEach(chk => chk.checked = false);
             toggleFridayBranchBox(false);
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب";
             document.getElementById('doctorModal').classList.add('active');
@@ -1098,6 +1245,8 @@
 
         function saveDoctor() {
             const id = document.getElementById('docId').value;
+            const selectedDays = Array.from(document.querySelectorAll('.doc-day-chk:checked')).map(c => c.value);
+
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('docName').value,
@@ -1106,6 +1255,7 @@
                 fee: document.getElementById('docFee').value,
                 branch: document.getElementById('docBranch').value,
                 isJoint: document.getElementById('docIsJoint').checked,
+                days: selectedDays,
                 isFriday: document.getElementById('docIsFridayDuty').checked,
                 fridayBranch: document.getElementById('docFridayBranch').value,
                 timing: document.getElementById('docTiming').value,
@@ -1119,7 +1269,7 @@
                 doctorsData[idx] = docObj;
             } else { doctorsData.push(docObj); }
 
-            localStorage.setItem('docDataStore_v4', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v5', JSON.stringify(doctorsData));
             renderDoctors();
             closeModal('doctorModal');
         }
@@ -1134,6 +1284,11 @@
             document.getElementById('docFee').value = doc.fee || "";
             document.getElementById('docBranch').value = doc.branch;
             document.getElementById('docIsJoint').checked = !!doc.isJoint;
+            
+            document.querySelectorAll('.doc-day-chk').forEach(chk => {
+                chk.checked = doc.days ? doc.days.includes(chk.value) : false;
+            });
+
             document.getElementById('docIsFridayDuty').checked = !!doc.isFriday;
             toggleFridayBranchBox(!!doc.isFriday);
             document.getElementById('docFridayBranch').value = doc.fridayBranch || doc.branch;
@@ -1145,12 +1300,12 @@
         function deleteDoctor(id) {
             if (confirm("هل تريد حذف هذا الطبيب؟")) {
                 doctorsData = doctorsData.filter(d => d.id !== id);
-                localStorage.setItem('docDataStore_v4', JSON.stringify(doctorsData));
+                localStorage.setItem('docDataStore_v5', JSON.stringify(doctorsData));
                 renderDoctors();
             }
         }
 
-        // --- 2. ALERTS (إصلاح النشر التام) ---
+        // --- 2. ALERTS (مع ضاغط الصور لمنع التعليق) ---
         function renderAlerts(search = "") {
             const grid = document.getElementById('alertsGridList');
             const pinnedBar = document.getElementById('pinnedAlertsBar');
@@ -1190,15 +1345,30 @@
             document.getElementById('alertModal').classList.add('active');
         }
 
-        function previewSelectedImage(input) {
+        // معالج ضغط الصورة لتفادي بطء وقفل localStorage
+        function previewAndCompressImage(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('alertImageBase64').value = e.target.result;
-                    document.getElementById('alertPreviewImg').src = e.target.result;
-                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxW = 500;
+                        const scale = maxW / img.width;
+                        canvas.width = (img.width > maxW) ? maxW : img.width;
+                        canvas.height = (img.width > maxW) ? img.height * scale : img.height;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('alertImageBase64').value = compressedBase64;
+                        document.getElementById('alertPreviewImg').src = compressedBase64;
+                        document.getElementById('imagePreviewContainer').style.display = 'block';
+                    }
                 }
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
         }
 
@@ -1221,7 +1391,7 @@
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
 
-            localStorage.setItem('alertsDataStore_v4', JSON.stringify(alertsData));
+            localStorage.setItem('alertsDataStore_v5', JSON.stringify(alertsData));
             renderAlerts();
             closeModal('alertModal');
         }
@@ -1244,30 +1414,131 @@
         function deleteAlert(id) {
             if (confirm("هل تريد حذف هذا التنبيه؟")) {
                 alertsData = alertsData.filter(a => a.id !== id);
-                localStorage.setItem('alertsDataStore_v4', JSON.stringify(alertsData));
+                localStorage.setItem('alertsDataStore_v5', JSON.stringify(alertsData));
                 renderAlerts();
             }
         }
 
-        // --- 3. DEPTS & DOCS FILTER ---
+        // --- 3. DEPTS AND DOCS (تعديل كامل بالجدول والملحوظات) ---
         function renderDeptsAndDocs(search = "") {
-            const rows = document.querySelectorAll('#deptsDocsTableBody tr');
-            rows.forEach(row => {
-                const text = row.innerText;
-                row.style.display = text.includes(search) ? '' : 'none';
+            const body = document.getElementById('deptsDocsTableBody');
+            body.innerHTML = "";
+
+            deptServicesData.filter(item => 
+                item.mDerm.includes(search) || item.mDent.includes(search) || item.wDerm.includes(search) || item.wDent.includes(search)
+            ).forEach(item => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${item.mDerm}</td>
+                        <td style="border-left:1px solid #334155;">${item.mDent}</td>
+                        <td>${item.wDerm}</td>
+                        <td>${item.wDent}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.2rem 0.4rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // عرض الملاحظات المهمة
+            const notesContainer = document.getElementById('deptNotesContainer');
+            notesContainer.innerHTML = "";
+            deptNotesData.forEach((note, idx) => {
+                notesContainer.innerHTML += `
+                    <div class="doc-sheet-card card-gold">
+                        <h3><i class="fa-solid fa-note-sticky"></i> ملحوظة مهمة #${idx + 1}</h3>
+                        <p>${note}</p>
+                        <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.4rem; padding-top:0.4rem;">
+                            <button class="btn btn-danger" style="padding:0.2rem 0.4rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i> حذف</button>
+                        </div>
+                    </div>
+                `;
             });
         }
 
-        // --- 4. COORDINATORS ---
+        function openDeptServiceModal() {
+            document.getElementById('deptRowId').value = "";
+            document.getElementById('mDerm').value = "";
+            document.getElementById('mDent').value = "";
+            document.getElementById('wDerm').value = "";
+            document.getElementById('wDent').value = "";
+            document.getElementById('deptServiceModal').classList.add('active');
+        }
+
+        function saveDeptService() {
+            const id = document.getElementById('deptRowId').value;
+            const rowObj = {
+                id: id ? parseInt(id) : Date.now(),
+                mDerm: document.getElementById('mDerm').value,
+                mDent: document.getElementById('mDent').value,
+                wDerm: document.getElementById('wDerm').value,
+                wDent: document.getElementById('wDent').value
+            };
+
+            if (id) {
+                const idx = deptServicesData.findIndex(s => s.id == id);
+                deptServicesData[idx] = rowObj;
+            } else { deptServicesData.push(rowObj); }
+
+            localStorage.setItem('deptServicesStore_v5', JSON.stringify(deptServicesData));
+            renderDeptsAndDocs();
+            closeModal('deptServiceModal');
+        }
+
+        function editDeptService(id) {
+            const item = deptServicesData.find(s => s.id === id);
+            if (!item) return;
+            document.getElementById('deptRowId').value = item.id;
+            document.getElementById('mDerm').value = item.mDerm;
+            document.getElementById('mDent').value = item.mDent;
+            document.getElementById('wDerm').value = item.wDerm;
+            document.getElementById('wDent').value = item.wDent;
+            document.getElementById('deptServiceModal').classList.add('active');
+        }
+
+        function deleteDeptService(id) {
+            if (confirm("هل تريد حذف هذا الصف؟")) {
+                deptServicesData = deptServicesData.filter(s => s.id !== id);
+                localStorage.setItem('deptServicesStore_v5', JSON.stringify(deptServicesData));
+                renderDeptsAndDocs();
+            }
+        }
+
+        function openDeptNoteModal() {
+            document.getElementById('deptNoteText').value = "";
+            document.getElementById('deptNoteModal').classList.add('active');
+        }
+
+        function saveDeptNote() {
+            const noteText = document.getElementById('deptNoteText').value.trim();
+            if (!noteText) return alert("أدخل نص الملحوظة!");
+            deptNotesData.push(noteText);
+            localStorage.setItem('deptNotesStore_v5', JSON.stringify(deptNotesData));
+            renderDeptsAndDocs();
+            closeModal('deptNoteModal');
+        }
+
+        function deleteDeptNote(idx) {
+            if (confirm("هل تريد حذف هذه الملحوظة؟")) {
+                deptNotesData.splice(idx, 1);
+                localStorage.setItem('deptNotesStore_v5', JSON.stringify(deptNotesData));
+                renderDeptsAndDocs();
+            }
+        }
+
+        // --- 4. COORDINATORS (Drag & Drop + Color Picker) ---
+        let draggedCardIdx = null;
+
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
             grid.innerHTML = "";
 
-            coordinatorsData.filter(c => c.name.includes(search) || c.rules.some(r => r.includes(search))).forEach(c => {
+            coordinatorsData.filter(c => c.name.includes(search) || c.rules.some(r => r.includes(search))).forEach((c, idx) => {
                 let rulesList = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 grid.innerHTML += `
-                    <div class="doc-sheet-card ${c.color}">
-                        <h3>${c.name}</h3>
+                    <div class="doc-sheet-card ${c.color || 'card-teal'}" draggable="true" ondragstart="handleDragStart(${idx})" ondragover="handleDragOver(event)" ondrop="handleDrop(${idx})">
+                        <h3><i class="fa-solid fa-grip-vertical" style="opacity:0.6; margin-left:0.4rem;"></i> ${c.name}</h3>
                         ${rulesList}
                         <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.4rem; padding-top:0.6rem;">
                             <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1276,6 +1547,16 @@
                     </div>
                 `;
             });
+        }
+
+        function handleDragStart(idx) { draggedCardIdx = idx; }
+        function handleDragOver(e) { e.preventDefault(); }
+        function handleDrop(targetIdx) {
+            if (draggedCardIdx === null || draggedCardIdx === targetIdx) return;
+            const movedCard = coordinatorsData.splice(draggedCardIdx, 1)[0];
+            coordinatorsData.splice(targetIdx, 0, movedCard);
+            localStorage.setItem('coordDataStore_v5', JSON.stringify(coordinatorsData));
+            renderCoordinators();
         }
 
         function openCoordinatorModal() {
@@ -1291,7 +1572,7 @@
             const coordObj = {
                 id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('coordName').value,
-                color: "card-teal",
+                color: document.getElementById('coordColor').value,
                 rules: rulesArray
             };
 
@@ -1302,7 +1583,7 @@
                 coordinatorsData[idx] = coordObj;
             } else { coordinatorsData.push(coordObj); }
 
-            localStorage.setItem('coordDataStore_v4', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v5', JSON.stringify(coordinatorsData));
             renderCoordinators();
             closeModal('coordModal');
         }
@@ -1312,6 +1593,7 @@
             if (!item) return;
             document.getElementById('coordId').value = item.id;
             document.getElementById('coordName').value = item.name;
+            document.getElementById('coordColor').value = item.color || "card-teal";
             document.getElementById('coordRules').value = item.rules.join('\n');
             document.getElementById('coordModal').classList.add('active');
         }
@@ -1319,7 +1601,7 @@
         function deleteCoordinator(id) {
             if (confirm("هل تريد حذف تعليمات هذا الطبيب؟")) {
                 coordinatorsData = coordinatorsData.filter(c => c.id !== id);
-                localStorage.setItem('coordDataStore_v4', JSON.stringify(coordinatorsData));
+                localStorage.setItem('coordDataStore_v5', JSON.stringify(coordinatorsData));
                 renderCoordinators();
             }
         }
@@ -1391,7 +1673,7 @@
             let category = document.getElementById('offCategory').value;
             if (category === "أخرى") {
                 const customCat = document.getElementById('offCustomCategory').value.trim();
-                if (!customCat) return alert("يرجى إدخال اسم القسم الجديد!");
+                if (!customCat) return alert("أدخل اسم القسم الجديد!");
                 category = customCat;
             }
 
@@ -1411,7 +1693,7 @@
                 offersData[idx] = offerObj;
             } else { offersData.push(offerObj); }
 
-            localStorage.setItem('offersDataStore_v4', JSON.stringify(offersData));
+            localStorage.setItem('offersDataStore_v5', JSON.stringify(offersData));
             selectedOfferTab = category;
             renderOffersTabs();
             renderOffers();
@@ -1432,7 +1714,7 @@
         function deleteOffer(id) {
             if (confirm("هل تريد حذف هذا العرض؟")) {
                 offersData = offersData.filter(o => o.id !== id);
-                localStorage.setItem('offersDataStore_v4', JSON.stringify(offersData));
+                localStorage.setItem('offersDataStore_v5', JSON.stringify(offersData));
                 renderOffersTabs();
                 renderOffers();
             }
@@ -1479,7 +1761,7 @@
                 inquiriesData[idx] = inqObj;
             } else { inquiriesData.push(inqObj); }
 
-            localStorage.setItem('inquiriesDataStore_v4', JSON.stringify(inquiriesData));
+            localStorage.setItem('inquiriesDataStore_v5', JSON.stringify(inquiriesData));
             renderInquiries();
             closeModal('inquiryModal');
         }
@@ -1496,7 +1778,7 @@
         function deleteInquiry(id) {
             if (confirm("هل تريد حذف هذا الاستفسار؟")) {
                 inquiriesData = inquiriesData.filter(i => i.id !== id);
-                localStorage.setItem('inquiriesDataStore_v4', JSON.stringify(inquiriesData));
+                localStorage.setItem('inquiriesDataStore_v5', JSON.stringify(inquiriesData));
                 renderInquiries();
             }
         }
