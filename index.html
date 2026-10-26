@@ -304,7 +304,7 @@
             padding: 0.75rem;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
-            font-weight: 400; /* Font B removal fix */
+            font-weight: 400;
         }
 
         th {
@@ -313,7 +313,7 @@
             font-weight: 600;
         }
 
-        /* 🔔 التنبيهات 2x Grid (تستوعب 6+ إشعارات) */
+        /* Alerts 2 columns */
         .alerts-2col-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -343,12 +343,12 @@
 
         .alert-content-block p {
             font-size: 0.88rem;
-            font-weight: 400; /* Font-weight fix */
+            font-weight: 400;
             line-height: 1.35;
             color: var(--text-main);
         }
 
-        /* 👥 المنسقين Sheet Styling */
+        /* Coordinators */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -380,7 +380,7 @@
         .card-darkblue { background-color: #1a237e; }
         .card-gold { background-color: #e65100; }
 
-        /* 🏷️ العروض والأسعار Tab Controls */
+        /* Offers */
         .offers-tabs {
             display: flex;
             gap: 0.5rem;
@@ -432,7 +432,7 @@
             display: inline-block;
         }
 
-        /* Modal Overlays */
+        /* Modals */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -517,17 +517,17 @@
 
         <div class="content-area">
 
-            <!-- 1. صفحة مواعيد الأطباء (مع الجنسية والكشفية وخانة مشتركة بالفرعين والمناوبة) -->
+            <!-- 1. صفحة مواعيد الأطباء (مع مناوبة الجمعة المحددة) -->
             <section id="schedule-section" class="page-section active">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
                     <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
                     <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة موعد طبيب</button>
                 </div>
 
-                <!-- شريط مناوبة الجمعة القادمة -->
+                <!-- شريط مناوبة الجمعة المحدث بناءً على اختيارك -->
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.6rem 1rem; border-radius:8px; margin-bottom:0.8rem; display:flex; gap:1.5rem; font-size:0.88rem;">
-                    <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (معشي):</strong> <span id="fridayDocMashy">د. أحمد علي</span></span>
-                    <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (الوسام):</strong> <span id="fridayDocWissam">د. سارة محمود</span></span>
+                    <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
+                    <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
                 </div>
 
                 <div class="page-local-search">
@@ -582,7 +582,7 @@
                 </div>
             </section>
 
-            <!-- 2. صفحة التنبيهات (مقسمة 50/50 2 columns لتستوعب 6+ تنبيهات وبخط مريح) -->
+            <!-- 2. صفحة التنبيهات (50/50 2-col) -->
             <section id="alerts-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
                     <h2><i class="fa-solid fa-bullhorn"></i> تنبيهات وإشعارات العيادة العامة</h2>
@@ -597,7 +597,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. صفحة دليل المنسقين (مأخوذة من الصور 3 و 4 بالشيت مع إضافة وتعديل وبحث) -->
+            <!-- 3. صفحة دليل المنسقين -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
@@ -612,7 +612,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
-            <!-- 4. صفحة العروض والأسعار (جديدة بالكامل مأخوذة من الصور 5 و 6 بالشيت) -->
+            <!-- 4. صفحة العروض والأسعار (مع خيار "أخرى" المخصص) -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -624,11 +624,8 @@
                     <input type="text" placeholder="بحث في قائمة العروض والأسعار أو الخدمة..." oninput="renderOffers(this.value)">
                 </div>
 
-                <div class="offers-tabs">
-                    <button class="offer-tab-btn active" onclick="filterOfferCategory('عروض اسنان', this)">عروض اسنان</button>
-                    <button class="offer-tab-btn" onclick="filterOfferCategory('عروض ليزر نساء', this)">عروض ليزر نساء</button>
-                    <button class="offer-tab-btn" onclick="filterOfferCategory('عروض ليزر رجال', this)">عروض ليزر رجال</button>
-                    <button class="offer-tab-btn" onclick="filterOfferCategory('عروض الجلديه والتجميل', this)">عروض الجلديه والتجميل</button>
+                <div class="offers-tabs" id="offersTabsContainer">
+                    <!-- تتحدث ديناميكياً لتشمل التبويبات والأقسام الجديدة -->
                 </div>
 
                 <div class="offers-table-box">
@@ -649,15 +646,15 @@
                 </div>
             </section>
 
-            <!-- 5. صفحة دليل الاستفسارات -->
+            <!-- 5. صفحة دليل الاستفسارات (تم إصلاح CRUD بالكامل) -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
-                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
+                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار جديد</button>
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في دليل الأسئلة..." oninput="renderInquiries(this.value)">
+                    <input type="text" placeholder="بحث في دليل الأسئلة والأجوبة..." oninput="renderInquiries(this.value)">
                 </div>
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
@@ -666,7 +663,7 @@
     </main>
 
     <!-- Modals -->
-    <!-- Modal 1: Doctor Schedule Modal (مع الجنسية والكشفية وخيار الطبيب المشترك) -->
+    <!-- Modal 1: Doctor Schedule Modal (مع إعدادات مناوبة الجمعة) -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -681,7 +678,7 @@
                 </div>
                 <div style="width:130px; display:flex; flex-direction:column; gap:0.3rem;">
                     <label>الجنسية</label>
-                    <input type="text" id="docNationality" class="form-control" placeholder="سعودي / مقيم">
+                    <input type="text" id="docNationality" class="form-control" placeholder="سعودي">
                 </div>
             </div>
             <div style="display:flex; gap:0.5rem;">
@@ -705,6 +702,10 @@
                 <input type="checkbox" id="docIsJoint" style="width:18px; height:18px;">
                 <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين (إظهار علامة مميزة)</label>
             </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.2rem;">
+                <input type="checkbox" id="docIsFridayDuty" style="width:18px; height:18px;">
+                <label for="docIsFridayDuty" style="font-weight:700; color:#60a5fa;">تعيين كـ "مناوب يوم الجمعة القادمة" في هذا الفرع</label>
+            </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>أيام ومواعيد الدوام</label>
                 <input type="text" id="docTiming" class="form-control" placeholder="من 12.30 م - 8.30 م">
@@ -713,7 +714,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: Alert Modal -->
+    <!-- Modal 2: Alert Modal (تم إصلاح النشر والصورة) -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -768,7 +769,7 @@
         </div>
     </div>
 
-    <!-- Modal 4: Offer Modal -->
+    <!-- Modal 4: Offer Modal (مع خيار "أخرى" المخصص) -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -778,12 +779,18 @@
             <input type="hidden" id="offerId">
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 <label>قسم العرض</label>
-                <select id="offCategory" class="form-control">
+                <select id="offCategory" class="form-control" onchange="checkCustomCategory(this.value)">
                     <option value="عروض اسنان">عروض اسنان</option>
                     <option value="عروض ليزر نساء">عروض ليزر نساء</option>
                     <option value="عروض ليزر رجال">عروض ليزر رجال</option>
                     <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
+                    <option value="أخرى">أخرى (إضافة قسم جديد...)</option>
                 </select>
+            </div>
+            <!-- خانة تظهر فقط عند اختيار "أخرى" -->
+            <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.4rem;">
+                <label>اسم القسم أو العرض الجديد</label>
+                <input type="text" id="offCustomCategory" class="form-control" placeholder="أدخل اسم القسم الجديد...">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 <label>اسم الخدمة / العرض</label>
@@ -791,39 +798,39 @@
             </div>
             <div style="display:flex; gap:0.5rem;">
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.3rem;">
-                    <label>سعر جهاز جنتل ماكس برو</label>
+                    <label>جهاز جنتل ماكس برو</label>
                     <input type="text" id="offGentle" class="form-control" placeholder="188 ريال">
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.3rem;">
-                    <label>سعر جهاز كلاريتي 2</label>
+                    <label>جهاز كلاريتي 2</label>
                     <input type="text" id="offClarity" class="form-control" placeholder="199 ريال">
                 </div>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
-                <label>السعر العام / سعر الخصم</label>
+                <label>السعر / الخصم</label>
                 <input type="text" id="offPrice" class="form-control" placeholder="996 ريال">
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
         </div>
     </div>
 
-    <!-- Modal 5: Inquiry Modal -->
+    <!-- Modal 5: Inquiry Modal (تم إصلاح تفاعل الإضافة والتعديل والحذف) -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>إضافة استفسار</h3>
+                <h3 id="inquiryModalTitle">إضافة / تعديل استفسار</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('inquiryModal')"></i>
             </div>
             <input type="hidden" id="inquiryId">
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
-                <label>السؤال</label>
-                <input type="text" id="inqQuestion" class="form-control">
+                <label>السؤال أو الاستفسار</label>
+                <input type="text" id="inqQuestion" class="form-control" placeholder="مثال: متى يؤخذ رتوش الليزر؟">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.4rem;">
-                <label>الإجابة</label>
-                <textarea id="inqAnswer" class="form-control" rows="3"></textarea>
+                <label>الإجابة والتفاصيل</label>
+                <textarea id="inqAnswer" class="form-control" rows="3" placeholder="أدخل الإجابة..."></textarea>
             </div>
-            <button class="btn btn-green" onclick="saveInquiry()">حفظ</button>
+            <button class="btn btn-green" onclick="saveInquiry()">حفظ الاستفسار</button>
         </div>
     </div>
 
@@ -833,45 +840,30 @@
     </div>
 
     <script>
-        // --- DATA STORES PERSISTENCE ---
-        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v2')) || [
-            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, timing: "من 12.30 م - 8.30 م حتى إشعار آخر" },
-            { id: 2, name: "د. أحمد علي", nationality: "مصري", specialty: "أسنان - تقويم", fee: "50 ريال", branch: "معشي", isJoint: true, timing: "السبت إلى الخميس: 4:00 م - 10:00 م" },
-            { id: 3, name: "د. سارة محمود", nationality: "سعودية", specialty: "جلدية وليزر", fee: "100 ريال", branch: "الوسام", isJoint: false, timing: "يومياً: 2:00 م - 9:00 م" }
+        // --- DATA STORES ---
+        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v3')) || [
+            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isFriday: true, timing: "من 12.30 م - 8.30 م" },
+            { id: 2, name: "د. سارة محمود", nationality: "سعودية", specialty: "جلدية وليزر", fee: "100 ريال", branch: "الوسام", isJoint: false, isFriday: true, timing: "يومياً: 2:00 م - 9:00 م" }
         ];
 
-        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v2')) || [
-            { id: 1, content: "عرض خاص للعسكريين فقط 58 نود التنويه بأن هذا العرض مخصص للعسكريين فقط ويشترط إبراز البطاقة العسكرية للاستفادة.", image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300&auto=format&fit=crop&q=60", time: "PM 5:10:44 ,10/26/2026" },
-            { id: 2, content: "إعلان مهم جداً نود التنويه إلى التغييرات التالية في جداول المناوبات: د.نازك ستكون متواجدة يومياً في فرع معشي.", image: "", time: "PM 5:01:04 ,10/26/2026" },
-            { id: 3, content: "إذا أحد أبرز لكم هذا العرض ، الجهاز المستخدم جنتل ماكس برو", image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=300&auto=format&fit=crop&q=60", time: "PM 4:57:12 ,10/26/2026" }
+        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v3')) || [
+            { id: 1, content: "عرض خاص للعسكريين فقط 58 نود التنويه بأن هذا العرض مخصص للعسكريين فقط ويشترط إبراز البطاقة العسكرية للاستفادة.", image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300&auto=format&fit=crop&q=60", time: "PM 5:10:44 ,10/26/2026" }
         ];
 
-        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore')) || [
-            { id: 1, name: "الدكتور سامي", color: "card-teal", rules: ["الكشفيه والمراجعه بعد الخلع او بعد الزراعه او فتح الخيط مدتها 30 دقيقة.", "❌ لا نضع ربع ساعة في الجدول نهائياً", "قبل التركيب وبعد الزراعه hilling مدتها لوزراعه او زرعتين مدتها 30 دقيقه.", "من 3 لـ 4 زرعات ياخد وقت علاج 45 دقيقه بداية من 6 تقريبا ساعه.", "الخلع على حسب لا يقل عن ساعة.", "الزراعه على عظم او مسامير (الدكتور هو الوحيد اللي بيعمل زراعة عظم)"] },
-            { id: 2, name: "الدكتور احمد", color: "card-maroon", rules: ["حشوات وتنظيف وخلع وسحب عصب وتبييض", "كل مواعيده مابين الـ 45 د الى ساعه", "الدكتور بيفك خياطه", "الدكتور منال و ابان: حشوات تجميليه وتبييض وتنظيف الجير", "نص ساعه للكشفيه ساعه للمعالجه"] },
-            { id: 3, name: "الجلديه", color: "card-red", rules: ["جلسه اساسيه مدتها ثابته ساعه (فل بدي) - الرتوش 45 د (فل بدي)", "منطقه صغيره (بكيني واندر ارم وتحديد الذقن) 30 د", "منطقه كبيره (بطن او ظهر ) 45 د", "التشقير 30 د - تنظيف بشره من 30 د لـ 45 د", "يتم الحلاقه شفره قبلها بـ 24 ساعه. ولو ماسويتها تقدر تسويها بالعقاده 50 ريال"] },
-            { id: 4, name: "الدكتوره انجي", color: "card-darkblue", rules: ["الكشفيه نص ساعه", "حاله محوله من طبيب عام بيحتاج شغل عصب اقل شي 45 د اقصي ساعه ونصف", "المعالجات من ساعه ونصف لـ ساعتين الا", "اقصى عدد حالات الانتظار 3 مواعيد"] },
-            { id: 5, name: "الدكتور عبد الله", color: "card-gold", rules: ["من الساعه 1 م الى 2 م تركيب او فك تقويم", "مثبتات مابعد التقويم 45 د الشد فقط 30 د", "يمنع منعاً باتاً تحديد موعد لمدة ربع ساعة."] }
+        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v3')) || [
+            { id: 1, name: "الدكتور سامي", color: "card-teal", rules: ["الكشفيه والمراجعه بعد الخلع او بعد الزراعه او فتح الخيط مدتها 30 دقيقة.", "❌ لا نضع ربع ساعة في الجدول نهائياً"] }
         ];
 
-        let offersData = JSON.parse(localStorage.getItem('offersDataStore')) || [
-            { id: 1, category: "عروض اسنان", name: "تقويم اسنان معدني (شامل الكشفية والتركيب والأشعة)", gentle: "-", clarity: "-", price: "996 ريال (الشهر 196)" },
-            { id: 2, category: "عروض اسنان", name: "زراعة اسنان", gentle: "-", clarity: "-", price: "1696 ريال" },
-            { id: 3, category: "عروض اسنان", name: "تركيبات اي ماكس (على السن الواحد)", gentle: "-", clarity: "-", price: "896 ريال" },
-            { id: 4, category: "عروض اسنان", name: "تبييض اسنان وتلميع مع كشفية مجانية", gentle: "-", clarity: "-", price: "477 ريال" },
-            { id: 5, category: "عروض ليزر نساء", name: "جلسة واحدة جسم كامل (يشمل الوجه والبكيني والأندر إرم)", gentle: "188 ريال مع الرتوش", clarity: "199 ريال", price: "666 ريال" },
-            { id: 6, category: "عروض ليزر نساء", name: "3 جلسات جسم كامل", gentle: "444 ريال مع الرتوش", clarity: "477 ريال", price: "1666 ريال" },
-            { id: 7, category: "عروض ليزر رجال", name: "جلسة واحدة جسم كامل", gentle: "555 ريال مع الرتوش", clarity: "-", price: "333 ريال" },
-            { id: 8, category: "عروض الجلديه والتجميل", name: "تشقير الحواجب", gentle: "-", clarity: "-", price: "33 ريال" },
-            { id: 9, category: "عروض الجلديه والتجميل", name: "تنظيف بشرة كلاسيك يبدأ", gentle: "-", clarity: "-", price: "96 ريال" },
-            { id: 10, category: "عروض الجلديه والتجميل", name: "إبرة الرنيش لـ 5 مل / فراكشنال ليزر", gentle: "-", clarity: "-", price: "1600 - 3000 ريال" }
+        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v3')) || [
+            { id: 1, category: "عروض اسنان", name: "تقويم اسنان معدني", gentle: "-", clarity: "-", price: "996 ريال" },
+            { id: 2, category: "عروض ليزر نساء", name: "جلسة واحدة جسم كامل", gentle: "188 ريال", clarity: "199 ريال", price: "666 ريال" }
         ];
 
-        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v2')) || [
+        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v3')) || [
             { id: 1, question: "متى يؤخذ رتوش الليزر؟", answer: "تاخذ 14 يوم بعد الجلسة ويمكن إتاحة حجز يوم قبل أو بعد." }
         ];
 
-        let selectedOfferTab = "عروض اسنان";
+        let selectedOfferTab = "";
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -879,6 +871,7 @@
             renderDoctors();
             renderAlerts();
             renderCoordinators();
+            renderOffersTabs();
             renderOffers();
             renderInquiries();
             
@@ -904,18 +897,27 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // --- 1. DOCTORS ---
+        // --- 1. DOCTORS & FRIDAY DUTY ---
         function renderDoctors(search = "") {
             const mashyBody = document.getElementById('mashyTableBody');
             const wissamBody = document.getElementById('wissamTableBody');
             mashyBody.innerHTML = ""; wissamBody.innerHTML = "";
             let countM = 0, countW = 0;
+            let fridayMashyName = "لم يُحدد بعد";
+            let fridayWissamName = "لم يُحدد بعد";
 
-            doctorsData.filter(d => d.name.includes(search) || d.specialty.includes(search) || (d.nationality && d.nationality.includes(search))).forEach(doc => {
+            doctorsData.filter(d => d.name.includes(search) || d.specialty.includes(search)).forEach(doc => {
+                if (doc.isFriday) {
+                    if (doc.branch === "معشي") fridayMashyName = doc.name;
+                    if (doc.branch === "الوسام") fridayWissamName = doc.name;
+                }
+
                 const jointBadge = doc.isJoint ? `<br><span class="tag-joint">⭐ طبيب مشترك بالفرعين</span>` : '';
+                const fridayBadge = doc.isFriday ? `<br><span style="color:#60a5fa; font-size:0.75rem;"><i class="fa-solid fa-star"></i> مناوب الجمعة</span>` : '';
+                
                 const rowHtml = `
                     <tr>
-                        <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || 'غير محدد'})</small>${jointBadge}</td>
+                        <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small>${jointBadge}${fridayBadge}</td>
                         <td>${doc.specialty}</td>
                         <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
                         <td>${doc.timing}</td>
@@ -932,6 +934,8 @@
 
             document.getElementById('countMashy').innerText = `${countM} أطباء`;
             document.getElementById('countWissam').innerText = `${countW} أطباء`;
+            document.getElementById('fridayDocMashy').innerText = fridayMashyName;
+            document.getElementById('fridayDocWissam').innerText = fridayWissamName;
         }
 
         function openDoctorModal() {
@@ -942,6 +946,7 @@
             document.getElementById('docFee').value = "";
             document.getElementById('docTiming').value = "";
             document.getElementById('docIsJoint').checked = false;
+            document.getElementById('docIsFridayDuty').checked = false;
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب";
             document.getElementById('doctorModal').classList.add('active');
         }
@@ -956,6 +961,7 @@
                 fee: document.getElementById('docFee').value,
                 branch: document.getElementById('docBranch').value,
                 isJoint: document.getElementById('docIsJoint').checked,
+                isFriday: document.getElementById('docIsFridayDuty').checked,
                 timing: document.getElementById('docTiming').value
             };
 
@@ -964,11 +970,9 @@
             if (id) {
                 const idx = doctorsData.findIndex(d => d.id == id);
                 doctorsData[idx] = docObj;
-            } else {
-                doctorsData.push(docObj);
-            }
+            } else { doctorsData.push(docObj); }
 
-            localStorage.setItem('docDataStore_v2', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v3', JSON.stringify(doctorsData));
             renderDoctors();
             closeModal('doctorModal');
         }
@@ -983,6 +987,7 @@
             document.getElementById('docFee').value = doc.fee || "";
             document.getElementById('docBranch').value = doc.branch;
             document.getElementById('docIsJoint').checked = !!doc.isJoint;
+            document.getElementById('docIsFridayDuty').checked = !!doc.isFriday;
             document.getElementById('docTiming').value = doc.timing;
             document.getElementById('doctorModal').classList.add('active');
         }
@@ -990,12 +995,12 @@
         function deleteDoctor(id) {
             if (confirm("هل تريد حذف هذا الطبيب؟")) {
                 doctorsData = doctorsData.filter(d => d.id !== id);
-                localStorage.setItem('docDataStore_v2', JSON.stringify(doctorsData));
+                localStorage.setItem('docDataStore_v3', JSON.stringify(doctorsData));
                 renderDoctors();
             }
         }
 
-        // --- 2. ALERTS (2 Column 50/50 Grid Layout) ---
+        // --- 2. ALERTS (تعديل ونشر وتخزين) ---
         function renderAlerts(search = "") {
             const grid = document.getElementById('alertsGridList');
             const pinnedBar = document.getElementById('pinnedAlertsBar');
@@ -1004,7 +1009,7 @@
             alertsData.filter(a => a.content.includes(search)).forEach(item => {
                 pinnedBar.innerHTML += `
                     <div class="alert-pill" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
-                        <span class="badge-alert">تنبيه</span> ${item.content.substring(0, 30)}...
+                        <span class="badge-alert">تنبيه</span> ${item.content.substring(0, 25)}...
                     </div>
                 `;
 
@@ -1030,6 +1035,7 @@
             document.getElementById('alertId').value = "";
             document.getElementById('alertContent').value = "";
             document.getElementById('alertImageBase64').value = "";
+            document.getElementById('alertFileInput').value = "";
             document.getElementById('imagePreviewContainer').style.display = 'none';
             document.getElementById('alertModal').classList.add('active');
         }
@@ -1056,7 +1062,7 @@
             const id = document.getElementById('alertId').value;
             const content = document.getElementById('alertContent').value;
             const image = document.getElementById('alertImageBase64').value;
-            if (!content) return alert("يرجى كابة التنبيه!");
+            if (!content) return alert("يرجى إدخال نص التنبيه!");
 
             const alertObj = { id: id ? parseInt(id) : Date.now(), content: content, image: image, time: new Date().toLocaleString('en-US') };
 
@@ -1065,7 +1071,7 @@
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
 
-            localStorage.setItem('alertsDataStore_v2', JSON.stringify(alertsData));
+            localStorage.setItem('alertsDataStore_v3', JSON.stringify(alertsData));
             renderAlerts();
             closeModal('alertModal');
         }
@@ -1079,6 +1085,8 @@
             if (item.image) {
                 document.getElementById('alertPreviewImg').src = item.image;
                 document.getElementById('imagePreviewContainer').style.display = 'block';
+            } else {
+                document.getElementById('imagePreviewContainer').style.display = 'none';
             }
             document.getElementById('alertModal').classList.add('active');
         }
@@ -1086,12 +1094,12 @@
         function deleteAlert(id) {
             if (confirm("هل تريد حذف هذا التنبيه؟")) {
                 alertsData = alertsData.filter(a => a.id !== id);
-                localStorage.setItem('alertsDataStore_v2', JSON.stringify(alertsData));
+                localStorage.setItem('alertsDataStore_v3', JSON.stringify(alertsData));
                 renderAlerts();
             }
         }
 
-        // --- 3. COORDINATORS GUIDE ---
+        // --- 3. COORDINATORS ---
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
             grid.innerHTML = "";
@@ -1135,7 +1143,7 @@
                 coordinatorsData[idx] = coordObj;
             } else { coordinatorsData.push(coordObj); }
 
-            localStorage.setItem('coordDataStore', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v3', JSON.stringify(coordinatorsData));
             renderCoordinators();
             closeModal('coordModal');
         }
@@ -1153,16 +1161,41 @@
         function deleteCoordinator(id) {
             if (confirm("هل تريد حذف تعليمات هذا الطبيب؟")) {
                 coordinatorsData = coordinatorsData.filter(c => c.id !== id);
-                localStorage.setItem('coordDataStore', JSON.stringify(coordinatorsData));
+                localStorage.setItem('coordDataStore_v3', JSON.stringify(coordinatorsData));
                 renderCoordinators();
             }
         }
 
-        // --- 4. OFFERS AND PRICES ---
+        // --- 4. OFFERS (مع خيار "أخرى" المخصص) ---
+        function checkCustomCategory(val) {
+            const box = document.getElementById('customCategoryBox');
+            if (val === "أخرى") {
+                box.style.display = "flex";
+            } else {
+                box.style.display = "none";
+            }
+        }
+
+        function renderOffersTabs() {
+            const container = document.getElementById('offersTabsContainer');
+            container.innerHTML = "";
+            
+            // استخراج الأقسام الفريدة
+            const categories = [...new Set(offersData.map(o => o.category))];
+            if (categories.length > 0 && !categories.includes(selectedOfferTab)) {
+                selectedOfferTab = categories[0];
+            }
+
+            categories.forEach(cat => {
+                const activeCls = (cat === selectedOfferTab) ? 'active' : '';
+                container.innerHTML += `<button class="offer-tab-btn ${activeCls}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`;
+            });
+        }
+
         function filterOfferCategory(catName, btnElem) {
             selectedOfferTab = catName;
             document.querySelectorAll('.offer-tab-btn').forEach(b => b.classList.remove('active'));
-            btnElem.classList.add('active');
+            if(btnElem) btnElem.classList.add('active');
             renderOffers();
         }
 
@@ -1196,14 +1229,23 @@
             document.getElementById('offGentle').value = "-";
             document.getElementById('offClarity').value = "-";
             document.getElementById('offPrice').value = "";
+            document.getElementById('offCategory').value = "عروض اسنان";
+            document.getElementById('customCategoryBox').style.display = "none";
             document.getElementById('offerModal').classList.add('active');
         }
 
         function saveOffer() {
             const id = document.getElementById('offerId').value;
+            let category = document.getElementById('offCategory').value;
+            if (category === "أخرى") {
+                const customCat = document.getElementById('offCustomCategory').value.trim();
+                if (!customCat) return alert("يرجى إدخال اسم القسم الجديد!");
+                category = customCat;
+            }
+
             const offerObj = {
                 id: id ? parseInt(id) : Date.now(),
-                category: document.getElementById('offCategory').value,
+                category: category,
                 name: document.getElementById('offName').value,
                 gentle: document.getElementById('offGentle').value,
                 clarity: document.getElementById('offClarity').value,
@@ -1217,7 +1259,9 @@
                 offersData[idx] = offerObj;
             } else { offersData.push(offerObj); }
 
-            localStorage.setItem('offersDataStore', JSON.stringify(offersData));
+            localStorage.setItem('offersDataStore_v3', JSON.stringify(offersData));
+            selectedOfferTab = category;
+            renderOffersTabs();
             renderOffers();
             closeModal('offerModal');
         }
@@ -1226,7 +1270,24 @@
             const item = offersData.find(o => o.id === id);
             if (!item) return;
             document.getElementById('offerId').value = item.id;
-            document.getElementById('offCategory').value = item.category;
+            
+            const selectEl = document.getElementById('offCategory');
+            let found = false;
+            for (let opt of selectEl.options) {
+                if (opt.value === item.category) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                selectEl.value = item.category;
+                document.getElementById('customCategoryBox').style.display = "none";
+            } else {
+                selectEl.value = "أخرى";
+                document.getElementById('customCategoryBox').style.display = "flex";
+                document.getElementById('offCustomCategory').value = item.category;
+            }
+
             document.getElementById('offName').value = item.name;
             document.getElementById('offGentle').value = item.gentle;
             document.getElementById('offClarity').value = item.clarity;
@@ -1235,14 +1296,15 @@
         }
 
         function deleteOffer(id) {
-            if (confirm("هل أنت تأكد من حذف هذا العرض؟")) {
+            if (confirm("هل تريد حذف هذا العرض؟")) {
                 offersData = offersData.filter(o => o.id !== id);
-                localStorage.setItem('offersDataStore', JSON.stringify(offersData));
+                localStorage.setItem('offersDataStore_v3', JSON.stringify(offersData));
+                renderOffersTabs();
                 renderOffers();
             }
         }
 
-        // --- 5. INQUIRIES ---
+        // --- 5. INQUIRIES (تم تصليح الإضافة والتعديل والحذف بالكامل) ---
         function renderInquiries(search = "") {
             const grid = document.getElementById('inquiryCardsGrid');
             grid.innerHTML = "";
@@ -1252,9 +1314,57 @@
                     <div class="doc-sheet-card card-darkblue">
                         <h3>${item.question}</h3>
                         <p>${item.answer}</p>
+                        <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.4rem; padding-top:0.5rem;">
+                            <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.2rem 0.4rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
+        }
+
+        function openInquiryModal() {
+            document.getElementById('inquiryId').value = "";
+            document.getElementById('inqQuestion').value = "";
+            document.getElementById('inqAnswer').value = "";
+            document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function saveInquiry() {
+            const id = document.getElementById('inquiryId').value;
+            const inqObj = {
+                id: id ? parseInt(id) : Date.now(),
+                question: document.getElementById('inqQuestion').value,
+                answer: document.getElementById('inqAnswer').value
+            };
+
+            if (!inqObj.question) return alert("يرجى إدخال السؤال!");
+
+            if (id) {
+                const idx = inquiriesData.findIndex(i => i.id == id);
+                inquiriesData[idx] = inqObj;
+            } else { inquiriesData.push(inqObj); }
+
+            localStorage.setItem('inquiriesDataStore_v3', JSON.stringify(inquiriesData));
+            renderInquiries();
+            closeModal('inquiryModal');
+        }
+
+        function editInquiry(id) {
+            const item = inquiriesData.find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('inquiryId').value = item.id;
+            document.getElementById('inqQuestion').value = item.question;
+            document.getElementById('inqAnswer').value = item.answer;
+            document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function deleteInquiry(id) {
+            if (confirm("هل تريد حذف هذا الاستفسار؟")) {
+                inquiriesData = inquiriesData.filter(i => i.id !== id);
+                localStorage.setItem('inquiriesDataStore_v3', JSON.stringify(inquiriesData));
+                renderInquiries();
+            }
         }
 
         function openLightbox(src) {
