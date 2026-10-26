@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الشاملة - مجمع ماجستي الطبي</title>
+    <title>لوحة الكول سنتر الموحدة - مجمع ماجستي الطبي</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* السيمات الأربعة المطلوبة */
         :root[data-theme="dark-blue"] {
             --bg-main: #0b1120; --bg-card: #151e32; --bg-header: #10192d;
             --border-color: #23324d; --text-main: #f1f5f9; --text-sub: #94a3b8;
@@ -35,49 +34,31 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 40px; transition: background 0.2s; }
 
-        /* شريط العلوى الثابت */
         .top-bar {
             background-color: var(--bg-header); border-bottom: 1px solid var(--border-color);
             padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
         }
-        .brand { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--accent); }
+        .brand { font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; color: var(--accent); }
         
-        .search-container { position: relative; width: 350px; }
+        .search-container { position: relative; width: 320px; }
         .search-container input {
-            width: 100%; padding: 7px 35px 7px 12px; border-radius: 6px;
-            border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-size: 0.88rem;
+            width: 100%; padding: 6px 32px 6px 12px; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-size: 0.85rem;
         }
-        .search-container i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sub); }
+        .search-container i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-sub); }
 
-        .theme-selector { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .theme-selector { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
 
-        /* المحتوى العام في صفحة واحدة متصلة */
         .dashboard-container { max-width: 1400px; margin: 20px auto; padding: 0 15px; display: flex; flex-direction: column; gap: 20px; }
 
-        /* تنبيهات العيادة المصغرة المثبتة */
-        .alerts-widget {
-            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 15px;
-            max-height: 220px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .alert-item {
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--bg-main); border: 1px solid var(--border-color); border-right: 4px solid var(--highlight-border);
-            border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; gap: 10px; font-size: 0.85rem;
-        }
-        .alert-thumb { width: 38px; height: 38px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); flex-shrink: 0; }
-
-        /* الأقسام والكروت */
-        .section-box {
-            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;
-        }
+        .section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; }
         .section-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--accent);
             font-size: 1.05rem; font-weight: 700;
         }
 
-        /* الجداول الاحترافية المدمجة */
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
         .data-table th { background: var(--bg-header); color: var(--text-sub); text-align: right; padding: 8px; border-bottom: 1px solid var(--border-color); }
         .data-table td { padding: 8px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
@@ -92,26 +73,39 @@
         .btn-danger { background: #ef4444; }
         .btn-warning { background: #f59e0b; }
 
-        /* شبكة الفروع (معشي والوسام) جنبًا إلى جنب */
         .branches-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media(max-width: 900px) { .branches-grid { grid-template-columns: 1fr; } }
 
-        /* Lightbox للصورة */
+        /* Alerts Widget */
+        .alert-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-main); border: 1px solid var(--border-color); border-right: 4px solid var(--highlight-border);
+            border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; gap: 10px; font-size: 0.85rem;
+        }
+        .alert-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); flex-shrink: 0; }
+
+        /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .modal img { max-width: 90vw; max-height: 90vh; border-radius: 8px; border: 2px solid white; }
+        .modal-content { background: var(--bg-card); width: 90%; max-width: 450px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.82rem; margin-bottom: 4px; font-weight: 600; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 7px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.85rem;
+        }
+        #lightboxImg { max-width: 90vw; max-height: 90vh; border-radius: 8px; border: 2px solid white; }
     </style>
 </head>
 <body data-theme="dark-blue">
 
-    <!-- Top Navigation Bar -->
+    <!-- Top Bar -->
     <div class="top-bar">
         <div class="brand">
-            <i class="fa-solid fa-hospital"></i> مجمع ماجستي الطبي - لوحة الكول سنتر الموحدة
+            <i class="fa-solid fa-hospital"></i> مجمع ماجستي الطبي - لوحة الكول سنتر الشاملة
         </div>
         <div class="search-container">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="globalSearch" placeholder="بحث فوري عن أي طبيب، خدمة، موعد أو استفسار..." onkeyup="filterEverything()">
+            <input type="text" id="globalSearch" placeholder="بحث شامل في المواعيد، التنبيهات، والاستفسارات..." onkeyup="filterEverything()">
         </div>
         <div>
             <select class="theme-selector" id="themeSelect" onchange="changeTheme(this.value)">
@@ -123,48 +117,24 @@
         </div>
     </div>
 
-    <!-- Main Single-Page Container -->
     <div class="dashboard-container">
 
-        <!-- 1. شريط التنبيهات والإشعارات العامة المصغر -->
+        <!-- 1. التنبيهات وإشعارات العيادة العامة (مع رفع الصور والحذف والتعديل) -->
         <div class="section-box">
             <div class="section-header">
                 <span><i class="fa-solid fa-bullhorn text-amber-400"></i> تنبيهات وإشعارات العيادة العامة</span>
-                <button class="btn" onclick="alert('إضافة تنبيه جديد')"><i class="fa-solid fa-plus"></i> إضافة تنبيه</button>
+                <button class="btn" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
             </div>
-            <div class="alerts-widget" id="alertsList">
-                <div class="alert-item">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div>
-                            <b>عروض أكتوبر</b> - تحديث عروض الشهر لجميع الفروع.
-                            <div style="font-size:0.7rem; color:var(--text-sub);">24/10/2026, 02:55 PM</div>
-                        </div>
-                    </div>
-                    <div><button class="btn btn-danger btn-sm" onclick="this.closest('.alert-item').remove()">حذف</button></div>
-                </div>
-                <div class="alert-item" style="border-right-color: #ef4444;">
-                    <div>
-                        🔴🔴 <b>د. تبيان:</b> من يوم السبت متواجدة في فرع معشي من 2 إلى 10 م.
-                        <div style="font-size:0.7rem; color:var(--text-sub);">24/10/2026, 02:06 PM</div>
-                    </div>
-                    <div><button class="btn btn-danger btn-sm" onclick="this.closest('.alert-item').remove()">حذف</button></div>
-                </div>
-                <div class="alert-item">
-                    <img src="https://via.placeholder.com/150" class="alert-thumb" onclick="openLightbox(this.src)" alt="صورة">
-                    <div style="flex:1;">
-                        <b>تنبيه ليزر جنتل ماكس برو:</b> الجهاز المستخدم للعرض هو جنتل ماكس برو[cite: 1].
-                        <div style="font-size:0.7rem; color:var(--text-sub);">20/10/2026, 09:33 PM</div>
-                    </div>
-                    <div><button class="btn btn-danger btn-sm" onclick="this.closest('.alert-item').remove()">حذف</button></div>
-                </div>
+            <div id="alertsContainer" style="max-height: 250px; overflow-y: auto;">
+                <!-- يتم تعبئتها ديناميكياً -->
             </div>
         </div>
 
-        <!-- 2. جدول دوام الأطباء المقسّم (معشي والوسام مع الأطباء المشتركين) -->
+        <!-- 2. جدول دوام الأطباء الرسمي (معشي والوسام مع صفوف الأطباء المشتركين) -->
         <div class="section-box">
             <div class="section-header">
                 <span><i class="fa-solid fa-user-doctor"></i> جدول دوام الأطباء الرسمي (معشي والوسام)</span>
-                <button class="btn" onclick="alert('إضافة طبيب جديد')"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
+                <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب / شفت</button>
             </div>
             <div class="branches-grid">
                 <!-- فرع معشي -->
@@ -176,29 +146,11 @@
                                 <th>الطبيب والتخصص</th>
                                 <th>الأوقات</th>
                                 <th>ملاحظات</th>
+                                <th style="width: 50px;">حذف</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><b>د. سامي الدبعي</b><br><span style="font-size:0.7rem; color:var(--text-sub);">جراحة وجه وفكين</span>[cite: 1]</td>
-                                <td>يومياً ماعدا السبت (1م-10م)[cite: 1]</td>
-                                <td>كشفية 100 / منسقة دايركت[cite: 1]</td>
-                            </tr>
-                            <tr>
-                                <td><b>د. محمود اللبان</b><br><span style="font-size:0.7rem; color:var(--text-sub);">تركيبات وزراعة</span>[cite: 1]</td>
-                                <td>9ص-12م / 4:30م-9:30م[cite: 1]</td>
-                                <td>عدم حجز انتظار لو منتظرة تركيب[cite: 1]</td>
-                            </tr>
-                            <tr class="shared-row">
-                                <td><b>د. عبد الله اسبيناتي</b> <span class="badge badge-shared">مشترك</span><br><span style="font-size:0.7rem; color:var(--text-sub);">تقويم أسنان</span>[cite: 1]</td>
-                                <td>1م-9م (السبت لـ الثلاثاء)[cite: 1]</td>
-                                <td>الأربعاء والخميس بالوسام[cite: 1]</td>
-                            </tr>
-                            <tr class="shared-row">
-                                <td><b>د. نازك قيناوي</b> <span class="badge badge-shared">مشتركة</span><br><span style="font-size:0.7rem; color:var(--text-sub);">جلدية وتجميل</span>[cite: 1]</td>
-                                <td>2م-10م (أحد، اثنين، أربعاء، خميس)[cite: 1]</td>
-                                <td>الثلاثاء فقط بالوسام[cite: 1]</td>
-                            </tr>
+                        <tbody id="maashiTableBody">
+                            <!-- ديناميكي -->
                         </tbody>
                     </table>
                 </div>
@@ -212,40 +164,22 @@
                                 <th>الطبيب والتخصص</th>
                                 <th>الأوقات</th>
                                 <th>مناوبات الجمعة</th>
+                                <th style="width: 50px;">حذف</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><b>د. إيهاب هاشم</b><br><span style="font-size:0.7rem; color:var(--text-sub);">أسنان عام</span>[cite: 1]</td>
-                                <td>9ص-12م / 4:30م-9:30م[cite: 1]</td>
-                                <td><span class="badge badge-fri">الجمعة</span> 4م-8م (تنظيف جير)[cite: 1]</td>
-                            </tr>
-                            <tr>
-                                <td><b>د. تبيان</b><br><span style="font-size:0.7rem; color:var(--text-sub);">أسنان عام</span>[cite: 1]</td>
-                                <td>كل سبت (2م-10م)[cite: 1]</td>
-                                <td>باقي الأيام بمعشي[cite: 1]</td>
-                            </tr>
-                            <tr class="shared-row">
-                                <td><b>د. عبد الله اسبيناتي</b> <span class="badge badge-shared">مشترك</span><br><span style="font-size:0.7rem; color:var(--text-sub);">تقويم أسنان</span>[cite: 1]</td>
-                                <td>الأربعاء والخميس (1م-9م)[cite: 1]</td>
-                                <td>باقي الأسبوع بمعشي[cite: 1]</td>
-                            </tr>
-                            <tr>
-                                <td><b>د. مصعب ميرغني</b><br><span style="font-size:0.7rem; color:var(--text-sub);">طوارئ وعام</span>[cite: 1]</td>
-                                <td>9ص-2م / 10م-1ص[cite: 1]</td>
-                                <td><span class="badge badge-fri">الجمعة</span> 2م-10م[cite: 1]</td>
-                            </tr>
+                        <tbody id="wisamTableBody">
+                            <!-- ديناميكي -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- 3. متابعة وتسليم العملاء بين الموظفين -->
+        <!-- 3. تسليم ومتابعة العملاء اليومية -->
         <div class="section-box">
             <div class="section-header">
-                <span><i class="fa-solid fa-users text-emerald-400"></i> تسليم ومتابعة العملاء اليومية (بين الشفتات)</span>
-                <button class="btn" onclick="alert('إضافة عميل جديد')"><i class="fa-solid fa-user-plus"></i> إضافة عميل</button>
+                <span><i class="fa-solid fa-users text-emerald-400"></i> تسليم ومتابعة العملاء (الكول سنتر)</span>
+                <button class="btn" onclick="openClientModal()"><i class="fa-solid fa-user-plus"></i> تسليم عميل</button>
             </div>
             <table class="data-table">
                 <thead>
@@ -258,11 +192,11 @@
                         <th>الحالة</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="clientsTableBody">
                     <tr>
                         <td>15/10/2026 - 02:15 PM</td>
                         <td><b>هاله احمد مغرم</b> (20668)</td>
-                        <td>الجلدية (معشي)</td>
+                        <td>الجلدية (معشي)[cite: 1]</td>
                         <td>-</td>
                         <td>بتسأل عن موعد ليزر الرتوش المجدول.</td>
                         <td><span style="color:#f59e0b;">محادثة قيد الإجراء</span></td>
@@ -270,8 +204,8 @@
                     <tr class="shared-row">
                         <td>15/10/2026 - 03:40 PM</td>
                         <td><b>سالمة عوض الخشي</b> (15298)</td>
-                        <td>الأسنان (الوسام)</td>
-                        <td>د. محمود اللبان</td>
+                        <td>الأسنان (الوسام)[cite: 1]</td>
+                        <td>د. محمود اللبان[cite: 1]</td>
                         <td>تم حجز وتنفيذ موعد تركيبات يوم 26.</td>
                         <td><span style="color:#10b981;">حجز مؤكد</span></td>
                     </tr>
@@ -279,20 +213,20 @@
             </table>
         </div>
 
-        <!-- 4. دليل الاستفسارات الشائعة وسياسات العيادة -->
+        <!-- 4. دليل الاستفسارات وسياسات العيادة -->
         <div class="section-box">
             <div class="section-header">
                 <span><i class="fa-solid fa-circle-question text-purple-400"></i> دليل الاستفسارات والسياسات السريعة</span>
-                <button class="btn" onclick="alert('إضافة استفسار جديد')"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
+                <button class="btn" onclick="openFaqModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
             </div>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">الموضوع</th>
+                        <th style="width: 28%;">الموضوع</th>
                         <th>التعليمات المعتمدة للكول سنتر</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="faqTableBody">
                     <tr>
                         <td><b>جلسات الرتوش والفرق بينها</b></td>
                         <td>الرتوش خلال 14 يوماً (أقصى حد 16 يوماً ولا تقل عن 12). بين الجلسة والأخرى شهر كامل[cite: 1].</td>
@@ -341,15 +275,193 @@
         <img id="lightboxImg" src="" alt="صورة مكبرة">
     </div>
 
-    <!-- Script -->
+    <!-- Generic Modal for Adding Items -->
+    <div class="modal" id="genericModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 id="modalTitle" style="font-size: 1rem; font-weight: 700;">إضافة</h3>
+                <button onclick="closeModal()" style="background:none; border:none; color:var(--text-main); font-size:1.1rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="modalBody"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+                <button class="btn btn-danger btn-sm" onclick="closeModal()">إلغاء</button>
+                <button class="btn btn-sm" id="modalSaveBtn">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
     <script>
+        // السيمات
         function changeTheme(themeName) {
             document.body.setAttribute('data-theme', themeName);
             localStorage.setItem('majesty_theme', themeName);
         }
-        const saved = localStorage.getItem('majesty_theme') || 'dark-blue';
-        document.getElementById('themeSelect').value = saved;
-        changeTheme(saved);
+        const savedTheme = localStorage.getItem('majesty_theme') || 'dark-blue';
+        document.getElementById('themeSelect').value = savedTheme;
+        changeTheme(savedTheme);
+
+        // بيانات افتراضية أولية تُحفظ في LocalStorage
+        let alertsData = JSON.parse(localStorage.getItem('majesty_alerts')) || [
+            { id: 1, title: "عروض أكتوبر", text: "تحديث عروض الشهر لجميع الفروع.", time: "24/10/2026, 02:55 PM", img: "" },
+            { id: 2, title: "د. تبيان - فرع معشي", text: "🔴🔴 د. تبيان من يوم السبت متواجدة في فرع معشي من 2 - 10 م.", time: "24/10/2026, 02:06 PM", img: "" },
+            { id: 3, title: "تنبيه ليزر جنتل ماكس برو", text: "إذا أحد أبرز لكم هذا العرض، الجهاز المستخدم هو جنتل ماكس برو.", time: "20/10/2026, 09:33 PM", img: "https://via.placeholder.com/150" }
+        ];
+
+        let maashiDoctors = JSON.parse(localStorage.getItem('majesty_maashi')) || [
+            { name: "د. سامي الدبعي", spec: "جراحة وجه وفكين", time: "يومياً ماعدا السبت (1م-10م)", note: "كشفية 100 / منسقة دايركت", shared: false },
+            { name: "د. محمود اللبان", spec: "تركيبات وزراعة", time: "9ص-12م / 4:30م-9:30م", note: "عدم حجز انتظار لو منتظرة تركيب", shared: false },
+            { name: "د. عبد الله اسبيناتي", spec: "تقويم أسنان", time: "1م-9م (السبت لـ الثلاثاء)", note: "الأربعاء والخميس بالوسام", shared: true },
+            { name: "د. نازك قيناوي", spec: "جلدية وتجميل", time: "2م-10م (أحد، اثنين، أربعاء، خميس)", note: "الثلاثاء فقط بالوسام", shared: true }
+        ];
+
+        let wisamDoctors = JSON.parse(localStorage.getItem('majesty_wisam')) || [
+            { name: "د. إيهاب هاشم", spec: "أسنان عام", time: "9ص-12م / 4:30م-9:30م", fri: "الجمعة 4م-8م (تنظيف جير)", shared: false },
+            { name: "د. تبيان", spec: "أسنان عام", time: "كل سبت (2م-10م)", fri: "باقي الأيام بمعشي", shared: false },
+            { name: "د. عبد الله اسبيناتي", spec: "تقويم أسنان", time: "الأربعاء والخميس (1م-9م)", fri: "باقي الأسبوع بمعشي", shared: true },
+            { name: "د. مصعب ميرغني", spec: "طوارئ وعام", time: "9ص-2م / 10م-1ص", fri: "الجمعة 2م-10م", shared: false }
+        ];
+
+        // عرض التنبيهات
+        function renderAlerts() {
+            const container = document.getElementById('alertsContainer');
+            container.innerHTML = '';
+            if(alertsData.length === 0) {
+                container.innerHTML = '<p style="font-size:0.8rem; color:var(--text-sub); text-align:center; padding:10px;">لا توجد تنبيهات حالية.</p>';
+                return;
+            }
+            alertsData.forEach(alert => {
+                container.innerHTML += `
+                    <div class="alert-item">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${alert.img ? `<img src="${alert.img}" class="alert-thumb" onclick="openLightbox('${alert.img}')" alt="صورة">` : ''}
+                            <div>
+                                <b>${alert.title}</b> - ${alert.text}
+                                <div style="font-size:0.7rem; color:var(--text-sub);">${alert.time}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteAlert(${alert.id})"><i class="fa-solid fa-trash"></i> حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+            localStorage.setItem('majesty_alerts', JSON.stringify(alertsData));
+        }
+
+        // عرض الأطباء
+        function renderDoctors() {
+            const mTable = document.getElementById('maashiTableBody');
+            mTable.innerHTML = '';
+            maashiDoctors.forEach((doc, idx) => {
+                mTable.innerHTML += `
+                    <tr class="${doc.shared ? 'shared-row' : ''}">
+                        <td><b>${doc.name}</b> ${doc.shared ? '<span class="badge badge-shared">مشترك</span>' : ''}<br><span style="font-size:0.7rem; color:var(--text-sub);">${doc.spec}</span></td>
+                        <td>${doc.time}</td>
+                        <td>${doc.note}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteDoctor('maashi', ${idx})"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+            localStorage.setItem('majesty_maashi', JSON.stringify(maashiDoctors));
+
+            const wTable = document.getElementById('wisamTableBody');
+            wTable.innerHTML = '';
+            wisamDoctors.forEach((doc, idx) => {
+                wTable.innerHTML += `
+                    <tr class="${doc.shared ? 'shared-row' : ''}">
+                        <td><b>${doc.name}</b> ${doc.shared ? '<span class="badge badge-shared">مشترك</span>' : ''}<br><span style="font-size:0.7rem; color:var(--text-sub);">${doc.spec}</span></td>
+                        <td>${doc.time}</td>
+                        <td>${doc.fri}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteDoctor('wisam', ${idx})"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+            localStorage.setItem('majesty_wisam', JSON.stringify(wisamDoctors));
+        }
+
+        // تشغيل عند التحميل
+        window.onload = function() {
+            renderAlerts();
+            renderDoctors();
+        };
+
+        // النوافذ المنبثقة (Modals) والإضافات
+        function openModal() { document.getElementById('genericModal').classList.add('active'); }
+        function closeModal() { document.getElementById('genericModal').classList.remove('active'); }
+
+        function openAlertModal() {
+            document.getElementById('modalTitle').innerText = 'إضافة تنبيه أو إشعار جديد';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="form-group"><label>عنوان التنبيه</label><input type="text" id="newAlertTitle" placeholder="العنوان..."></div>
+                <div class="form-group"><label>نص التنبيه</label><textarea id="newAlertText" rows="3" placeholder="التفاصيل..."></textarea></div>
+                <div class="form-group"><label>رابط الصورة أو الملف (اختياري)</label><input type="text" id="newAlertImg" placeholder="https://..."></div>
+            `;
+            document.getElementById('modalSaveBtn').onclick = function() {
+                let title = document.getElementById('newAlertTitle').value;
+                let text = document.getElementById('newAlertText').value;
+                let img = document.getElementById('newAlertImg').value;
+                if(!title || !text) { alert('يرجى إدخال العنوان والنص'); return; }
+                
+                let now = new Date().toLocaleString('en-US', { hour12: true });
+                alertsData.push({ id: Date.now(), title, text, time: now, img });
+                renderAlerts();
+                closeModal();
+            };
+            openModal();
+        }
+
+        function deleteAlert(id) {
+            if(confirm('هل أنت متأكد من حذف هذا التنبيه؟')) {
+                alertsData = alertsData.filter(a => a.id !== id);
+                renderAlerts();
+            }
+        }
+
+        function openDoctorModal() {
+            document.getElementById('modalTitle').innerText = 'إضافة طبيب أو شفت جديد';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="form-group"><label>اسم الطبيب</label><input type="text" id="docName" placeholder="د. ..."></div>
+                <div class="form-group"><label>التخصص</label><input type="text" id="docSpec" placeholder="أسنان، جلدية، إلخ..."></div>
+                <div class="form-group"><label>الأوقات</label><input type="text" id="docTime" placeholder="من ص ل م..."></div>
+                <div class="form-group"><label>الفرع والنوع</label>
+                    <select id="docBranch">
+                        <option value="maashi">فرع معشي</option>
+                        <option value="wisam">فرع الوسام</option>
+                        <option value="shared">طبيب مشترك بين الفرعين</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>ملاحظات / مناوبة الجمعة</label><input type="text" id="docNote" placeholder="ملاحظة..."></div>
+            `;
+            document.getElementById('modalSaveBtn').onclick = function() {
+                let name = document.getElementById('docName').value;
+                let spec = document.getElementById('docSpec').value;
+                let time = document.getElementById('docTime').value;
+                let branch = document.getElementById('docBranch').value;
+                let note = document.getElementById('docNote').value;
+                if(!name) { alert('يرجى إدخال اسم الطبيب'); return; }
+
+                if(branch === 'maashi') {
+                    maashiDoctors.push({ name, spec, time, note, shared: false });
+                } else if(branch === 'wisam') {
+                    wisamDoctors.push({ name, spec, time, fri: note, shared: false });
+                } else if(branch === 'shared') {
+                    maashiDoctors.push({ name, spec, time, note, shared: true });
+                    wisamDoctors.push({ name, spec, time, fri: note, shared: true });
+                }
+                renderDoctors();
+                closeModal();
+            };
+            openModal();
+        }
+
+        function deleteDoctor(branch, idx) {
+            if(confirm('هل أنت متأكد من حذف هذا الطبيب من الجدول؟')) {
+                if(branch === 'maashi') maashiDoctors.splice(idx, 1);
+                if(branch === 'wisam') wisamDoctors.splice(idx, 1);
+                renderDoctors();
+            }
+        }
 
         function openLightbox(src) {
             document.getElementById('lightboxImg').src = src;
