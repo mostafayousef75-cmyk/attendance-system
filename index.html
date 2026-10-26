@@ -196,7 +196,6 @@
             font-size: 0.8rem;
         }
 
-        /* Cloud Indicator Light */
         .cloud-indicator {
             display: inline-flex;
             align-items: center;
@@ -349,7 +348,7 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* تماثل تام 50% لفرع معشي و 50% للوسام وبدون فراغات */
+        /* شبكة مواعيد الأطباء */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -384,12 +383,11 @@
             overflow-x: auto;
         }
 
-        /* الجداول ثابتة الشكل تماماً (إلغاء التحرير والسحب) وبنفس التنسيق النهائي */
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.7rem;
-            table-layout: fixed; /* تثبيت الأحجام تماماً */
+            table-layout: fixed;
         }
 
         th, td {
@@ -409,13 +407,13 @@
             font-size: 0.72rem;
         }
 
-        /* تحديد أعمدة ثابتة ومتطابقة بين الفرعين تماماً */
-        th:nth-child(1), td:nth-child(1) { width: 22%; }
-        th:nth-child(2), td:nth-child(2) { width: 18%; }
-        th:nth-child(3), td:nth-child(3) { width: 12%; }
-        th:nth-child(4), td:nth-child(4) { width: 30%; }
-        th:nth-child(5), td:nth-child(5) { width: 25%; }
-        th:nth-child(6), td:nth-child(6) { width: 15%; text-align: center; }
+        /* أعمدة جدول مواعيد الأطباء الثابتة */
+        #schedule-section th:nth-child(1), #schedule-section td:nth-child(1) { width: 22%; }
+        #schedule-section th:nth-child(2), #schedule-section td:nth-child(2) { width: 18%; }
+        #schedule-section th:nth-child(3), #schedule-section td:nth-child(3) { width: 12%; }
+        #schedule-section th:nth-child(4), #schedule-section td:nth-child(4) { width: 30%; }
+        #schedule-section th:nth-child(5), #schedule-section td:nth-child(5) { width: 25%; }
+        #schedule-section th:nth-child(6), #schedule-section td:nth-child(6) { width: 15%; text-align: center; }
 
         .alerts-2col-grid {
             display: grid;
@@ -575,7 +573,6 @@
             font-size: 0.76rem;
         }
 
-        /* تنسيق الأيام القابل للإخفاء والإظهار */
         .days-section-box {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -587,7 +584,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 0.25rem;
             margin-top: 0.3rem;
-            display: none; /* مخفية افتراضياً لتوفير المساحة */
+            display: none;
         }
         .days-checklist.show {
             display: grid;
@@ -725,7 +722,7 @@
                     </div>
                 </div>
 
-                <!-- شبكة متماثلة تماماً بين فرع معشي وفرع الوسام بالشكل النهائي -->
+                <!-- شبكة مواعيد الأطباء -->
                 <div class="split-grid">
                     <!-- فرع معشي -->
                     <div class="branch-box">
@@ -750,7 +747,7 @@
                         </div>
                     </div>
 
-                    <!-- فرع الوسام (متطابق تماماً في العرض والأعمدة) -->
+                    <!-- فرع الوسام -->
                     <div class="branch-box">
                         <div class="branch-title">
                             <span><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
@@ -790,37 +787,36 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء -->
+            <!-- 3. الأقسام والأطباء (مُحدث بالهيكل المطلوب بدقة) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
                     <div style="display:flex; gap:0.3rem;">
-                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز</button>
+                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> ملحوظة</button>
                     </div>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث داخلي..." oninput="renderDeptsAndDocs(this.value)">
+                    <input type="text" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs(this.value)">
                 </div>
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
                     <div class="offers-table-box">
                         <div class="table-responsive">
-                            <table id="deptsDocsTable">
+                            <table style="table-layout: auto;">
                                 <thead>
-                                    <tr style="background:#1e293b; color:#fff;">
-                                        <th colspan="2" style="text-align:center; border-left:1px solid #334155;">فرع معشي</th>
-                                        <th colspan="2" style="text-align:center;">فرع الوسام</th>
-                                        <th>إدارة</th>
+                                    <tr style="background:#1e293b; color:#fff; text-align:center;">
+                                        <th colspan="2" style="border-left:1px solid #334155; padding:0.4rem;">فرع معشي</th>
+                                        <th colspan="2" style="padding:0.4rem;">فرع الوسام</th>
+                                        <th rowspan="2" style="vertical-align:middle; width:70px;">إدارة</th>
                                     </tr>
-                                    <tr>
-                                        <th>الجلدية</th>
-                                        <th style="border-left:1px solid #334155;">الأسنان</th>
-                                        <th>الجلدية</th>
-                                        <th>الأسنان</th>
-                                        <th>حذف/تعديل</th>
+                                    <tr style="background:#0f172a; color:var(--text-muted); text-align:center; font-size:0.68rem;">
+                                        <th style="border-left:1px solid #334155; padding:0.3rem;">الجلدية (الخدمة / الجهاز)</th>
+                                        <th style="border-left:1px solid #334155; padding:0.3rem;">الأسنان (الخدمة)</th>
+                                        <th style="border-left:1px solid #334155; padding:0.3rem;">الجلدية (الخدمة / الجهاز)</th>
+                                        <th style="padding:0.3rem;">الأسنان (الخدمة)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="deptsDocsTableBody"></tbody>
@@ -943,7 +939,6 @@
                 </select>
             </div>
 
-            <!-- لون الصف المخصص -->
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون الصف المخصص للطبيب:</label>
                 <select id="docCustomColor" class="form-control">
@@ -966,7 +961,6 @@
                 <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / خارج الدوام (تلوين الكارت بالأحمر)</label>
             </div>
 
-            <!-- أيام دوام فرع معشي (تظهر عند النقر لتوفير المساحة) -->
             <div class="days-section-box">
                 <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('mashyDaysBox')">
                     <label style="font-weight:700; color:#60a5fa; cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> تحديد أيام دوام فرع معشي</label>
@@ -983,7 +977,6 @@
                 </div>
             </div>
 
-            <!-- أيام دوام فرع الوسام (تظهر عند النقر لتوفير المساحة) -->
             <div class="days-section-box">
                 <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('wissamDaysBox')">
                     <label style="font-weight:700; color:#34d399; cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> تحديد أيام دوام فرع الوسام</label>
@@ -1082,31 +1075,37 @@
         </div>
     </div>
 
-    <!-- Modal 4: Dept Service Modal -->
+    <!-- Modal 4: Dept Service Modal (محدث لفرع معشي والوسام تحت الجلدية والأسنان) -->
     <div class="modal-overlay" id="deptServiceModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>إضافة صف أجهزة وخدمات</h3>
+                <h3>إضافة خدمة / جهاز للأقسام</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptServiceModal')"></i>
             </div>
             <input type="hidden" id="deptRowId">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <label>معشي - جلدية</label>
-                <input type="text" id="mDerm" class="form-control">
+            <h4 style="color:var(--primary-color); font-size:0.8rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem;">فرع معشي</h4>
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>معشي - جلدية (الخدمة / الجهاز)</label>
+                    <input type="text" id="mDerm" class="form-control" placeholder="مثال: جنتل ماكس برو">
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>معشي - أسنان (الخدمة)</label>
+                    <input type="text" id="mDent" class="form-control" placeholder="مثال: تنظيف جير">
+                </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <label>معشي - أسنان</label>
-                <input type="text" id="mDent" class="form-control">
+            <h4 style="color:var(--primary-color); font-size:0.8rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; margin-top:0.3rem;">فرع الوسام</h4>
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الوسام - جلدية (الخدمة / الجهاز)</label>
+                    <input type="text" id="wDerm" class="form-control" placeholder="مثال: كلاريتي 2">
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الوسام - أسنان (الخدمة)</label>
+                    <input type="text" id="wDent" class="form-control" placeholder="مثال: تقويم">
+                </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <label>الوسام - جلدية</label>
-                <input type="text" id="wDerm" class="form-control">
-            </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <label>الوسام - أسنان</label>
-                <input type="text" id="wDent" class="form-control">
-            </div>
-            <button class="btn btn-green" onclick="saveDeptService()">حفظ الصف</button>
+            <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveDeptService()">حفظ الصف</button>
         </div>
     </div>
 
@@ -1293,6 +1292,7 @@
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
+                    deptServicesData = [{ id: 1, mDerm: "جنتل ماكس برو", mDent: "تنظيف جير", wDerm: "كلاريتي 2", wDent: "تقويم" }];
                     syncToCloud();
                 }
 
@@ -1357,7 +1357,6 @@
             document.getElementById('kpiOffers').innerText = offersData.length;
         }
 
-        // دالة إظهار وإخفاء أيام الدوام في المودال لتوفير المساحة
         function toggleDaysChecklist(boxId) {
             const box = document.getElementById(boxId);
             box.classList.toggle('show');
@@ -1558,7 +1557,6 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 
-                // تطبيق اللون المخصص للطبيب
                 let customBgStyle = "";
                 if (doc.isLeave) {
                     customBgStyle = "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);";
@@ -1862,18 +1860,19 @@
             }
         }
 
+        // دالة عرض الأقسام والخدمات تحت الجلدية والأسنان لكل فرع
         function renderDeptsAndDocs(search = "") {
             const body = document.getElementById('deptsDocsTableBody');
             if(!body) return;
             body.innerHTML = "";
-            deptServicesData.filter(s => s.mDerm.includes(search) || s.wDerm.includes(search)).forEach(item => {
+            deptServicesData.filter(s => (s.mDerm && s.mDerm.includes(search)) || (s.wDerm && s.wDerm.includes(search)) || (s.mDent && s.mDent.includes(search)) || (s.wDent && s.wDent.includes(search))).forEach(item => {
                 body.innerHTML += `
                     <tr>
-                        <td>${item.mDerm}</td>
-                        <td style="border-left:1px solid #334155;">${item.mDent}</td>
-                        <td>${item.wDerm}</td>
-                        <td>${item.wDent}</td>
-                        <td>
+                        <td style="border-left:1px solid var(--border-color);">${item.mDerm || '-'}</td>
+                        <td style="border-left:1px solid var(--border-color);">${item.mDent || '-'}</td>
+                        <td style="border-left:1px solid var(--border-color);">${item.wDerm || '-'}</td>
+                        <td>${item.wDent || '-'}</td>
+                        <td style="text-align:center;">
                             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -1928,10 +1927,10 @@
             const item = deptServicesData.find(s => s.id === id);
             if (!item) return;
             document.getElementById('deptRowId').value = item.id;
-            document.getElementById('mDerm').value = item.mDerm;
-            document.getElementById('mDent').value = item.mDent;
-            document.getElementById('wDerm').value = item.wDerm;
-            document.getElementById('wDent').value = item.wDent;
+            document.getElementById('mDerm').value = item.mDerm || "";
+            document.getElementById('mDent').value = item.mDent || "";
+            document.getElementById('wDerm').value = item.wDerm || "";
+            document.getElementById('wDent').value = item.wDent || "";
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
