@@ -1460,7 +1460,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (إصلاح تصفية الأطباء المشتركين وأطباء الوسام بدقة متناهية) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (إصلاح تصفية الأطباء حسب الفرع بدقة) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1541,8 +1541,9 @@
                 const mashyDays = doc.mashyDays || [];
                 const wissamDays = doc.wissamDays || [];
 
-                const isInMashy = mashyDays.includes(currentDay);
-                const isInWissam = wissamDays.includes(currentDay);
+                // فحص تواجده اليوم في الفروع
+                const isInMashy = (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) && mashyDays.includes(currentDay);
+                const isInWissam = (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0) && wissamDays.includes(currentDay);
 
                 if (!doc.isLeave) {
                     if (isInMashy) todayMashyDocs.push(doc.name);
@@ -1553,9 +1554,10 @@
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
-                // شرط ظهور الطبيب في فرع معشي: إذا كان فرعه معشي، أو طبيب مشترك، ولدينا أيام معشي مدخلة
-                const showInMashy = (doc.branch === "معشي" || doc.isJoint) && mashyDays.length > 0;
-                if (showInMashy) {
+                // الشرط الصحيح لإظهار الطبيب في جدول "فرع معشي": (أن يكون فرعه معشي أو طبيب مشترك) مع وجود أيام في معشي
+                const shouldShowInMashy = (doc.branch === "معشي" && mashyDays.length > 0) || (doc.isJoint && mashyDays.length > 0);
+
+                if (shouldShowInMashy) {
                     let mashyScheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                     mashyScheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div>`;
 
@@ -1576,9 +1578,10 @@
                     countM++;
                 }
 
-                // شرط ظهور الطبيب في فرع الوسام: إذا كان فرعه الوسام، أو طبيب مشترك، ولدينا أيام وسام مدخلة
-                const showInWissam = (doc.branch === "الوسام" || doc.isJoint) && wissamDays.length > 0;
-                if (showInWissam) {
+                // الشرط الصحيح لإظهار الطبيب في جدول "فرع الوسام": (أن يكون فرعه الوسام أو طبيب مشترك) مع وجود أيام في الوسام
+                const shouldShowInWissam = (doc.branch === "الوسام" && wissamDays.length > 0) || (doc.isJoint && wissamDays.length > 0);
+
+                if (shouldShowInWissam) {
                     let wissamScheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                     wissamScheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
 
