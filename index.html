@@ -170,7 +170,7 @@
 
         .search-container {
             position: relative;
-            width: 280px;
+            width: 320px;
         }
 
         .search-container input {
@@ -258,6 +258,35 @@
             display: block;
         }
 
+        /* Global Search Results Panel */
+        #globalSearchResultsSection {
+            display: none;
+        }
+        #globalSearchResultsSection.active {
+            display: block;
+        }
+        .search-result-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.7rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .source-badge {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
         .page-local-search {
             margin-bottom: 0.5rem;
             position: relative;
@@ -330,7 +359,6 @@
             overflow-x: auto;
         }
 
-        /* تصغير حجم الجداول والكروت لتعرض أكثر من 3 دكاترة بوضوح */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -601,10 +629,10 @@
     <!-- المحتوى الرئيسي -->
     <main class="main-wrapper">
         <header class="top-header">
-            <!-- بحث شامل ذكي يبحث في الموقع بالكامل ويخبرك بالقسم والنتيجة -->
+            <!-- بحث شامل حقيقي يبحث في كافة أقسام الموقع ويعرض اسم القسم ومصدر المعلومة -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="globalSearch" placeholder="بحث شامل بكل الأقسام..." oninput="handleGlobalSearch(this.value)">
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل في كافة أقسام الموقع..." oninput="handleTrueGlobalSearch(this.value)">
             </div>
             
             <div class="kpi-bar">
@@ -620,6 +648,15 @@
         <div class="pinned-alerts-banner" id="pinnedAlertsBar"></div>
 
         <div class="content-area">
+
+            <!-- لوحة نتائج البحث الشامل الموحدة (تظهر تلقائياً عند البحث) -->
+            <section id="globalSearchResultsSection" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة أقسام الموقع</h2>
+                    <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث والعودة</button>
+                </div>
+                <div id="globalSearchResultsList"></div>
+            </section>
 
             <!-- 1. مواعيد الأطباء -->
             <section id="schedule-section" class="page-section">
@@ -1140,20 +1177,20 @@
 
     <script>
         // --- DATA STORES ---
-        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v10')) || [
+        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v11')) || [
             { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة" }
         ];
 
-        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v10')) || [
+        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v11')) || [
             { id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }
         ];
 
-        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v10')) || [];
-        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v10')) || [];
-        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v10')) || [];
-        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v10')) || [];
-        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v10')) || [];
-        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v10')) || [];
+        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v11')) || [];
+        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v11')) || [];
+        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v11')) || [];
+        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v11')) || [];
+        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v11')) || [];
+        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v11')) || [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1184,7 +1221,12 @@
         });
 
         function switchTab(tabId, elem, save = true) {
-            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            // إخفاء نتائج البحث الشامل عند التنقل العادي
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            
+            document.querySelectorAll('.page-section').forEach(s => {
+                if(s.id !== 'globalSearchResultsSection') s.classList.remove('active');
+            });
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             
             const targetSec = document.getElementById(`${tabId}-section`);
@@ -1238,14 +1280,14 @@
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
                         
-                        localStorage.setItem('docDataStore_v10', JSON.stringify(doctorsData));
-                        localStorage.setItem('fridayScheduleStore_v10', JSON.stringify(fridaySchedules));
-                        localStorage.setItem('alertsDataStore_v10', JSON.stringify(alertsData));
-                        localStorage.setItem('coordDataStore_v10', JSON.stringify(coordinatorsData));
-                        localStorage.setItem('deptServicesStore_v10', JSON.stringify(deptServicesData));
-                        localStorage.setItem('deptNotesStore_v10', JSON.stringify(deptNotesData));
-                        localStorage.setItem('offersDataStore_v10', JSON.stringify(offersData));
-                        localStorage.setItem('inquiriesDataStore_v10', JSON.stringify(inquiriesData));
+                        localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
+                        localStorage.setItem('fridayScheduleStore_v11', JSON.stringify(fridaySchedules));
+                        localStorage.setItem('alertsDataStore_v11', JSON.stringify(alertsData));
+                        localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
+                        localStorage.setItem('deptServicesStore_v11', JSON.stringify(deptServicesData));
+                        localStorage.setItem('deptNotesStore_v11', JSON.stringify(deptNotesData));
+                        localStorage.setItem('offersDataStore_v11', JSON.stringify(offersData));
+                        localStorage.setItem('inquiriesDataStore_v11', JSON.stringify(inquiriesData));
 
                         alert("تم استيراد البيانات بنجاح!");
                         location.reload();
@@ -1283,7 +1325,7 @@
                 fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal });
             }
 
-            localStorage.setItem('fridayScheduleStore_v10', JSON.stringify(fridaySchedules));
+            localStorage.setItem('fridayScheduleStore_v11', JSON.stringify(fridaySchedules));
             document.getElementById('fridayDocName').value = "";
             document.getElementById('fridayDate').value = "";
             renderFridayScheduleTable();
@@ -1303,7 +1345,7 @@
         function deleteFridaySchedule(id) {
             if (confirm("هل تريد حذف هذه المناوبة؟")) {
                 fridaySchedules = fridaySchedules.filter(f => f.id !== id);
-                localStorage.setItem('fridayScheduleStore_v10', JSON.stringify(fridaySchedules));
+                localStorage.setItem('fridayScheduleStore_v11', JSON.stringify(fridaySchedules));
                 renderFridayScheduleTable();
                 renderDoctors();
             }
@@ -1424,7 +1466,7 @@
             const targetIdx = doctorsData.findIndex(d => d.id === targetId);
             const moved = doctorsData.splice(oldIdx, 1)[0];
             doctorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('docDataStore_v10', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
             renderDoctors();
         }
 
@@ -1471,7 +1513,7 @@
                 doctorsData[idx] = docObj;
             } else { doctorsData.push(docObj); }
 
-            localStorage.setItem('docDataStore_v10', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
             renderDoctors();
             closeModal('doctorModal');
         }
@@ -1503,7 +1545,7 @@
         function deleteDoctor(id) {
             if (confirm("حذف هذا الطبيب؟")) {
                 doctorsData = doctorsData.filter(d => d.id !== id);
-                localStorage.setItem('docDataStore_v10', JSON.stringify(doctorsData));
+                localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
                 renderDoctors();
             }
         }
@@ -1619,7 +1661,7 @@
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
 
-            localStorage.setItem('alertsDataStore_v10', JSON.stringify(alertsData));
+            localStorage.setItem('alertsDataStore_v11', JSON.stringify(alertsData));
             renderAlerts();
             closeModal('alertModal');
         }
@@ -1647,7 +1689,7 @@
         function deleteAlert(id) {
             if (confirm("حذف هذا التنبيه؟")) {
                 alertsData = alertsData.filter(a => a.id !== id);
-                localStorage.setItem('alertsDataStore_v10', JSON.stringify(alertsData));
+                localStorage.setItem('alertsDataStore_v11', JSON.stringify(alertsData));
                 renderAlerts();
             }
         }
@@ -1710,7 +1752,7 @@
                 const idx = deptServicesData.findIndex(s => s.id == id);
                 deptServicesData[idx] = rowObj;
             } else { deptServicesData.push(rowObj); }
-            localStorage.setItem('deptServicesStore_v10', JSON.stringify(deptServicesData));
+            localStorage.setItem('deptServicesStore_v11', JSON.stringify(deptServicesData));
             renderDeptsAndDocs();
             closeModal('deptServiceModal');
         }
@@ -1729,7 +1771,7 @@
         function deleteDeptService(id) {
             if (confirm("حذف الصف؟")) {
                 deptServicesData = deptServicesData.filter(s => s.id !== id);
-                localStorage.setItem('deptServicesStore_v10', JSON.stringify(deptServicesData));
+                localStorage.setItem('deptServicesStore_v11', JSON.stringify(deptServicesData));
                 renderDeptsAndDocs();
             }
         }
@@ -1739,14 +1781,14 @@
             const txt = document.getElementById('deptNoteText').value.trim();
             if (!txt) return;
             deptNotesData.push(txt);
-            localStorage.setItem('deptNotesStore_v10', JSON.stringify(deptNotesData));
+            localStorage.setItem('deptNotesStore_v11', JSON.stringify(deptNotesData));
             renderDeptsAndDocs();
             closeModal('deptNoteModal');
         }
         function deleteDeptNote(idx) {
             if (confirm("حذف الملحوظة؟")) {
                 deptNotesData.splice(idx, 1);
-                localStorage.setItem('deptNotesStore_v10', JSON.stringify(deptNotesData));
+                localStorage.setItem('deptNotesStore_v11', JSON.stringify(deptNotesData));
                 renderDeptsAndDocs();
             }
         }
@@ -1778,7 +1820,7 @@
             if (draggedCoordIdx === null || draggedCoordIdx === targetIdx) return;
             const moved = coordinatorsData.splice(draggedCoordIdx, 1)[0];
             coordinatorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('coordDataStore_v10', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
             renderCoordinators();
         }
 
@@ -1796,7 +1838,7 @@
                 const idx = coordinatorsData.findIndex(c => c.id == id);
                 coordinatorsData[idx] = obj;
             } else { coordinatorsData.push(obj); }
-            localStorage.setItem('coordDataStore_v10', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
             renderCoordinators();
             closeModal('coordModal');
         }
@@ -1812,7 +1854,7 @@
         function deleteCoordinator(id) {
             if (confirm("حذف؟")) {
                 coordinatorsData = coordinatorsData.filter(c => c.id !== id);
-                localStorage.setItem('coordDataStore_v10', JSON.stringify(coordinatorsData));
+                localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
                 renderCoordinators();
             }
         }
@@ -1877,7 +1919,7 @@
                 const idx = offersData.findIndex(o => o.id == id);
                 offersData[idx] = obj;
             } else { offersData.push(obj); }
-            localStorage.setItem('offersDataStore_v10', JSON.stringify(offersData));
+            localStorage.setItem('offersDataStore_v11', JSON.stringify(offersData));
             selectedOfferTab = cat;
             renderOffersTabs();
             renderOffers();
@@ -1896,7 +1938,7 @@
         function deleteOffer(id) {
             if (confirm("حذف؟")) {
                 offersData = offersData.filter(o => o.id !== id);
-                localStorage.setItem('offersDataStore_v10', JSON.stringify(offersData));
+                localStorage.setItem('offersDataStore_v11', JSON.stringify(offersData));
                 renderOffersTabs();
                 renderOffers();
             }
@@ -1953,7 +1995,7 @@
                 const idx = inquiriesData.findIndex(i => i.id == id);
                 inquiriesData[idx] = obj;
             } else { inquiriesData.push(obj); }
-            localStorage.setItem('inquiriesDataStore_v10', JSON.stringify(inquiriesData));
+            localStorage.setItem('inquiriesDataStore_v11', JSON.stringify(inquiriesData));
             renderInquiries();
             closeModal('inquiryModal');
         }
@@ -1968,52 +2010,151 @@
         function deleteInquiry(id) {
             if (confirm("حذف؟")) {
                 inquiriesData = inquiriesData.filter(i => i.id !== id);
-                localStorage.setItem('inquiriesDataStore_v10', JSON.stringify(inquiriesData));
+                localStorage.setItem('inquiriesDataStore_v11', JSON.stringify(inquiriesData));
                 renderInquiries();
             }
         }
 
-        // --- 8. GLOBAL DEEP SEARCH ---
-        function handleGlobalSearch(query) {
-            if (!query.trim()) {
-                renderDoctors();
-                renderAlerts();
-                renderOffers();
-                renderInquiries();
-                renderCoordinators();
+        // --- 8. TRUE GLOBAL DEEP SEARCH (بحث شامل حقيقي في كافة أقسام الموقع مع ذكر مصدر القسم والصفحة) ---
+        function handleTrueGlobalSearch(query) {
+            const q = query.trim().toLowerCase();
+            const resultsSection = document.getElementById('globalSearchResultsSection');
+            const resultsList = document.getElementById('globalSearchResultsList');
+
+            if (!q) {
+                resultsSection.classList.remove('active');
+                const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                document.getElementById(`${activeTab}-section`).classList.add('active');
                 return;
             }
-            
-            const q = query.toLowerCase();
 
-            const foundDoc = doctorsData.some(d => d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q)));
-            const foundOffer = offersData.some(o => o.name.toLowerCase().includes(q) || o.price.toLowerCase().includes(q));
-            const foundAlert = alertsData.some(a => a.content.toLowerCase().includes(q));
-            const foundInq = inquiriesData.some(i => i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q));
-            const foundCoord = coordinatorsData.some(c => c.name.toLowerCase().includes(q));
+            // إخفاء جميع الأقسام وإظهار قسم نتائج البحث الشامل
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            resultsSection.classList.add('active');
+            resultsList.innerHTML = "";
 
-            if (foundDoc) {
-                switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'), false);
-                renderDoctors(query);
-            } else if (foundOffer) {
-                switchTab('offers', document.querySelector('.nav-link[data-tab="offers"]'), false);
-                renderOffers(query);
-            } else if (foundAlert) {
-                switchTab('alerts', document.querySelector('.nav-link[data-tab="alerts"]'), false);
-                renderAlerts(query);
-            } else if (foundInq) {
-                switchTab('inquiries', document.querySelector('.nav-link[data-tab="inquiries"]'), false);
-                renderInquiries(query);
-            } else if (foundCoord) {
-                switchTab('coordinators', document.querySelector('.nav-link[data-tab="coordinators"]'), false);
-                renderCoordinators(query);
-            } else {
-                renderDoctors(query);
-                renderAlerts(query);
-                renderOffers(query);
-                renderInquiries(query);
-                renderCoordinators(query);
+            let foundCount = 0;
+
+            // 1. البحث في الأطباء
+            doctorsData.forEach(d => {
+                if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q)) || (d.notes && d.notes.toLowerCase().includes(q))) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-user-doctor"></i> قسم: مواعيد الأطباء (${d.branch})</span>
+                                <h4 style="margin-top:0.3rem;">${d.name} - ${d.specialty}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">الكشفية: ${d.fee || 'مجانية'} | الدوام: ${d.timing}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule', '${d.name}')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            // 2. البحث في مناوبات الجمعة
+            fridaySchedules.forEach(f => {
+                if (f.doc.toLowerCase().includes(q) || f.date.includes(q) || f.branch.toLowerCase().includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-calendar-check"></i> قسم: مناوبات الجمعة</span>
+                                <h4 style="margin-top:0.3rem;">مناوبة يوم ${f.date} (${f.branch})</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">الطبيب المناوب: ${f.doc}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            // 3. البحث في العروض والأسعار
+            offersData.forEach(o => {
+                if (o.name.toLowerCase().includes(q) || o.category.toLowerCase().includes(q) || o.price.toLowerCase().includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-tags"></i> قسم: العروض والأسعار (${o.category})</span>
+                                <h4 style="margin-top:0.3rem;">${o.name}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">السعر العام: ${o.price} | جنتل: ${o.gentle} | كلاريتي: ${o.clarity}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            // 4. البحث في التنبيهات والإشعارات
+            alertsData.forEach(a => {
+                if (a.content.toLowerCase().includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-bullhorn"></i> قسم: التنبيهات والإشعارات العامة</span>
+                                <h4 style="margin-top:0.3rem;">${a.content}</h4>
+                                <p style="font-size:0.70rem; color:var(--text-muted);">${a.time}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('alerts')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            // 5. البحث في دليل المنسقين
+            coordinatorsData.forEach(c => {
+                const matchRules = c.rules.some(r => r.toLowerCase().includes(q));
+                if (c.name.toLowerCase().includes(q) || matchRules) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-users-gear"></i> قسم: دليل وقوانين المنسقين</span>
+                                <h4 style="margin-top:0.3rem;">تعليمات: ${c.name}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">${c.rules.join(' | ').substring(0, 80)}...</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('coordinators')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            // 6. البحث في الاستفسارات
+            inquiriesData.forEach(i => {
+                if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-circle-question"></i> قسم: دليل الاستفسارات (${i.category})</span>
+                                <h4 style="margin-top:0.3rem;">س: ${i.question}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">ج: ${i.answer}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('inquiries')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            if (foundCount === 0) {
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد أي نتائج مطابقة لـ "${query}" في أي قسم من أقسام الموقع.</div>`;
             }
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelectorAll('.nav-link')[0];
+            switchTab(activeTab, targetNav);
+        }
+
+        function jumpToSectionAndFind(tabId) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            const targetNav = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
+            switchTab(tabId, targetNav);
         }
 
         function openLightbox(src) {
