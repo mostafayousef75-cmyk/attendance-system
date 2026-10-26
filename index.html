@@ -348,7 +348,6 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* شبكة مواعيد الأطباء */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -407,7 +406,6 @@
             font-size: 0.72rem;
         }
 
-        /* أعمدة جدول مواعيد الأطباء الثابتة */
         #schedule-section th:nth-child(1), #schedule-section td:nth-child(1) { width: 22%; }
         #schedule-section th:nth-child(2), #schedule-section td:nth-child(2) { width: 18%; }
         #schedule-section th:nth-child(3), #schedule-section td:nth-child(3) { width: 12%; }
@@ -698,9 +696,10 @@
                     </div>
                 </div>
 
+                <!-- شريط مناوبات الجمعة العلوية مع عكس الألوان (معشي أبيض والوسام برتقالي أو العكس حسب الطلب) -->
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
                     <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
+                        <span><i class="fa-solid fa-user-clock" style="color:#fff;"></i> <strong>مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="color:#fff; font-weight:700;">-</span></span>
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
                     </div>
                     <div style="display:flex; gap:1rem; color:#60a5fa; flex-wrap:wrap;">
@@ -722,7 +721,7 @@
                     </div>
                 </div>
 
-                <!-- شبكة مواعيد الأطباء -->
+                <!-- شبكة مواعيد الأطباء (مفصولين تماماً في الترتيب والسحب) -->
                 <div class="split-grid">
                     <!-- فرع معشي -->
                     <div class="branch-box">
@@ -787,7 +786,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (مُحدث بالهيكل المطلوب بدقة) -->
+            <!-- 3. الأقسام والأطباء (محدث بقسم الأسنان والجلدية: الخدمة / الجهاز) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -814,9 +813,9 @@
                                     </tr>
                                     <tr style="background:#0f172a; color:var(--text-muted); text-align:center; font-size:0.68rem;">
                                         <th style="border-left:1px solid #334155; padding:0.3rem;">الجلدية (الخدمة / الجهاز)</th>
-                                        <th style="border-left:1px solid #334155; padding:0.3rem;">الأسنان (الخدمة)</th>
+                                        <th style="border-left:1px solid #334155; padding:0.3rem;">الأسنان (الخدمة / الجهاز)</th>
                                         <th style="border-left:1px solid #334155; padding:0.3rem;">الجلدية (الخدمة / الجهاز)</th>
-                                        <th style="padding:0.3rem;">الأسنان (الخدمة)</th>
+                                        <th style="padding:0.3rem;">الأسنان (الخدمة / الجهاز)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="deptsDocsTableBody"></tbody>
@@ -1075,7 +1074,7 @@
         </div>
     </div>
 
-    <!-- Modal 4: Dept Service Modal (محدث لفرع معشي والوسام تحت الجلدية والأسنان) -->
+    <!-- Modal 4: Dept Service Modal -->
     <div class="modal-overlay" id="deptServiceModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1090,7 +1089,7 @@
                     <input type="text" id="mDerm" class="form-control" placeholder="مثال: جنتل ماكس برو">
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>معشي - أسنان (الخدمة)</label>
+                    <label>معشي - أسنان (الخدمة / الجهاز)</label>
                     <input type="text" id="mDent" class="form-control" placeholder="مثال: تنظيف جير">
                 </div>
             </div>
@@ -1101,7 +1100,7 @@
                     <input type="text" id="wDerm" class="form-control" placeholder="مثال: كلاريتي 2">
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>الوسام - أسنان (الخدمة)</label>
+                    <label>الوسام - أسنان (الخدمة / الجهاز)</label>
                     <input type="text" id="wDent" class="form-control" placeholder="مثال: تقويم">
                 </div>
             </div>
@@ -1541,18 +1540,25 @@
             let todayMashyDocs = [];
             let todayWissamDocs = [];
 
-            doctorsData.filter(d => {
+            // فرز مستقل تماماً لفرع معشي
+            const mashyList = doctorsData.filter(d => {
                 const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.notes && d.notes.toLowerCase().includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec;
-            }).forEach((doc) => {
-                const mashyDays = doc.mashyDays || doc.days || [];
-                const wissamDays = doc.wissamDays || (doc.isJoint ? (doc.days || []) : []);
+                const mashyDays = d.mashyDays || d.days || [];
+                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || mashyDays.length > 0);
+            });
 
-                if (!doc.isLeave) {
-                    if (mashyDays.includes(currentDay) && (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0)) todayMashyDocs.push(doc.name);
-                    if (wissamDays.includes(currentDay) && (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0)) todayWissamDocs.push(doc.name);
-                }
+            // فرز مستقل تماماً لفرع الوسام
+            const wissamList = doctorsData.filter(d => {
+                const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.notes && d.notes.toLowerCase().includes(search));
+                const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
+                const wissamDays = d.wissamDays || (d.isJoint ? (d.days || []) : []);
+                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || wissamDays.length > 0);
+            });
+
+            mashyList.forEach((doc) => {
+                const mashyDays = doc.mashyDays || doc.days || [];
+                if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
 
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
@@ -1565,49 +1571,61 @@
                 }
 
                 let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
-                
                 if (mashyDays.length > 0) {
                     scheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div><br>`;
                 }
+
+                mashyBody.innerHTML += `
+                    <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
+                        <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
+                        <td>${doc.specialty}</td>
+                        <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                        <td>${scheduleHtml}</td>
+                        <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
+                        <td>
+                            <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                countM++;
+            });
+
+            wissamList.forEach((doc) => {
+                const wissamDays = doc.wissamDays || (doc.isJoint ? (doc.days || []) : []);
+                if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
+
+                const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
+                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
+                
+                let customBgStyle = "";
+                if (doc.isLeave) {
+                    customBgStyle = "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);";
+                } else if (doc.customColor) {
+                    customBgStyle = `background-color: ${doc.customColor};`;
+                }
+
+                let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 if (wissamDays.length > 0) {
                     scheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
                 }
 
-                if (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) {
-                    mashyBody.innerHTML += `
-                        <tr style="${customBgStyle}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
-                            <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
-                            <td>${doc.specialty}</td>
-                            <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td>${scheduleHtml}</td>
-                            <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
-                            <td>
-                                <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
-                                <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                    countM++;
-                }
-
-                if (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0) {
-                    wissamBody.innerHTML += `
-                        <tr style="${customBgStyle}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
-                            <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
-                            <td>${doc.specialty}</td>
-                            <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td>${scheduleHtml}</td>
-                            <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
-                            <td>
-                                <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
-                                <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                    countW++;
-                }
+                wissamBody.innerHTML += `
+                    <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
+                        <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
+                        <td>${doc.specialty}</td>
+                        <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                        <td>${scheduleHtml}</td>
+                        <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
+                        <td>
+                            <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                countW++;
             });
 
             document.getElementById('countMashy').innerText = `${countM} أطباء`;
@@ -1619,17 +1637,24 @@
             updateKPIs();
         }
 
+        let draggedBranch = null;
         let draggedDocId = null;
-        function handleDocDragStart(e, id) { draggedDocId = id; }
-        function handleDocDrop(e, targetId) {
+        function handleBranchDragStart(e, branch, id) {
+            draggedBranch = branch;
+            draggedDocId = id;
+        }
+        function handleBranchDrop(e, branch, targetId) {
             e.preventDefault();
-            if (draggedDocId === null || draggedDocId === targetId) return;
+            if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
+            
             const oldIdx = doctorsData.findIndex(d => d.id === draggedDocId);
             const targetIdx = doctorsData.findIndex(d => d.id === targetId);
-            const moved = doctorsData.splice(oldIdx, 1)[0];
-            doctorsData.splice(targetIdx, 0, moved);
-            syncToCloud();
-            renderDoctors();
+            if (oldIdx !== -1 && targetIdx !== -1) {
+                const moved = doctorsData.splice(oldIdx, 1)[0];
+                doctorsData.splice(targetIdx, 0, moved);
+                syncToCloud();
+                renderDoctors();
+            }
         }
 
         function openDoctorModal() {
@@ -1860,7 +1885,6 @@
             }
         }
 
-        // دالة عرض الأقسام والخدمات تحت الجلدية والأسنان لكل فرع
         function renderDeptsAndDocs(search = "") {
             const body = document.getElementById('deptsDocsTableBody');
             if(!body) return;
