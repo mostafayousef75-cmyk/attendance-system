@@ -3,251 +3,629 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مؤشر الأداء والمواعيد - ماجستي (قائمة جانبية)</title>
+    <title>نظام إدارة الكول سنتر والمواعيد</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
     <style>
-        :root {
-            --bg-body: #0d1117;
-            --bg-sidebar: #161b22;
-            --bg-card: #21262d;
-            --border-color: #30363d;
-            --text-main: #e6edf3;
-            --text-muted: #8b949e;
-            --accent: #238636;
-            --accent-blue: #1f6feb;
-            --highlight: #7c2d12;
-        }
+        /* الثيمات الأربعة */
+        body.theme-dark { background-color: #0f172a; color: #f8fafc; }
+        body.theme-dark .card-bg { background-color: #1e293b; border-color: #334155; }
+        body.theme-dark .table-bg { background-color: #1e293b; }
+        body.theme-dark input, body.theme-dark select, body.theme-dark textarea { background-color: #334155; color: #fff; border-color: #475569; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        body.theme-light { background-color: #f1f5f9; color: #0f172a; }
+        body.theme-light .card-bg { background-color: #ffffff; border-color: #e2e8f0; }
+        body.theme-light .table-bg { background-color: #ffffff; }
+        body.theme-light input, body.theme-light select, body.theme-light textarea { background-color: #ffffff; color: #0f172a; border-color: #cbd5e1; }
 
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background-color: var(--bg-sidebar);
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .sidebar-brand {
-            padding: 20px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #58a6ff;
-        }
-        .sidebar-menu { list-style: none; padding: 15px 10px; flex: 1; }
-        .sidebar-menu li { margin-bottom: 8px; }
-        .sidebar-menu button {
-            width: 100%;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            padding: 12px 15px;
-            text-align: right;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
-        }
-        .sidebar-menu button:hover, .sidebar-menu button.active {
-            background-color: var(--bg-card);
-            color: var(--text-main);
-            border-right: 4px solid #58a6ff;
-        }
+        body.theme-blue { background-color: #0b192c; color: #e2e8f0; }
+        body.theme-blue .card-bg { background-color: #1e3e62; border-color: #000000; }
+        body.theme-blue .table-bg { background-color: #1e3e62; }
+        body.theme-blue input, body.theme-blue select, body.theme-blue textarea { background-color: #000000; color: #fff; border-color: #1e3e62; }
 
-        /* Main Content Area */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        .topbar {
-            background-color: var(--bg-sidebar);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .search-input {
-            background: var(--bg-body);
-            border: 1px solid var(--border-color);
-            padding: 8px 15px;
-            border-radius: 6px;
-            color: var(--text-main);
-            width: 300px;
-        }
-        .content-body { padding: 25px; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
+        body.theme-purple { background-color: #1a102f; color: #f3e8ff; }
+        body.theme-purple .card-bg { background-color: #2e1a47; border-color: #4c1d95; }
+        body.theme-purple .table-bg { background-color: #2e1a47; }
+        body.theme-purple input, body.theme-purple select, body.theme-purple textarea { background-color: #4c1d95; color: #fff; border-color: #6b21a8; }
 
-        /* Tables & Cards */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+        /* جداول مضغوطة لعرض أكبر عدد من البيانات */
+        .compact-table td, .compact-table th {
+            padding: 6px 10px;
+            font-size: 0.875rem;
+            white-space: nowrap;
         }
-        .table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        .table th, .table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: right; }
-        .table th { background: rgba(0,0,0,0.2); color: var(--text-muted); }
-        .table tr:hover { background: rgba(255,255,255,0.01); }
-        
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-        .badge-branch { background: #1f6feb; color: white; }
-        .badge-time { background: #238636; color: white; }
-        
-        .btn {
-            background: var(--accent-blue);
-            color: white; border: none; padding: 6px 12px;
-            border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+        .highlight-text {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
         }
-        .btn-danger { background: #da3633; }
     </style>
 </head>
-<body>
+<body class="theme-dark min-h-screen font-sans">
 
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <div>
-            <div class="sidebar-brand">
-                <i class="fa-solid fa-hospital"></i>
-                <span>ماجستي الطبي</span>
-            </div>
-            <ul class="sidebar-menu">
-                <li><button class="active" onclick="switchTab('tabAlerts', this)"><i class="fa-solid fa-bell"></i> التنبيهات والإشعارات</button></li>
-                <li><button onclick="switchTab('tabSchedule', this)"><i class="fa-solid fa-calendar-days"></i> جدول المواعيد (الفرعين)</button></li>
-                <li><button onclick="switchTab('tabClients', this)"><i class="fa-solid fa-users"></i> تسليم ومتابعة العملاء</button></li>
-                <li><button onclick="switchTab('tabFaq', this)"><i class="fa-solid fa-circle-question"></i> الاستفسارات والخدمات</button></li>
-            </ul>
-        </div>
-        <div style="padding: 15px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted);">
-            نسخة الكول سنتر المحدثة 2026
-        </div>
-    </div>
-
-    <!-- Main Wrapper -->
-    <div class="main-content">
-        <div class="topbar">
-            <h3>لوحة التحكم والتحولات اليومية</h3>
-            <input type="text" class="search-input" id="globalSearch" placeholder="بحث شامل في المواعيد أو العملاء..." onkeyup="filterContent()">
+    <!-- النافذة العلوية للتنقل والبحث والثيمات -->
+    <header class="sticky top-0 z-50 card-bg border-b p-3 shadow-md flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-3">
+            <h1 class="text-xl font-bold text-blue-400"><i class="fa-solid fa-headset ml-2"></i>منصة الكول سنتر</h1>
+            <nav class="flex gap-1 bg-black/20 p-1 rounded-lg">
+                <button onclick="switchTab('schedules')" id="tab-schedules" class="px-3 py-1 rounded text-sm font-semibold bg-blue-600 text-white">جدول المواعيد</button>
+                <button onclick="switchTab('notices')" id="tab-notices" class="px-3 py-1 rounded text-sm font-semibold hover:bg-black/30">الإشعارات والتنبيهات</button>
+                <button onclick="switchTab('handover')" id="tab-handover" class="px-3 py-1 rounded text-sm font-semibold hover:bg-black/30">متابعة وتسليم العملاء</button>
+                <button onclick="switchTab('inquiries')" id="tab-inquiries" class="px-3 py-1 rounded text-sm font-semibold hover:bg-black/30">الاستفسارات والعروض</button>
+            </nav>
         </div>
 
-        <div class="content-body">
-            <!-- TAB 1: ALERTS -->
-            <div id="tabAlerts" class="tab-pane active">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h4>تنبيهات وإشعارات العيادة العامة</h4>
-                    <button class="btn"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
-                </div>
-                <div class="card">
-                    <div style="font-weight: 700; margin-bottom: 5px; color: #58a6ff;">عروض أكتوبر المحدثة</div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">تحديث عروض الجلسات والخصومات لجميع الفروع.</p>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;"><i class="fa-regular fa-clock"></i> 24/10/2026, 02:55 PM</div>
-                </div>
+        <div class="flex items-center gap-3">
+            <!-- البحث المتقدم الشامل -->
+            <div class="relative">
+                <i class="fa-solid fa-search absolute right-3 top-2.5 text-gray-400 text-sm"></i>
+                <input type="text" id="globalSearch" oninput="handleGlobalSearch()" placeholder="بحث متقدم في كافة الأقسام..." class="pr-9 pl-3 py-1.5 text-sm rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
-            <!-- TAB 2: SCHEDULE -->
-            <div id="tabSchedule" class="tab-pane">
-                <div class="card">
-                    <h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">فرع مـعـشـي وفرع الـوسـام (مقسم ومنظم)</h4>
-                    <table class="table">
+            <!-- خيارات السيمات الأربعة -->
+            <div class="flex items-center gap-1 border border-gray-600 p-1 rounded-lg">
+                <button onclick="setTheme('theme-dark')" title="داكن" class="w-6 h-6 rounded-full bg-slate-800 border"></button>
+                <button onclick="setTheme('theme-light')" title="فاتح" class="w-6 h-6 rounded-full bg-white border"></button>
+                <button onclick="setTheme('theme-blue')" title="أزرق" class="w-6 h-6 rounded-full bg-blue-800 border"></button>
+                <button onclick="setTheme('theme-purple')" title="أرجواني" class="w-6 h-6 rounded-full bg-purple-800 border"></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-4 max-w-[1600px] mx-auto">
+
+        <!-- 1. صفحة جدول المواعيد (مقسم لفرع معشي وفرع الوسام ومناوبات الجمعة) -->
+        <section id="sec-schedules" class="space-y-4">
+            <div class="flex justify-between items-center card-bg p-3 rounded-lg border">
+                <h2 class="text-lg font-bold"><i class="fa-solid fa-user-doctor ml-2 text-green-400"></i>جدول مواعيد الأطباء (مقسم حسب الفرع)</h2>
+                <button onclick="openDoctorModal()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold"><i class="fa-solid fa-plus ml-1"></i>إضافة طبيب/موعد</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- فرع معشي -->
+                <div class="card-bg p-3 rounded-lg border">
+                    <h3 class="text-md font-bold mb-2 text-yellow-400 border-b pb-1"><i class="fa-solid fa-hospital ml-1"></i>فرع معشي</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right compact-table border-collapse">
+                            <thead>
+                                <tr class="bg-black/30 border-b border-gray-600">
+                                    <th>الطبيب</th>
+                                    <th>التخصص</th>
+                                    <th>المواعيد / الأيام</th>
+                                    <th>ملاحظات</th>
+                                    <th>إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctors-mashi-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- فرع الوسام -->
+                <div class="card-bg p-3 rounded-lg border">
+                    <h3 class="text-md font-bold mb-2 text-blue-400 border-b pb-1"><i class="fa-solid fa-hospital-user ml-1"></i>فرع الوسام</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right compact-table border-collapse">
+                            <thead>
+                                <tr class="bg-black/30 border-b border-gray-600">
+                                    <th>الطبيب</th>
+                                    <th>التخصص</th>
+                                    <th>المواعيد / الأيام</th>
+                                    <th>ملاحظات</th>
+                                    <th>إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctors-wisam-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دكاترة الفرعين ومناوبات الجمعة -->
+            <div class="card-bg p-3 rounded-lg border">
+                <h3 class="text-md font-bold mb-2 text-purple-400 border-b pb-1"><i class="fa-solid fa-calendar-week ml-1"></i>مناوبات الجمعة / دكاترة الفرعين</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right compact-table border-collapse">
                         <thead>
-                            <tr>
-                                <th>الفرع</th>
+                            <tr class="bg-black/30 border-b border-gray-600">
                                 <th>اسم الطبيب</th>
+                                <th>الفرع</th>
                                 <th>التخصص</th>
-                                <th>أيام وساعات التواجد</th>
-                                <th>ملاحظات ومناوبات الجمعة</th>
+                                <th>توقيت المناوبة / المواعيد</th>
+                                <th>آخر تعديل</th>
+                                <th>إجراء</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="badge badge-branch">معشي</span></td>
-                                <td><b>د. سامي الدبعي</b></td>
-                                <td>جراحة وجه وفكين</td>
-                                <td>يومياً ماعدا السبت (1م - 10م)</td>
-                                <td>التواصل دايركت / كشفية 100</td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge badge-branch" style="background:#8957e5;">الوسام</span></td>
-                                <td><b>د. إيهاب هاشم</b></td>
-                                <td>طبيب أسنان عام</td>
-                                <td>9ص - 12م / 4:30م - 9:30م</td>
-                                <td>مناوبة الجمعة (4م - 8م)</td>
-                            </tr>
-                        </tbody>
+                        <tbody id="doctors-shared-body"></tbody>
                     </table>
                 </div>
             </div>
+        </section>
 
-            <!-- TAB 3: CLIENTS -->
-            <div id="tabClients" class="tab-pane">
-                <div class="card">
-                    <h4 style="margin-bottom: 15px;">سجل العملاء والمتابعة اليومية</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>التاريخ والوقت</th>
-                                <th>اسم العميل</th>
-                                <th>رقم الجوال / الملف</th>
-                                <th>القسم والدكتور</th>
-                                <th>التفاصيل</th>
-                                <th>الحالة</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>15/10/2026 - 02:15 PM</td>
-                                <td><b>هاله احمد مغرم</b></td>
-                                <td>0547565466 (20668)</td>
-                                <td>الجلدية</td>
-                                <td>بتسأل عن موعد ليزر الترتوش المجدول.</td>
-                                <td><span style="color:#d29922;">محادثة</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- 2. صفحة الإشعارات والتنبيهات (مع دعم الصور والملفات) -->
+        <section id="sec-notices" class="space-y-4 hidden">
+            <div class="flex justify-between items-center card-bg p-3 rounded-lg border">
+                <h2 class="text-lg font-bold"><i class="fa-solid fa-bell ml-2 text-yellow-400"></i>شاشة الإشعارات والتنبيهات الهامة</h2>
+                <button onclick="openNoticeModal()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold"><i class="fa-solid fa-plus ml-1"></i>إضافة تنبيه جديد</button>
             </div>
+            <div id="notices-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
 
-            <!-- TAB 4: FAQ -->
-            <div id="tabFaq" class="tab-pane">
-                <div class="card">
-                    <h4>الاستفسارات والتعليمات السريعة</h4>
-                    <p style="margin-top: 10px; color: var(--text-muted);">قريباً سيتم عرض كافة التعليمات الخاصة بالرتوش، إبر النظارة، والخصومات.</p>
-                </div>
+        <!-- 3. صفحة تسليم ومتابعة العملاء (شكل مضغوط لاستعراض أقصى عدد) -->
+        <section id="sec-handover" class="space-y-4 hidden">
+            <div class="flex justify-between items-center card-bg p-3 rounded-lg border">
+                <h2 class="text-lg font-bold"><i class="fa-solid fa-users ml-2 text-teal-400"></i>جدول تسليم ومتابعة العملاء بين الكول سنتر</h2>
+                <button onclick="openHandoverModal()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold"><i class="fa-solid fa-user-plus ml-1"></i>تسليم عميل جديد</button>
             </div>
+            <div class="card-bg p-3 rounded-lg border overflow-x-auto">
+                <table class="w-full text-right compact-table border-collapse">
+                    <thead>
+                        <tr class="bg-black/30 border-b border-gray-600">
+                            <th>العميل</th>
+                            <th>الهاتف</th>
+                            <th>الفرع/القسم</th>
+                            <th>حالة الطلب / ما تم مع العميل</th>
+                            <th>المنسق المسؤول</th>
+                            <th>التاريخ/وقت التحديث</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="handover-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 4. صفحة الاستفسارات والخدمات والعروض -->
+        <section id="sec-inquiries" class="space-y-4 hidden">
+            <div class="flex justify-between items-center card-bg p-3 rounded-lg border">
+                <h2 class="text-lg font-bold"><i class="fa-solid fa-circle-question ml-2 text-indigo-400"></i>دليل الاستفسارات، الخدمات، والعروض</h2>
+                <button onclick="openInquiryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold"><i class="fa-solid fa-plus ml-1"></i>إضافة استفسار/عرض</button>
+            </div>
+            <div id="inquiries-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+    </main>
+
+    <!-- Modal: إضافة/تعديل طبيب -->
+    <div id="doctorModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="card-bg p-5 rounded-lg max-w-md w-full border shadow-xl">
+            <h3 id="doctorModalTitle" class="text-lg font-bold mb-3">إضافة طبيب</h3>
+            <form id="doctorForm" onsubmit="saveDoctor(event)" class="space-y-3">
+                <input type="hidden" id="doc-id">
+                <div>
+                    <label class="block text-xs font-bold mb-1">اسم الطبيب</label>
+                    <input type="text" id="doc-name" required class="w-full p-2 text-sm rounded border">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">الفرع</label>
+                        <select id="doc-branch" class="w-full p-2 text-sm rounded border">
+                            <option value="معشي">معشي</option>
+                            <option value="الوسام">الوسام</option>
+                            <option value="الفرعين">الفرعين</option>
+                            <option value="مناوبة الجمعة">مناوبة الجمعة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">التخصص</label>
+                        <input type="text" id="doc-spec" required class="w-full p-2 text-sm rounded border">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">المواعيد والأيام</label>
+                    <textarea id="doc-timing" rows="2" required class="w-full p-2 text-sm rounded border"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">ملاحظات إضافية (مظللة)</label>
+                    <input type="text" id="doc-notes" class="w-full p-2 text-sm rounded border" placeholder="مثلاً: يتطلب حجز مسبق">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeDoctorModal()" class="px-4 py-1.5 rounded bg-gray-500 text-white text-sm">إلغاء</button>
+                    <button type="submit" class="px-4 py-1.5 rounded bg-blue-600 text-white text-sm font-bold">حفظ</button>
+                </div>
+            </form>
         </div>
     </div>
 
+    <!-- Modal: إضافة/تعديل تنبيه -->
+    <div id="noticeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="card-bg p-5 rounded-lg max-w-md w-full border shadow-xl">
+            <h3 id="noticeModalTitle" class="text-lg font-bold mb-3">إضافة تنبيه جديد</h3>
+            <form id="noticeForm" onsubmit="saveNotice(event)" class="space-y-3">
+                <input type="hidden" id="notice-id">
+                <div>
+                    <label class="block text-xs font-bold mb-1">عنوان التنبيه</label>
+                    <input type="text" id="notice-title" required class="w-full p-2 text-sm rounded border">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">تفاصيل التنبيه</label>
+                    <textarea id="notice-body" rows="3" required class="w-full p-2 text-sm rounded border"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">رابط صورة أو مرفق (URL/Base64)</label>
+                    <input type="text" id="notice-img" class="w-full p-2 text-sm rounded border" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeNoticeModal()" class="px-4 py-1.5 rounded bg-gray-500 text-white text-sm">إلغاء</button>
+                    <button type="submit" class="px-4 py-1.5 rounded bg-yellow-600 text-white text-sm font-bold">حفظ التنبيه</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: إضافة/تعديل عميل -->
+    <div id="handoverModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="card-bg p-5 rounded-lg max-w-md w-full border shadow-xl">
+            <h3 id="handoverModalTitle" class="text-lg font-bold mb-3">تسليم/تحديث عميل</h3>
+            <form id="handoverForm" onsubmit="saveHandover(event)" class="space-y-3">
+                <input type="hidden" id="ho-id">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">اسم العميل</label>
+                        <input type="text" id="ho-name" required class="w-full p-2 text-sm rounded border">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">رقم الهاتف</label>
+                        <input type="text" id="ho-phone" required class="w-full p-2 text-sm rounded border">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">الفرع / القسم</label>
+                        <input type="text" id="ho-branch" required class="w-full p-2 text-sm rounded border">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">اسم المنسق</label>
+                        <input type="text" id="ho-agent" required class="w-full p-2 text-sm rounded border">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">تفاصيل حالة العميل وما تم معه</label>
+                    <textarea id="ho-status" rows="3" required class="w-full p-2 text-sm rounded border"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeHandoverModal()" class="px-4 py-1.5 rounded bg-gray-500 text-white text-sm">إلغاء</button>
+                    <button type="submit" class="px-4 py-1.5 rounded bg-teal-600 text-white text-sm font-bold">حفظ البيانات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: إضافة/تعديل استفسار -->
+    <div id="inquiryModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="card-bg p-5 rounded-lg max-w-md w-full border shadow-xl">
+            <h3 id="inquiryModalTitle" class="text-lg font-bold mb-3">إضافة استفسار / عرض</h3>
+            <form id="inquiryForm" onsubmit="saveInquiry(event)" class="space-y-3">
+                <input type="hidden" id="inq-id">
+                <div>
+                    <label class="block text-xs font-bold mb-1">عنوان الاستفسار / العرض</label>
+                    <input type="text" id="inq-title" required class="w-full p-2 text-sm rounded border">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">التفاصيل / السعر / الخصم</label>
+                    <textarea id="inq-details" rows="3" required class="w-full p-2 text-sm rounded border"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeInquiryModal()" class="px-4 py-1.5 rounded bg-gray-500 text-white text-sm">إلغاء</button>
+                    <button type="submit" class="px-4 py-1.5 rounded bg-indigo-600 text-white text-sm font-bold">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script JavaScript للربط وإدارة الموقع -->
     <script>
-        function switchTab(paneId, btnEl) {
-            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.sidebar-menu button').forEach(el => el.classList.remove('active'));
-            document.getElementById(paneId).classList.add('active');
-            btnEl.classList.add('active');
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            databaseURL: "https://monasqen-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // متغيرات البيانات المحلية
+        let store = { doctors: {}, notices: {}, handover: {}, inquiries: {} };
+
+        // تغيير السيمات
+        function setTheme(themeName) {
+            document.body.className = themeName + " min-h-screen font-sans";
+            localStorage.setItem('callcenter_theme', themeName);
+        }
+        // استرجاع السيم المسجل
+        const savedTheme = localStorage.getItem('callcenter_theme') || 'theme-dark';
+        setTheme(savedTheme);
+
+        // التبديل بين التبويبات
+        function switchTab(tab) {
+            ['schedules', 'notices', 'handover', 'inquiries'].forEach(t => {
+                document.getElementById('sec-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).classList.remove('bg-blue-600', 'text-white');
+            });
+            document.getElementById('sec-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('bg-blue-600', 'text-white');
         }
 
-        function filterContent() {
-            let query = document.getElementById('globalSearch').value.toLowerCase();
-            document.querySelectorAll('.table tr, .card').forEach(item => {
-                let text = item.innerText.toLowerCase();
-                if(!item.closest('thead')) {
-                    item.style.display = text.includes(query) ? '' : 'none';
+        // الاستماع الفوري للبيانات من Firebase
+        db.ref('doctors').on('value', snap => { store.doctors = snap.val() || {}; renderDoctors(); });
+        db.ref('notices').on('value', snap => { store.notices = snap.val() || {}; renderNotices(); });
+        db.ref('handover').on('value', snap => { store.handover = snap.val() || {}; renderHandover(); });
+        db.ref('inquiries').on('value', snap => { store.inquiries = snap.val() || {}; renderInquiries(); });
+
+        // دالة المساعدة في التواريخ
+        const getTimestamp = () => new Date().toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+
+        // --- 1. إدارة الأطباء ---
+        function renderDoctors(filter = "") {
+            const mashiTbody = document.getElementById('doctors-mashi-body');
+            const wisamTbody = document.getElementById('doctors-wisam-body');
+            const sharedTbody = document.getElementById('doctors-shared-body');
+
+            mashiTbody.innerHTML = ''; wisamTbody.innerHTML = ''; sharedTbody.innerHTML = '';
+
+            Object.entries(store.doctors).forEach(([id, doc]) => {
+                if (filter && !JSON.stringify(doc).toLowerCase().includes(filter.toLowerCase())) return;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-700/50 hover:bg-black/10";
+                
+                const notes = doc.notes ? `<span class="highlight-text">${doc.notes}</span>` : '-';
+                
+                if (doc.branch === 'معشي' || doc.branch === 'الوسام') {
+                    tr.innerHTML = `
+                        <td class="font-bold">${doc.name}</td>
+                        <td>${doc.spec}</td>
+                        <td class="text-blue-300">${doc.timing}</td>
+                        <td>${notes}</td>
+                        <td class="space-x-1 space-x-reverse">
+                            <button onclick="editDoctor('${id}')" class="text-yellow-400 hover:text-yellow-300"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteDoctor('${id}')" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    if (doc.branch === 'معشي') mashiTbody.appendChild(tr);
+                    else wisamTbody.appendChild(tr);
+                } else {
+                    tr.innerHTML = `
+                        <td class="font-bold">${doc.name}</td>
+                        <td><span class="bg-purple-900/50 text-purple-200 px-2 py-0.5 rounded text-xs">${doc.branch}</span></td>
+                        <td>${doc.spec}</td>
+                        <td class="text-blue-300">${doc.timing}</td>
+                        <td class="text-xs text-gray-400">${doc.updatedAt || '-'}</td>
+                        <td class="space-x-1 space-x-reverse">
+                            <button onclick="editDoctor('${id}')" class="text-yellow-400 hover:text-yellow-300"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteDoctor('${id}')" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    sharedTbody.appendChild(tr);
                 }
             });
+        }
+
+        function openDoctorModal() {
+            document.getElementById('doctorForm').reset();
+            document.getElementById('doc-id').value = '';
+            document.getElementById('doctorModalTitle').innerText = 'إضافة طبيب جديد';
+            document.getElementById('doctorModal').classList.remove('hidden');
+        }
+        function closeDoctorModal() { document.getElementById('doctorModal').classList.add('hidden'); }
+
+        function saveDoctor(e) {
+            e.preventDefault();
+            const id = document.getElementById('doc-id').value || db.ref('doctors').push().key;
+            const data = {
+                name: document.getElementById('doc-name').value,
+                branch: document.getElementById('doc-branch').value,
+                spec: document.getElementById('doc-spec').value,
+                timing: document.getElementById('doc-timing').value,
+                notes: document.getElementById('doc-notes').value,
+                updatedAt: getTimestamp()
+            };
+            db.ref('doctors/' + id).set(data);
+            closeDoctorModal();
+        }
+
+        function editDoctor(id) {
+            const doc = store.doctors[id];
+            document.getElementById('doc-id').value = id;
+            document.getElementById('doc-name').value = doc.name;
+            document.getElementById('doc-branch').value = doc.branch;
+            document.getElementById('doc-spec').value = doc.spec;
+            document.getElementById('doc-timing').value = doc.timing;
+            document.getElementById('doc-notes').value = doc.notes || '';
+            document.getElementById('doctorModalTitle').innerText = 'تعديل بيانات الطبيب';
+            document.getElementById('doctorModal').classList.remove('hidden');
+        }
+        function deleteDoctor(id) { if(confirm('هل انت متاكد من حذف هذا الموعد؟')) db.ref('doctors/' + id).remove(); }
+
+        // --- 2. إدارة الإشعارات والتنبيهات ---
+        function renderNotices(filter = "") {
+            const container = document.getElementById('notices-list');
+            container.innerHTML = '';
+            Object.entries(store.notices).forEach(([id, notice]) => {
+                if (filter && !JSON.stringify(notice).toLowerCase().includes(filter.toLowerCase())) return;
+
+                const card = document.createElement('div');
+                card.className = "card-bg p-4 rounded-lg border flex flex-col justify-between shadow-sm relative";
+                
+                let imgHtml = notice.img ? `<a href="${notice.img}" target="_blank" class="mt-2 block"><img src="${notice.img}" class="h-36 w-full object-cover rounded border hover:opacity-90"></a>` : '';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-md text-yellow-400 mb-1">${notice.title}</h3>
+                            <span class="text-[10px] text-gray-400">${notice.updatedAt}</span>
+                        </div>
+                        <p class="text-sm text-gray-200 whitespace-pre-line">${notice.body}</p>
+                        ${imgHtml}
+                    </div>
+                    <div class="flex justify-end gap-3 mt-3 border-t pt-2 border-gray-700">
+                        <button onclick="editNotice('${id}')" class="text-xs text-yellow-400"><i class="fa-solid fa-pen ml-1"></i>تعديل</button>
+                        <button onclick="deleteNotice('${id}')" class="text-xs text-red-400"><i class="fa-solid fa-trash ml-1"></i>حذف</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openNoticeModal() {
+            document.getElementById('noticeForm').reset();
+            document.getElementById('notice-id').value = '';
+            document.getElementById('noticeModalTitle').innerText = 'إضافة تنبيه جديد';
+            document.getElementById('noticeModal').classList.remove('hidden');
+        }
+        function closeNoticeModal() { document.getElementById('noticeModal').classList.add('hidden'); }
+
+        function saveNotice(e) {
+            e.preventDefault();
+            const id = document.getElementById('notice-id').value || db.ref('notices').push().key;
+            const data = {
+                title: document.getElementById('notice-title').value,
+                body: document.getElementById('notice-body').value,
+                img: document.getElementById('notice-img').value,
+                updatedAt: getTimestamp()
+            };
+            db.ref('notices/' + id).set(data);
+            closeNoticeModal();
+        }
+        function editNotice(id) {
+            const n = store.notices[id];
+            document.getElementById('notice-id').value = id;
+            document.getElementById('notice-title').value = n.title;
+            document.getElementById('notice-body').value = n.body;
+            document.getElementById('notice-img').value = n.img || '';
+            document.getElementById('noticeModalTitle').innerText = 'تعديل التنبيه';
+            document.getElementById('noticeModal').classList.remove('hidden');
+        }
+        function deleteNotice(id) { if(confirm('حذف هذا التنبيه؟')) db.ref('notices/' + id).remove(); }
+
+        // --- 3. إدارة تسليم العملاء ---
+        function renderHandover(filter = "") {
+            const tbody = document.getElementById('handover-body');
+            tbody.innerHTML = '';
+            Object.entries(store.handover).forEach(([id, ho]) => {
+                if (filter && !JSON.stringify(ho).toLowerCase().includes(filter.toLowerCase())) return;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-700/50 hover:bg-black/10";
+                tr.innerHTML = `
+                    <td class="font-bold">${ho.name}</td>
+                    <td dir="ltr" class="text-right">${ho.phone}</td>
+                    <td><span class="bg-teal-900/40 text-teal-300 px-2 py-0.5 rounded text-xs">${ho.branch}</span></td>
+                    <td class="max-w-xs truncate">${ho.status}</td>
+                    <td><span class="text-xs bg-gray-700 px-2 py-0.5 rounded">${ho.agent}</span></td>
+                    <td class="text-xs text-gray-400">${ho.updatedAt}</td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="editHandover('${id}')" class="text-yellow-400 hover:text-yellow-300"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteHandover('${id}')" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openHandoverModal() {
+            document.getElementById('handoverForm').reset();
+            document.getElementById('ho-id').value = '';
+            document.getElementById('handoverModalTitle').innerText = 'إضافة عميل للمتابعة';
+            document.getElementById('handoverModal').classList.remove('hidden');
+        }
+        function closeHandoverModal() { document.getElementById('handoverModal').classList.add('hidden'); }
+
+        function saveHandover(e) {
+            e.preventDefault();
+            const id = document.getElementById('ho-id').value || db.ref('handover').push().key;
+            const data = {
+                name: document.getElementById('ho-name').value,
+                phone: document.getElementById('ho-phone').value,
+                branch: document.getElementById('ho-branch').value,
+                agent: document.getElementById('ho-agent').value,
+                status: document.getElementById('ho-status').value,
+                updatedAt: getTimestamp()
+            };
+            db.ref('handover/' + id).set(data);
+            closeHandoverModal();
+        }
+        function editHandover(id) {
+            const ho = store.handover[id];
+            document.getElementById('ho-id').value = id;
+            document.getElementById('ho-name').value = ho.name;
+            document.getElementById('ho-phone').value = ho.phone;
+            document.getElementById('ho-branch').value = ho.branch;
+            document.getElementById('ho-agent').value = ho.agent;
+            document.getElementById('ho-status').value = ho.status;
+            document.getElementById('handoverModalTitle').innerText = 'تحديث بيانات العميل';
+            document.getElementById('handoverModal').classList.remove('hidden');
+        }
+        function deleteHandover(id) { if(confirm('مسح العميل؟')) db.ref('handover/' + id).remove(); }
+
+        // --- 4. إدارة الاستفسارات والعروض ---
+        function renderInquiries(filter = "") {
+            const container = document.getElementById('inquiries-list');
+            container.innerHTML = '';
+            Object.entries(store.inquiries).forEach(([id, inq]) => {
+                if (filter && !JSON.stringify(inq).toLowerCase().includes(filter.toLowerCase())) return;
+
+                const card = document.createElement('div');
+                card.className = "card-bg p-4 rounded-lg border flex flex-col justify-between shadow-sm";
+                card.innerHTML = `
+                    <div>
+                        <h3 class="font-bold text-md text-indigo-400 mb-1"><i class="fa-solid fa-circle-info ml-1"></i>${inq.title}</h3>
+                        <p class="text-sm text-gray-200 whitespace-pre-line mt-2">${inq.details}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-3 border-t pt-2 border-gray-700">
+                        <span class="text-[10px] text-gray-400">آخر تحديث: ${inq.updatedAt}</span>
+                        <div class="space-x-2 space-x-reverse">
+                            <button onclick="editInquiry('${id}')" class="text-xs text-yellow-400"><i class="fa-solid fa-pen ml-1"></i>تعديل</button>
+                            <button onclick="deleteInquiry('${id}')" class="text-xs text-red-400"><i class="fa-solid fa-trash ml-1"></i>حذف</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openInquiryModal() {
+            document.getElementById('inquiryForm').reset();
+            document.getElementById('inq-id').value = '';
+            document.getElementById('inquiryModalTitle').innerText = 'إضافة استفسار / عرض جديد';
+            document.getElementById('inquiryModal').classList.remove('hidden');
+        }
+        function closeInquiryModal() { document.getElementById('inquiryModal').classList.add('hidden'); }
+
+        function saveInquiry(e) {
+            e.preventDefault();
+            const id = document.getElementById('inq-id').value || db.ref('inquiries').push().key;
+            const data = {
+                title: document.getElementById('inq-title').value,
+                details: document.getElementById('inq-details').value,
+                updatedAt: getTimestamp()
+            };
+            db.ref('inquiries/' + id).set(data);
+            closeInquiryModal();
+        }
+        function editInquiry(id) {
+            const inq = store.inquiries[id];
+            document.getElementById('inq-id').value = id;
+            document.getElementById('inq-title').value = inq.title;
+            document.getElementById('inq-details').value = inq.details;
+            document.getElementById('inquiryModalTitle').innerText = 'تعديل الاستفسار';
+            document.getElementById('inquiryModal').classList.remove('hidden');
+        }
+        function deleteInquiry(id) { if(confirm('حذف هذا الاستفسار؟')) db.ref('inquiries/' + id).remove(); }
+
+        // --- البحث المتقدم الشامل ---
+        function handleGlobalSearch() {
+            const val = document.getElementById('globalSearch').value;
+            renderDoctors(val);
+            renderNotices(val);
+            renderHandover(val);
+            renderInquiries(val);
         }
     </script>
 </body>
