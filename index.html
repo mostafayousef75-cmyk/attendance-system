@@ -1451,7 +1451,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (نسخ جدول الطبيب للعميل، ألوان أيام أزرق/أخضر فاتح) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (تنسيق نسخ رسالة العميل بدون ملاحظات وبدون الفروع الفارغة) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1460,20 +1460,29 @@
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
-            const mashyDays = doc.mashyDays && doc.mashyDays.length > 0 ? doc.mashyDays.join('، ') : 'لا يوجد';
-            const wissamDays = doc.wissamDays && doc.wissamDays.length > 0 ? doc.wissamDays.join('، ') : 'لا يوجد';
             
-            const clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})
+            const mashyDays = doc.mashyDays || doc.days || [];
+            const wissamDays = doc.wissamDays || [];
+            
+            let scheduleLines = [];
+            if (mashyDays.length > 0) {
+                scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
+            }
+            if (wissamDays.length > 0) {
+                scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
+            }
+
+            let clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})
 التخصص: ${doc.specialty}
 الكشفية: ${doc.fee || 'مجانية'}
-مواعيد الدوام:
-• فرع معشي: ${mashyDays}
-• فرع الوسام: ${wissamDays}
-الساعات: ${doc.timing || ''}
-ملاحظات: ${doc.notes || 'لا توجد'}`;
+الساعات: ${doc.timing || ''}`;
+
+            if (scheduleLines.length > 0) {
+                clientText += `\nمواعيد الدوام:\n` + scheduleLines.join('\n');
+            }
 
             navigator.clipboard.writeText(clientText).then(() => {
-                alert(`📋 تم نسخ تفاصيل الدوام للعميل بنجاح!\n\n${clientText}`);
+                alert(`📋 تم نسخ تفاصيل الدوام للعميل بنجاح (بدون ملاحظات وبدون الفروع المغلقة)!\n\n${clientText}`);
             }).catch(err => {
                 alert("تعذر النسخ تلقائياً!");
             });
