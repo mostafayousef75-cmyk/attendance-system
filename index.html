@@ -17,10 +17,10 @@
     <style>
         :root {
             --font-family: 'Tajawal', sans-serif;
-            --bg-base: #000000;
-            --bg-surface: #0a0a0c;
-            --bg-card: #121216;
-            --bg-sidebar: #050507;
+            --bg-base: #030305;
+            --bg-surface: #0a0a0e;
+            --bg-card: #13131a;
+            --bg-sidebar: #060609;
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --border-color: #27272a;
@@ -360,25 +360,30 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
+        /* تماثل وتوازن الفروع اليمين واليسار تماماً */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
+            gap: 0.8rem;
+            align-items: start;
         }
 
         .branch-box {
             background-color: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 0.4rem;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            padding: 0.6rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 230px);
         }
 
         .branch-title {
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-weight: 700;
-            padding-bottom: 0.25rem;
-            margin-bottom: 0.3rem;
+            padding-bottom: 0.3rem;
+            margin-bottom: 0.4rem;
             border-bottom: 2px solid var(--primary-color);
             display: flex;
             align-items: center;
@@ -387,22 +392,22 @@
 
         .table-responsive {
             width: 100%;
-            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
         }
 
-        /* تقليل الفراغات والمساحات داخل الجدول */
+        /* تنسيق الجداول الاحترافي */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.68rem;
+            font-size: 0.7rem;
         }
 
         th, td {
-            padding: 0.12rem 0.25rem;
+            padding: 0.3rem 0.35rem;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
-            font-weight: 400;
-            line-height: 1.15;
+            line-height: 1.2;
             vertical-align: middle;
         }
 
@@ -410,12 +415,15 @@
             background-color: var(--bg-card);
             color: var(--text-muted);
             font-weight: 600;
-            font-size: 0.70rem;
+            font-size: 0.72rem;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
 
         .doctor-on-leave {
             background-color: rgba(220, 38, 38, 0.15) !important;
-            border-right: 3px solid var(--danger-color);
+            border-right: 3px solid var(--danger-color) !important;
         }
 
         .draggable-doctor-row {
@@ -424,6 +432,13 @@
         .draggable-doctor-row:active {
             cursor: grabbing;
         }
+
+        /* تلوين حواف صفوف الأطباء حسب التخصص للتمييز البصري السريع */
+        .spec-general { border-right: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.03); }
+        .spec-dentist { border-right: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.03); }
+        .spec-derm { border-right: 4px solid #ec4899; background: rgba(236, 72, 153, 0.03); }
+        .spec-specialist { border-right: 4px solid #10b981; background: rgba(16, 185, 129, 0.03); }
+        .spec-other { border-right: 4px solid #8b5cf6; background: rgba(139, 92, 246, 0.03); }
 
         /* Alerts 2 Column Grid */
         .alerts-2col-grid {
@@ -612,12 +627,29 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.8);
         }
 
+        /* دليل الألوان الموضعي في الأعلى */
+        .legend-bar {
+            display: flex;
+            gap: 0.8rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            margin-bottom: 0.4rem;
+            font-size: 0.68rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
         /* Mobile Responsive Support */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; overflow: auto; }
             .sidebar { width: 100%; height: auto; }
             .main-wrapper { height: auto; overflow: visible; }
             .split-grid { grid-template-columns: 1fr; }
+            .branch-box { height: auto; }
             .alerts-2col-grid { grid-template-columns: 1fr; }
             .top-header { flex-direction: column; align-items: stretch; }
             .search-container { width: 100%; }
@@ -706,6 +738,16 @@
                     </div>
                 </div>
 
+                <!-- دليل ألوان التخصصات -->
+                <div class="legend-bar">
+                    <span><i class="fa-solid fa-palette"></i> <strong>دليل التخصصات:</strong></span>
+                    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> طبيب عام</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> أسنان</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#ec4899;"></span> جلدية / ليزر</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> أخصائي / استشاري</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> في إجازة</div>
+                </div>
+
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
                     <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
@@ -730,6 +772,7 @@
                     </div>
                 </div>
 
+                <!-- شبكة متماثلة اليمين واليسار -->
                 <div class="split-grid">
                     <!-- فرع معشي -->
                     <div class="branch-box">
@@ -1281,7 +1324,6 @@
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                 } else {
-                    // بيانات افتراضية أولية في حال كانت القاعدة فارغة
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
                     syncToCloud();
@@ -1305,7 +1347,6 @@
             }, 1000);
         });
 
-        // دالة حفظ ومزامنة البيانات في السحابة
         function syncToCloud() {
             const payload = {
                 doctorsData,
@@ -1350,7 +1391,7 @@
             document.getElementById('kpiOffers').innerText = offersData.length;
         }
 
-        // --- JSON IMPORT / EXPORT (للنسخ الاحتياطي اليدوي) ---
+        // --- JSON IMPORT / EXPORT ---
         function exportJSON() {
             const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
@@ -1460,10 +1501,21 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (تم تحديث نسخ رسالة العميل لتشمل الملاحظات) ---
+        // --- 2. DOCTORS & SPECIALTY COLOR MAPPING ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
+        }
+
+        // دالة تحديد فئة اللون بناءً على التخصص لتمييز الطبيب العام والأخصائي والأسنان والجلدية
+        function getSpecialtyCssClass(specialty) {
+            if (!specialty) return 'spec-other';
+            const s = specialty.toLowerCase();
+            if (s.includes('عام')) return 'spec-general';
+            if (s.includes('أسنان') || s.includes('ابام') || s.includes('لثه') || s.includes('تقويم')) return 'spec-dentist';
+            if (s.includes('جلدية') || s.includes('ليزر') || s.includes('تجميل')) return 'spec-derm';
+            if (s.includes('أخصائي') || s.includes('استشاري') || s.includes('اخصائي')) return 'spec-specialist';
+            return 'spec-other';
         }
 
         function copyDoctorForClient(id) {
@@ -1474,12 +1526,8 @@
             const wissamDays = doc.wissamDays || [];
             
             let scheduleLines = [];
-            if (mashyDays.length > 0) {
-                scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
-            }
-            if (wissamDays.length > 0) {
-                scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
-            }
+            if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
+            if (wissamDays.length > 0) scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
 
             let clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})
 التخصص: ${doc.specialty}
@@ -1490,7 +1538,6 @@
                 clientText += `\nمواعيد الدوام:\n` + scheduleLines.join('\n');
             }
 
-            // إضافة الملاحظات إذا كانت موجودة وغير فارغة
             if (doc.notes && doc.notes.trim() !== "") {
                 clientText += `\nالملاحظات: ${doc.notes}`;
             }
@@ -1507,7 +1554,6 @@
             const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
 
-            // تعبئة قائمة التخصصات المنسدلة تلقائياً
             const specDropdown = document.getElementById('specialtyFilter');
             const currentSpecVal = specDropdown.value;
             const uniqueSpecialties = [...new Set(doctorsData.map(d => d.specialty).filter(Boolean))];
@@ -1553,7 +1599,9 @@
 
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
-                const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
+                
+                // تحديد كلاس اللون الخاص بالتخصص أو الإجازة
+                const rowClass = doc.isLeave ? "doctor-on-leave" : `draggable-doctor-row ${getSpecialtyCssClass(doc.specialty)}`;
 
                 let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 
