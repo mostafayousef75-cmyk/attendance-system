@@ -349,7 +349,7 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* توزيع المساحة بنسبة 50% تماثل تام بين الفرعين وبدون فراغات */
+        /* تماثل تام 50% لفرع معشي و 50% للوسام وبدون فراغات */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -384,22 +384,22 @@
             overflow-x: auto;
         }
 
-        /* الجداول متطابقة تماماً والتحكم في عرض الأعمدة وحجم الصفوف */
+        /* الجداول ثابتة الشكل تماماً (إلغاء التحرير والسحب) وبنفس التنسيق النهائي */
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.7rem;
-            table-layout: auto;
+            table-layout: fixed; /* تثبيت الأحجام تماماً */
         }
 
         th, td {
-            padding: 0.5rem 0.4rem; /* مساحة صفوف مريحة وفخمة */
+            padding: 0.5rem 0.4rem;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
             line-height: 1.3;
             vertical-align: middle;
-            resize: horizontal; /* إمكانية تحكم المستخدم في حجم الأعمدة بالسحب */
             overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         th {
@@ -407,8 +407,15 @@
             color: var(--text-muted);
             font-weight: 600;
             font-size: 0.72rem;
-            position: relative;
         }
+
+        /* تحديد أعمدة ثابتة ومتطابقة بين الفرعين تماماً */
+        th:nth-child(1), td:nth-child(1) { width: 22%; }
+        th:nth-child(2), td:nth-child(2) { width: 18%; }
+        th:nth-child(3), td:nth-child(3) { width: 12%; }
+        th:nth-child(4), td:nth-child(4) { width: 30%; }
+        th:nth-child(5), td:nth-child(5) { width: 25%; }
+        th:nth-child(6), td:nth-child(6) { width: 15%; text-align: center; }
 
         .alerts-2col-grid {
             display: grid;
@@ -568,14 +575,22 @@
             font-size: 0.76rem;
         }
 
+        /* تنسيق الأيام القابل للإخفاء والإظهار */
+        .days-section-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.4rem;
+        }
         .days-checklist {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.25rem;
-            background: var(--bg-card);
-            padding: 0.4rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            margin-top: 0.3rem;
+            display: none; /* مخفية افتراضياً لتوفير المساحة */
+        }
+        .days-checklist.show {
+            display: grid;
         }
 
         .day-row {
@@ -584,6 +599,7 @@
             justify-content: space-between;
             gap: 0.2rem;
             font-size: 0.75rem;
+            cursor: pointer;
         }
 
         .lightbox-img {
@@ -696,7 +712,7 @@
                     </div>
                 </div>
 
-                <!-- شريط البحث الفلتر -->
+                <!-- شريط البحث والفلتر -->
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem;">
                     <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
@@ -709,7 +725,7 @@
                     </div>
                 </div>
 
-                <!-- شبكة متماثلة تماماً 50% لفرع معشي و 50% لفرع الوسام وبدون أي فراغات -->
+                <!-- شبكة متماثلة تماماً بين فرع معشي وفرع الوسام بالشكل النهائي -->
                 <div class="split-grid">
                     <!-- فرع معشي -->
                     <div class="branch-box">
@@ -734,7 +750,7 @@
                         </div>
                     </div>
 
-                    <!-- فرع الوسام (متطابق تماماً في العرض والهيكل) -->
+                    <!-- فرع الوسام (متطابق تماماً في العرض والأعمدة) -->
                     <div class="branch-box">
                         <div class="branch-title">
                             <span><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
@@ -927,7 +943,7 @@
                 </select>
             </div>
 
-            <!-- اختيار لون الصف المخصص حسب رغبتك -->
+            <!-- لون الصف المخصص -->
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون الصف المخصص للطبيب:</label>
                 <select id="docCustomColor" class="form-control">
@@ -950,9 +966,13 @@
                 <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / خارج الدوام (تلوين الكارت بالأحمر)</label>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label style="font-weight:700; color:#60a5fa;">أيام دوام فرع معشي:</label>
-                <div class="days-checklist">
+            <!-- أيام دوام فرع معشي (تظهر عند النقر لتوفير المساحة) -->
+            <div class="days-section-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('mashyDaysBox')">
+                    <label style="font-weight:700; color:#60a5fa; cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> تحديد أيام دوام فرع معشي</label>
+                    <i class="fa-solid fa-chevron-down" style="color:#60a5fa; font-size:0.75rem;"></i>
+                </div>
+                <div class="days-checklist" id="mashyDaysBox">
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="السبت"> السبت</label>
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأحد"> الأحد</label>
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الإثنين"> الإثنين</label>
@@ -963,9 +983,13 @@
                 </div>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label style="font-weight:700; color:#34d399;">أيام دوام فرع الوسام:</label>
-                <div class="days-checklist">
+            <!-- أيام دوام فرع الوسام (تظهر عند النقر لتوفير المساحة) -->
+            <div class="days-section-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('wissamDaysBox')">
+                    <label style="font-weight:700; color:#34d399; cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> تحديد أيام دوام فرع الوسام</label>
+                    <i class="fa-solid fa-chevron-down" style="color:#34d399; font-size:0.75rem;"></i>
+                </div>
+                <div class="days-checklist" id="wissamDaysBox">
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="السبت"> السبت</label>
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأحد"> الأحد</label>
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الإثنين"> الإثنين</label>
@@ -1333,6 +1357,12 @@
             document.getElementById('kpiOffers').innerText = offersData.length;
         }
 
+        // دالة إظهار وإخفاء أيام الدوام في المودال لتوفير المساحة
+        function toggleDaysChecklist(boxId) {
+            const box = document.getElementById(boxId);
+            box.classList.toggle('show');
+        }
+
         function exportJSON() {
             const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
@@ -1528,7 +1558,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 
-                // تطبيق اللون المخصص الذي حدده المستخدم أو لون الإجازة
+                // تطبيق اللون المخصص للطبيب
                 let customBgStyle = "";
                 if (doc.isLeave) {
                     customBgStyle = "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);";
@@ -1617,6 +1647,8 @@
             document.getElementById('docIsLeave').checked = false;
             document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
             document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = false);
+            document.getElementById('mashyDaysBox').classList.remove('show');
+            document.getElementById('wissamDaysBox').classList.remove('show');
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب";
             document.getElementById('doctorModal').classList.add('active');
         }
