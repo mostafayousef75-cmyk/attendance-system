@@ -1460,7 +1460,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (تصميم شارات المواعيد النظيفة، وإخفاء الفروع الفارغة) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (تم تحديث نسخ رسالة العميل لتشمل الملاحظات) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1490,8 +1490,13 @@
                 clientText += `\nمواعيد الدوام:\n` + scheduleLines.join('\n');
             }
 
+            // إضافة الملاحظات إذا كانت موجودة وغير فارغة
+            if (doc.notes && doc.notes.trim() !== "") {
+                clientText += `\nالملاحظات: ${doc.notes}`;
+            }
+
             navigator.clipboard.writeText(clientText).then(() => {
-                alert(`📋 تم نسخ تفاصيل الدوام للعميل بنجاح!\n\n${clientText}`);
+                alert(`📋 تم نسخ تفاصيل الدوام والملاحظات للعميل بنجاح!\n\n${clientText}`);
             }).catch(err => {
                 alert("تعذر النسخ تلقائياً!");
             });
@@ -1550,7 +1555,6 @@
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
-                // تنسيق المواعيد بشكل شارات (Badges) نظيفة ومختصرة بدلاً من التكدس
                 let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 
                 if (mashyDays.length > 0) {
