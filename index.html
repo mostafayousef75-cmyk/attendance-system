@@ -1460,7 +1460,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (تصميم شارات المواعيد النظيفة، وإخفاء الفروع الفارغة) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (إصلاح تصفية الأطباء حسب الفرع بدقة) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1470,7 +1470,7 @@
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
             
-            const mashyDays = doc.mashyDays || doc.days || [];
+            const mashyDays = doc.mashyDays || [];
             const wissamDays = doc.wissamDays || [];
             
             let scheduleLines = [];
@@ -1538,35 +1538,35 @@
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec;
             }).forEach((doc) => {
-                const mashyDays = doc.mashyDays || doc.days || [];
-                const wissamDays = doc.wissamDays || (doc.isJoint ? (doc.days || []) : []);
+                const mashyDays = doc.mashyDays || [];
+                const wissamDays = doc.wissamDays || [];
+
+                // فحص تواجده اليوم في الفروع
+                const isInMashy = (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) && mashyDays.includes(currentDay);
+                const isInWissam = (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0) && wissamDays.includes(currentDay);
 
                 if (!doc.isLeave) {
-                    if (mashyDays.includes(currentDay) && (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0)) todayMashyDocs.push(doc.name);
-                    if (wissamDays.includes(currentDay) && (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0)) todayWissamDocs.push(doc.name);
+                    if (isInMashy) todayMashyDocs.push(doc.name);
+                    if (isInWissam) todayWissamDocs.push(doc.name);
                 }
 
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
-                // تنسيق المواعيد بشكل شارات (Badges) نظيفة ومختصرة بدلاً من التكدس
-                let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
-                
-                if (mashyDays.length > 0) {
-                    scheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div><br>`;
-                }
-                if (wissamDays.length > 0) {
-                    scheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
-                }
+                // الشرط الصحيح لإظهار الطبيب في جدول "فرع معشي": (أن يكون فرعه معشي أو طبيب مشترك) مع وجود أيام في معشي
+                const shouldShowInMashy = (doc.branch === "معشي" && mashyDays.length > 0) || (doc.isJoint && mashyDays.length > 0);
 
-                if (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) {
+                if (shouldShowInMashy) {
+                    let mashyScheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
+                    mashyScheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div>`;
+
                     mashyBody.innerHTML += `
                         <tr class="${rowClass}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td>${scheduleHtml}</td>
+                            <td>${mashyScheduleHtml}</td>
                             <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
@@ -1578,13 +1578,19 @@
                     countM++;
                 }
 
-                if (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0) {
+                // الشرط الصحيح لإظهار الطبيب في جدول "فرع الوسام": (أن يكون فرعه الوسام أو طبيب مشترك) مع وجود أيام في الوسام
+                const shouldShowInWissam = (doc.branch === "الوسام" && wissamDays.length > 0) || (doc.isJoint && wissamDays.length > 0);
+
+                if (shouldShowInWissam) {
+                    let wissamScheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
+                    wissamScheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
+
                     wissamBody.innerHTML += `
                         <tr class="${rowClass}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td>${scheduleHtml}</td>
+                            <td>${wissamScheduleHtml}</td>
                             <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
@@ -1680,7 +1686,7 @@
             document.getElementById('docIsLeave').checked = !!doc.isLeave;
             
             document.querySelectorAll('.doc-mashy-chk').forEach(c => {
-                c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : (doc.days ? doc.days.includes(c.value) : false);
+                c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : false;
             });
             document.querySelectorAll('.doc-wissam-chk').forEach(c => {
                 c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false;
