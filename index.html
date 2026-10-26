@@ -168,7 +168,7 @@
 
         .search-container {
             position: relative;
-            width: 400px;
+            width: 380px;
         }
 
         .search-container input {
@@ -188,6 +188,27 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
+        }
+
+        /* KPIs & Quick Stats Bar */
+        .kpi-bar {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .kpi-num {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .pinned-alerts-banner {
@@ -305,7 +326,6 @@
             overflow-x: auto;
         }
 
-        /* تصغير حجم ليرات وجدول الأطباء كما طلبت */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -326,16 +346,11 @@
             font-size: 0.82rem;
         }
 
-        /* صفوف الأطباء القابلة للسحب والترتيب (Drag & Drop) */
         .draggable-doctor-row {
             cursor: grab;
         }
         .draggable-doctor-row:active {
             cursor: grabbing;
-        }
-        .draggable-doctor-row.dragging {
-            opacity: 0.4;
-            background: #1e293b;
         }
 
         /* Alerts 2 Column Grid */
@@ -377,9 +392,10 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
+            cursor: pointer;
         }
 
-        /* Coordinators Grid */
+        /* Coordinators Grid (Drag & Drop enabled) */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -459,7 +475,7 @@
             display: inline-block;
         }
 
-        /* Modal Overlays & Scrollable */
+        /* Modal Overlays */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -567,6 +583,14 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="globalSearch" placeholder="بحث شامل في المواعيد، العروض، الأطباء..." oninput="handleGlobalSearch(this.value)">
             </div>
+            
+            <!-- شريط مؤشرات الأداء السريع (KPIs) -->
+            <div class="kpi-bar">
+                <div class="kpi-card"><i class="fa-solid fa-user-doctor" style="color:var(--primary-color);"></i> الأطباء: <span id="kpiDocs" class="kpi-num">0</span></div>
+                <div class="kpi-card"><i class="fa-solid fa-bell" style="color:#60a5fa;"></i> التنبيهات: <span id="kpiAlerts" class="kpi-num">0</span></div>
+                <div class="kpi-card"><i class="fa-solid fa-tags" style="color:#16a34a;"></i> العروض: <span id="kpiOffers" class="kpi-num">0</span></div>
+            </div>
+
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.85rem;"></div>
         </header>
 
@@ -575,31 +599,30 @@
 
         <div class="content-area">
 
-            <!-- 1. مواعيد الأطباء (مع تصغير الحجم وإمكانية السحب والإفلات) -->
+            <!-- 1. مواعيد الأطباء -->
             <section id="schedule-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.7rem;">
                     <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
                     <div style="display:flex; gap:0.4rem;">
-                        <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> جدولة المناوبات بالتاريخ</button>
+                        <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> جدولة مناوبات الجمعة</button>
                         <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة موعد طبيب</button>
                     </div>
                 </div>
 
-                <!-- شريط المناوبة اليومية وتاريخ اليوم -->
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.6rem 0.9rem; border-radius:8px; margin-bottom:0.8rem; display:flex; flex-direction:column; gap:0.4rem; font-size:0.82rem;">
                     <div style="display:flex; gap:1.2rem; border-bottom:1px solid var(--border-color); padding-bottom:0.4rem;">
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة القادمة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
+                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
+                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
                     </div>
                     <div style="display:flex; gap:1.2rem; color:#60a5fa;">
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الأطباء المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:#fff;">-</span></span>
+                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:#fff;">-</span></span>
                         <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:#fff;">-</span></span>
                     </div>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في الأطباء، الجنسية، التخصص، أو الملاحظات..." oninput="renderDoctors(this.value)">
+                    <input type="text" placeholder="بحث في الأطباء، الجنسية، التخصص..." oninput="renderDoctors(this.value)">
                 </div>
 
                 <div class="split-grid">
@@ -616,8 +639,8 @@
                                         <th>الطبيب والجنسية</th>
                                         <th>التخصص</th>
                                         <th>الكشفية</th>
-                                        <th>أيام ومواعيد الدوام</th>
-                                        <th>الملاحظات والتنويهات</th>
+                                        <th>أيام ومواعيد الدوام (معشي)</th>
+                                        <th>الملاحظات</th>
                                         <th>إجراءات</th>
                                     </tr>
                                 </thead>
@@ -639,8 +662,8 @@
                                         <th>الطبيب والجنسية</th>
                                         <th>التخصص</th>
                                         <th>الكشفية</th>
-                                        <th>أيام ومواعيد الدوام</th>
-                                        <th>الملاحظات والتنويهات</th>
+                                        <th>أيام ومواعيد الدوام (الوسام)</th>
+                                        <th>الملاحظات</th>
                                         <th>إجراءات</th>
                                     </tr>
                                 </thead>
@@ -651,16 +674,16 @@
                 </div>
             </section>
 
-            <!-- 2. التنبيهات والإشعارات (مع دعم رفع ملفات PDF بجانب الصور) -->
+            <!-- 2. التنبيهات والإشعارات -->
             <section id="alerts-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.7rem;">
                     <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
-                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
+                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه أو ملف PDF</button>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث سريع في نص التنبيهات..." oninput="renderAlerts(this.value)">
+                    <input type="text" placeholder="بحث سريع في التنبيهات..." oninput="renderAlerts(this.value)">
                 </div>
 
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
@@ -678,7 +701,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث داخلي في جدول الأجهزة والخدمات..." oninput="renderDeptsAndDocs(this.value)">
+                    <input type="text" placeholder="بحث داخلي في جدول الأجهزة..." oninput="renderDeptsAndDocs(this.value)">
                 </div>
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1rem;">
@@ -707,10 +730,10 @@
                 </div>
             </section>
 
-            <!-- 4. دليل المنسقين -->
+            <!-- 4. دليل المنسقين (مع Drag & Drop وإمكانية تحريك الكروت) -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.7rem;">
-                    <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
+                    <h2>دليل وقوانين تسليم المنسقين التفصيلي <small style="font-size:0.7rem; color:var(--text-muted);">(اسحب الكارت لترتيبه)</small></h2>
                     <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات طبيب</button>
                 </div>
 
@@ -754,14 +777,13 @@
                 </div>
             </section>
 
-            <!-- 6. دليل الاستفسارات (مع الفلاتر المطلوبة والأقسام) -->
+            <!-- 6. دليل الاستفسارات -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.7rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
                     <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار جديد</button>
                 </div>
                 
-                <!-- فلاتر دليل الاستفسارات -->
                 <div class="offers-tabs" id="inquiriesFilterTabs">
                     <button class="offer-tab-btn active" onclick="filterInquiryCategory('الكل', this)">الكل</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
@@ -783,7 +805,7 @@
     </main>
 
     <!-- MODALS -->
-    <!-- Modal 1: Doctor Modal -->
+    <!-- Modal 1: Doctor Modal (فصل أيام معشي عن الوسام) -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -823,16 +845,31 @@
                 <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين</label>
             </div>
 
+            <!-- أيام فرع معشي -->
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label style="font-weight:700; color:#60a5fa;">أيام دوام الطبيب بالأسبوع:</label>
+                <label style="font-weight:700; color:#60a5fa;">أيام دوام الطبيب في فرع "معشي":</label>
                 <div class="days-checklist">
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="السبت"> السبت</label>
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الأحد"> الأحد</label>
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الإثنين"> الإثنين</label>
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الثلاثاء"> الثلاثاء</label>
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الأربعاء"> الأربعاء</label>
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الخميس"> الخميس</label>
-                    <label class="day-row"><input type="checkbox" class="doc-day-chk" value="الجمعة"> الجمعة</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="السبت"> السبت</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأحد"> الأحد</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الإثنين"> الإثنين</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الثلاثاء"> الثلاثاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأربعاء"> الأربعاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الخميس"> الخميس</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الجمعة"> الجمعة</label>
+                </div>
+            </div>
+
+            <!-- أيام فرع الوسام -->
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label style="font-weight:700; color:#34d399;">أيام دوام الطبيب في فرع "الوسام":</label>
+                <div class="days-checklist">
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="السبت"> السبت</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأحد"> الأحد</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الإثنين"> الإثنين</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الثلاثاء"> الثلاثاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأربعاء"> الأربعاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الخميس"> الخميس</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الجمعة"> الجمعة</label>
                 </div>
             </div>
 
@@ -857,17 +894,17 @@
 
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الملاحظات والتنويهات</label>
-                <textarea id="docNotes" class="form-control" rows="2" placeholder="يوم الجمعة بيعمل 100 ريال بيعمل تنضيف جير..."></textarea>
+                <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات الطبيب..."></textarea>
             </div>
             <button class="btn btn-green" onclick="saveDoctor()">حفظ البيانات</button>
         </div>
     </div>
 
-    <!-- Modal 2: Alert Modal (دعم الصور وملفات الـ PDF) -->
+    <!-- Modal 2: Alert Modal (دعم PDF والفتح السلس) -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="alertModalTitle">إضافة تنبيه أو إشعار جديد</h3>
+                <h3 id="alertModalTitle">إضافة تنبيه أو ملف PDF جديد</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
             <input type="hidden" id="alertId">
@@ -889,7 +926,7 @@
         </div>
     </div>
 
-    <!-- Modal 3: Friday Schedule Modal (يدعم أكثر من طبيب بالمناوبة) -->
+    <!-- Modal 3: Friday Schedule Modal (يدعم أكثر من طبيب) -->
     <div class="modal-overlay" id="fridayModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1033,7 +1070,7 @@
         </div>
     </div>
 
-    <!-- Modal 8: Inquiry Modal (مع الأقسام المطلوبة وخانة كتابة عند اختيار أخرى) -->
+    <!-- Modal 8: Inquiry Modal -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1075,18 +1112,18 @@
 
     <script>
         // --- DATA STORES ---
-        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v6')) || [
-            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], isFriday: true, fridayBranch: "معشي", timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة القادمة بفرع معشي" },
-            { id: 2, name: "د. أحمد الششتاوي", nationality: "سوري", specialty: "طبيب عام أسنان", fee: "75 ريال", branch: "معشي", isJoint: false, days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], isFriday: false, timing: "من 1 م حتى 9 م", notes: "يوم الجمعة بيفعل 100 ريال بيعمل تنضيف جير" }
+        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v7')) || [
+            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], isFriday: true, fridayBranch: "معشي", timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة القادمة بفرع معشي" },
+            { id: 2, name: "د. أحمد الششتاوي", nationality: "سوري", specialty: "طبيب عام أسنان", fee: "75 ريال", branch: "معشي", isJoint: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], isFriday: false, timing: "من 1 م حتى 9 م", notes: "يوم الجمعة بيعمل 100 ريال بيعمل تنضيف جير" }
         ];
 
-        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v6')) || [];
-        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v6')) || [];
-        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v6')) || [];
-        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v6')) || [];
-        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v6')) || [];
-        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v6')) || [];
-        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v6')) || [];
+        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v7')) || [];
+        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v7')) || [];
+        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v7')) || [];
+        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v7')) || [];
+        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v7')) || [];
+        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v7')) || [];
+        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v7')) || [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1095,7 +1132,6 @@
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
             changeTheme(savedTheme);
 
-            // استرجاع وتبويب الصفحة السخية الحالية لمنع العودة للبداية عند الـ Refresh
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
             switchTab(activeTab, targetNav, false);
@@ -1108,6 +1144,7 @@
             renderOffers();
             renderInquiriesTabs();
             renderInquiries();
+            updateKPIs();
             
             setInterval(() => {
                 const now = new Date();
@@ -1135,6 +1172,12 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
+        }
+
+        function updateKPIs() {
+            document.getElementById('kpiDocs').innerText = doctorsData.length;
+            document.getElementById('kpiAlerts').innerText = alertsData.length;
+            document.getElementById('kpiOffers').innerText = offersData.length;
         }
 
         // --- JSON IMPORT / EXPORT ---
@@ -1165,13 +1208,13 @@
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
                         
-                        localStorage.setItem('docDataStore_v6', JSON.stringify(doctorsData));
-                        localStorage.setItem('alertsDataStore_v6', JSON.stringify(alertsData));
-                        localStorage.setItem('coordDataStore_v6', JSON.stringify(coordinatorsData));
-                        localStorage.setItem('deptServicesStore_v6', JSON.stringify(deptServicesData));
-                        localStorage.setItem('deptNotesStore_v6', JSON.stringify(deptNotesData));
-                        localStorage.setItem('offersDataStore_v6', JSON.stringify(offersData));
-                        localStorage.setItem('inquiriesDataStore_v6', JSON.stringify(inquiriesData));
+                        localStorage.setItem('docDataStore_v7', JSON.stringify(doctorsData));
+                        localStorage.setItem('alertsDataStore_v7', JSON.stringify(alertsData));
+                        localStorage.setItem('coordDataStore_v7', JSON.stringify(coordinatorsData));
+                        localStorage.setItem('deptServicesStore_v7', JSON.stringify(deptServicesData));
+                        localStorage.setItem('deptNotesStore_v7', JSON.stringify(deptNotesData));
+                        localStorage.setItem('offersDataStore_v7', JSON.stringify(offersData));
+                        localStorage.setItem('inquiriesDataStore_v7', JSON.stringify(inquiriesData));
 
                         alert("تم استيراد البيانات بنجاح!");
                         location.reload();
@@ -1181,7 +1224,7 @@
             }
         }
 
-        // --- 1. DOCTORS & DRAG/DROP SORTING ---
+        // --- 1. DOCTORS (فصل أيام معشي عن الوسام + تتبع التواجد) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1199,7 +1242,7 @@
             const docVal = document.getElementById('fridayDocName').value;
             if (!dateVal || !docVal) return alert("يرجى ملء البيانات!");
             fridaySchedules.push({ date: dateVal, branch: branchVal, doc: docVal });
-            localStorage.setItem('fridayScheduleStore_v6', JSON.stringify(fridaySchedules));
+            localStorage.setItem('fridayScheduleStore_v7', JSON.stringify(fridaySchedules));
             alert("تم تسجيل مناوبة الجمعة بنجاح!");
             renderDoctors();
             closeModal('fridayModal');
@@ -1213,7 +1256,6 @@
             let fridayMashyName = "لم يُحدد";
             let fridayWissamName = "لم يُحدد";
 
-            // فحص جدول المناوبات بالتاريخ أولاً أو بالطبيب المعين
             if (fridaySchedules.length > 0) {
                 const latest = fridaySchedules[fridaySchedules.length - 1];
                 if (latest.branch === "معشي") fridayMashyName = latest.doc;
@@ -1232,31 +1274,56 @@
                     if (doc.fridayBranch === "الوسام") fridayWissamName = doc.name;
                 }
 
-                if (doc.days && doc.days.includes(currentDay)) {
-                    if (doc.branch === "معشي" || doc.isJoint) todayMashyDocs.push(doc.name);
-                    if (doc.branch === "الوسام" || doc.isJoint) todayWissamDocs.push(doc.name);
+                const mashyDays = doc.mashyDays || doc.days || [];
+                const wissamDays = doc.wissamDays || (doc.isJoint ? (doc.days || []) : []);
+
+                if (mashyDays.includes(currentDay) && (doc.branch === "معشي" || doc.isJoint)) {
+                    todayMashyDocs.push(doc.name);
+                }
+                if (wissamDays.includes(currentDay) && (doc.branch === "الوسام" || doc.isJoint)) {
+                    todayWissamDocs.push(doc.name);
                 }
 
                 const jointBadge = doc.isJoint ? `<br><span class="tag-joint">⭐ طبيب مشترك بالفرعين</span>` : '';
                 const fridayBadge = doc.isFriday ? `<br><span style="color:#60a5fa; font-size:0.7rem;"><i class="fa-solid fa-star"></i> مناوب الجمعة (${doc.fridayBranch || doc.branch})</span>` : '';
-                const daysStr = doc.days ? doc.days.join(' ، ') : '';
 
-                const rowHtml = `
-                    <tr class="draggable-doctor-row" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
-                        <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small>${jointBadge}${fridayBadge}</td>
-                        <td>${doc.specialty}</td>
-                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                        <td><strong>${doc.timing}</strong><br><small style="color:#9ca3af;">الأيام: ${daysStr}</small></td>
-                        <td style="color:#f59e0b; font-size:0.8rem;">${doc.notes || '-'}</td>
-                        <td>
-                            <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
+                // كارت معشي
+                if (doc.branch === "معشي" || doc.isJoint) {
+                    const daysMashyStr = mashyDays.join(' ، ');
+                    mashyBody.innerHTML += `
+                        <tr class="draggable-doctor-row" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
+                            <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small>${jointBadge}${fridayBadge}</td>
+                            <td>${doc.specialty}</td>
+                            <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                            <td><strong>${doc.timing}</strong><br><small style="color:#34d399;">أيام معشي: ${daysMashyStr || 'غير محددة'}</small></td>
+                            <td style="color:#f59e0b; font-size:0.8rem;">${doc.notes || '-'}</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    countM++;
+                }
 
-                if (doc.branch === "معشي" || doc.isJoint) { mashyBody.innerHTML += rowHtml; countM++; }
-                if (doc.branch === "الوسام" || doc.isJoint) { wissamBody.innerHTML += rowHtml; countW++; }
+                // كارت الوسام
+                if (doc.branch === "الوسام" || doc.isJoint) {
+                    const daysWissamStr = wissamDays.join(' ، ');
+                    wissamBody.innerHTML += `
+                        <tr class="draggable-doctor-row" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
+                            <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small>${jointBadge}${fridayBadge}</td>
+                            <td>${doc.specialty}</td>
+                            <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                            <td><strong>${doc.timing}</strong><br><small style="color:#34d399;">أيام الوسام: ${daysWissamStr || 'غير محددة'}</small></td>
+                            <td style="color:#f59e0b; font-size:0.8rem;">${doc.notes || '-'}</td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    countW++;
+                }
             });
 
             document.getElementById('countMashy').innerText = `${countM} أطباء`;
@@ -1266,9 +1333,9 @@
 
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
             document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
+            updateKPIs();
         }
 
-        // إعادة ترتيب الأطباء بالسحب والإفلات
         let draggedDocId = null;
         function handleDocDragStart(e, id) { draggedDocId = id; }
         function handleDocDrop(e, targetId) {
@@ -1278,7 +1345,7 @@
             const targetIdx = doctorsData.findIndex(d => d.id === targetId);
             const moved = doctorsData.splice(oldIdx, 1)[0];
             doctorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('docDataStore_v6', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v7', JSON.stringify(doctorsData));
             renderDoctors();
         }
 
@@ -1292,7 +1359,8 @@
             document.getElementById('docNotes').value = "";
             document.getElementById('docIsJoint').checked = false;
             document.getElementById('docIsFridayDuty').checked = false;
-            document.querySelectorAll('.doc-day-chk').forEach(c => c.checked = false);
+            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
+            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = false);
             toggleFridayBranchBox(false);
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب";
             document.getElementById('doctorModal').classList.add('active');
@@ -1300,7 +1368,9 @@
 
         function saveDoctor() {
             const id = document.getElementById('docId').value;
-            const days = Array.from(document.querySelectorAll('.doc-day-chk:checked')).map(c => c.value);
+            const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
+            const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
+
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('docName').value,
@@ -1309,7 +1379,8 @@
                 fee: document.getElementById('docFee').value,
                 branch: document.getElementById('docBranch').value,
                 isJoint: document.getElementById('docIsJoint').checked,
-                days: days,
+                mashyDays: mashyDays,
+                wissamDays: wissamDays,
                 isFriday: document.getElementById('docIsFridayDuty').checked,
                 fridayBranch: document.getElementById('docFridayBranch').value,
                 timing: document.getElementById('docTiming').value,
@@ -1323,7 +1394,7 @@
                 doctorsData[idx] = docObj;
             } else { doctorsData.push(docObj); }
 
-            localStorage.setItem('docDataStore_v6', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v7', JSON.stringify(doctorsData));
             renderDoctors();
             closeModal('doctorModal');
         }
@@ -1338,7 +1409,14 @@
             document.getElementById('docFee').value = doc.fee || "";
             document.getElementById('docBranch').value = doc.branch;
             document.getElementById('docIsJoint').checked = !!doc.isJoint;
-            document.querySelectorAll('.doc-day-chk').forEach(c => c.checked = doc.days ? doc.days.includes(c.value) : false);
+            
+            document.querySelectorAll('.doc-mashy-chk').forEach(c => {
+                c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : (doc.days ? doc.days.includes(c.value) : false);
+            });
+            document.querySelectorAll('.doc-wissam-chk').forEach(c => {
+                c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false;
+            });
+
             document.getElementById('docIsFridayDuty').checked = !!doc.isFriday;
             toggleFridayBranchBox(!!doc.isFriday);
             document.getElementById('docFridayBranch').value = doc.fridayBranch || doc.branch;
@@ -1350,12 +1428,12 @@
         function deleteDoctor(id) {
             if (confirm("حذف هذا الطبيب؟")) {
                 doctorsData = doctorsData.filter(d => d.id !== id);
-                localStorage.setItem('docDataStore_v6', JSON.stringify(doctorsData));
+                localStorage.setItem('docDataStore_v7', JSON.stringify(doctorsData));
                 renderDoctors();
             }
         }
 
-        // --- 2. ALERTS (دعم صور وملفات PDF معاينة وفتح) ---
+        // --- 2. ALERTS (إصلاح ملفات الـ PDF وفتحها بـ Blob URL) ---
         function renderAlerts(search = "") {
             const grid = document.getElementById('alertsGridList');
             const pinnedBar = document.getElementById('pinnedAlertsBar');
@@ -1371,7 +1449,7 @@
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") {
-                        mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
+                        mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح ملف PDF</a>`;
                     } else {
                         mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                     }
@@ -1391,6 +1469,7 @@
                     </div>
                 `;
             });
+            updateKPIs();
         }
 
         function openAlertModal() {
@@ -1410,12 +1489,14 @@
                 
                 if (file.type === "application/pdf") {
                     reader.onload = function(e) {
-                        document.getElementById('alertMediaBase64').value = e.target.result;
+                        const blob = new Blob([file], { type: 'application/pdf' });
+                        const blobUrl = URL.createObjectURL(blob);
+                        document.getElementById('alertMediaBase64').value = blobUrl;
                         document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${e.target.result}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة ملف PDF</a>`;
+                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${blobUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة ملف PDF</a>`;
                         document.getElementById('mediaPreviewContainer').style.display = 'block';
                     }
-                    reader.readAsDataURL(file);
+                    reader.readAsArrayBuffer(file);
                 } else {
                     reader.onload = function(e) {
                         const img = new Image();
@@ -1462,7 +1543,7 @@
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
 
-            localStorage.setItem('alertsDataStore_v6', JSON.stringify(alertsData));
+            localStorage.setItem('alertsDataStore_v7', JSON.stringify(alertsData));
             renderAlerts();
             closeModal('alertModal');
         }
@@ -1490,7 +1571,7 @@
         function deleteAlert(id) {
             if (confirm("حذف هذا التنبيه؟")) {
                 alertsData = alertsData.filter(a => a.id !== id);
-                localStorage.setItem('alertsDataStore_v6', JSON.stringify(alertsData));
+                localStorage.setItem('alertsDataStore_v7', JSON.stringify(alertsData));
                 renderAlerts();
             }
         }
@@ -1551,7 +1632,7 @@
                 const idx = deptServicesData.findIndex(s => s.id == id);
                 deptServicesData[idx] = rowObj;
             } else { deptServicesData.push(rowObj); }
-            localStorage.setItem('deptServicesStore_v6', JSON.stringify(deptServicesData));
+            localStorage.setItem('deptServicesStore_v7', JSON.stringify(deptServicesData));
             renderDeptsAndDocs();
             closeModal('deptServiceModal');
         }
@@ -1570,7 +1651,7 @@
         function deleteDeptService(id) {
             if (confirm("حذف الصف؟")) {
                 deptServicesData = deptServicesData.filter(s => s.id !== id);
-                localStorage.setItem('deptServicesStore_v6', JSON.stringify(deptServicesData));
+                localStorage.setItem('deptServicesStore_v7', JSON.stringify(deptServicesData));
                 renderDeptsAndDocs();
             }
         }
@@ -1580,27 +1661,29 @@
             const txt = document.getElementById('deptNoteText').value.trim();
             if (!txt) return;
             deptNotesData.push(txt);
-            localStorage.setItem('deptNotesStore_v6', JSON.stringify(deptNotesData));
+            localStorage.setItem('deptNotesStore_v7', JSON.stringify(deptNotesData));
             renderDeptsAndDocs();
             closeModal('deptNoteModal');
         }
         function deleteDeptNote(idx) {
             if (confirm("حذف الملحوظة؟")) {
                 deptNotesData.splice(idx, 1);
-                localStorage.setItem('deptNotesStore_v6', JSON.stringify(deptNotesData));
+                localStorage.setItem('deptNotesStore_v7', JSON.stringify(deptNotesData));
                 renderDeptsAndDocs();
             }
         }
 
-        // --- 4. COORDINATORS ---
+        // --- 4. COORDINATORS (Drag & Drop مفعل لكروت المنسقين) ---
+        let draggedCoordIdx = null;
+
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
             grid.innerHTML = "";
-            coordinatorsData.filter(c => c.name.includes(search)).forEach(c => {
+            coordinatorsData.filter(c => c.name.includes(search)).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 grid.innerHTML += `
-                    <div class="doc-sheet-card ${c.color || 'card-teal'}">
-                        <h3>${c.name}</h3>
+                    <div class="doc-sheet-card ${c.color || 'card-teal'}" draggable="true" ondragstart="handleCoordDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleCoordDrop(event, ${idx})">
+                        <h3><i class="fa-solid fa-grip-vertical" style="opacity:0.6; margin-left:0.4rem;"></i> ${c.name}</h3>
                         ${rules}
                         <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.3rem; padding-top:0.4rem;">
                             <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.75rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1610,6 +1693,17 @@
                 `;
             });
         }
+
+        function handleCoordDragStart(e, idx) { draggedCoordIdx = idx; }
+        function handleCoordDrop(e, targetIdx) {
+            e.preventDefault();
+            if (draggedCoordIdx === null || draggedCoordIdx === targetIdx) return;
+            const moved = coordinatorsData.splice(draggedCoordIdx, 1)[0];
+            coordinatorsData.splice(targetIdx, 0, moved);
+            localStorage.setItem('coordDataStore_v7', JSON.stringify(coordinatorsData));
+            renderCoordinators();
+        }
+
         function openCoordinatorModal() {
             document.getElementById('coordId').value = "";
             document.getElementById('coordName').value = "";
@@ -1624,7 +1718,7 @@
                 const idx = coordinatorsData.findIndex(c => c.id == id);
                 coordinatorsData[idx] = obj;
             } else { coordinatorsData.push(obj); }
-            localStorage.setItem('coordDataStore_v6', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v7', JSON.stringify(coordinatorsData));
             renderCoordinators();
             closeModal('coordModal');
         }
@@ -1640,7 +1734,7 @@
         function deleteCoordinator(id) {
             if (confirm("حذف؟")) {
                 coordinatorsData = coordinatorsData.filter(c => c.id !== id);
-                localStorage.setItem('coordDataStore_v6', JSON.stringify(coordinatorsData));
+                localStorage.setItem('coordDataStore_v7', JSON.stringify(coordinatorsData));
                 renderCoordinators();
             }
         }
@@ -1657,6 +1751,7 @@
             cats.forEach(cat => {
                 container.innerHTML += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`;
             });
+            updateKPIs();
         }
         function filterOfferCategory(cat, btn) {
             selectedOfferTab = cat;
@@ -1702,7 +1797,7 @@
                 const idx = offersData.findIndex(o => o.id == id);
                 offersData[idx] = obj;
             } else { offersData.push(obj); }
-            localStorage.setItem('offersDataStore_v6', JSON.stringify(offersData));
+            localStorage.setItem('offersDataStore_v7', JSON.stringify(offersData));
             selectedOfferTab = cat;
             renderOffersTabs();
             renderOffers();
@@ -1721,19 +1816,17 @@
         function deleteOffer(id) {
             if (confirm("حذف؟")) {
                 offersData = offersData.filter(o => o.id !== id);
-                localStorage.setItem('offersDataStore_v6', JSON.stringify(offersData));
+                localStorage.setItem('offersDataStore_v7', JSON.stringify(offersData));
                 renderOffersTabs();
                 renderOffers();
             }
         }
 
-        // --- 6. INQUIRIES (مع فلاتر الأقسام المطلوبة) ---
+        // --- 6. INQUIRIES ---
         function checkInquiryCustomCat(val) {
             document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
         }
-        function renderInquiriesTabs() {
-            // يتم استخدام الأزرار الثابتة بالـ HTML حسب طلبك
-        }
+        function renderInquiriesTabs() {}
         function filterInquiryCategory(cat, btn) {
             selectedInquiryFilter = cat;
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1779,7 +1872,7 @@
                 const idx = inquiriesData.findIndex(i => i.id == id);
                 inquiriesData[idx] = obj;
             } else { inquiriesData.push(obj); }
-            localStorage.setItem('inquiriesDataStore_v6', JSON.stringify(inquiriesData));
+            localStorage.setItem('inquiriesDataStore_v7', JSON.stringify(inquiriesData));
             renderInquiries();
             closeModal('inquiryModal');
         }
@@ -1794,7 +1887,7 @@
         function deleteInquiry(id) {
             if (confirm("حذف؟")) {
                 inquiriesData = inquiriesData.filter(i => i.id !== id);
-                localStorage.setItem('inquiriesDataStore_v6', JSON.stringify(inquiriesData));
+                localStorage.setItem('inquiriesDataStore_v7', JSON.stringify(inquiriesData));
                 renderInquiries();
             }
         }
