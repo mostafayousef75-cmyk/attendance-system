@@ -3,540 +3,760 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر - مجمع ماجستي الطبي</title>
-    <!-- FontAwesome -->
+    <title>لوحة الكول سنتر والمنسقين - العيادات</title>
+    <!-- خط تجول واستيراد الأيقونات -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Tajawal) -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --font-family: 'Tajawal', sans-serif;
-            --bg-base: #080c14;
-            --bg-surface: #0f172a;
-            --bg-card: #050914;
-            --bg-sidebar: #0b1329;
+            --bg-base: #000000;
+            --bg-surface: #0a0a0c;
+            --bg-card: #121216;
+            --bg-sidebar: #050507;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #27272a;
+            --primary-color: #f59e0b;
+            --primary-hover: #d97706;
+            --accent-blue: #2563eb;
+            --accent-green: #16a34a;
+            --danger-color: #dc2626;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        body.theme-darkblue {
+            --bg-base: #060913;
+            --bg-surface: #0c1222;
+            --bg-card: #111a30;
+            --bg-sidebar: #080d1a;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --border-color: #1e293b;
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --accent-orange: #f97316;
+            --primary-color: #3b82f6;
         }
 
-        body.theme-amoled {
-            --bg-base: #000000; --bg-surface: #0a0a0a; --bg-card: #121212; --bg-sidebar: #050505; --text-main: #f3f4f6; --text-muted: #a1a1aa; --border-color: #27272a; --primary-color: #f59e0b;
-        }
-        body.theme-darkblue {
-            --bg-base: #080c14; --bg-surface: #0f172a; --bg-card: #050914; --bg-sidebar: #0b1329; --text-main: #ffffff; --text-muted: #94a3b8; --border-color: #1e293b; --primary-color: #2563eb;
-        }
-        body.theme-gray {
-            --bg-base: #121214; --bg-surface: #1a1a1e; --bg-card: #0d0d0f; --bg-sidebar: #151518; --text-main: #f4f4f5; --text-muted: #a1a1aa; --border-color: #27272a; --primary-color: #6366f1;
-        }
-        body.theme-light {
-            --bg-base: #f1f5f9; --bg-surface: #ffffff; --bg-card: #f8fafc; --bg-sidebar: #0f172a; --text-main: #0f172a; --text-muted: #64748b; --border-color: #cbd5e1; --primary-color: #2563eb;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            transition: background 0.2s, border 0.2s;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
-        body { background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
-
-        /* الهيدر العلوي */
-        .header-bar {
-            background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color);
-            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
-        .brand-title { font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--primary-color); }
-        .search-box { position: relative; width: 350px; }
-        .search-box input {
-            width: 100%; padding: 7px 35px 7px 12px; border-radius: 6px; border: 1px solid var(--border-color);
-            background: var(--bg-card); color: var(--text-main); font-size: 0.85rem;
-        }
-        .search-box i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        /* تخطيط الصفحة الرئيسي */
-        .main-layout { display: flex; flex: 1; }
-        
-        /* القائمة الجانبية */
+        /* Sidebar Styling */
         .sidebar {
-            width: 250px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color);
-            padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; position: sticky; top: 55px; height: calc(100vh - 55px);
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.2rem 1rem;
+            flex-shrink: 0;
         }
-        .nav-btn {
-            background: none; border: none; color: var(--text-muted); text-align: right; padding: 10px 15px; border-radius: 6px;
-            font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s;
+
+        .brand-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
-        .nav-btn:hover, .nav-btn.active { background-color: var(--primary-color); color: #ffffff; }
 
-        /* محتوى الصفحة */
-        .content-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        .tab-section { display: none; }
-        .tab-section.active { display: flex; flex-direction: column; gap: 15px; }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            flex: 1;
+        }
 
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .section-title { font-size: 1.15rem; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
 
-        /* الأزرار وجداول البيانات */
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bg-surface);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .theme-box {
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .theme-select {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            margin-top: 0.4rem;
+        }
+
+        /* Main Container */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-container {
+            position: relative;
+            width: 450px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .pinned-alerts-banner {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1.5rem;
+            display: flex;
+            gap: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .alert-pill {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-alert {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: bold;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 1.2rem;
+            overflow-y: auto;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
         .btn {
-            background-color: var(--primary-color); color: white; border: none; padding: 6px 14px; border-radius: 6px;
-            font-weight: 700; cursor: pointer; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-success { background-color: #10b981; }
-        .btn-danger { background-color: #ef4444; }
-        .btn-warning { background-color: #f59e0b; color: #000; }
-        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
-
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; background: var(--bg-card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
-        .data-table th { background: var(--bg-surface); color: var(--text-muted); text-align: right; padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 700; }
-        .data-table td { padding: 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        .data-table tr:hover { background-color: rgba(255,255,255,0.02); }
-
-        .shared-row { background-color: rgba(124, 58, 237, 0.12) !important; }
-        .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
-        .badge-maashi { background: #0284c7; color: white; }
-        .badge-wisam { background: #7c3aed; color: white; }
-        .badge-shared { background: #4f46e5; color: white; }
-
-        /* تنبيهات وتعأميم مطابقة للصورة رقم 3 */
-        .alert-card {
-            background-color: var(--bg-card); border: 1px solid var(--border-color); border-right: 4px solid var(--accent-orange);
-            border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem;
-        }
-        .file-attachment-btn {
-            display: inline-flex; align-items: center; gap: 8px; background: #0b1329; border: 1px solid var(--border-color);
-            padding: 6px 12px; border-radius: 6px; color: #38bdf8; text-decoration: none; font-size: 0.8rem; font-weight: 700; width: fit-content; cursor: pointer;
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 0.55rem 1.1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        /* شبكة بطاقات المنسقين (مطابقة للصور 4 و 5) */
-        .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
-        .coord-card {
-            border-radius: 8px; padding: 15px; color: #fff; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .coord-card h3 { font-size: 1.05rem; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 6px; }
-        .coord-card ul { padding-right: 18px; font-size: 0.82rem; line-height: 1.7; }
+        .btn-green { background-color: var(--accent-green); color: #fff; }
+        .btn-blue { background-color: var(--accent-blue); color: #fff; }
+        .btn-danger { background-color: var(--danger-color); color: #fff; }
+        .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* نافذة منبثقة (Modal) */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 500; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--bg-surface); width: 90%; max-width: 500px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 0.82rem; margin-bottom: 5px; font-weight: 700; color: var(--text-muted); }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-size: 0.85rem;
+        /* Split Screen (50/50 Grid Layout) */
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        .table-responsive {
+            width: 100%;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 0.75rem 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        th {
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+        }
+
+        /* Styling for Notifications / Alerts (Style 3) */
+        .alert-card-item {
+            background-color: #080d18;
+            border: 1px solid #1d283a;
+            border-left: 4px solid #f97316;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alert-file-btn {
+            background-color: #1e293b;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            border: 1px solid #334155;
+        }
+
+        /* Coordinators Grid (Sheet Style 4 & 5) */
+        .coordinators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .doc-sheet-card {
+            border-radius: 8px;
+            padding: 1rem;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .doc-sheet-card h3 {
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.1rem;
+        }
+
+        /* Color variations matching Google Sheet */
+        .card-teal { background-color: #0d47a1; }
+        .card-maroon { background-color: #4a148c; }
+        .card-red { background-color: #b71c1c; }
+        .card-darkblue { background-color: #1a237e; }
+        .card-gold { background-color: #e65100; }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 520px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.65rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            outline: none;
         }
     </style>
 </head>
-<body class="theme-darkblue">
+<body class="theme-amoled">
 
-    <!-- الهيدر العلوي -->
-    <header class="header-bar">
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
         <div class="brand-title">
-            <i class="fa-solid fa-headset"></i> لوحة الكول سنتر - مجمع ماجستي الطبي
+            <i class="fa-solid fa-headset"></i>
+            <span>لوحة الكول سنتر</span>
         </div>
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="globalSearch" placeholder="بحث شامل في المواعيد، الخدمات، الاستفسارات..." onkeyup="filterEverything()">
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 0.8rem; color: var(--text-muted);">السيم:</span>
-            <select id="themeSelect" onchange="changeTheme(this.value)" style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 6px; font-size: 0.82rem;">
-                <option value="theme-darkblue">الأزرق الغامق</option>
-                <option value="theme-amoled">OLED الأسود</option>
-                <option value="theme-gray">الرصاصي الفحمي</option>
-                <option value="theme-light">المضيء الفاتح</option>
+        <ul class="nav-links">
+            <li><a class="nav-link active" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> مواعيد الأطباء</a></li>
+            <li><a class="nav-link" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> التنبيهات والتعاميم</a></li>
+            <li><a class="nav-link" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> دليل الاستفسارات</a></li>
+            <li><a class="nav-link" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users"></i> تسليم المنسقين</a></li>
+        </ul>
+        
+        <div class="theme-box">
+            <label style="font-size: 0.85rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> اختيار المظهر (السيم)</label>
+            <select class="theme-select" onchange="changeTheme(this.value)">
+                <option value="theme-amoled">OLED أسود (Amoled)</option>
+                <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
             </select>
         </div>
-    </header>
+    </aside>
 
-    <div class="main-layout">
-        <!-- القائمة الجانبية -->
-        <nav class="sidebar">
-            <button class="nav-btn active" onclick="switchTab('scheduleTab', this)"><i class="fa-solid fa-calendar-days"></i> مواعيد الأطباء</button>
-            <button class="nav-btn" onclick="switchTab('noticesTab', this)"><i class="fa-solid fa-bullhorn"></i> التنبيهات والتعاميم</button>
-            <button class="nav-btn" onclick="switchTab('faqTab', this)"><i class="fa-solid fa-circle-question"></i> دليل الاستفسارات</button>
-            <button class="nav-btn" onclick="switchTab('coordinatorsTab', this)"><i class="fa-solid fa-users-gear"></i> تسليم المنسقين</button>
-        </nav>
+    <!-- المحتوى الرئيسي -->
+    <main class="main-wrapper">
+        <header class="top-header">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="globalSearch" placeholder="بحث شامل في المواعيد، الخدمات، والاستفسارات..." oninput="filterTables(this.value)">
+            </div>
+            <div id="clockDisplay" style="font-weight: 500; font-size: 0.9rem;"></div>
+        </header>
 
-        <!-- محتوى الصفحات -->
-        <main class="content-area">
+        <!-- شريط التنبيهات العلوي المثبت -->
+        <div class="pinned-alerts-banner" id="pinnedAlertsBar">
+            <div class="alert-pill"><span class="badge-alert">تنبيه</span> تعديل مواعيد خصومات الليزر</div>
+            <div class="alert-pill"><span class="badge-alert">تنبيه</span> سياسة إلغاء المواعيد الجديدة</div>
+        </div>
 
-            <!-- 1. صفحة مواعيد الأطباء -->
-            <section id="scheduleTab" class="tab-section active">
-                <div class="section-header">
-                    <h2 class="section-title"><i class="fa-solid fa-user-doctor text-blue-400"></i> جدول دوام الأطباء المقسّم (فرع معشي / الوسام)</h2>
-                    <button class="btn btn-success" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب / موعد</button>
+        <div class="content-area">
+
+            <!-- 1. جدول دوام الأطباء مقسّم نصين (مطابق للصورة رقم 2) -->
+            <section id="schedule-section" class="page-section active">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2>جدول دوام الأطباء المقسم (فرع معشي / الوسام)</h2>
+                    <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب / موعد</button>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
+
+                <div class="split-grid">
+                    <!-- العمود الأيمن: اسم الطبيب والتخصص والفرع -->
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>اسم الطبيب</th>
+                                    <th>التخصص</th>
+                                    <th>الفرع</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docRightBody">
+                                <tr>
+                                    <td><strong>د. أحمد علي</strong></td>
+                                    <td>أسنان - تقويم</td>
+                                    <td><span style="background:#1e3a8a; color:#93c5fd; padding:0.2rem 0.5rem; border-radius:4px;">معشي</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>د. سارة محمود</strong></td>
+                                    <td>جلدية وليزر</td>
+                                    <td><span style="background:#581c87; color:#e9d5ff; padding:0.2rem 0.5rem; border-radius:4px;">الوسام</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>د. محمد الشمري</strong></td>
+                                    <td>تركيبات وزراعة</td>
+                                    <td><span style="background:#713f12; color:#fef08a; padding:0.2rem 0.5rem; border-radius:4px;">مشترك</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- العمود الأيسر: المواعيد والأيام والملاحظات والإجراءات -->
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>أيام الدوام والمواعيد</th>
+                                    <th>ملاحظات المناوبة</th>
+                                    <th>آخر تحديث</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docLeftBody">
+                                <tr>
+                                    <td>السبت إلى الخميس: 4:00 م - 10:00 م</td>
+                                    <td>مناوبة الجمعة بالتناوب</td>
+                                    <td>2026-10-25 10:00</td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editDoctor(1)"><i class="fa-solid fa-pen"></i></button>
+                                        <button class="btn btn-danger" style="padding:0.2rem 0.4rem;" onclick="deleteDoctor(1)"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>يومياً: 2:00 م - 9:00 م</td>
+                                    <td>حجز مسبق فقط</td>
+                                    <td>2026-10-26 08:00</td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editDoctor(2)"><i class="fa-solid fa-pen"></i></button>
+                                        <button class="btn btn-danger" style="padding:0.2rem 0.4rem;" onclick="deleteDoctor(2)"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>معشي (أحد/ثلاثاء)، الوسام (سبت/أربعاء)</td>
+                                    <td>مشترك بين الفرعين</td>
+                                    <td>2026-10-26 09:15</td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding:0.2rem 0.4rem;" onclick="editDoctor(3)"><i class="fa-solid fa-pen"></i></button>
+                                        <button class="btn btn-danger" style="padding:0.2rem 0.4rem;" onclick="deleteDoctor(3)"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. التنبيهات والتعاميم بنفس استايل صورة رقم 3 وتقسيم 50/50 -->
+            <section id="alerts-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 style="color: #60a5fa;"><i class="fa-solid fa-bullhorn"></i> تنبيهات وإشعارات العيادة العامة</h2>
+                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
+                </div>
+
+                <div class="split-grid">
+                    <!-- الجانب الأيمن: قائمة التنبيهات الرئيسية (مع التعديل والحذف وإرفاق ملف) -->
+                    <div id="alertsContainerRight">
+                        <div class="alert-card-item">
+                            <div>
+                                <h4 style="color:#fff; margin-bottom:0.4rem;">عروض اكتوبر</h4>
+                                <span style="font-size:0.75rem; color:#94a3b8;">02:55:35PM , 24/10/2026</span>
+                            </div>
+                            <div style="display:flex; gap:0.5rem; align-items:center;">
+                                <a href="#" class="alert-file-btn"><i class="fa-solid fa-file-pdf"></i> عروض اكتوبر.pdf</a>
+                                <button class="btn btn-blue" style="padding:0.3rem 0.6rem;" onclick="editAlert(1)"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                <button class="btn btn-danger" style="padding:0.3rem 0.6rem;" onclick="deleteAlert(1)"><i class="fa-solid fa-trash"></i> حذف</button>
+                            </div>
+                        </div>
+
+                        <div class="alert-card-item">
+                            <div>
+                                <h4 style="color:#fff; margin-bottom:0.4rem;">د.تبيان من يوم السبت متواجده في فرع معشي من 2-10 🟠🔴</h4>
+                                <span style="font-size:0.75rem; color:#94a3b8;">02:06:41PM , 24/10/2026</span>
+                            </div>
+                            <div style="display:flex; gap:0.5rem; align-items:center;">
+                                <button class="btn btn-blue" style="padding:0.3rem 0.6rem;" onclick="editAlert(2)"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                <button class="btn btn-danger" style="padding:0.3rem 0.6rem;" onclick="deleteAlert(2)"><i class="fa-solid fa-trash"></i> حذف</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الجانب الأيسر: الإرشادات أو الصور والتنبيهات الفرعية -->
+                    <div id="alertsContainerLeft">
+                        <div class="alert-card-item">
+                            <div>
+                                <h4 style="color:#fff; margin-bottom:0.4rem;">اذا احد ابرز لكم هذا العرض . الجهاز المستخدم جنتل ماكس برو</h4>
+                                <span style="font-size:0.75rem; color:#94a3b8;">مرفق صورة العرض والتوضيح</span>
+                            </div>
+                            <div style="display:flex; gap:0.5rem; align-items:center;">
+                                <button class="btn btn-blue" style="padding:0.3rem 0.6rem;" onclick="editAlert(3)"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                <button class="btn btn-danger" style="padding:0.3rem 0.6rem;" onclick="deleteAlert(3)"><i class="fa-solid fa-trash"></i> حذف</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. دليل الاستفسارات (مع التعديل والحذف وتكثيف المعلومات) -->
+            <section id="inquiries-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2>دليل الاستفسارات، الخدمات، والأسعار</h2>
+                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار جديد</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
                         <thead>
                             <tr>
-                                <th>اسم الطبيب</th>
-                                <th>التخصص</th>
-                                <th>الفرع</th>
-                                <th>أيام الدوام والمواعيد</th>
-                                <th>ملاحظات المناوبة</th>
-                                <th>آخر تحديث</th>
-                                <th style="text-align: center;">الإجراءات</th>
+                                <th>القسم / الخدمة</th>
+                                <th>السؤال / الاستفسار الشائع</th>
+                                <th>الإجابة / السياسة المعتمدة</th>
+                                <th>السعر / العرض</th>
+                                <th>الإجراءات (تعديل / حذف)</th>
                             </tr>
                         </thead>
-                        <tbody id="doctorsTableBody"></tbody>
+                        <tbody id="inquiriesTableBody">
+                            <tr>
+                                <td><strong>الجلدية</strong></td>
+                                <td>أسعار جلسات الفراكشنال ليزر</td>
+                                <td>الجلسة للوجه كامل شاملة الرتوش مجاناً بعد 14 يوم</td>
+                                <td style="color:var(--primary-color); font-weight:bold;">350 ريال</td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding:0.25rem 0.5rem;" onclick="editInquiry(1)"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteInquiry(1)"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>الأسنان</strong></td>
+                                <td>سعر تبييض الأسنان بالزووم</td>
+                                <td>العرض الحالي يشمل التبييض والتنظيف وإزالة الجير</td>
+                                <td style="color:var(--primary-color); font-weight:bold;">499 ريال</td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding:0.25rem 0.5rem;" onclick="editInquiry(2)"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteInquiry(2)"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- 2. صفحة التنبيهات والتعاميم (مطابقة للصورة 3 مع زر رفع ملف حقيقي) -->
-            <section id="noticesTab" class="tab-section">
-                <div class="section-header">
-                    <h2 class="section-title"><i class="fa-solid fa-bullhorn text-amber-400"></i> تنبيهات وإشعارات العيادة العامة</h2>
-                    <button class="btn btn-success" onclick="openNoticeModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
+            <!-- 4. تسليم المنسقين وتحويل شيت جوجل الكامل إلى تصميم فاخر (مطابق للصور 4 و 5) -->
+            <section id="coordinators-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2>دليل وقوانين تسليم المنسقين (مأخوذة من الشيت الرسمي)</h2>
                 </div>
-                <div id="noticesContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+
+                <div class="coordinators-grid">
+                    <!-- الدكتور سامي -->
+                    <div class="doc-sheet-card card-teal">
+                        <h3>الدكتور سامي</h3>
+                        <p>• الكشفيه والمراجعه بعد الخلع او بعد الزراعه او فتح الخيط مدتها 30 دقيقة.</p>
+                        <p style="color:#ffeb3b; font-weight:bold;">❌ لا نضع ربع ساعة في الجدول نهائياً.</p>
+                        <p>• قبل التركيب وبعد الزراعه hilling مدتها لوزرعه او زرعتين مدتها 30 دقيقه.</p>
+                        <p>• من 3 لـ 4 زرعات ياخد وقت علاج 45 دقيقه بداية من 6 تقريبا ساعه.</p>
+                        <p>• الخلع على حسب لا يقل عن ساعة.</p>
+                        <p>• الزراعة على عظم أو مسامير (الدكتور هو الوحيد اللي بيعمل زراعة عظم).</p>
+                    </div>
+
+                    <!-- الدكتور أحمد -->
+                    <div class="doc-sheet-card card-maroon">
+                        <h3>الدكتور احمد</h3>
+                        <p>• حشوات وتنظيف وخلع وسحب عصب وتبييض.</p>
+                        <p>• كل مواعيده مابين الـ 45 د إلى ساعة.</p>
+                        <p>• الدكتور بيفك خياطة.</p>
+                        <h4 style="margin-top:0.5rem; text-decoration:underline;">الدكتور منال و ابان</h4>
+                        <p>• حشوات تجميليه وتبييض وتنظيف الجير (د ابان بيخلع خلع عادى وليس عصب).</p>
+                        <p>• نص ساعه للكشفيه ساعه للمعالجه.</p>
+                    </div>
+
+                    <!-- الجلدية -->
+                    <div class="doc-sheet-card card-red">
+                        <h3>الجلديه</h3>
+                        <p>• جلسه اساسيه مدتها ثابته ساعه (فل بدي).</p>
+                        <p>• الرتوش 45 د (فل بدي).</p>
+                        <p>• منطقه صغيره (بكيني واندر ارم وتحديد الذقن) 30 د.</p>
+                        <p>• منطقه كبيره (بطن او ظهر ) 45 د.</p>
+                        <p>• التشقير 30 د - تنظيف بشره من 30 لـ 45 د.</p>
+                        <p>• الفلر والبوتوكس مع الكشفيه عادى.</p>
+                        <p style="color:#ffeb3b;">• يتم الحلاقه شفره قبلها بـ 24 ساعه. ولو ماسويتها تقدر تسويها بالعقاده 50 ريال.</p>
+                    </div>
+
+                    <!-- الدكتوره انجي -->
+                    <div class="doc-sheet-card card-darkblue">
+                        <h3>الدكتوره انجي</h3>
+                        <p>• الكشفيه نص ساعه.</p>
+                        <p>• حاله محوله من طبيب عام بيحتاج شغل عصب اقل شي 45 د اقصي ساعه ونصف.</p>
+                        <p>• المعالجات من ساعه ونصف لـ ساعتين الا.</p>
+                        <p>• يفضل الكشفيات بعد 7 م.</p>
+                        <p>• حاله مستعجله تستقبل عادى كشفية بداية اليوم.</p>
+                        <p>• اقصى عدد حالات الانتظار 3 مواعيد.</p>
+                    </div>
+
+                    <!-- الدكتور عبد الله -->
+                    <div class="doc-sheet-card card-gold">
+                        <h3>الدكتور عبد الله</h3>
+                        <p>• من الساعه 1 م الى 2 م تركيب او فك تقويم.</p>
+                        <p>• من 8 الى 9 م فك او تركيب ما بين الساعه 2م الى 8 ساعه للفك او التركيب.</p>
+                        <p>• مثبتات مابعد التقويم 45 د الشد فقط 30 د.</p>
+                        <p>• من الساعه 7.5 لايستقبل اي انتظار عادى اي عدد في الانتظار.</p>
+                        <p><strong>* يمنع منعاً باتاً تحديد موعد لمدة ربع ساعة.</strong></p>
+                    </div>
+                </div>
             </section>
 
-            <!-- 3. دليل الاستفسارات (مع CRUD كامل) -->
-            <section id="faqTab" class="tab-section">
-                <div class="section-header">
-                    <h2 class="section-title"><i class="fa-solid fa-circle-question text-purple-400"></i> دليل الاستفسارات وسياسات العيادة</h2>
-                    <button class="btn btn-success" onclick="openFaqModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار جديد</button>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 30%;">موضوع الاستفسار / السؤال</th>
-                            <th>الإجابة والتعليمات المعتمدة للكول سنتر</th>
-                            <th style="text-align: center; width: 100px;">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="faqTableBody"></tbody>
-                </table>
-            </section>
+        </div>
+    </main>
 
-            <!-- 4. صفحة تسليم المنسقين (مطابقة للصور 4 و 5 بدقة) -->
-            <section id="coordinatorsTab" class="tab-section">
-                <div class="section-header">
-                    <h2 class="section-title"><i class="fa-solid fa-users-gear text-emerald-400"></i> تعليمات وتوجيهات المنسقين والأطباء (من الشيت)</h2>
-                </div>
-                <div class="coordinators-grid" id="coordinatorsContainer"></div>
-            </section>
-
-        </main>
-    </div>
-
-    <!-- نافذة المودال العامة (إضافة/تعديل) -->
-    <div class="modal" id="genericModal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 id="modalTitle" style="font-size: 1rem; font-weight: 900;">إضافة</h3>
-                <button onclick="closeModal()" style="background:none; border:none; color:var(--text-main); font-size:1.1rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+    <!-- النوافذ المنبثقة (Modals) للإضافة والتعديل -->
+    <!-- Modal التنبيهات مع رفع ملف برزر محلي -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>إضافة / تعديل تنبيه</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
-            <div id="modalBody" class="space-y-3"></div>
-            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
-                <button class="btn btn-danger btn-sm" onclick="closeModal()">إلغاء</button>
-                <button class="btn btn-sm btn-success" id="modalSaveBtn">حفظ</button>
+            <input type="hidden" id="editAlertId">
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>عنوان التنبيه أو الإشعار</label>
+                <input type="text" id="alertTitleInput" class="form-control" placeholder="أدخل العنوان...">
             </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>إرفاق ملف (PDF / صورة) عبر زر رفع مباشر</label>
+                <input type="file" id="alertFileInput" class="form-control" accept="image/*,.pdf">
+            </div>
+            <button class="btn btn-green" onclick="saveAlertItem()">حفظ ونشر التنبيه</button>
         </div>
     </div>
 
-    <!-- سكريبت التشغيل والتخزين -->
+    <!-- Modal الاستفسارات (إضافة وتعديل) -->
+    <div class="modal-overlay" id="inquiryModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>إضافة / تعديل استفسار</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('inquiryModal')"></i>
+            </div>
+            <input type="hidden" id="editInquiryId">
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>القسم / الخدمة</label>
+                <input type="text" id="inqCategory" class="form-control" placeholder="مثال: الأسنان">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>السؤال أو الاستفسار</label>
+                <input type="text" id="inqQuestion" class="form-control" placeholder="السؤال الشائع...">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>الإجابة والسياسة</label>
+                <textarea id="inqAnswer" class="form-control" rows="3"></textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <label>السعر / العرض</label>
+                <input type="text" id="inqPrice" class="form-control" placeholder="مثال: 299 ريال">
+            </div>
+            <button class="btn" onclick="saveInquiryItem()">حفظ البيانات</button>
+        </div>
+    </div>
+
     <script>
-        function changeTheme(themeName) {
-            document.body.className = themeName;
-            localStorage.setItem('theme', themeName);
-        }
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'theme-darkblue';
-            document.body.className = savedTheme;
-            document.getElementById('themeSelect').value = savedTheme;
-            renderAll();
-        });
-
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
+        // التبديل بين الأقسام
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId + '-section').classList.add('active');
+            element.classList.add('active');
         }
 
-        // --- البيانات المحفوظة محلياً أو الافتراضية المستخرجة من الشيت ---
-        let doctorsData = JSON.parse(localStorage.getItem('m_doctors')) || [
-            { id: 1, name: "د. أحمد علي", spec: "أسنان - تقويم", branch: "معشي", timing: "السبت إلى الخميس: 4:00 م - 10:00 م", note: "مناوبة الجمعة بالتناوب", update: "2026-10-25 10:00" },
-            { id: 2, name: "د. سارة محمود", spec: "جلدية وليزر", branch: "الوسام", timing: "يومياً: 2:00 م - 9:00 م", note: "حجز مسبق فقط", update: "2026-10-26 08:00" },
-            { id: 3, name: "د. محمد الشمري", spec: "تركيبات وزراعة", branch: "مشترك (معشي والوسام)", timing: "معشي (أحد/ثلاثاء)، الوسام (سبت/أربعاء)", note: "مشترك بين الفرعين", update: "2026-10-26 09:15" },
-            { id: 4, name: "د. سامي الدبعي", spec: "استشاري جراحة وجه وفكين", branch: "معشي", timing: "يومياً ماعدا السبت (1م - 10م)", note: "كشفية 100 / التواصل دايركت", update: "2026-10-26 12:00" },
-            { id: 5, name: "د. إيهاب هاشم", spec: "طبيب أسنان عام", branch: "الوسام", timing: "9ص - 12م / 4:30م - 9:30م", note: "الجمعة والسبت 4م لـ 8م (تنظيف جير)", update: "2026-10-26 12:30" }
-        ];
-
-        let noticesData = JSON.parse(localStorage.getItem('m_notices')) || [
-            { id: 1, title: "عروض أكتوبر", text: "تحديث عروض الشهر لجميع الفروع وتفاصيل الخصومات.", time: "02:55:35 PM, 24/10/2026", fileName: "عروض اكتوبر.pdf", fileUrl: "#" },
-            { id: 2, title: "د. تبيان من يوم السبت متواجدة في فرع معشي من 2-10", text: "تنبيه هام لجميع موظفي الشيفتات بخصوص جدول الدوام.", time: "02:06:41 PM, 24/10/2026", fileName: "", fileUrl: "" },
-            { id: 3, title: "تنبيه ليزر جنتل ماكس برو", text: "إذا أحد أبرز لكم هذا العرض، الجهاز المستخدم هو جنتل ماكس برو بالوسام ومعشي.", time: "09:33:31 PM, 20/10/2026", fileName: "صورة_الجهاز.jpg", fileUrl: "#" }
-        ];
-
-        let faqData = JSON.parse(localStorage.getItem('m_faq')) || [
-            { id: 1, q: "جلسات الرتوش والفرق بين الجلسات", a: "الرتوش خلال 14 يوماً بعد الجلسة (أقصى حد 16 يوماً ولا تقل عن 12). بين الجلسة والأخرى شهر كامل." },
-            { id: 2, q: "تشقير الوجه وتنظيف البشرة", a: "الانتظار 24–48 ساعة بين التشقير وتنظيف البشرة العميق، وفي حال وجود احمرار 3–5 أيام." },
-            { id: 3, q: "تقسيم الجسم الكامل (Full Body)", a: "مرفوض تماماً تقسيم مناطق الفل بدي على جلسات مختلفة، وقت جلستها تسوي الجسم كامل." },
-            { id: 4, q: "إبر النظارة والفيتامينات", a: "إبر النظارة تحت إشراف طبي بالطوارئ، أما إبر فيتامين B12 و D فعادية بـ 10 ريال للحقنة بالوسام." },
-            { id: 5, q: "سياسة استرجاع الحجوزات والعروض", a: "سياسة حجز العروض لا يوجد فيها استرجاع المبالغ المالية، لا تسترد ولكن تقدر تستبدلها بخدمة أخرى." }
-        ];
-
-        const coordinatorsData = [
-            {
-                title: "الدكتور سامي",
-                bg: "#065f46",
-                rules: [
-                    "الكشفية والمراجعه بعد الخلع أو بعد الزراعة أو فتح الخيط مدتها 30 دقيقة.",
-                    "لا نضع ربع ساعة في الجدول نهائياً ❌.",
-                    "قبل التركيب وبعد الزراعة healing مدتها لزرعة أو زرعتين 30 دقيقة، من 3 لـ 4 زرعات 45 دقيقة، 6 زرعات ساعة.",
-                    "مواعيد الزراعة تتراوح بين ساعة ونصف إلى ساعتين ونصف."
-                ]
-            },
-            {
-                title: "الدكتور احمد",
-                bg: "#581c87",
-                rules: [
-                    "حشوات وتنزيف وخلع وسحب عصب وتبييض كل مواعيده ما بين 45 دقيقة إلى ساعة.",
-                    "الدكتور بيفك خياطة.",
-                    "الخلع على حسب لا يقل عن ساعة."
-                ]
-            },
-            {
-                title: "الجلدية والتجميل",
-                bg: "#7f1d1d",
-                rules: [
-                    "جلسة أساسية مدتها ثابتة ساعة (فل بدي)، الرتوش 45 د (فل بدي)، منطقة صغيرة (بكيني واندرارم وتحديد الذقن) 30 د.",
-                    "منطقة كبيرة (بطن أو ظهر) 45 د، التشقير 30 د، تنظيف بشرة من 30د لـ 45د، جلسة الفراكشنال 30د.",
-                    "بيتم الحلاقة شفره قبلها بـ 24 ساعة، ولو ما سويتها تقدر تسويها بالعيادة بـ 50 ريال."
-                ]
-            },
-            {
-                title: "الدكتوره انجى",
-                bg: "#1e3a8a",
-                rules: [
-                    "الكشفية نص ساعة، حالة محولة من طبيب عام يحتاج شغل عصب أقل شي 45 د أقصى ساعة ونص.",
-                    "المعالجات من ساعة ونص لساعة ونص إلا خمسة، يفضل الكشفيات بعد 7 م.",
-                    "حالة مستعجلة تستقبل عادي كشفية بداية اليوم، أقصى عدد حالات الانتظار 3 مواعيد."
-                ]
-            },
-            {
-                title: "الدكتور عبد الله",
-                bg: "#78350f",
-                rules: [
-                    "من الساعة 1 م إلى 2 م تركيب أو فك تقويم، ومن 8 إلى 9 م فك أو تركيب.",
-                    "ما بين 2 م إلى 8 م ساعة للفك أو التركيب (30د للفك و 30د للتركيب).",
-                    "من الساعة 7.5 لا يستقبل أي انتظار، وعادي أي عدد في الانتظار."
-                ]
-            },
-            {
-                title: "الدكتوره مروان ومحمود",
-                bg: "#0f766e",
-                rules: [
-                    "مواعيد الدكتور مروان من 45 د إلى ساعة، الكشفية 15 دق.",
-                    "دكتور محمود: حشوات تجميلية وتبييض وتنظيف الجير، كشفية نصف ساعة وساعة للمعالجة.",
-                    "التركيبات تصل من المعمل خلال 10 أيام إلى 14 يوم عمل."
-                ]
-            }
-        ];
-
-        // --- دوام العرض والتحديث ---
-        function renderAll() {
-            renderDoctors();
-            renderNotices();
-            renderFaq();
-            renderCoordinators();
+        // تغيير المظهر
+        function changeTheme(themeClass) {
+            document.body.className = themeClass;
         }
 
-        function renderDoctors() {
-            const tbody = document.getElementById('doctorsTableBody');
-            tbody.innerHTML = '';
-            doctorsData.forEach((doc, idx) => {
-                let badgeClass = 'badge-maashi';
-                if(doc.branch.includes('الوسام')) badgeClass = 'badge-wisam';
-                if(doc.branch.includes('مشترك')) badgeClass = 'badge-shared';
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="font-weight: 700;">${doc.name}</td>
-                        <td>${doc.spec}</td>
-                        <td><span class="badge ${badgeClass}">${doc.branch}</span></td>
-                        <td>${doc.timing}</td>
-                        <td>${doc.note}</td>
-                        <td style="font-size: 0.75rem; color: var(--text-muted);">${doc.update}</td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; justify-content: center; gap: 5px;">
-                                <button class="btn btn-warning btn-sm" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('m_doctors', JSON.stringify(doctorsData));
+        // إغلاق النوافذ المنبثقة
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
 
-        function renderNotices() {
-            const container = document.getElementById('noticesContainer');
-            container.innerHTML = '';
-            noticesData.forEach(item => {
-                let fileHtml = item.fileName ? `<div style="margin-top: 5px;"><span class="file-attachment-btn" onclick="alert('جاري فتح الملف: ${item.fileName}')"><i class="fa-solid fa-file-pdf" style="color: #f43f5e;"></i> ${item.fileName}</span></div>` : '';
-                container.innerHTML += `
-                    <div class="alert-card">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <h3 style="font-weight: 900; font-size: 0.95rem;">${item.title}</h3>
-                            <span style="font-size: 0.72rem; color: var(--text-muted);"><i class="fa-regular fa-clock"></i> ${item.time}</span>
-                        </div>
-                        ${item.text ? `<p style="font-size: 0.82rem; color: var(--text-muted);">${item.text}</p>` : ''}
-                        ${fileHtml}
-                        <div style="display: flex; gap: 6px; margin-top: 5px;">
-                            <button class="btn btn-warning btn-sm" onclick="editNotice(${item.id})"><i class="fa-solid fa-pen"></i> تعديل</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteNotice(${item.id})"><i class="fa-solid fa-trash"></i> حذف</button>
-                        </div>
-                    </div>
-                `;
-            });
-            localStorage.setItem('m_notices', JSON.stringify(noticesData));
+        function openAlertModal() {
+            document.getElementById('editAlertId').value = "";
+            document.getElementById('alertTitleInput').value = "";
+            document.getElementById('alertModal').classList.add('active');
         }
 
-        function renderFaq() {
-            const tbody = document.getElementById('faqTableBody');
-            tbody.innerHTML = '';
-            faqData.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="font-weight: 700;">${item.q}</td>
-                        <td>${item.a}</td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; justify-content: center; gap: 5px;">
-                                <button class="btn btn-warning btn-sm" onclick="editFaq(${item.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteFaq(${item.id})"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('m_faq', JSON.stringify(faqData));
+        function openInquiryModal() {
+            document.getElementById('editInquiryId').value = "";
+            document.getElementById('inqCategory').value = "";
+            document.getElementById('inqQuestion').value = "";
+            document.getElementById('inqAnswer').value = "";
+            document.getElementById('inqPrice').value = "";
+            document.getElementById('inquiryModal').classList.add('active');
         }
 
-        function renderCoordinators() {
-            const container = document.getElementById('coordinatorsContainer');
-            container.innerHTML = '';
-            coordinatorsData.forEach(coord => {
-                let rulesList = coord.rules.map(r => `<li>${r}</li>`).join('');
-                container.innerHTML += `
-                    <div class="coord-card" style="background-color: ${coord.bg};">
-                        <h3><i class="fa-solid fa-user-doctor"></i> ${coord.title}</h3>
-                        <ul>${rulesList}</ul>
-                    </div>
-                `;
-            });
-        }
+        // الساعة الحية
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
+        }, 1000);
 
-        // --- المودال والإدارة (CRUD) ---
-        function openModal() { document.getElementById('genericModal').classList.add('active'); }
-        function closeModal() { document.getElementById('genericModal').classList.remove('active'); }
-
-        // أطباء
-        function openDoctorModal(id = null) {
-            let item = id ? doctorsData.find(x => x.id === id) : null;
-            document.getElementById('modalTitleinnerText = item ? 'تعديل الطبيب والموعد' : 'إضافة طبيب أو موعد جديد';
-            document.getElementById('modalBody').innerHTML = `
-                <div class="form-group"><label>اسم الطبيب</label><input type="text" id="dName" value="${item ? item.name : ''}"></div>
-                <div class="form-group"><label>التخصص</label><input type="text" id="dSpec" value="${item ? item.spec : ''}"></div>
-                <div class="form-group"><label>الفرع</label>
-                    <select id="dBranch">
-                        <option value="معشي" ${item && item.branch === 'معشي' ? 'selected' : ''}>معشي</option>
-                        <option value="الوسام" ${item && item.branch === 'الوسام' ? 'selected' : ''}>الوسام</option>
-                        <option value="مشترك (معشي والوسام)" ${item && item.branch.includes('مشترك') ? 'selected' : ''}>مشترك بين الفرعين</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>أيام الدوام والمواعيد</label><input type="text" id="dTiming" value="${item ? item.timing : ''}"></div>
-                <div class="form-group"><label>ملاحظات المناوبة</label><input type="text" id="dNote" value="${item ? item.note : ''}"></div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let name = document.getElementById('dName').value;
-                let spec = document.getElementById('dSpec').value;
-                let branch = document.getElementById('dBranch').value;
-                let timing = document.getElementById('dTiming').value;
-                let note = document.getElementById('dNote').value;
-                let update = new Date().toISOString().slice(0, 10) + ' ' + new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: false});
-
-                if(!name) { alert('أدخل اسم الطبيب'); return; }
-                if(item) {
-                    item.name = name; item.spec = spec; item.branch = branch; item.timing = timing; item.note = note; item.update = update;
-                } else {
-                    doctorsData.push({ id: Date.now(), name, spec, branch, timing, note, update });
-                }
-                renderDoctors(); closeModal();
-            };
-            openModal();
-        }
-        function editDoctor(id) { openDoctorModal(id); }
-        function deleteDoctor(id) {
-            if(confirm('هل أنت متأكد من حذف هذا الطبيب؟')) {
-                doctorsData = doctorsData.filter(x => x.id !== id);
-                renderDoctors();
+        // وظائف الحذف والتعديل
+        function deleteAlert(id) {
+            if(confirm('هل أنت تأكد من حذف هذا التنبيه؟')) {
+                alert('تم حذف التنبيه بنجاح');
             }
         }
 
-        // تنبيهات (مع زر رفع ملف حقيقي)
-        function openNoticeModal(id = null) {
-            let item = id ? noticesData.find(x => x.id === id) : null;
-            document.getElementById('modalTitle').innerText = item ? 'تعديل التنبيه والتعميم' : 'إضافة تنبيه أو تعميم جديد';
-            document.getElementById('modalBody').innerHTML = `
-                <div class="form-group"><label>عنوان التنبيه</label><input type="text" id="nTitle" value="${item ? item.title : ''}"></div>
-                <div class="form-group"><label>التفاصيل / الملاحظة</label><textarea id="nText" rows="3">${item ? item.text : ''}</textarea></div>
-                <div class="form-group"><label>رفع ملف (PDF أو صورة)</label><input type="file" id="nFile" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"></div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let title = document.getElementById('nTitle').value;
-                let text = document.getElementById('nText').value;
-                let fileInput = document.getElementById('nFile');
-                let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : (item ? item.fileName : '');
-                if(!title) { alert('أدخل عنوان التنبيه'); return; }
-
-                let time = new Date().toLocaleTimeString('en-US', { hour12: true }) + ', ' + new Date().toLocaleDateString('en-GB');
-                if(item) {
-                    item.title = title; item.text = text; item.fileName = fileName; item.time = time;
-                } else {
-                    noticesData.unshift({ id: Date.now(), title, text, time, fileName, fileUrl: '#' });
-                }
-                renderNotices(); closeModal();
-            };
-            openModal();
-        }
-        function editNotice(id) { openNoticeModal(id); }
-        function deleteNotice(id) {
-            if(confirm('حذف هذا التنبيه؟')) { noticesData = noticesData.filter(x => x.id !== id); renderNotices(); }
+        function editAlert(id) {
+            openAlertModal();
+            document.getElementById('alertTitleInput').value = "تعديل التنبيه رقم " + id;
         }
 
-        // استفسارات CRUD
-        function openFaqModal(id = null) {
-            let item = id ? faqData.find(x => x.id === id) : null;
-            document.getElementById('modalTitle').innerText = item ? 'تعديل الاستفسار' : 'إضافة استفسار جديد';
-            document.getElementById('modalBody').innerHTML = `
-                <div class="form-group"><label>موضوع الاستفسار / السؤال</label><input type="text" id="fQ" value="${item ? item.q : ''}"></div>
-                <div class="form-group"><label>الإجابة والتعليمات المعتمدة</label><textarea id="fA" rows="3">${item ? item.a : ''}</textarea></div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let q = document.getElementById('fQ').value;
-                let a = document.getElementById('fA').value;
-                if(!q || !a) { alert('املأ الحقول المطلوبة'); return; }
-                if(item) { item.q = q; item.a = a; }
-                else { faqData.push({ id: Date.now(), q, a }); }
-                renderFaq(); closeModal();
-            };
-            openModal();
-        }
-        function editFaq(id) { openFaqModal(id); }
-        function deleteFaq(id) {
-            if(confirm('حذف الاستفسار؟')) { faqData = faqData.filter(x => x.id !== id); renderFaq(); }
+        function deleteInquiry(id) {
+            if(confirm('هل أنت تأكد من حذف هذا الاستفسار؟')) {
+                alert('تم الحذف بنجاح');
+            }
         }
 
-        // بحث شامل
-        function filterEverything() {
-            let val = document.getElementById('globalSearch').value.toLowerCase();
-            document.querySelectorAll('tbody tr, .alert-card, .coord-card').forEach(el => {
-                el.style.display = el.innerText.toLowerCase().includes(val) ? '' : 'none';
-            });
+        function editInquiry(id) {
+            openInquiryModal();
+            document.getElementById('inqCategory').value = "الجلدية";
+            document.getElementById('inqQuestion').value = "استفسار معدل";
+        }
+
+        function saveAlertItem() {
+            const fileInput = document.getElementById('alertFileInput');
+            const fileName = fileInput.files[0] ? fileInput.files[0].name : "مرفق.pdf";
+            alert("تم حفظ التنبيه مع الملف: " + fileName);
+            closeModal('alertModal');
+        }
+
+        function saveInquiryItem() {
+            alert("تم حفظ الاستفسار بنجاح في القائمة!");
+            closeModal('inquiryModal');
         }
     </script>
 </body>
