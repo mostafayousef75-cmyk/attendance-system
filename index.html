@@ -359,25 +359,27 @@
             overflow-x: auto;
         }
 
+        /* تصغير حجم الجداول والكروت وتنسيق النصوص لتكون مسلسلة ومريحة */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.73rem;
+            font-size: 0.70rem;
         }
 
         th, td {
-            padding: 0.3rem 0.4rem;
+            padding: 0.25rem 0.35rem;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
             font-weight: 400;
-            line-height: 1.2;
+            line-height: 1.3;
+            vertical-align: middle;
         }
 
         th {
             background-color: var(--bg-card);
             color: var(--text-muted);
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
         }
 
         .doctor-on-leave {
@@ -1177,20 +1179,20 @@
 
     <script>
         // --- DATA STORES ---
-        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v11')) || [
+        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v12')) || [
             { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة" }
         ];
 
-        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v11')) || [
+        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v12')) || [
             { id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }
         ];
 
-        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v11')) || [];
-        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v11')) || [];
-        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v11')) || [];
-        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v11')) || [];
-        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v11')) || [];
-        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v11')) || [];
+        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v12')) || [];
+        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v12')) || [];
+        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v12')) || [];
+        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v12')) || [];
+        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v12')) || [];
+        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v12')) || [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1221,7 +1223,6 @@
         });
 
         function switchTab(tabId, elem, save = true) {
-            // إخفاء نتائج البحث الشامل عند التنقل العادي
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             
             document.querySelectorAll('.page-section').forEach(s => {
@@ -1280,14 +1281,14 @@
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
                         
-                        localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
-                        localStorage.setItem('fridayScheduleStore_v11', JSON.stringify(fridaySchedules));
-                        localStorage.setItem('alertsDataStore_v11', JSON.stringify(alertsData));
-                        localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
-                        localStorage.setItem('deptServicesStore_v11', JSON.stringify(deptServicesData));
-                        localStorage.setItem('deptNotesStore_v11', JSON.stringify(deptNotesData));
-                        localStorage.setItem('offersDataStore_v11', JSON.stringify(offersData));
-                        localStorage.setItem('inquiriesDataStore_v11', JSON.stringify(inquiriesData));
+                        localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
+                        localStorage.setItem('fridayScheduleStore_v12', JSON.stringify(fridaySchedules));
+                        localStorage.setItem('alertsDataStore_v12', JSON.stringify(alertsData));
+                        localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
+                        localStorage.setItem('deptServicesStore_v12', JSON.stringify(deptServicesData));
+                        localStorage.setItem('deptNotesStore_v12', JSON.stringify(deptNotesData));
+                        localStorage.setItem('offersDataStore_v12', JSON.stringify(offersData));
+                        localStorage.setItem('inquiriesDataStore_v12', JSON.stringify(inquiriesData));
 
                         alert("تم استيراد البيانات بنجاح!");
                         location.reload();
@@ -1325,7 +1326,7 @@
                 fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal });
             }
 
-            localStorage.setItem('fridayScheduleStore_v11', JSON.stringify(fridaySchedules));
+            localStorage.setItem('fridayScheduleStore_v12', JSON.stringify(fridaySchedules));
             document.getElementById('fridayDocName').value = "";
             document.getElementById('fridayDate').value = "";
             renderFridayScheduleTable();
@@ -1345,7 +1346,7 @@
         function deleteFridaySchedule(id) {
             if (confirm("هل تريد حذف هذه المناوبة؟")) {
                 fridaySchedules = fridaySchedules.filter(f => f.id !== id);
-                localStorage.setItem('fridayScheduleStore_v11', JSON.stringify(fridaySchedules));
+                localStorage.setItem('fridayScheduleStore_v12', JSON.stringify(fridaySchedules));
                 renderFridayScheduleTable();
                 renderDoctors();
             }
@@ -1370,7 +1371,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (مع تنسيق وفرد الكلام بشكل أفقي ومنظم) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1413,17 +1414,21 @@
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.65rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
+                // تنسيق الأيام والمواعيد بشكل مسلسلات أفقية مرتبة لتوفير المساحة وعدم التكدس
+                const mashyDaysFormatted = mashyDays.length > 0 ? mashyDays.join(' ، ') : 'لا يوجد';
+                const wissamDaysFormatted = wissamDays.length > 0 ? wissamDays.join(' ، ') : 'لا يوجد';
+
                 if (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) {
                     mashyBody.innerHTML += `
                         <tr class="${rowClass}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td><strong>${doc.timing}</strong><br><small style="color:#34d399;">معشي: ${mashyDays.join(' ، ') || 'لا يوجد'}</small></td>
-                            <td style="color:#f59e0b; font-size:0.7rem;">${doc.notes || '-'}</td>
+                            <td><span style="color:#60a5fa; font-weight:600;">${doc.timing}</span><br><small style="color:#34d399;">أيام الدوام: ${mashyDaysFormatted}</small></td>
+                            <td style="color:#f59e0b; font-size:0.68rem;">${doc.notes || '-'}</td>
                             <td>
-                                <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -1436,11 +1441,11 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td><strong>${doc.timing}</strong><br><small style="color:#34d399;">الوسام: ${wissamDays.join(' ، ') || 'لا يوجد'}</small></td>
-                            <td style="color:#f59e0b; font-size:0.7rem;">${doc.notes || '-'}</td>
+                            <td><span style="color:#60a5fa; font-weight:600;">${doc.timing}</span><br><small style="color:#34d399;">أيام الدوام: ${wissamDaysFormatted}</small></td>
+                            <td style="color:#f59e0b; font-size:0.68rem;">${doc.notes || '-'}</td>
                             <td>
-                                <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -1466,7 +1471,7 @@
             const targetIdx = doctorsData.findIndex(d => d.id === targetId);
             const moved = doctorsData.splice(oldIdx, 1)[0];
             doctorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
             renderDoctors();
         }
 
@@ -1513,7 +1518,7 @@
                 doctorsData[idx] = docObj;
             } else { doctorsData.push(docObj); }
 
-            localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
+            localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
             renderDoctors();
             closeModal('doctorModal');
         }
@@ -1545,7 +1550,7 @@
         function deleteDoctor(id) {
             if (confirm("حذف هذا الطبيب؟")) {
                 doctorsData = doctorsData.filter(d => d.id !== id);
-                localStorage.setItem('docDataStore_v11', JSON.stringify(doctorsData));
+                localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
                 renderDoctors();
             }
         }
@@ -1661,7 +1666,7 @@
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
 
-            localStorage.setItem('alertsDataStore_v11', JSON.stringify(alertsData));
+            localStorage.setItem('alertsDataStore_v12', JSON.stringify(alertsData));
             renderAlerts();
             closeModal('alertModal');
         }
@@ -1689,7 +1694,7 @@
         function deleteAlert(id) {
             if (confirm("حذف هذا التنبيه؟")) {
                 alertsData = alertsData.filter(a => a.id !== id);
-                localStorage.setItem('alertsDataStore_v11', JSON.stringify(alertsData));
+                localStorage.setItem('alertsDataStore_v12', JSON.stringify(alertsData));
                 renderAlerts();
             }
         }
@@ -1752,7 +1757,7 @@
                 const idx = deptServicesData.findIndex(s => s.id == id);
                 deptServicesData[idx] = rowObj;
             } else { deptServicesData.push(rowObj); }
-            localStorage.setItem('deptServicesStore_v11', JSON.stringify(deptServicesData));
+            localStorage.setItem('deptServicesStore_v12', JSON.stringify(deptServicesData));
             renderDeptsAndDocs();
             closeModal('deptServiceModal');
         }
@@ -1771,7 +1776,7 @@
         function deleteDeptService(id) {
             if (confirm("حذف الصف؟")) {
                 deptServicesData = deptServicesData.filter(s => s.id !== id);
-                localStorage.setItem('deptServicesStore_v11', JSON.stringify(deptServicesData));
+                localStorage.setItem('deptServicesStore_v12', JSON.stringify(deptServicesData));
                 renderDeptsAndDocs();
             }
         }
@@ -1781,14 +1786,14 @@
             const txt = document.getElementById('deptNoteText').value.trim();
             if (!txt) return;
             deptNotesData.push(txt);
-            localStorage.setItem('deptNotesStore_v11', JSON.stringify(deptNotesData));
+            localStorage.setItem('deptNotesStore_v12', JSON.stringify(deptNotesData));
             renderDeptsAndDocs();
             closeModal('deptNoteModal');
         }
         function deleteDeptNote(idx) {
             if (confirm("حذف الملحوظة؟")) {
                 deptNotesData.splice(idx, 1);
-                localStorage.setItem('deptNotesStore_v11', JSON.stringify(deptNotesData));
+                localStorage.setItem('deptNotesStore_v12', JSON.stringify(deptNotesData));
                 renderDeptsAndDocs();
             }
         }
@@ -1820,7 +1825,7 @@
             if (draggedCoordIdx === null || draggedCoordIdx === targetIdx) return;
             const moved = coordinatorsData.splice(draggedCoordIdx, 1)[0];
             coordinatorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
             renderCoordinators();
         }
 
@@ -1838,7 +1843,7 @@
                 const idx = coordinatorsData.findIndex(c => c.id == id);
                 coordinatorsData[idx] = obj;
             } else { coordinatorsData.push(obj); }
-            localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
+            localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
             renderCoordinators();
             closeModal('coordModal');
         }
@@ -1854,7 +1859,7 @@
         function deleteCoordinator(id) {
             if (confirm("حذف؟")) {
                 coordinatorsData = coordinatorsData.filter(c => c.id !== id);
-                localStorage.setItem('coordDataStore_v11', JSON.stringify(coordinatorsData));
+                localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
                 renderCoordinators();
             }
         }
@@ -1919,7 +1924,7 @@
                 const idx = offersData.findIndex(o => o.id == id);
                 offersData[idx] = obj;
             } else { offersData.push(obj); }
-            localStorage.setItem('offersDataStore_v11', JSON.stringify(offersData));
+            localStorage.setItem('offersDataStore_v12', JSON.stringify(offersData));
             selectedOfferTab = cat;
             renderOffersTabs();
             renderOffers();
@@ -1938,7 +1943,7 @@
         function deleteOffer(id) {
             if (confirm("حذف؟")) {
                 offersData = offersData.filter(o => o.id !== id);
-                localStorage.setItem('offersDataStore_v11', JSON.stringify(offersData));
+                localStorage.setItem('offersDataStore_v12', JSON.stringify(offersData));
                 renderOffersTabs();
                 renderOffers();
             }
@@ -1995,7 +2000,7 @@
                 const idx = inquiriesData.findIndex(i => i.id == id);
                 inquiriesData[idx] = obj;
             } else { inquiriesData.push(obj); }
-            localStorage.setItem('inquiriesDataStore_v11', JSON.stringify(inquiriesData));
+            localStorage.setItem('inquiriesDataStore_v12', JSON.stringify(inquiriesData));
             renderInquiries();
             closeModal('inquiryModal');
         }
@@ -2010,12 +2015,12 @@
         function deleteInquiry(id) {
             if (confirm("حذف؟")) {
                 inquiriesData = inquiriesData.filter(i => i.id !== id);
-                localStorage.setItem('inquiriesDataStore_v11', JSON.stringify(inquiriesData));
+                localStorage.setItem('inquiriesDataStore_v12', JSON.stringify(inquiriesData));
                 renderInquiries();
             }
         }
 
-        // --- 8. TRUE GLOBAL DEEP SEARCH (بحث شامل حقيقي في كافة أقسام الموقع مع ذكر مصدر القسم والصفحة) ---
+        // --- 8. TRUE GLOBAL DEEP SEARCH ---
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -2028,14 +2033,12 @@
                 return;
             }
 
-            // إخفاء جميع الأقسام وإظهار قسم نتائج البحث الشامل
             document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
             let foundCount = 0;
 
-            // 1. البحث في الأطباء
             doctorsData.forEach(d => {
                 if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q)) || (d.notes && d.notes.toLowerCase().includes(q))) {
                     foundCount++;
@@ -2046,13 +2049,12 @@
                                 <h4 style="margin-top:0.3rem;">${d.name} - ${d.specialty}</h4>
                                 <p style="font-size:0.75rem; color:var(--text-muted);">الكشفية: ${d.fee || 'مجانية'} | الدوام: ${d.timing}</p>
                             </div>
-                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule', '${d.name}')">عرض بالصفحة</button>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule')">عرض بالصفحة</button>
                         </div>
                     `;
                 }
             });
 
-            // 2. البحث في مناوبات الجمعة
             fridaySchedules.forEach(f => {
                 if (f.doc.toLowerCase().includes(q) || f.date.includes(q) || f.branch.toLowerCase().includes(q)) {
                     foundCount++;
@@ -2069,7 +2071,6 @@
                 }
             });
 
-            // 3. البحث في العروض والأسعار
             offersData.forEach(o => {
                 if (o.name.toLowerCase().includes(q) || o.category.toLowerCase().includes(q) || o.price.toLowerCase().includes(q)) {
                     foundCount++;
@@ -2086,7 +2087,6 @@
                 }
             });
 
-            // 4. البحث في التنبيهات والإشعارات
             alertsData.forEach(a => {
                 if (a.content.toLowerCase().includes(q)) {
                     foundCount++;
@@ -2103,7 +2103,6 @@
                 }
             });
 
-            // 5. البحث في دليل المنسقين
             coordinatorsData.forEach(c => {
                 const matchRules = c.rules.some(r => r.toLowerCase().includes(q));
                 if (c.name.toLowerCase().includes(q) || matchRules) {
@@ -2121,7 +2120,6 @@
                 }
             });
 
-            // 6. البحث في الاستفسارات
             inquiriesData.forEach(i => {
                 if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)) {
                     foundCount++;
