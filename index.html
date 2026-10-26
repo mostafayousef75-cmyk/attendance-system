@@ -1332,7 +1332,7 @@
             if (targetSec) targetSec.classList.add('active');
             if (elem) elem.classList.add('active');
 
-            if (save) localStorage.getItem('activeTab', tabId);
+            if (save) localStorage.setItem('activeTab', tabId);
         }
 
         function changeTheme(themeName) {
@@ -1460,7 +1460,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (فلتر التخصص، وتقليل المساحات، وتلوين الكشفية والملاحظات بأصفر فاتح) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (تصميم شارات المواعيد النظيفة، وإخفاء الفروع الفارغة) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1550,8 +1550,15 @@
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
-                const mashyDaysFormatted = mashyDays.length > 0 ? mashyDays.join(' ، ') : 'لا يوجد';
-                const wissamDaysFormatted = wissamDays.length > 0 ? wissamDays.join(' ، ') : 'لا يوجد';
+                // تنسيق المواعيد بشكل شارات (Badges) نظيفة ومختصرة بدلاً من التكدس
+                let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
+                
+                if (mashyDays.length > 0) {
+                    scheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div><br>`;
+                }
+                if (wissamDays.length > 0) {
+                    scheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
+                }
 
                 if (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) {
                     mashyBody.innerHTML += `
@@ -1559,11 +1566,7 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td>
-                                <span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br>
-                                <small style="color:#38bdf8; font-weight:700;">معشي: ${mashyDaysFormatted}</small><br>
-                                <small style="color:#4ade80; font-weight:700;">الوسام: ${wissamDaysFormatted}</small>
-                            </td>
+                            <td>${scheduleHtml}</td>
                             <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
@@ -1581,11 +1584,7 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td>
-                                <span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br>
-                                <small style="color:#38bdf8; font-weight:700;">معشي: ${mashyDaysFormatted}</small><br>
-                                <small style="color:#4ade80; font-weight:700;">الوسام: ${wissamDaysFormatted}</small>
-                            </td>
+                            <td>${scheduleHtml}</td>
                             <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
