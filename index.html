@@ -1,552 +1,892 @@
+tml>
+``````html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مؤشر الأداء والمواعيد - مجمع ماجستي الطبي</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
+    <title>لوحة التحكم والخدمات - مركز العيادات</title>
+    <!-- Tajawal Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { cairo: ['Cairo', 'sans-serif'] },
-                    colors: {
-                        brand: { 500: '#2563eb', 600: '#1d4ed8' },
-                        darkBg: '#0b1329',
-                        darkCard: '#111c38',
-                        darkHeader: '#080f21',
-                        darkBorder: '#1e293b'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { font-family: 'Cairo', sans-serif; }
-        .alert-card-border { border-right: 4px solid #f97316; }
-        .shared-doctor-row { background-color: rgba(124, 58, 237, 0.15) !important; }
+        :root {
+            --font-family: 'Tajawal', sans-serif;
+            --bg-base: #000000;
+            --bg-surface: #0a0a0a;
+            --bg-card: #121212;
+            --bg-sidebar: #050505;
+            --text-main: #f3f4f6;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            
+            --primary-color: #f59e0b;
+            --primary-hover: #d97706;
+            --accent-purple: #7c3aed;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --success-color: #16a34a;
+
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.4);
+            --radius-lg: 12px;
+            --radius-md: 8px;
+        }
+
+        /* السيم الأزرق الغامق */
+        body.theme-darkblue {
+            --bg-base: #080c14;
+            --bg-surface: #0f172a;
+            --bg-card: #050914;
+            --bg-sidebar: #0b1329;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+        }
+
+        /* سيم OLED الأسود (Amoled) */
+        body.theme-amoled {
+            --bg-base: #000000;
+            --bg-surface: #0a0a0a;
+            --bg-card: #121212;
+            --bg-sidebar: #050505;
+            --text-main: #f3f4f6;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --primary-color: #f59e0b;
+            --primary-hover: #d97706;
+        }
+
+        /* سيم الرصاصي الفحمي */
+        body.theme-gray {
+            --bg-base: #121214;
+            --bg-surface: #1a1a1e;
+            --bg-card: #0d0d0f;
+            --bg-sidebar: #151518;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+        }
+
+        /* السيم المضيء الفاتح */
+        body.theme-light {
+            --bg-base: #f1f5f9;
+            --bg-surface: #ffffff;
+            --bg-card: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+        }
+
+        /* تطبيق المتغيرات الأساسية */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bg-surface);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Theme Selector Controls */
+        .theme-selector-box {
+            padding: 1rem 0 0 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .theme-selector-box label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-select {
+            width: 100%;
+            padding: 0.6rem;
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Main Content Layout */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header Bar */
+        .top-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            outline: none;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Banner Notifications (Pinned at top) */
+        .pinned-alerts-banner {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .alert-pill {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-pill .badge {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: bold;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: var(--bg-base);
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* Buttons & Controls */
+        .btn {
+            background-color: var(--primary-color);
+            color: #000000;
+            font-weight: 700;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-family);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Compact Data Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .tag-branch {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .tag-mashy { background: #1e3a8a; color: #93c5fd; }
+        .tag-wissam { background: #581c87; color: #e9d5ff; }
+        .tag-both { background: #713f12; color: #fef08a; }
+
+        /* Media & Attachment Card Grids */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            padding: 0.6rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            outline: none;
+        }
+
+        /* File Preview Modal */
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+        }
+
+        .highlight-text {
+            background-color: var(--primary-color);
+            color: #000;
+            padding: 0 0.2rem;
+            border-radius: 2px;
+        }
     </style>
 </head>
-<body class="bg-[#0b1329] text-slate-100 min-h-screen pb-12 transition-colors duration-200" id="bodyTag">
+<body class="theme-amoled">
 
-    <!-- Top Navbar -->
-    <header class="bg-[#080f21] border-b border-slate-800 sticky top-0 z-50 px-4 py-3 shadow-md">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand-title">
+            <i class="fa-solid fa-headset"></i>
+            <span>لوحة الكول سنتر</span>
+        </div>
+        <ul class="nav-links">
+            <li><a class="nav-link active" onclick="switchTab('schedule')"><i class="fa-solid fa-calendar-check"></i> مواعيد الأطباء</a></li>
+            <li><a class="nav-link" onclick="switchTab('alerts')"><i class="fa-solid fa-bullhorn"></i> التنبيهات والتعاميم</a></li>
+            <li><a class="nav-link" onclick="switchTab('inquiries')"><i class="fa-solid fa-circle-question"></i> دليل الاستفسارات</a></li>
+            <li><a class="nav-link" onclick="switchTab('handover')"><i class="fa-solid fa-users-gear"></i> تسليم المنسقين</a></li>
+        </ul>
+        
+        <!-- Theme Controls -->
+        <div class="theme-selector-box">
+            <label for="themeSelect"><i class="fa-solid fa-palette"></i> اختيار المظهر (السيم)</label>
+            <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
+                <option value="theme-amoled">OLED أسود (Amoled)</option>
+                <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
+                <option value="theme-gray">رصاصي فحمي (Gray)</option>
+                <option value="theme-light">مضيء فاتح (Light)</option>
+            </select>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <main class="main-wrapper">
+        <!-- Top Search Header -->
+        <header class="top-header">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="globalSearch" placeholder="بحث شامل في المواعيد، الخدمات، والاستفسارات..." oninput="handleGlobalSearch(this.value)">
+            </div>
+            <div id="timestamp" style="font-size:0.85rem; color: var(--text-muted);"></div>
+        </header>
+
+        <!-- Top Pinned Notifications Banner -->
+        <div class="pinned-alerts-banner" id="pinnedBanner">
+            <div class="alert-pill"><span class="badge">تنبيه هام</span> مناوبات الجمعة تحدّث أسبوعياً عبر الفرعين</div>
+        </div>
+
+        <!-- Main Dynamic Content Container -->
+        <div class="content-area">
             
-            <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="p-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-bold text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-bars"></i> القائمة
-                </button>
-                <h1 class="text-lg md:text-xl font-extrabold flex items-center gap-2 text-white">
-                    <i class="fa-solid fa-hospital text-blue-500"></i> مجمع ماجستي الطبي
-                </h1>
-            </div>
-
-            <!-- Global Search Bar -->
-            <div class="relative flex-1 max-w-md">
-                <input type="text" id="globalSearch" onkeyup="filterEverything()" placeholder="بحث سريع في المواعيد، التنبيهات، والأطباء..." 
-                       class="w-full bg-slate-900 border border-slate-700 text-sm rounded-lg pr-10 pl-4 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <i class="fa-solid fa-search absolute right-3 top-3 text-slate-400"></i>
-            </div>
-
-            <!-- Themes Select -->
-            <div class="flex items-center gap-2">
-                <label class="text-xs text-slate-400 font-semibold hidden md:block">السيم:</label>
-                <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-slate-800 text-slate-200 text-xs border border-slate-700 rounded-lg px-3 py-2 focus:outline-none">
-                    <option value="theme-blue">الأزرق الغامق</option>
-                    <option value="theme-oled">OLED الأسود</option>
-                    <option value="theme-charcoal">الرصاصي الفحمي</option>
-                    <option value="theme-light">المضيء الفاتح</option>
-                </select>
-            </div>
-        </div>
-    </header>
-
-    <!-- Sidebar Menu -->
-    <div id="sidebar" class="fixed inset-y-0 right-0 w-64 bg-[#080f21] border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 p-5 flex flex-col gap-4 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-            <h2 class="font-bold text-lg text-white"><i class="fa-solid fa-compass text-blue-400"></i> الأقسام السريعة</h2>
-            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <a href="#noticesSection" onclick="toggleSidebar()" class="p-2.5 rounded-lg hover:bg-blue-600/30 text-sm font-semibold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-bullhorn text-amber-400"></i> التنبيهات والإشعارات</a>
-        <a href="#scheduleSection" onclick="toggleSidebar()" class="p-2.5 rounded-lg hover:bg-blue-600/30 text-sm font-semibold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-blue-400"></i> جدول دوام الأطباء</a>
-        <a href="#coordinatorsSection" onclick="toggleSidebar()" class="p-2.5 rounded-lg hover:bg-blue-600/30 text-sm font-semibold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-tie text-emerald-400"></i> صفحة المنسقين والقواعد</a>
-        <a href="#faqSection" onclick="toggleSidebar()" class="p-2.5 rounded-lg hover:bg-blue-600/30 text-sm font-semibold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-circle-question text-purple-400"></i> دليل الاستفسارات والسياسات</a>
-        <a href="#servicesSection" onclick="toggleSidebar()" class="p-2.5 rounded-lg hover:bg-blue-600/30 text-sm font-semibold flex items-center gap-2 text-slate-200"><i class="fa-solid fa-layer-group text-rose-400"></i> الأقسام والأجهزة والخدمات</a>
-    </div>
-
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 mt-6 flex flex-col gap-6">
-
-        <!-- 1. واجهة التنبيهات والإشعارات المصممة كالصورة بالضبط -->
-        <section id="noticesSection" class="bg-[#111c38] border border-slate-800 rounded-xl p-4 shadow-lg">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h2 class="text-base font-bold text-blue-400 flex items-center gap-2">
-                    <i class="fa-solid fa-bullhorn text-amber-400"></i> تنبيهات وإشعارات العيادة العامة
-                </h2>
-                <!-- زر الأخضر زمردي المميز إضافة تنبيه جديد -->
-                <button onclick="openNoticeModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-1.5 shadow">
-                    <i class="fa-solid fa-plus"></i> إضافة تنبيه جديد
-                </button>
-            </div>
-
-            <!-- قائمة الكروت بنفس تصميم الصورة -->
-            <div id="noticesContainer" class="flex flex-col gap-3 max-h-96 overflow-y-auto pr-1">
-                <!-- يتم التعبئة ديناميكياً بواسطة JS -->
-            </div>
-        </section>
-
-        <!-- 2. جدول دوام الأطباء المنظم مسبقاً (معشي والوسام مع تمييز الأطباء المشتركين) -->
-        <section id="scheduleSection" class="bg-[#111c38] border border-slate-800 rounded-xl p-4 shadow-lg">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h2 class="text-base font-bold text-blue-400 flex items-center gap-2">
-                    <i class="fa-solid fa-user-doctor"></i> جدول دوام الأطباء الرسمي (معشي والوسام)
-                </h2>
-                <button onclick="openDoctorModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1">
-                    <i class="fa-solid fa-plus"></i> إضافة طبيب / شفت
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <!-- فرع معشي -->
-                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-3">
-                    <div class="font-bold text-sm text-blue-400 border-b border-slate-800 pb-2 mb-3 flex justify-between items-center">
-                        <span><i class="fa-solid fa-building-user ml-1"></i> فــــــرع مـــــعــــشـــــي</span>
-                        <span class="text-[10px] bg-blue-950 text-blue-300 px-2 py-0.5 rounded">الدوام الأساسي</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs text-right border-collapse">
-                            <thead>
-                                <tr class="bg-slate-800 text-slate-400 border-b border-slate-700">
-                                    <th class="p-2">الطبيب والتخصص</th>
-                                    <th class="p-2">أيام وأوقات التواجد</th>
-                                    <th class="p-2">ملاحظات</th>
-                                    <th class="p-2 text-center">إجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="maashiTableBody" class="divide-y divide-slate-800"></tbody>
-                        </table>
-                    </div>
+            <!-- Tab 1: Schedules (Doctor Timetable) -->
+            <section id="schedule-section" class="page-section active">
+                <div class="section-header">
+                    <h2 class="section-title">جدول دوام الأطباء المقسّم (فرع معشي / الوسام)</h2>
+                    <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب / موعد</button>
                 </div>
-
-                <!-- فرع الوسام -->
-                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-3">
-                    <div class="font-bold text-sm text-purple-400 border-b border-slate-800 pb-2 mb-3 flex justify-between items-center">
-                        <span><i class="fa-solid fa-clinic-medical ml-1"></i> فــــــرع الـــوســــــــام</span>
-                        <span class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded">يشمل المختبر والطوارئ</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs text-right border-collapse">
-                            <thead>
-                                <tr class="bg-slate-800 text-slate-400 border-b border-slate-700">
-                                    <th class="p-2">الطبيب والتخصص</th>
-                                    <th class="p-2">أيام وأوقات التواجد</th>
-                                    <th class="p-2">مناوبات الجمعة</th>
-                                    <th class="p-2 text-center">إجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="wisamTableBody" class="divide-y divide-slate-800"></tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم الطبيب</th>
+                                <th>التخصص</th>
+                                <th>الفرع</th>
+                                <th>أيام الدوام والمواعيد</th>
+                                <th>ملاحظات المناوبة</th>
+                                <th>آخر تحديث</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorsTableBody">
+                            <!-- Populated Dynamically -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- 3. صفحة المنسقين والقواعد المعتمدة من الشيت -->
-        <section id="coordinatorsSection" class="bg-[#111c38] border border-slate-800 rounded-xl p-4 shadow-lg">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">
-                    <i class="fa-solid fa-user-tie"></i> صفحة المنسقين وقواعد المواعيد والسيستم (كايزن)
-                </h2>
-                <button onclick="openCoordModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1">
-                    <i class="fa-solid fa-plus"></i> إضافة قاعدة جديدة
-                </button>
-            </div>
-            <div id="coordContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </section>
+            <!-- Tab 2: Alerts & Attachments -->
+            <section id="alerts-section" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">إشعارات وتنبيهات العيادة العامة (المرفقات والمستندات)</h2>
+                    <button class="btn" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه جديد</button>
+                </div>
+                <div class="cards-grid" id="alertsGrid">
+                    <!-- Dynamic Cards -->
+                </div>
+            </section>
 
-        <!-- 4. دليل الاستفسارات والسياسات الشائعة -->
-        <section id="faqSection" class="bg-[#111c38] border border-slate-800 rounded-xl p-4 shadow-lg">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
-                <h2 class="text-base font-bold text-purple-400 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-question"></i> دليل الاستفسارات وسياسات العيادة
-                </h2>
-                <button onclick="openFaqModal()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1">
-                    <i class="fa-solid fa-plus"></i> إضافة استفسار
-                </button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-right border-collapse">
-                    <thead>
-                        <tr class="bg-slate-800 text-slate-400 border-b border-slate-700">
-                            <th class="p-2.5 w-1/4">موضوع الاستفسار</th>
-                            <th class="p-2.5">التعليمات المعتمدة للكول سنتر</th>
-                            <th class="p-2.5 text-center w-24">إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="faqTableBody" class="divide-y divide-slate-800"></tbody>
-                </table>
-            </div>
-        </section>
+            <!-- Tab 3: Inquiries & Clinic Directory -->
+            <section id="inquiries-section" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">دليل الاستفسارات، الخدمات، والأسعار</h2>
+                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار / خدمة</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>القسم / الخدمة</th>
+                                <th>السؤال / الاستفسار الشائع</th>
+                                <th>الإجابة / السياسة المعتمدة</th>
+                                <th>السعر / العرض</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiriesTableBody">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-        <!-- 5. الأقسام والخدمات والأجهزة -->
-        <section id="servicesSection" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-[#111c38] border border-slate-800 rounded-xl p-4 shadow-lg">
-                <h3 class="font-bold text-sm text-blue-400 border-b border-slate-800 pb-2 mb-3"><i class="fa-solid fa-microscope ml-1"></i> قسم الجلدية والتجميل والأجهزة</h3>
-                <ul class="text-xs space-y-2 text-slate-300 leading-relaxed list-disc pr-4">
-                    <li><b>جهاز جنتل ماكس برو (GentleMax Pro):</b> إزالة الشعر بالليزر بالفرعين (ممرضة واحدة بالفرع للجنتل)[cite: 1].</li>
-                    <li><b>جهاز كلاريتي تو (Clarity II):</b> إزالة شعر وتجميل وممتاز للشعر السميك[cite: 1].</li>
-                    <li><b>جهاز هيليوس / سبيكترا:</b> ليزر كربوني، تشقير، توريد شفايف، وإزالة تاتو[cite: 1].</li>
-                    <li><b>هايدرا تاتش:</b> تنظيف بشرة عميق وإزالة الرؤوس السوداء (ميشيل بالوسام وضحى بمعشي)[cite: 1].</li>
-                    <li><b>تجهيز الليزر:</b> حلاقة الشعر قبلها بـ 24 ساعة (أو بالعيادة بـ 50 ريال للفل بدي)[cite: 1].</li>
-                </ul>
-            </div>
-            <div class="bg-[#111c38] border border-slate-800 rounded-xl p-4 shadow-lg">
-                <h3 class="font-bold text-sm text-purple-400 border-b border-slate-800 pb-2 mb-3"><i class="fa-solid fa-tooth ml-1"></i> قسم الأسنان والأشعة والمختبر</h3>
-                <ul class="text-xs space-y-2 text-slate-300 leading-relaxed list-disc pr-4">
-                    <li><b>مايكروسكوب علاج العصب:</b> لمعالجة الجذور المعقدة[cite: 1].</li>
-                    <li><b>جهاز البيزو (Piezo):</b> جراحة وتوسيع العظم وقص الفك[cite: 1].</li>
-                    <li><b>تبييض الزوم (Zoom White):</b> تبييض الأسنان السريع مع كشفية مجانية[cite: 1].</li>
-                    <li><b>الأشعة والمختبر:</b> بانوراما، سيفالومتريك، 3D (بمعشي فقط، لايوجد خصم على الأشعة)[cite: 1].</li>
-                    <li><b>إبر العضل والتحاليل:</b> إبرة العضل 10 ريال (الوسام)، متوفر تحاليل تساقط الشعر والشاملة[cite: 1].</li>
-                </ul>
-            </div>
-        </section>
+            <!-- Tab 4: Coordinators Handover Log -->
+            <section id="handover-section" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">سجل تسليم وتأكيد العملاء بين المنسقين</h2>
+                    <button class="btn" onclick="openHandoverModal()"><i class="fa-solid fa-user-plus"></i> إضافة عميل للمتابعة</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم العميل</th>
+                                <th>رقم التواصل</th>
+                                <th>الفرع / الطبيب</th>
+                                <th>حالة المتابعة</th>
+                                <th>الملاحظات / التحديث</th>
+                                <th>وقت التعديل</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="handoverTableBody">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
+        </div>
     </main>
 
-    <!-- Modal Dynamic Window -->
-    <div id="modalOverlay" class="fixed inset-0 bg-black/75 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#111c38] border border-slate-700 rounded-xl w-full max-w-md p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                <h3 id="modalTitle" class="font-bold text-white text-base">إضافة / تعديل</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Modals for CRUD -->
+    <!-- Modal 1: Doctor Schedule Modal -->
+    <div class="modal-overlay" id="doctorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="doctorModalTitle">إضافة موعد طبيب</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="closeModal('doctorModal')"></i>
             </div>
-            <div id="modalBody" class="space-y-3"></div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-700">
-                <button onclick="closeModal()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">إلغاء</button>
-                <button id="modalSaveBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-1.5 rounded-lg">حفظ التغييرات</button>
+            <input type="hidden" id="docId">
+            <div class="form-group">
+                <label>اسم الطبيب</label>
+                <input type="text" id="docName" class="form-control" required>
             </div>
+            <div class="form-group">
+                <label>التخصص</label>
+                <input type="text" id="docSpecialty" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>الفرع</label>
+                <select id="docBranch" class="form-control">
+                    <option value="معشي">فرع معشي</option>
+                    <option value="الوسام">فرع الوسام</option>
+                    <option value="مشترك (معشي والوسام)">مشترك (الفرعين)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>أيام ومواعيد الدوام</label>
+                <input type="text" id="docTiming" class="form-control" placeholder="مثال: السبت - الخميس (4 م - 10 م)">
+            </div>
+            <div class="form-group">
+                <label>ملاحظات المناوبة</label>
+                <input type="text" id="docNotes" class="form-control" placeholder="مناوبة الجمعة / حجز مسبق">
+            </div>
+            <button class="btn" onclick="saveDoctor()">حفظ البيانات</button>
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Modal 2: Alert Modal -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>إضافة تنبيه / تعميم</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="closeModal('alertModal')"></i>
+            </div>
+            <input type="hidden" id="alertId">
+            <div class="form-group">
+                <label>عنوان التنبيه</label>
+                <input type="text" id="alertTitle" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>تفاصيل التنبيه</label>
+                <textarea id="alertContent" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>رابط صورة / ملف مرفق</label>
+                <input type="text" id="alertMedia" class="form-control" placeholder="https://example.com/image.jpg">
+            </div>
+            <button class="btn" onclick="saveAlert()">نشر التنبيه</button>
+        </div>
+    </div>
+
+    <!-- Lightbox Preview Modal -->
+    <div class="modal-overlay" id="lightboxModal" onclick="closeModal('lightboxModal')">
+        <img id="lightboxImg" class="lightbox-img" src="" alt="المرفق">
+    </div>
+
+    <!-- JavaScript Logic & Theme Script Integration -->
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('translate-x-full');
+        // 1. Theme Management Script
+        function changeTheme(themeName) {
+            document.body.className = themeName;
+            localStorage.setItem('theme', themeName);
+            const selectEl = document.getElementById('themeSelect');
+            if (selectEl) selectEl.value = themeName;
         }
 
-        function changeTheme(theme) {
-            const body = document.getElementById('bodyTag');
-            if (theme === 'theme-oled') {
-                body.className = "bg-black text-white min-h-screen pb-12";
-            } else if (theme === 'theme-charcoal') {
-                body.className = "bg-zinc-900 text-zinc-100 min-h-screen pb-12";
-            } else if (theme === 'theme-light') {
-                body.className = "bg-slate-100 text-slate-900 min-h-screen pb-12";
-            } else {
-                body.className = "bg-[#0b1329] text-slate-100 min-h-screen pb-12";
-            }
-            localStorage.setItem('selected_theme', theme);
-        }
-
-        // --- البيانات وتخزينها محلياً ---
-        let notices = JSON.parse(localStorage.getItem('m_notices')) || [
-            { id: 1, title: "عروض أكتوبر", text: "تحديث عروض الشهر لجميع الفروع.", time: "02:55:35PM, 24/10/2026", fileUrl: "", fileName: "عروض اكتوبر.pdf" },
-            { id: 2, title: "د. تبيان من يوم السبت متواجدة في فرع معشي من 2-10", text: "🔴🔴 تنبيه هام لجميع موظفي الشيفتات.", time: "02:06:41PM, 24/10/2026", fileUrl: "", fileName: "" },
-            { id: 3, title: "عرض ليزر جنتل ماكس برو", text: "إذا أحد أبرز لكم هذا العرض، الجهاز المستخدم هو جنتل ماكس برو.", time: "09:33:31PM, 20/10/2026", fileUrl: "https://via.placeholder.com/150", fileName: "صورة_العرض.jpg" }
-        ];
-
-        let maashiDocs = JSON.parse(localStorage.getItem('m_maashi')) || [
-            { name: "د. سامي الدبعي", spec: "استشاري جراحة وجه وفكين وزراعة", timing: "يومياً ماعدا السبت (1م - 10م)", note: "كشفية 100 / منسقة دايركت", isShared: false },
-            { name: "د. محمود اللبان", spec: "أخصائي تركيبات وزراعة", timing: "9ص - 12م / 4:30م - 9:30م", note: "عدم حجز انتظار لو منتظرة تركيب", isShared: false },
-            { name: "د. عبد الله اسبيناتي", spec: "أخصائي تقويم أسنان", timing: "1م - 9م (السبت إلى الثلاثاء)", note: "الأربعاء والخميس بالوسام", isShared: true },
-            { name: "د. نازك قيناوي", spec: "أخصائية جلدية وتجميل", timing: "2م - 10م (أحد، اثنين، أربعاء، خميس)", note: "الثلاثاء فقط بالوسام", isShared: true }
-        ];
-
-        let wisamDocs = JSON.parse(localStorage.getItem('m_wisam')) || [
-            { name: "د. إيهاب هاشم", spec: "طبيب أسنان عام", timing: "9ص - 12م / 4:30م - 9:30م", friNote: "الجمعة والسبت 4م لـ 8م", isShared: false },
-            { name: "د. تبيان", spec: "طبيبة أسنان عامة", timing: "كل سبت (2م - 10م)", friNote: "باقي الأيام بفرع معشي", isShared: false },
-            { name: "د. عبد الله اسبيناتي", spec: "أخصائي تقويم أسنان", timing: "الأربعاء والخميس (1م - 9م)", friNote: "باقي الأيام بفرع معشي", isShared: true },
-            { name: "د. مصعب ميرغني", spec: "طوارئ وطب عام", timing: "9ص - 2م / 10م - 1ص", friNote: "مناوبة الجمعة 2م لـ 10م", isShared: false }
-        ];
-
-        let coords = JSON.parse(localStorage.getItem('m_coords')) || [
-            { id: 1, title: "قواعد مواعيد الأطباء الأساسية", text: "مدة المواعيد القصيرة (كشف، فك خيط، هيلنق، خلع) 1 إلى 3 ساعات حسب الجدول. يمنع منعاً باتاً تحديد 15 دقيقة إلا للمنسقين المخولين فقط. مواعيد الزراعة من 1.5 إلى 2.5 ساعة." },
-            { id: 2, title: "تعليمات السيستم (كايزن)", text: "يمنع تعديل موعد أدخله زميل آخر دون علمه. عند استقبال أي حالة يجب الرجوع للطبيب أولاً. وصول التركيبة من المعمل خلال 10 إلى 14 يوم عمل." }
-        ];
-
-        let faqs = JSON.parse(localStorage.getItem('m_faqs')) || [
-            { id: 1, q: "جلسات الرتوش والفرق بين الجلسات", a: "الرتوش خلال 14 يوماً بعد الجلسة (أقصى حد 16 يوماً ولا تقل عن 12). بين الجلسة والأخرى شهر كامل." },
-            { id: 2, q: "تشقير الوجه وتنظيف البشرة", a: "الانتظار 24–48 ساعة بين التشقير وتنظيف البشرة العميق، وفي حال وجود احمرار 3–5 أيام." },
-            { id: 3, q: "تقسيم الجسم الكامل (Full Body)", a: "مرفوض تماماً تقسيم مناطق الفل بدي على جلسات مختلفة، وقت جلستها تسوي الجسم كامل." },
-            { id: 4, q: "إبر النظارة والفيتامينات", a: "إبر النظارة تحت إشراف طبي بالطوارئ، أما إبر فيتامين B12 و D فعادية بـ 10 ريال للحقنة بالوسام." }
-        ];
-
-        // --- Render Functions ---
-        function renderAll() {
-            renderNotices();
-            renderDoctors();
-            renderCoords();
-            renderFaqs();
-        }
-
-        function renderNotices() {
-            const container = document.getElementById('noticesContainer');
-            container.innerHTML = '';
-            notices.forEach(item => {
-                let fileSnippet = '';
-                if(item.fileName) {
-                    fileSnippet = `<div class="mt-1"><span class="inline-flex items-center gap-1.5 bg-slate-950 border border-slate-700 text-blue-400 font-bold px-2.5 py-1 rounded text-[11px] cursor-pointer" onclick="window.open('${item.fileUrl || '#'}')"><i class="fa-solid fa-file-pdf text-rose-500"></i> ${item.fileName}</span></div>`;
-                }
-                container.innerHTML += `
-                    <div class="bg-slate-900/90 border border-slate-800 alert-card-border rounded-lg p-3 flex flex-col justify-between gap-2 shadow">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-xs md:text-sm text-slate-100">${item.title}</h3>
-                            <span class="text-[10px] text-slate-400 font-mono flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${item.time}</span>
-                        </div>
-                        ${item.text ? `<p class="text-xs text-slate-300">${item.text}</p>` : ''}
-                        ${fileSnippet}
-                        <div class="flex gap-2 mt-1">
-                            <button onclick="editNotice(${item.id})" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1"><i class="fa-solid fa-pen"></i> تعديل</button>
-                            <button onclick="deleteNotice(${item.id})" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1"><i class="fa-solid fa-trash"></i> حذف</button>
-                        </div>
-                    </div>
-                `;
-            });
-            localStorage.setItem('m_notices', JSON.stringify(notices));
-        }
-
-        function renderDoctors() {
-            const mTable = document.getElementById('maashiTableBody');
-            mTable.innerHTML = '';
-            maashiDocs.forEach((doc, i) => {
-                mTable.innerHTML += `
-                    <tr class="${doc.isShared ? 'shared-doctor-row' : ''} hover:bg-slate-800/40">
-                        <td class="p-2 font-semibold text-blue-300">${doc.name} ${doc.isShared ? '<span class="text-[9px] bg-purple-700 text-white px-1 rounded ml-1">مشترك</span>' : ''}<br><span class="text-[10px] text-slate-400 font-normal">${doc.spec}</span></td>
-                        <td class="p-2">${doc.timing}</td>
-                        <td class="p-2 text-amber-300/90">${doc.note}</td>
-                        <td class="p-2 text-center">
-                            <div class="flex justify-center gap-1">
-                                <button onclick="editDoctor('maashi', ${i})" class="text-blue-400 p-1 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteDoctor('maashi', ${i})" class="text-rose-400 p-1 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('m_maashi', JSON.stringify(maashiDocs));
-
-            const wTable = document.getElementById('wisamTableBody');
-            wTable.innerHTML = '';
-            wisamDocs.forEach((doc, i) => {
-                wTable.innerHTML += `
-                    <tr class="${doc.isShared ? 'shared-doctor-row' : ''} hover:bg-slate-800/40">
-                        <td class="p-2 font-semibold text-purple-300">${doc.name} ${doc.isShared ? '<span class="text-[9px] bg-purple-700 text-white px-1 rounded ml-1">مشترك</span>' : ''}<br><span class="text-[10px] text-slate-400 font-normal">${doc.spec}</span></td>
-                        <td class="p-2">${doc.timing}</td>
-                        <td class="p-2 text-blue-300">${doc.friNote}</td>
-                        <td class="p-2 text-center">
-                            <div class="flex justify-center gap-1">
-                                <button onclick="editDoctor('wisam', ${i})" class="text-blue-400 p-1 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteDoctor('wisam', ${i})" class="text-rose-400 p-1 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('m_wisam', JSON.stringify(wisamDocs));
-        }
-
-        function renderCoords() {
-            const container = document.getElementById('coordContainer');
-            container.innerHTML = '';
-            coords.forEach(c => {
-                container.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-2">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-1">
-                            <h4 class="font-bold text-xs text-emerald-400">${c.title}</h4>
-                            <div class="flex gap-1">
-                                <button onclick="editCoord(${c.id})" class="text-blue-400 text-xs p-1"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteCoord(${c.id})" class="text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed">${c.text}</p>
-                    </div>
-                `;
-            });
-            localStorage.setItem('m_coords', JSON.stringify(coords));
-        }
-
-        function renderFaqs() {
-            const tbody = document.getElementById('faqTableBody');
-            tbody.innerHTML = '';
-            faqs.forEach(f => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/40">
-                        <td class="p-2.5 font-bold text-slate-200">${f.q}</td>
-                        <td class="p-2.5 text-slate-300">${f.a}</td>
-                        <td class="p-2.5 text-center">
-                            <div class="flex justify-center gap-2">
-                                <button onclick="editFaq(${f.id})" class="text-blue-400 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteFaq(${f.id})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('m_faqs', JSON.stringify(faqs));
-        }
-
-        // --- Modals Logic & Actions ---
-        function openModal() { document.getElementById('modalOverlay').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
-
-        // 1. التنبيهات CRUD
-        function openNoticeModal(id = null) {
-            let item = id ? notices.find(x => x.id === id) : null;
-            document.getElementById('modalTitle').innerText = item ? 'تعديل التنبيه' : 'إضافة تنبيه جديد';
-            document.getElementById('modalBody').innerHTML = `
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">العنوان</label><input type="text" id="nTitle" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.title : ''}"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">التفاصيل / الملاحظة</label><textarea id="nText" rows="2" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white">${item ? item.text : ''}</textarea></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">اسم الملف المرفق / الصورة</label><input type="text" id="nFileName" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.fileName : ''}" placeholder="مثال: عرض_أكتوبر.pdf"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">رابط الملف / الصورة (اختياري)</label><input type="text" id="nFileUrl" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.fileUrl : ''}"></div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let title = document.getElementById('nTitle').value;
-                let text = document.getElementById('nText').value;
-                let fileName = document.getElementById('nFileName').value;
-                let fileUrl = document.getElementById('nFileUrl').value;
-                if(!title) { alert('يرجى إدخال العنوان'); return; }
-                
-                let time = new Date().toLocaleTimeString('en-US', { hour12: true }) + ', ' + new Date().toLocaleDateString('en-GB');
-                if(item) {
-                    item.title = title; item.text = text; item.fileName = fileName; item.fileUrl = fileUrl;
-                } else {
-                    notices.unshift({ id: Date.now(), title, text, time, fileName, fileUrl });
-                }
-                renderNotices(); closeModal();
-            };
-            openModal();
-        }
-        function editNotice(id) { openNoticeModal(id); }
-        function deleteNotice(id) {
-            if(confirm('هل أنت متأكد من حذف هذا التنبيه؟')) { notices = notices.filter(x => x.id !== id); renderNotices(); }
-        }
-
-        // 2. الأطباء CRUD
-        function openDoctorModal(branch = 'maashi', idx = null) {
-            let item = idx !== null ? (branch === 'maashi' ? maashiDocs[idx] : wisamDocs[idx]) : null;
-            document.getElementById('modalTitle').innerText = item ? 'تعديل الطبيب' : 'إضافة طبيب جديد';
-            document.getElementById('modalBody').innerHTML = `
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">اسم الطبيب</label><input type="text" id="dName" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.name : ''}"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">التخصص</label><input type="text" id="dSpec" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.spec : ''}"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">أيام وساعات الدوام</label><input type="text" id="dTiming" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.timing : ''}"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">ملاحظات / مناوبة الجمعة</label><input type="text" id="dNote" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? (item.note || item.friNote || '') : ''}"></div>
-                <div>
-                    <label class="text-xs font-semibold text-slate-300 block mb-1">الفرع والنوع</label>
-                    <select id="dBranch" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white">
-                        <option value="maashi" ${branch === 'maashi' && (!item || !item.isShared) ? 'selected' : ''}>فرع معشي فقط</option>
-                        <option value="wisam" ${branch === 'wisam' && (!item || !item.isShared) ? 'selected' : ''}>فرع الوسام فقط</option>
-                        <option value="shared" ${item && item.isShared ? 'selected' : ''}>طبيب مشترك بين الفرعين (تلوين مخصص)</option>
-                    </select>
-                </div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let name = document.getElementById('dName').value;
-                let spec = document.getElementById('dSpec').value;
-                let timing = document.getElementById('dTiming').value;
-                let note = document.getElementById('dNote').value;
-                let b = document.getElementById('dBranch').value;
-                if(!name) { alert('أدخل اسم الطبيب'); return; }
-
-                let isShared = (b === 'shared');
-                let newDoc = { name, spec, timing, note, friNote: note, isShared };
-
-                if(item) {
-                    if(branch === 'maashi') maashiDocs[idx] = newDoc;
-                    else wisamDocs[idx] = newDoc;
-                } else {
-                    if(b === 'maashi' || isShared) maashiDocs.push(newDoc);
-                    if(b === 'wisam' || isShared) wisamDocs.push(newDoc);
-                }
-                renderDoctors(); closeModal();
-            };
-            openModal();
-        }
-        function editDoctor(b, i) { openDoctorModal(b, i); }
-        function deleteDoctor(b, i) {
-            if(confirm('حذف هذا الطبيب؟')) {
-                if(b === 'maashi') maashiDocs.splice(i, 1);
-                else wisamDocs.splice(i, 1);
-                renderDoctors();
-            }
-        }
-
-        // 3. قواعد المنسقين CRUD
-        function openCoordModal(id = null) {
-            let item = id ? coords.find(x => x.id === id) : null;
-            document.getElementById('modalTitle').innerText = item ? 'تعديل القاعدة' : 'إضافة قاعدة جديدة';
-            document.getElementById('modalBody').innerHTML = `
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">العنوان</label><input type="text" id="cTitle" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.title : ''}"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">التفاصيل والقواعد</label><textarea id="cText" rows="3" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white">${item ? item.text : ''}</textarea></div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let title = document.getElementById('cTitle').value;
-                let text = document.getElementById('cText').value;
-                if(item) { item.title = title; item.text = text; }
-                else { coords.push({ id: Date.now(), title, text }); }
-                renderCoords(); closeModal();
-            };
-            openModal();
-        }
-        function editCoord(id) { openCoordModal(id); }
-        function deleteCoord(id) {
-            if(confirm('حذف التوجيه؟')) { coords = coords.filter(x => x.id !== id); renderCoords(); }
-        }
-
-        // 4. الاستفسارات CRUD
-        function openFaqModal(id = null) {
-            let item = id ? faqs.find(x => x.id === id) : null;
-            document.getElementById('modalTitle').innerText = item ? 'تعديل الاستفسار' : 'إضافة استفسار جديد';
-            document.getElementById('modalBody').innerHTML = `
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">الموضوع</label><input type="text" id="fQ" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white" value="${item ? item.q : ''}"></div>
-                <div><label class="text-xs font-semibold text-slate-300 block mb-1">الإجابة المعتمدة</label><textarea id="fA" rows="3" class="w-full bg-slate-900 border border-slate-700 text-xs rounded p-2 text-white">${item ? item.a : ''}</textarea></div>
-            `;
-            document.getElementById('modalSaveBtn').onclick = function() {
-                let q = document.getElementById('fQ').value;
-                let a = document.getElementById('fA').value;
-                if(item) { item.q = q; item.a = a; }
-                else { faqs.push({ id: Date.now(), q, a }); }
-                renderFaqs(); closeModal();
-            };
-            openModal();
-        }
-        function editFaq(id) { openFaqModal(id); }
-        function deleteFaq(id) {
-            if(confirm('حذف الاستفسار؟')) { faqs = faqs.filter(x => x.id !== id); renderFaqs(); }
-        }
-
-        // Search Filter
-        function filterEverything() {
-            let val = document.getElementById('globalSearch').value.toLowerCase();
-            document.querySelectorAll('tbody tr, #noticesContainer > div, #coordContainer > div').forEach(el => {
-                el.style.display = el.innerText.toLowerCase().includes(val) ? '' : 'none';
-            });
-        }
-
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('selected_theme') || 'theme-blue';
-            document.getElementById('themeSelect').value = savedTheme;
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'theme-amoled';
             changeTheme(savedTheme);
-            renderAll();
-        };
+            renderAllData();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timestamp').innerText = now.toLocaleString('ar-EG');
+        }
+
+        // Initial Data Arrays (Sheet Context Hydration)
+        let doctorsData = JSON.parse(localStorage.getItem('docData')) || [
+            { id: 1, name: "د. أحمد علي", specialty: "أسنان - تقويم", branch: "معشي", timing: "السبت إلى الخميس: 4:00 م - 10:00 م", notes: "مناوبة الجمعة بالتناوب", updated: "2026-10-25 10:00" },
+            { id: 2, name: "د. سارة محمود", specialty: "جلدية وليزر", branch: "الوسام", timing: "يومياً: 2:00 م - 9:00 م", notes: "حجز مسبق فقط", updated: "2026-10-26 08:00" },
+            { id: 3, name: "د. محمد الشمري", specialty: "تركيبات وزراعة", branch: "مشترك (معشي والوسام)", timing: "معشي (أحد/ثلاثاء)، الوسام (سبت/أربعاء)", notes: "مشترك بين الفرعين", updated: "2026-10-26 09:15" }
+        ];
+
+        let alertsData = JSON.parse(localStorage.getItem('alertsData')) || [
+            { id: 1, title: "تعديل مواعيد خصومات الليزر", content: "تخفيضات شهر أكتوبر على الجلسات الفردية ممتدة لنهاية الأسبوع.", media: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=500&auto=format&fit=crop&q=60", updated: "منذ ساعة" },
+            { id: 2, title: "سياسة إلغاء المواعيد", content: "يرجى تأكيد الحضور مع العميل قبل الموعد بـ 4 ساعات.", media: "", updated: "اليوم 09:00 ص" }
+        ];
+
+        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesData')) || [
+            { id: 1, category: "الجلدية", question: "أسعار جلسات الفراكشنال ليزر", answer: "الجلسة للوجه كامل بـ 350 ريال شاملة الرتوش", price: "350 ريال" },
+            { id: 2, category: "الأسنان", question: "سعر تبييض الأسنان بالزووم", answer: "العرض الحالي يشمل التبييض والتنظيف", price: "499 ريال" }
+        ];
+
+        let handoverData = JSON.parse(localStorage.getItem('handoverData')) || [
+            { id: 1, name: "عبدالله العتيبي", phone: "0501234567", details: "د. أحمد علي (معشي)", status: "بانتظار التأكيد", notes: "تم التواصل ولم يرد، يعاد الاتصال عصراً", updated: "2026-10-26 08:30" }
+        ];
+
+        // Navigation Switcher
+        function switchTab(tabKey) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(`${tabKey}-section`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Render Functions
+        function renderAllData() {
+            renderDoctors();
+            renderAlerts();
+            renderInquiries();
+            renderHandover();
+        }
+
+        function renderDoctors(filter = "") {
+            const body = document.getElementById('doctorsTableBody');
+            body.innerHTML = "";
+            doctorsData.filter(d => d.name.includes(filter) || d.specialty.includes(filter) || d.branch.includes(filter)).forEach(doc => {
+                let badgeClass = doc.branch.includes('معشي') ? 'tag-mashy' : (doc.branch.includes('الوسام') ? 'tag-wissam' : 'tag-both');
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${doc.name}</strong></td>
+                        <td>${doc.specialty}</td>
+                        <td><span class="tag-branch ${badgeClass}">${doc.branch}</span></td>
+                        <td>${doc.timing}</td>
+                        <td>${doc.notes}</td>
+                        <td style="font-size:0.75rem; color:var(--text-muted);">${doc.updated}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:0.2rem 0.5rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.2rem 0.5rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAlerts() {
+            const grid = document.getElementById('alertsGrid');
+            const banner = document.getElementById('pinnedBanner');
+            grid.innerHTML = "";
+            banner.innerHTML = "";
+
+            alertsData.forEach(item => {
+                // Top Banner Pills
+                banner.innerHTML += `<div class="alert-pill"><span class="badge">تنبيه</span> ${item.title}</div>`;
+
+                // Cards Grid
+                let imageHtml = item.media ? `<img src="${item.media}" class="card-img" onclick="openLightbox('${item.media}')" alt="مرفق">` : '';
+                grid.innerHTML += `
+                    <div class="card">
+                        <h4 style="color:var(--primary-color);">${item.title}</h4>
+                        <p style="font-size:0.9rem; color:var(--text-main);">${item.content}</p>
+                        ${imageHtml}
+                        <div class="card-actions">
+                            <span style="font-size:0.75rem; color:var(--text-muted); margin-left:auto;">${item.updated}</span>
+                            <button class="btn btn-danger" style="padding:0.2rem 0.5rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderInquiries(filter = "") {
+            const body = document.getElementById('inquiriesTableBody');
+            body.innerHTML = "";
+            inquiriesData.filter(i => i.question.includes(filter) || i.category.includes(filter) || i.answer.includes(filter)).forEach(item => {
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${item.category}</strong></td>
+                        <td>${item.question}</td>
+                        <td>${item.answer}</td>
+                        <td style="color:var(--primary-color); font-weight:bold;">${item.price}</td>
+                        <td>
+                            <button class="btn btn-danger" style="padding:0.2rem 0.5rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderHandover() {
+            const body = document.getElementById('handoverTableBody');
+            body.innerHTML = "";
+            handoverData.forEach(h => {
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${h.name}</strong></td>
+                        <td>${h.phone}</td>
+                        <td>${h.details}</td>
+                        <td><span class="tag-branch tag-both">${h.status}</span></td>
+                        <td>${h.notes}</td>
+                        <td style="font-size:0.75rem; color:var(--text-muted);">${h.updated}</td>
+                        <td>
+                            <button class="btn btn-danger" style="padding:0.2rem 0.5rem;" onclick="deleteHandover(${h.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Global Search Filter Handler
+        function handleGlobalSearch(query) {
+            renderDoctors(query);
+            renderInquiries(query);
+        }
+
+        // Modal Helpers
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openDoctorModal() {
+            document.getElementById('docId').value = "";
+            document.getElementById('docName').value = "";
+            document.getElementById('docSpecialty').value = "";
+            document.getElementById('docTiming').value = "";
+            document.getElementById('docNotes').value = "";
+            document.getElementById('doctorModal').classList.add('active');
+        }
+
+        function saveDoctor() {
+            const id = document.getElementById('docId').value;
+            const docObj = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('docName').value,
+                specialty: document.getElementById('docSpecialty').value,
+                branch: document.getElementById('docBranch').value,
+                timing: document.getElementById('docTiming').value,
+                notes: document.getElementById('docNotes').value,
+                updated: new Date().toLocaleString('ar-EG')
+            };
+
+            if (id) {
+                const index = doctorsData.findIndex(d => d.id == id);
+                doctorsData[index] = docObj;
+            } else {
+                doctorsData.push(docObj);
+            }
+
+            localStorage.setItem('docData', JSON.stringify(doctorsData));
+            renderDoctors();
+            closeModal('doctorModal');
+        }
+
+        function deleteDoctor(id) {
+            doctorsData = doctorsData.filter(d => d.id !== id);
+            localStorage.setItem('docData', JSON.stringify(doctorsData));
+            renderDoctors();
+        }
+
+        function openAlertModal() {
+            document.getElementById('alertModal').classList.add('active');
+        }
+
+        function saveAlert() {
+            const alertObj = {
+                id: Date.now(),
+                title: document.getElementById('alertTitle').value,
+                content: document.getElementById('alertContent').value,
+                media: document.getElementById('alertMedia').value,
+                updated: "الآن"
+            };
+            alertsData.unshift(alertObj);
+            localStorage.setItem('alertsData', JSON.stringify(alertsData));
+            renderAlerts();
+            closeModal('alertModal');
+        }
+
+        function deleteAlert(id) {
+            alertsData = alertsData.filter(a => a.id !== id);
+            localStorage.setItem('alertsData', JSON.stringify(alertsData));
+            renderAlerts();
+        }
+
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
     </script>
 </body>
 </html>
+```
