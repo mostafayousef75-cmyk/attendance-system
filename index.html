@@ -174,7 +174,7 @@
 
         .search-container {
             position: relative;
-            width: 320px;
+            width: 300px;
         }
 
         .search-container input {
@@ -195,6 +195,33 @@
             transform: translateY(-50%);
             color: var(--text-muted);
             font-size: 0.8rem;
+        }
+
+        /* Cloud Indicator Light (لمبة سحابية واضحة) */
+        .cloud-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(22, 163, 74, 0.2);
+            border: 1px solid var(--accent-green);
+            color: #4ade80;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cloud-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulseDot 1.5s infinite;
+        }
+        @keyframes pulseDot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #22c55e; }
+            100% { transform: scale(0.9); opacity: 0.7; }
         }
 
         .kpi-bar {
@@ -639,6 +666,12 @@
                 <input type="text" id="globalSearchInput" placeholder="بحث شامل في كافة أقسام الموقع..." oninput="handleTrueGlobalSearch(this.value)">
             </div>
             
+            <!-- لمبة الاتصال السحابي الحية الواضحة -->
+            <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
+                <span class="cloud-dot"></span>
+                <span>متصل بالسحابة</span>
+            </div>
+
             <div class="kpi-bar">
                 <div class="kpi-card"><i class="fa-solid fa-user-doctor" style="color:var(--primary-color);"></i> الأطباء: <span id="kpiDocs" class="kpi-num">0</span></div>
                 <div class="kpi-card"><i class="fa-solid fa-bell" style="color:#60a5fa;"></i> التنبيهات: <span id="kpiAlerts" class="kpi-num">0</span></div>
@@ -702,7 +735,7 @@
                                         <th>الطبيب والجنسية</th>
                                         <th>التخصص</th>
                                         <th>الكشفية</th>
-                                        <th>أيام ومواعيد الدوام</th>
+                                        <th>فرع معشي والمواعيد</th>
                                         <th>الملاحظات</th>
                                         <th>إدارة</th>
                                     </tr>
@@ -725,7 +758,7 @@
                                         <th>الطبيب والجنسية</th>
                                         <th>التخصص</th>
                                         <th>الكشفية</th>
-                                        <th>أيام ومواعيد الدوام</th>
+                                        <th>فرع الوسام والمواعيد</th>
                                         <th>الملاحظات</th>
                                         <th>إدارة</th>
                                     </tr>
@@ -1191,6 +1224,20 @@
         }
         const db = firebase.database();
 
+        // تتبع حالة الاتصال السحابي اللحظي (لمبة الإشعار)
+        db.ref('.info/connected').on('value', function(snap) {
+            const badge = document.getElementById('cloudStatusBadge');
+            if (snap.val() === true) {
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة</span>`;
+                badge.style.borderColor = "#16a34a";
+                badge.style.color = "#4ade80";
+            } else {
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 10px #dc2626;"></span><span>غير متصل</span>`;
+                badge.style.borderColor = "#dc2626";
+                badge.style.color = "#f87171";
+            }
+        });
+
         // --- DATA STORES (متزامنة سحابياً) ---
         let doctorsData = [];
         let fridaySchedules = [];
@@ -1404,10 +1451,32 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (أيام ومواعيد الدوام باللون الأبيض الواضح في السيم الأسود) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (نسخ جدول الطبيب للعميل، ألوان أيام أزرق/أخضر فاتح) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
+        }
+
+        function copyDoctorForClient(id) {
+            const doc = doctorsData.find(d => d.id === id);
+            if (!doc) return;
+            const mashyDays = doc.mashyDays && doc.mashyDays.length > 0 ? doc.mashyDays.join('، ') : 'لا يوجد';
+            const wissamDays = doc.wissamDays && doc.wissamDays.length > 0 ? doc.wissamDays.join('، ') : 'لا يوجد';
+            
+            const clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})
+التخصص: ${doc.specialty}
+الكشفية: ${doc.fee || 'مجانية'}
+مواعيد الدوام:
+• فرع معشي: ${mashyDays}
+• فرع الوسام: ${wissamDays}
+الساعات: ${doc.timing || ''}
+ملاحظات: ${doc.notes || 'لا توجد'}`;
+
+            navigator.clipboard.writeText(clientText).then(() => {
+                alert(`📋 تم نسخ تفاصيل الدوام للعميل بنجاح!\n\n${clientText}`);
+            }).catch(err => {
+                alert("تعذر النسخ تلقائياً!");
+            });
         }
 
         function renderDoctors(search = "") {
@@ -1456,9 +1525,14 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td><span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br><small style="color:var(--text-main); opacity:0.9;">أيام الدوام: ${mashyDaysFormatted}</small></td>
+                            <td>
+                                <span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br>
+                                <small style="color:#38bdf8; font-weight:700;">معشي: ${mashyDaysFormatted}</small><br>
+                                <small style="color:#4ade80; font-weight:700;">الوسام: ${wissamDaysFormatted}</small>
+                            </td>
                             <td style="color:#f59e0b; font-size:0.68rem;">${doc.notes || '-'}</td>
                             <td>
+                                <button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.6rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
                                 <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
                             </td>
@@ -1473,9 +1547,14 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td><span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br><small style="color:var(--text-main); opacity:0.9;">أيام الدوام: ${wissamDaysFormatted}</small></td>
+                            <td>
+                                <span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br>
+                                <small style="color:#38bdf8; font-weight:700;">معشي: ${mashyDaysFormatted}</small><br>
+                                <small style="color:#4ade80; font-weight:700;">الوسام: ${wissamDaysFormatted}</small>
+                            </td>
                             <td style="color:#f59e0b; font-size:0.68rem;">${doc.notes || '-'}</td>
                             <td>
+                                <button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.6rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
                                 <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
                             </td>
