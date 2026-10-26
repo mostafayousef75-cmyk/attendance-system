@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات</title>
+    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي)</title>
     <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK (v8 Compat للتزامن السحابي اللحظي) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         :root {
             --font-family: 'Tajawal', sans-serif;
@@ -17,7 +21,7 @@
             --bg-surface: #0a0a0c;
             --bg-card: #121216;
             --bg-sidebar: #050507;
-            --text-main: #f3f4f6;
+            --text-main: #ffffff;
             --text-muted: #9ca3af;
             --border-color: #27272a;
             --primary-color: #f59e0b;
@@ -359,7 +363,6 @@
             overflow-x: auto;
         }
 
-        /* تصغير حجم الجداول والكروت وتنسيق النصوص لتكون مسلسلة ومريحة */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -631,7 +634,6 @@
     <!-- المحتوى الرئيسي -->
     <main class="main-wrapper">
         <header class="top-header">
-            <!-- بحث شامل حقيقي يبحث في كافة أقسام الموقع ويعرض اسم القسم ومصدر المعلومة -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="globalSearchInput" placeholder="بحث شامل في كافة أقسام الموقع..." oninput="handleTrueGlobalSearch(this.value)">
@@ -651,7 +653,7 @@
 
         <div class="content-area">
 
-            <!-- لوحة نتائج البحث الشامل الموحدة (تظهر تلقائياً عند البحث) -->
+            <!-- لوحة نتائج البحث الشامل الموحدة -->
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
                     <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة أقسام الموقع</h2>
@@ -1178,21 +1180,32 @@
     </div>
 
     <script>
-        // --- DATA STORES ---
-        let doctorsData = JSON.parse(localStorage.getItem('docDataStore_v12')) || [
-            { id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة" }
-        ];
+        // --- FIREBASE CONFIGURATION (ضع رابط وسيتنج قاعدة بياناتك السحابية هنا) ---
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "YOUR_DATABASE_URL", // رابط قاعدة البيانات السحابية
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-        let fridaySchedules = JSON.parse(localStorage.getItem('fridayScheduleStore_v12')) || [
-            { id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }
-        ];
+        // تهيئة فايربيس
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
 
-        let alertsData = JSON.parse(localStorage.getItem('alertsDataStore_v12')) || [];
-        let coordinatorsData = JSON.parse(localStorage.getItem('coordDataStore_v12')) || [];
-        let deptServicesData = JSON.parse(localStorage.getItem('deptServicesStore_v12')) || [];
-        let deptNotesData = JSON.parse(localStorage.getItem('deptNotesStore_v12')) || [];
-        let offersData = JSON.parse(localStorage.getItem('offersDataStore_v12')) || [];
-        let inquiriesData = JSON.parse(localStorage.getItem('inquiriesDataStore_v12')) || [];
+        // --- DATA STORES (متزامنة سحابياً) ---
+        let doctorsData = [];
+        let fridaySchedules = [];
+        let alertsData = [];
+        let coordinatorsData = [];
+        let deptServicesData = [];
+        let deptNotesData = [];
+        let offersData = [];
+        let inquiriesData = [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1205,22 +1218,57 @@
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
             switchTab(activeTab, targetNav, false);
 
-            renderDoctors();
-            renderFridayScheduleTable();
-            renderAlerts();
-            renderDeptsAndDocs();
-            renderCoordinators();
-            renderOffersTabs();
-            renderOffers();
-            renderInquiriesTabs();
-            renderInquiries();
-            updateKPIs();
+            // الاستماع للتحديثات السحابية لحظياً من Firebase Realtime Database
+            db.ref('clinicData').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    doctorsData = data.doctorsData || [];
+                    fridaySchedules = data.fridaySchedules || [];
+                    alertsData = data.alertsData || [];
+                    coordinatorsData = data.coordinatorsData || [];
+                    deptServicesData = data.deptServicesData || [];
+                    deptNotesData = data.deptNotesData || [];
+                    offersData = data.offersData || [];
+                    inquiriesData = data.inquiriesData || [];
+                } else {
+                    // بيانات افتراضية أولية في حال كانت القاعدة فارغة
+                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة" }];
+                    fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
+                    syncToCloud();
+                }
+
+                renderDoctors();
+                renderFridayScheduleTable();
+                renderAlerts();
+                renderDeptsAndDocs();
+                renderCoordinators();
+                renderOffersTabs();
+                renderOffers();
+                renderInquiriesTabs();
+                renderInquiries();
+                updateKPIs();
+            });
             
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
         });
+
+        // دالة حفظ ومزامنة البيانات في السحابة
+        function syncToCloud() {
+            const payload = {
+                doctorsData,
+                fridaySchedules,
+                alertsData,
+                coordinatorsData,
+                deptServicesData,
+                deptNotesData,
+                offersData,
+                inquiriesData
+            };
+            db.ref('clinicData').set(payload);
+        }
 
         function switchTab(tabId, elem, save = true) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
@@ -1252,13 +1300,13 @@
             document.getElementById('kpiOffers').innerText = offersData.length;
         }
 
-        // --- JSON IMPORT / EXPORT ---
+        // --- JSON IMPORT / EXPORT (للطوارئ والنسخ الاحتياطي اليدوي) ---
         function exportJSON() {
             const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `callcenter_backup_${Date.now()}.json`);
+            dlAnchor.setAttribute("download", `callcenter_cloud_backup_${Date.now()}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
@@ -1281,17 +1329,8 @@
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
                         
-                        localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
-                        localStorage.setItem('fridayScheduleStore_v12', JSON.stringify(fridaySchedules));
-                        localStorage.setItem('alertsDataStore_v12', JSON.stringify(alertsData));
-                        localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
-                        localStorage.setItem('deptServicesStore_v12', JSON.stringify(deptServicesData));
-                        localStorage.setItem('deptNotesStore_v12', JSON.stringify(deptNotesData));
-                        localStorage.setItem('offersDataStore_v12', JSON.stringify(offersData));
-                        localStorage.setItem('inquiriesDataStore_v12', JSON.stringify(inquiriesData));
-
-                        alert("تم استيراد البيانات بنجاح!");
-                        location.reload();
+                        syncToCloud();
+                        alert("تم استيراد البيانات ورفعها للسحابة بنجاح!");
                     } catch (err) { alert("ملف JSON غير صالح!"); }
                 };
                 reader.readAsText(input.files[0]);
@@ -1326,12 +1365,12 @@
                 fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal });
             }
 
-            localStorage.setItem('fridayScheduleStore_v12', JSON.stringify(fridaySchedules));
+            syncToCloud();
             document.getElementById('fridayDocName').value = "";
             document.getElementById('fridayDate').value = "";
             renderFridayScheduleTable();
             renderDoctors();
-            alert("تم حفظ مناوبة الجمعة بنجاح!");
+            alert("تم حفظ مناوبة الجمعة سحابياً بنجاح!");
         }
 
         function editFridaySchedule(id) {
@@ -1346,7 +1385,7 @@
         function deleteFridaySchedule(id) {
             if (confirm("هل تريد حذف هذه المناوبة؟")) {
                 fridaySchedules = fridaySchedules.filter(f => f.id !== id);
-                localStorage.setItem('fridayScheduleStore_v12', JSON.stringify(fridaySchedules));
+                syncToCloud();
                 renderFridayScheduleTable();
                 renderDoctors();
             }
@@ -1371,7 +1410,7 @@
             });
         }
 
-        // --- 2. DOCTORS & BRANCH SUPPORT (مع تنسيق وفرد الكلام بشكل أفقي ومنظم) ---
+        // --- 2. DOCTORS & BRANCH SUPPORT (أيام ومواعيد الدوام باللون الأبيض الناصع في السيم الأسود) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1414,7 +1453,6 @@
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.65rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
                 const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
-                // تنسيق الأيام والمواعيد بشكل مسلسلات أفقية مرتبة لتوفير المساحة وعدم التكدس
                 const mashyDaysFormatted = mashyDays.length > 0 ? mashyDays.join(' ، ') : 'لا يوجد';
                 const wissamDaysFormatted = wissamDays.length > 0 ? wissamDays.join(' ، ') : 'لا يوجد';
 
@@ -1424,7 +1462,7 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td><span style="color:#60a5fa; font-weight:600;">${doc.timing}</span><br><small style="color:#34d399;">أيام الدوام: ${mashyDaysFormatted}</small></td>
+                            <td><span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br><small style="color:var(--text-main); opacity:0.9;">أيام الدوام: ${mashyDaysFormatted}</small></td>
                             <td style="color:#f59e0b; font-size:0.68rem;">${doc.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1441,7 +1479,7 @@
                             <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                             <td>${doc.specialty}</td>
                             <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                            <td><span style="color:#60a5fa; font-weight:600;">${doc.timing}</span><br><small style="color:#34d399;">أيام الدوام: ${wissamDaysFormatted}</small></td>
+                            <td><span style="color:var(--text-main); font-weight:600;">${doc.timing}</span><br><small style="color:var(--text-main); opacity:0.9;">أيام الدوام: ${wissamDaysFormatted}</small></td>
                             <td style="color:#f59e0b; font-size:0.68rem;">${doc.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1471,7 +1509,7 @@
             const targetIdx = doctorsData.findIndex(d => d.id === targetId);
             const moved = doctorsData.splice(oldIdx, 1)[0];
             doctorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
+            syncToCloud();
             renderDoctors();
         }
 
@@ -1518,7 +1556,7 @@
                 doctorsData[idx] = docObj;
             } else { doctorsData.push(docObj); }
 
-            localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
+            syncToCloud();
             renderDoctors();
             closeModal('doctorModal');
         }
@@ -1550,7 +1588,7 @@
         function deleteDoctor(id) {
             if (confirm("حذف هذا الطبيب؟")) {
                 doctorsData = doctorsData.filter(d => d.id !== id);
-                localStorage.setItem('docDataStore_v12', JSON.stringify(doctorsData));
+                syncToCloud();
                 renderDoctors();
             }
         }
@@ -1666,7 +1704,7 @@
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
 
-            localStorage.setItem('alertsDataStore_v12', JSON.stringify(alertsData));
+            syncToCloud();
             renderAlerts();
             closeModal('alertModal');
         }
@@ -1694,7 +1732,7 @@
         function deleteAlert(id) {
             if (confirm("حذف هذا التنبيه؟")) {
                 alertsData = alertsData.filter(a => a.id !== id);
-                localStorage.setItem('alertsDataStore_v12', JSON.stringify(alertsData));
+                syncToCloud();
                 renderAlerts();
             }
         }
@@ -1757,7 +1795,7 @@
                 const idx = deptServicesData.findIndex(s => s.id == id);
                 deptServicesData[idx] = rowObj;
             } else { deptServicesData.push(rowObj); }
-            localStorage.setItem('deptServicesStore_v12', JSON.stringify(deptServicesData));
+            syncToCloud();
             renderDeptsAndDocs();
             closeModal('deptServiceModal');
         }
@@ -1776,7 +1814,7 @@
         function deleteDeptService(id) {
             if (confirm("حذف الصف؟")) {
                 deptServicesData = deptServicesData.filter(s => s.id !== id);
-                localStorage.setItem('deptServicesStore_v12', JSON.stringify(deptServicesData));
+                syncToCloud();
                 renderDeptsAndDocs();
             }
         }
@@ -1786,14 +1824,14 @@
             const txt = document.getElementById('deptNoteText').value.trim();
             if (!txt) return;
             deptNotesData.push(txt);
-            localStorage.setItem('deptNotesStore_v12', JSON.stringify(deptNotesData));
+            syncToCloud();
             renderDeptsAndDocs();
             closeModal('deptNoteModal');
         }
         function deleteDeptNote(idx) {
             if (confirm("حذف الملحوظة؟")) {
                 deptNotesData.splice(idx, 1);
-                localStorage.setItem('deptNotesStore_v12', JSON.stringify(deptNotesData));
+                syncToCloud();
                 renderDeptsAndDocs();
             }
         }
@@ -1825,7 +1863,7 @@
             if (draggedCoordIdx === null || draggedCoordIdx === targetIdx) return;
             const moved = coordinatorsData.splice(draggedCoordIdx, 1)[0];
             coordinatorsData.splice(targetIdx, 0, moved);
-            localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
+            syncToCloud();
             renderCoordinators();
         }
 
@@ -1843,7 +1881,7 @@
                 const idx = coordinatorsData.findIndex(c => c.id == id);
                 coordinatorsData[idx] = obj;
             } else { coordinatorsData.push(obj); }
-            localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
+            syncToCloud();
             renderCoordinators();
             closeModal('coordModal');
         }
@@ -1859,7 +1897,7 @@
         function deleteCoordinator(id) {
             if (confirm("حذف؟")) {
                 coordinatorsData = coordinatorsData.filter(c => c.id !== id);
-                localStorage.setItem('coordDataStore_v12', JSON.stringify(coordinatorsData));
+                syncToCloud();
                 renderCoordinators();
             }
         }
@@ -1924,7 +1962,7 @@
                 const idx = offersData.findIndex(o => o.id == id);
                 offersData[idx] = obj;
             } else { offersData.push(obj); }
-            localStorage.setItem('offersDataStore_v12', JSON.stringify(offersData));
+            syncToCloud();
             selectedOfferTab = cat;
             renderOffersTabs();
             renderOffers();
@@ -1943,7 +1981,7 @@
         function deleteOffer(id) {
             if (confirm("حذف؟")) {
                 offersData = offersData.filter(o => o.id !== id);
-                localStorage.setItem('offersDataStore_v12', JSON.stringify(offersData));
+                syncToCloud();
                 renderOffersTabs();
                 renderOffers();
             }
@@ -2000,7 +2038,7 @@
                 const idx = inquiriesData.findIndex(i => i.id == id);
                 inquiriesData[idx] = obj;
             } else { inquiriesData.push(obj); }
-            localStorage.setItem('inquiriesDataStore_v12', JSON.stringify(inquiriesData));
+            syncToCloud();
             renderInquiries();
             closeModal('inquiryModal');
         }
@@ -2015,7 +2053,7 @@
         function deleteInquiry(id) {
             if (confirm("حذف؟")) {
                 inquiriesData = inquiriesData.filter(i => i.id !== id);
-                localStorage.setItem('inquiriesDataStore_v12', JSON.stringify(inquiriesData));
+                syncToCloud();
                 renderInquiries();
             }
         }
