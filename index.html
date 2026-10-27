@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي + ذكاء اصطناعي)</title>
+    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي + شات عائم)</title>
     <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -256,7 +256,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات الاحترافي مع زر التحكم بالوقف والحركة وتحديد النص بالماوس */
+        /* شريط التنبيهات مع السحب بالماوس والتحكم */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -285,6 +285,11 @@
             white-space: nowrap;
             flex: 1;
             position: relative;
+            cursor: grab;
+            user-select: none;
+        }
+        .ticker-container:active {
+            cursor: grabbing;
         }
         .ticker-track {
             display: inline-flex;
@@ -631,31 +636,62 @@
             display: inline-block;
         }
 
-        /* تنسيق قسم شات الذكاء الاصطناعي Gemini */
-        .ai-chat-container {
+        /* تنسيق شات الذكاء الاصطناعي العائم في أسفل يسار الشاشة */
+        .ai-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: #000;
+            border-radius: 50%;
             display: flex;
-            flex-direction: column;
-            height: calc(100vh - 120px);
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 10000;
+            transition: transform 0.2s;
+        }
+        .ai-floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .ai-floating-chat-window {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            width: 340px;
+            height: 420px;
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
+            display: none;
+            flex-direction: column;
+            z-index: 10000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             overflow: hidden;
+        }
+        .ai-floating-chat-window.active {
+            display: flex;
         }
         .ai-messages-box {
             flex: 1;
-            padding: 1rem;
+            padding: 0.6rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 0.6rem;
             user-select: text !important;
         }
         .ai-message {
-            max-width: 80%;
-            padding: 0.7rem 1rem;
+            max-width: 85%;
+            padding: 0.5rem 0.7rem;
             border-radius: 8px;
-            font-size: 0.82rem;
-            line-height: 1.4;
+            font-size: 0.78rem;
+            line-height: 1.35;
             user-select: text !important;
         }
         .ai-message.user {
@@ -670,21 +706,21 @@
             align-self: flex-end;
         }
         .ai-input-box {
-            padding: 0.6rem;
+            padding: 0.4rem;
             background: var(--bg-card);
             border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 0.5rem;
+            gap: 0.3rem;
         }
         .ai-input-box input {
             flex: 1;
-            padding: 0.5rem 0.8rem;
+            padding: 0.35rem 0.6rem;
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             color: var(--text-main);
             outline: none;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
         }
 
         .modal-overlay {
@@ -792,7 +828,6 @@
             <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
-            <li><a class="nav-link" data-tab="gemini-ai" onclick="switchTab('gemini-ai', this)"><i class="fa-solid fa-robot"></i> <span>دردشة الذكاء الاصطناعي</span></a></li>
         </ul>
         
         <div class="theme-box">
@@ -828,17 +863,17 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات الاحترافي مع زر إيقاف وتشغيل الحركة -->
+        <!-- شريط التنبيهات الاحترافي مع السحب بالماوس يمين ويسار والوضع الافتراضي -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-container" id="tickerWrapper">
                 <div class="ticker-track" id="tickerTrackContainer">
-                    <!-- التنبيهات المتحركة -->
+                    <!-- التنبيهات المتحركة مرتبة من الأحدث للأقدم -->
                 </div>
             </div>
             <div style="display:flex; gap:0.2rem;">
                 <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn" title="إيقاف أو تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="resetTickerDefault()" title="إعادة وضع الحركة الافتراضي"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
+                <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="resetTickerDefault()" title="الوضع الافتراضي وترتيب الأحدث للأقدم"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
             </div>
         </div>
 
@@ -1073,25 +1108,28 @@
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
 
-            <!-- 7. دردشة الذكاء الاصطناعي (Gemini AI Chat) -->
-            <section id="gemini-ai-section" class="page-section">
-                <div class="ai-chat-container">
-                    <div style="padding:0.6rem 1rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-                        <h3><i class="fa-solid fa-robot" style="color:var(--primary-color);"></i> مساعد الذكاء الاصطناعي (Gemini)</h3>
-                        <span style="font-size:0.7rem; color:var(--text-muted);">متصل عبر Google Studio API</span>
-                    </div>
-                    <div class="ai-messages-box" id="aiMessagesBox">
-                        <div class="ai-message gemini">مرحباً يا أستاذ مصطفى! أنا جاهز لمساعدتك في أي استفسار أو مهمة داخل النظام أو للإجابة على أسئلتك. كيف يمكنني مساعدتك اليوم؟</div>
-                    </div>
-                    <div class="ai-input-box">
-                        <input type="text" id="aiUserInput" placeholder="اكتب رسالتك لمدير الذكاء الاصطناعي..." onkeypress="if(event.key === 'Enter') sendGeminiMessage()">
-                        <button class="btn btn-blue" onclick="sendGeminiMessage()"><i class="fa-solid fa-paper-plane"></i> إرسال</button>
-                    </div>
-                </div>
-            </section>
-
         </div>
     </main>
+
+    <!-- زر دردشة الذكاء الاصطناعي العائم في أسفل اليسار -->
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="مساعد الذكاء الاصطناعي (Gemini)">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <!-- نافذة شات الذكاء الاصطناعي العائمة -->
+    <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
+        <div style="padding:0.5rem 0.8rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="font-size:0.8rem;"><i class="fa-solid fa-robot" style="color:var(--primary-color);"></i> مساعد الذكاء الاصطناعي (Gemini)</h4>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingChat()"></i>
+        </div>
+        <div class="ai-messages-box" id="aiMessagesBox">
+            <div class="ai-message gemini">مرحباً يا أستاذ مصطفى! جاهز لمساعدتك في أي استفسار. كيف يمكنني مساعدتك اليوم؟</div>
+        </div>
+        <div class="ai-input-box">
+            <input type="text" id="aiUserInput" placeholder="اكتب رسالتك..." onkeypress="if(event.key === 'Enter') sendGeminiMessage()">
+            <button class="btn btn-blue" style="padding:0.3rem 0.5rem; font-size:0.75rem;" onclick="sendGeminiMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <!-- MODALS -->
     <!-- Modal 1: Doctor Modal -->
@@ -1548,12 +1586,45 @@
                 const now = new Date();
                 document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
+
+            // تفعيل السحب بالماوس (Drag to Scroll) لشريط التنبيهات يمين ويسار
+            initTickerDragScroll();
         });
 
         function toggleSidebar() {
             const sidebar = document.getElementById('appSidebar');
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+
+        // تفاعل سحب الشريط بالماوس يمين ويسار
+        function initTickerDragScroll() {
+            const slider = document.getElementById('tickerWrapper');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+            slider.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2;
+                slider.scrollLeft = scrollLeft - walk;
+            });
         }
 
         let isTickerPaused = false;
@@ -1579,6 +1650,12 @@
             track.classList.remove('paused');
             btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
             btn.style.color = "inherit";
+            renderAlerts(); // إعادة ترتيب العرض من الأحدث للأقدم
+        }
+
+        function toggleFloatingChat() {
+            const win = document.getElementById('aiFloatingChatWindow');
+            win.classList.toggle('active');
         }
 
         function syncToCloud() {
@@ -2066,7 +2143,10 @@
             grid.innerHTML = ""; 
             tickerTrack.innerHTML = "";
 
-            alertsData.forEach(item => {
+            // ترتيب الإشعارات والتنبيهات من الأحدث إلى الأقدم (الأحدث في المقدمة / الأول)
+            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
+
+            sortedAlerts.forEach(item => {
                 tickerTrack.innerHTML += `
                     <div class="ticker-item" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
                         <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
@@ -2075,7 +2155,7 @@
                 `;
             });
 
-            alertsData.filter(a => a.content.includes(search)).forEach(item => {
+            sortedAlerts.filter(a => a.content.includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") {
@@ -2166,12 +2246,15 @@
             const mediaType = document.getElementById('alertMediaType').value;
             if (!content) return alert("أدخل نص التنبيه!");
 
-            const alertObj = { id: id ? parseInt(id) : Date.now(), content, media, mediaType, time: new Date().toLocaleString('en-US') };
+            const alertObj = { id: Date.now(), content, media, mediaType, time: new Date().toLocaleString('en-US') };
 
             if (id) {
                 const idx = alertsData.findIndex(a => a.id == id);
+                alertObj.id = parseInt(id); // الحفاظ على الid الأصلي عند التعديل
                 alertsData[idx] = alertObj;
-            } else { alertsData.unshift(alertObj); }
+            } else { 
+                alertsData.push(alertObj); // يضاف للنهاية، وعند العرض يُرتّب الأحدث في المقدمة
+            }
 
             syncToCloud();
             renderAlerts();
@@ -2611,7 +2694,7 @@
             }
         }
 
-        // دالة إرسال واستقبال رسائل دردشة الذكاء الاصطناعي مع Google Gemini API
+        // دالة إرسال واستقبال رسائل الشات العائم مع Google Gemini API
         async function sendGeminiMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
@@ -2627,7 +2710,8 @@
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const apiKey = "AQ.Ab8RN6JqlZAausqoTqz4SNJUJcRBaBuwiy1IUfkGASrXcHMEAQ";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+            // تصحيح مسار الاتصال بنموذج Gemini عبر v1
+            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             try {
                 const response = await fetch(url, {
@@ -2646,7 +2730,7 @@
                     const reply = data.candidates[0].content.parts[0].text;
                     msgBox.innerHTML += `<div class="ai-message gemini">${reply}</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من الحصول على رد من النموذج حالياً. تأكد من اتصالك بالإنترنت.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من الحصول على رد من النموذج حالياً. تأكد من اتصالك بالإنترنت ومفتاح الـ API.</div>`;
                 }
             } catch (error) {
                 const loadEl = document.getElementById(loadingId);
