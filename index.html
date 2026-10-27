@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي)</title>
+    <title>لوحة خدمة عملاء ماجستى - العيادات (سحابي)</title>
     <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +98,7 @@
             padding: 0.8rem 0.35rem;
         }
 
-        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .brand-container,
         .sidebar.collapsed .json-tools,
         .sidebar.collapsed .nav-link span,
         .sidebar.collapsed .theme-box label,
@@ -111,14 +111,27 @@
             padding: 0.5rem;
         }
 
+        .brand-container {
+            margin-bottom: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
         .brand-title {
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             font-weight: 800;
             color: var(--primary-color);
-            margin-bottom: 0.6rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .brand-subtitle {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            font-family: monospace;
+            letter-spacing: 0.5px;
         }
 
         .json-tools {
@@ -193,7 +206,7 @@
 
         .search-container {
             position: relative;
-            width: 280px;
+            width: 260px;
         }
 
         .search-container input {
@@ -256,7 +269,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات الاحترافي مع زر التحكم بالوقف والحركة */
+        /* شريط التنبيهات مع السحب اليدوي والتحكم بالبطء والزر الافتراضي */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -280,15 +293,20 @@
             flex-shrink: 0;
         }
         .ticker-container {
-            overflow: hidden;
+            overflow-x: auto;
             white-space: nowrap;
             flex: 1;
             position: relative;
+            cursor: grab;
+            scrollbar-width: none; /* إخفاء شريط التمرير */
         }
+        .ticker-container::-webkit-scrollbar { display: none; }
+        .ticker-container:active { cursor: grabbing; }
+
         .ticker-track {
             display: inline-flex;
             gap: 2rem;
-            animation: marqueeTicker 60s linear infinite;
+            animation: marqueeTicker 80s linear infinite; /* حركة بطيئة جداً ومريحة */
         }
         .ticker-track.paused {
             animation-play-state: paused !important;
@@ -440,7 +458,7 @@
         }
 
         th, td {
-            padding: 0.4rem 0.3rem; /* تقليل الفراغات الإضافية لتوفير مساحة واحترافية عالية */
+            padding: 0.4rem 0.3rem;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
             line-height: 1.25;
@@ -510,7 +528,7 @@
             cursor: pointer;
         }
 
-        /* صفحة دليل المنسقين (مع مقبض التحريك الجانبي فقط لتسهيل تحديد النص) */
+        /* الكروت القابلة للسحب (المنسقين والاستفسارات) */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -607,7 +625,6 @@
             margin-bottom: 0.6rem;
         }
 
-        /* السعر البارز في العروض */
         .price-badge {
             background-color: rgba(37, 99, 235, 0.25);
             color: var(--primary-color);
@@ -715,12 +732,15 @@
 
     <!-- الشريط الجانبي القابل للطي -->
     <aside class="sidebar" id="appSidebar">
-        <div class="brand-title">
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-                <i class="fa-solid fa-headset"></i>
-                <span class="brand-text">لوحة الكول سنتر</span>
+        <div class="brand-container">
+            <div class="brand-title">
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                    <i class="fa-solid fa-headset"></i>
+                    <span>لوحة خدمة عملاء ماجستى</span>
+                </div>
+                <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
             </div>
-            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
+            <div class="brand-subtitle">Developed by Mostafa Yousef</div>
         </div>
 
         <div class="json-tools">
@@ -771,15 +791,18 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات مع زر تحكم الوقف والحركة -->
+        <!-- شريط التنبيهات التفاعلي مع السحب والأزرار -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-            <div class="ticker-container">
+            <div class="ticker-container" id="tickerContainer" onmousedown="startTickerDrag(event)" onmousemove="tickerDragging(event)" onmouseup="stopTickerDrag()" onmouseleave="stopTickerDrag()">
                 <div class="ticker-track" id="tickerTrackContainer">
-                    <!-- التنبيهات المتحركة -->
+                    <!-- التنبيهات -->
                 </div>
             </div>
-            <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn" title="إيقاف أو تشغيل الحركة"><i class="fa-solid fa-pause"></i></button>
+            <div style="display:flex; gap:0.2rem;">
+                <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="resetTickerPosition()" title="الرجوع للوضع الافتراضي (أول إشعار)"><i class="fa-solid fa-rotate-right"></i></button>
+                <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn" title="إيقاف أو تشغيل الحركة"><i class="fa-solid fa-pause"></i></button>
+            </div>
         </div>
 
         <div class="content-area">
@@ -893,11 +916,12 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء -->
+            <!-- 3. الأقسام والأطباء (أعمدة مستقلة تماماً وخيارات عرض مرنة) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
                     <div style="display:flex; gap:0.3rem;">
+                        <button class="btn btn-secondary" onclick="toggleDeptsLayout()" id="deptsLayoutBtn"><i class="fa-solid fa-columns"></i> تغيير طريقة العرض</button>
                         <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
@@ -908,49 +932,50 @@
                     <input type="text" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs(this.value)">
                 </div>
 
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
-                    <div style="display:flex; flex-direction:column; gap:0.6rem;">
-                        <!-- فرع معشي -->
-                        <div class="branch-box">
-                            <div class="branch-title">
-                                <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span>
-                            </div>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr style="background:var(--bg-surface); color:var(--text-muted); text-align:center; font-size:0.68rem;">
-                                            <th style="border-left:1px solid var(--border-color); padding:0.3rem;">الجلدية (الخدمة / الجهاز)</th>
-                                            <th style="padding:0.3rem;">الأسنان (الخدمة / الجهاز)</th>
-                                            <th rowspan="2" style="vertical-align:middle; width:70px;">إدارة</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="mashyDeptsTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- فرع الوسام -->
-                        <div class="branch-box">
-                            <div class="branch-title">
-                                <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span>
-                            </div>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr style="background:var(--bg-surface); color:var(--text-muted); text-align:center; font-size:0.68rem;">
-                                            <th style="border-left:1px solid var(--border-color); padding:0.3rem;">الجلدية (الخدمة / الجهاز)</th>
-                                            <th style="padding:0.3rem;">الأسنان (الخدمة / الجهاز)</th>
-                                            <th rowspan="2" style="vertical-align:middle; width:70px;">إدارة</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="wissamDeptsTableBody"></tbody>
-                                </table>
-                            </div>
+                <div id="deptsMainGridContainer" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
+                    <!-- 1. معشي - جلدية -->
+                    <div class="branch-box">
+                        <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي - قسم الجلدية</span></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>الخدمة / الجهاز</th><th style="width:70px; text-align:center;">إدارة</th></tr></thead>
+                                <tbody id="mashyDermTableBody"></tbody>
+                            </table>
                         </div>
                     </div>
-
-                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
+                    <!-- 2. معشي - أسنان -->
+                    <div class="branch-box">
+                        <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي - قسم الأسنان</span></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>الخدمة / الجهاز</th><th style="width:70px; text-align:center;">إدارة</th></tr></thead>
+                                <tbody id="mashyDentTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 3. الوسام - جلدية -->
+                    <div class="branch-box">
+                        <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام - قسم الجلدية</span></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>الخدمة / الجهاز</th><th style="width:70px; text-align:center;">إدارة</th></tr></thead>
+                                <tbody id="wissamDermTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 4. الوسام - أسنان -->
+                    <div class="branch-box">
+                        <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام - قسم الأسنان</span></div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>الخدمة / الجهاز</th><th style="width:70px; text-align:center;">إدارة</th></tr></thead>
+                                <tbody id="wissamDentTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+
+                <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.4rem; margin-top:0.6rem;"></div>
             </section>
 
             <!-- 4. دليل المنسقين -->
@@ -968,7 +993,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
-            <!-- 5. العروض والأسعار (احترافي، بدون فراغات، أعضاء ذكية للأجهزة حسب الإدخال، وخانة ملحوظات) -->
+            <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -984,14 +1009,12 @@
 
                 <div class="offers-table-box">
                     <div class="table-responsive">
-                        <table id="offersTableElement">
-                            <!-- سيتم توليد الجدول ديناميكياً حسب الأعمدة التي تحتوي على قيم -->
-                        </table>
+                        <table id="offersTableElement"></table>
                     </div>
                 </div>
             </section>
 
-            <!-- 6. دليل الاستفسارات -->
+            <!-- 6. دليل الاستفسارات (مع إمكانية تلوين الكروت والسحب والإفلات) -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
@@ -1207,18 +1230,19 @@
                     <option value="الوسام">فرع الوسام</option>
                 </select>
             </div>
-            <div style="display:flex; gap:0.4rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>الجلدية (الخدمة / الجهاز)</label>
-                    <input type="text" id="deptDerm" class="form-control" placeholder="مثال: ليزر كربوني / هيليوس">
-                </div>
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>الأسنان (الخدمة / الجهاز)</label>
-                    <input type="text" id="deptDent" class="form-control" placeholder="مثال: تنظيف جير">
-                </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>القسم</label>
+                <select id="deptCategorySelect" class="form-control">
+                    <option value="جلدية">قسم الجلدية</option>
+                    <option value="أسنان">قسم الأسنان</option>
+                </select>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>اسم الخدمة / الجهاز</label>
+                <input type="text" id="deptServiceName" class="form-control" placeholder="مثال: ليزر كربوني / تنظيف جير">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem; margin-top:0.2rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون تمييز هذا المربع (الخلية) فقط:</label>
+                <label style="font-weight:700; color:var(--primary-color);">لون تمييز هذا الصف:</label>
                 <select id="deptCustomColor" class="form-control">
                     <option value="">بدون تمييز (تلقائي)</option>
                     <option value="background-color: rgba(245, 158, 11, 0.25); color: #fef08a;">برتقالي مميز (Highlight)</option>
@@ -1291,7 +1315,7 @@
         </div>
     </div>
 
-    <!-- Modal 7: Offer Modal (اختيارية الأجهزة بالكامل مع خانة الملاحظات) -->
+    <!-- Modal 7: Offer Modal -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1365,6 +1389,17 @@
                 <input type="text" id="inqCustomCategoryText" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>لون الكارت</label>
+                <select id="inqColor" class="form-control">
+                    <option value="card-darkblue">أزرق داكن (افتراضي)</option>
+                    <option value="card-teal">أزرق ملكي</option>
+                    <option value="card-maroon">بنفسجي غامق</option>
+                    <option value="card-red">أحمر مارون</option>
+                    <option value="card-gold">برتقالي ذهبي</option>
+                    <option value="card-green">أخضر زيتي</option>
+                </select>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>السؤال أو الاستفسار</label>
                 <input type="text" id="inqQuestion" class="form-control">
             </div>
@@ -1411,6 +1446,7 @@
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
+        let deptsStackMode = false; // طريقة عرض الأقسام (شبكة أو تحت بعض)
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -1444,12 +1480,13 @@
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
                     deptServicesData = [
-                        { id: 1, branch: "معشي", derm: "جنتل ماكس برو", dent: "تنظيف جير", customColor: "", isJoint: true },
-                        { id: 2, branch: "الوسام", derm: "كلاريتي 2", dent: "تقويم", customColor: "", isJoint: true }
+                        { id: 1, branch: "معشي", category: "جلدية", name: "جنتل ماكس برو", customColor: "", isJoint: true },
+                        { id: 2, branch: "معشي", category: "أسنان", name: "تنظيف جير", customColor: "", isJoint: true },
+                        { id: 3, branch: "الوسام", category: "جلدية", name: "كلاريتي 2", customColor: "", isJoint: true },
+                        { id: 4, branch: "الوسام", category: "أسنان", name: "تقويم", customColor: "", isJoint: true }
                     ];
                     deptNotesData = [
-                        { text: "مجمع ماجستي الطبي والدوام ( 920031480 ) ( 2722 ) الاتصال بماجستي", color: "card-gold" },
-                        { text: "في حال احد سال على عرض الزراعة او التقويم يتم الاتصال بسؤال العمل هل تم كشفية من قبل والتوضيح له ان الكشفية للاسترشاد اذا اصرف فى حجز العرض مباشرة .. ويستعمل لمدة اسبوع حتى لا تفوته العرض مع كتابة الملاحظات", color: "card-gold" }
+                        { text: "مجمع ماجستي الطبي والدوام ( 920031480 ) ( 2722 ) الاتصال بماجستي", color: "card-gold" }
                     ];
                     syncToCloud();
                 }
@@ -1483,7 +1520,11 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
+        // تحكم شريط التنبيهات (سحب بالماوس + إيقاف/تشغيل + رجوع للوضع الافتراضي)
         let isTickerPaused = false;
+        let isDraggingTicker = false;
+        let tickerStartX, tickerScrollLeft;
+
         function toggleTickerPlay() {
             isTickerPaused = !isTickerPaused;
             const track = document.getElementById('tickerTrackContainer');
@@ -1497,6 +1538,31 @@
                 btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
                 btn.style.color = "inherit";
             }
+        }
+
+        function resetTickerPosition() {
+            const container = document.getElementById('tickerContainer');
+            container.scrollLeft = 0;
+        }
+
+        function startTickerDrag(e) {
+            isDraggingTicker = true;
+            const container = document.getElementById('tickerContainer');
+            tickerStartX = e.pageX - container.offsetLeft;
+            tickerScrollLeft = container.scrollLeft;
+        }
+
+        function tickerDragging(e) {
+            if (!isDraggingTicker) return;
+            e.preventDefault();
+            const container = document.getElementById('tickerContainer');
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - tickerStartX) * 2;
+            container.scrollLeft = tickerScrollLeft - walk;
+        }
+
+        function stopTickerDrag() {
+            isDraggingTicker = false;
         }
 
         function syncToCloud() {
@@ -2124,22 +2190,36 @@
             }
         }
 
-        function renderDeptsAndDocs(search = "") {
-            const mashyBody = document.getElementById('mashyDeptsTableBody');
-            const wissamBody = document.getElementById('wissamDeptsTableBody');
-            if(!mashyBody || !wissamBody) return;
-            
-            mashyBody.innerHTML = "";
-            wissamBody.innerHTML = "";
+        function toggleDeptsLayout() {
+            deptsStackMode = !deptsStackMode;
+            const gridContainer = document.getElementById('deptsMainGridContainer');
+            if (deptsStackMode) {
+                gridContainer.style.gridTemplateColumns = "1fr";
+            } else {
+                gridContainer.style.gridTemplateColumns = "1fr 1fr";
+            }
+        }
 
-            deptServicesData.filter(s => (s.derm && s.derm.includes(search)) || (s.dent && s.dent.includes(search))).forEach(item => {
+        function renderDeptsAndDocs(search = "") {
+            const mashyDermBody = document.getElementById('mashyDermTableBody');
+            const mashyDentBody = document.getElementById('mashyDentTableBody');
+            const wissamDermBody = document.getElementById('wissamDermTableBody');
+            const wissamDentBody = document.getElementById('wissamDentTableBody');
+            
+            if(!mashyDermBody || !mashyDentBody || !wissamDermBody || !wissamDentBody) return;
+            
+            mashyDermBody.innerHTML = "";
+            mashyDentBody.innerHTML = "";
+            wissamDermBody.innerHTML = "";
+            wissamDentBody.innerHTML = "";
+
+            deptServicesData.filter(s => s.name && s.name.toLowerCase().includes(search.toLowerCase())).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
 
                 const rowHtml = `
-                    <tr>
-                        <td ${cellStyle} style="border-left:1px solid var(--border-color); ${item.customColor || ''}">${item.derm || '-'} ${jointBadge}</td>
-                        <td ${cellStyle} style="${item.customColor || ''}">${item.dent || '-'}</td>
+                    <tr ${cellStyle}>
+                        <td style="${item.customColor || ''}">${item.name || '-'} ${jointBadge}</td>
                         <td style="text-align:center;">
                             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button>
@@ -2148,9 +2228,11 @@
                 `;
 
                 if (item.branch === "معشي") {
-                    mashyBody.innerHTML += rowHtml;
+                    if (item.category === "جلدية") mashyDermBody.innerHTML += rowHtml;
+                    else mashyDentBody.innerHTML += rowHtml;
                 } else {
-                    wissamBody.innerHTML += rowHtml;
+                    if (item.category === "جلدية") wissamDermBody.innerHTML += rowHtml;
+                    else wissamDentBody.innerHTML += rowHtml;
                 }
             });
 
@@ -2175,8 +2257,8 @@
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = "";
             document.getElementById('deptBranchSelect').value = "معشي";
-            document.getElementById('deptDerm').value = "";
-            document.getElementById('deptDent').value = "";
+            document.getElementById('deptCategorySelect').value = "جلدية";
+            document.getElementById('deptServiceName').value = "";
             document.getElementById('deptCustomColor').value = "";
             document.getElementById('deptIsJoint').checked = false;
             document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز للأقسام";
@@ -2188,11 +2270,12 @@
             const rowObj = {
                 id: id ? parseInt(id) : Date.now(),
                 branch: document.getElementById('deptBranchSelect').value,
-                derm: document.getElementById('deptDerm').value,
-                dent: document.getElementById('deptDent').value,
+                category: document.getElementById('deptCategorySelect').value,
+                name: document.getElementById('deptServiceName').value.trim(),
                 customColor: document.getElementById('deptCustomColor').value,
                 isJoint: document.getElementById('deptIsJoint').checked
             };
+            if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
             if (id) {
                 const idx = deptServicesData.findIndex(s => s.id == id);
                 deptServicesData[idx] = rowObj;
@@ -2207,8 +2290,8 @@
             if (!item) return;
             document.getElementById('deptRowId').value = item.id;
             document.getElementById('deptBranchSelect').value = item.branch || "معشي";
-            document.getElementById('deptDerm').value = item.derm || "";
-            document.getElementById('deptDent').value = item.dent || "";
+            document.getElementById('deptCategorySelect').value = item.category || "جلدية";
+            document.getElementById('deptServiceName').value = item.name || "";
             document.getElementById('deptCustomColor').value = item.customColor || "";
             document.getElementById('deptIsJoint').checked = !!item.isJoint;
             document.getElementById('deptModalTitle').innerText = "تعديل خدمة / جهاز";
@@ -2266,6 +2349,7 @@
             }
         }
 
+        // دليل المنسقين (سحب وإفلات)
         let draggedCoordIdx = null;
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
@@ -2334,6 +2418,7 @@
             }
         }
 
+        // العروض والأسعار
         function checkCustomCategory(val) {
             document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none";
         }
@@ -2360,7 +2445,6 @@
             
             const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || o.price.includes(search) || (o.notes && o.notes.includes(search))));
             
-            // تحقق هل يوجد أي عرض في القسم يحتوي على جهاز أول أو ثانٍ
             const hasDev1 = filteredOffers.some(o => o.device1 && o.device1.trim() !== "");
             const hasDev2 = filteredOffers.some(o => o.device2 && o.device2.trim() !== "");
 
@@ -2460,6 +2544,7 @@
             }
         }
 
+        // دليل الاستفسارات (تلوين وسحب وإفلات)
         function checkInquiryCustomCat(val) {
             document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
         }
@@ -2470,6 +2555,7 @@
             if (btn) btn.classList.add('active');
             renderInquiries();
         }
+        let draggedInquiryIdx = null;
         function renderInquiries(search = "") {
             const grid = document.getElementById('inquiryCardsGrid');
             if(!grid) return;
@@ -2478,33 +2564,55 @@
                 const matchCat = (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter);
                 const matchSearch = (i.question.includes(search) || i.answer.includes(search));
                 return matchCat && matchSearch;
-            }).forEach(item => {
+            }).forEach((item, idx) => {
                 grid.innerHTML += `
-                    <div class="doc-sheet-card card-darkblue">
-                        <span style="font-size:0.6rem; background:rgba(255,255,255,0.1); padding:0.05rem 0.25rem; border-radius:4px; width:fit-content;">${item.category || 'عام'}</span>
-                        <h3>${item.question}</h3>
-                        <p>${item.answer}</p>
-                        <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.2rem; padding-top:0.25rem;">
-                            <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+                    <div class="doc-sheet-card ${item.color || 'card-darkblue'}">
+                        <h3>
+                            <span class="card-drag-handle" draggable="true" ondragstart="handleInquiryDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleInquiryDrop(event, ${idx})" title="اسحب من هنا فقط"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span style="font-size:0.6rem; background:rgba(255,255,255,0.1); padding:0.05rem 0.25rem; border-radius:4px; margin:0 0.4rem;">${item.category || 'عام'}</span>
+                            <span style="flex:1; cursor:text; user-select:text;">${item.question}</span>
+                            <div style="display:flex; gap:0.2rem;">
+                                <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <p style="user-select:text; cursor:text;">${item.answer}</p>
                     </div>
                 `;
             });
         }
+
+        function handleInquiryDragStart(e, idx) { draggedInquiryIdx = idx; }
+        function handleInquiryDrop(e, targetIdx) {
+            e.preventDefault();
+            if (draggedInquiryIdx === null || draggedInquiryIdx === targetIdx) return;
+            const moved = inquiriesData.splice(draggedInquiryIdx, 1)[0];
+            inquiriesData.splice(targetIdx, 0, moved);
+            syncToCloud();
+            renderInquiries();
+        }
+
         function openInquiryModal() {
             document.getElementById('inquiryId').value = "";
             document.getElementById('inqQuestion').value = "";
             document.getElementById('inqAnswer').value = "";
             document.getElementById('inqCategory').value = "الليزر";
+            document.getElementById('inqColor').value = "card-darkblue";
             document.getElementById('inqCustomCatBox').style.display = "none";
             document.getElementById('inquiryModal').classList.add('active');
         }
+
         function saveInquiry() {
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
-            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value };
+            const obj = { 
+                id: id ? parseInt(id) : Date.now(), 
+                category: cat, 
+                color: document.getElementById('inqColor').value,
+                question: document.getElementById('inqQuestion').value, 
+                answer: document.getElementById('inqAnswer').value 
+            };
             if (!obj.question) return;
             if (id) {
                 const idx = inquiriesData.findIndex(i => i.id == id);
@@ -2514,14 +2622,17 @@
             renderInquiries();
             closeModal('inquiryModal');
         }
+
         function editInquiry(id) {
             const item = inquiriesData.find(i => i.id === id);
             if (!item) return;
             document.getElementById('inquiryId').value = item.id;
             document.getElementById('inqQuestion').value = item.question;
             document.getElementById('inqAnswer').value = item.answer;
+            document.getElementById('inqColor').value = item.color || "card-darkblue";
             document.getElementById('inquiryModal').classList.add('active');
         }
+
         function deleteInquiry(id) {
             if (confirm("حذف؟")) {
                 inquiriesData = inquiriesData.filter(i => i.id !== id);
@@ -2530,6 +2641,7 @@
             }
         }
 
+        // البحث الشامل
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
