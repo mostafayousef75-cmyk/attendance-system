@@ -256,7 +256,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات الاحترافي البطيء والمريح للعين (Ticker Bar) */
+        /* شريط التنبيهات الاحترافي مع زر التحكم بالوقف والحركة */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -288,10 +288,10 @@
         .ticker-track {
             display: inline-flex;
             gap: 2rem;
-            animation: marqueeTicker 80s linear infinite; /* حركة بطيئة جداً ومريحة للقراءة */
+            animation: marqueeTicker 60s linear infinite;
         }
-        .ticker-track:hover {
-            animation-play-state: paused; /* إيقاف تام عند وضع الماوس لنسخ وقراءة النص براحة */
+        .ticker-track.paused {
+            animation-play-state: paused !important;
         }
         .ticker-item {
             background: var(--bg-card);
@@ -440,10 +440,10 @@
         }
 
         th, td {
-            padding: 0.5rem 0.4rem;
+            padding: 0.4rem 0.3rem; /* تقليل الفراغات الإضافية لتوفير مساحة واحترافية عالية */
             border-bottom: 1px solid var(--border-color);
             text-align: right;
-            line-height: 1.3;
+            line-height: 1.25;
             vertical-align: middle;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -510,7 +510,7 @@
             cursor: pointer;
         }
 
-        /* صفحة دليل المنسقين */
+        /* صفحة دليل المنسقين (مع مقبض التحريك الجانبي فقط لتسهيل تحديد النص) */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -543,6 +543,19 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .card-drag-handle {
+            cursor: grab;
+            padding: 0.2rem 0.4rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+        .card-drag-handle:active {
+            cursor: grabbing;
+            opacity: 1;
         }
 
         .doc-sheet-card p {
@@ -594,7 +607,7 @@
             margin-bottom: 0.6rem;
         }
 
-        /* السعر الواضح والبارز في العروض */
+        /* السعر البارز في العروض */
         .price-badge {
             background-color: rgba(37, 99, 235, 0.25);
             color: var(--primary-color);
@@ -700,7 +713,7 @@
 </head>
 <body class="theme-amoled">
 
-    <!-- الشريط الجانبي مع إمكانية الطي والفتح عبر زر السهم -->
+    <!-- الشريط الجانبي القابل للطي -->
     <aside class="sidebar" id="appSidebar">
         <div class="brand-title">
             <div style="display:flex; align-items:center; gap:0.4rem;">
@@ -758,14 +771,15 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات الاحترافي البطيء (Ticker Bar) -->
+        <!-- شريط التنبيهات مع زر تحكم الوقف والحركة -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-container">
                 <div class="ticker-track" id="tickerTrackContainer">
-                    <!-- سيتم تعبئته تلقائياً بالتنبيهات -->
+                    <!-- التنبيهات المتحركة -->
                 </div>
             </div>
+            <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn" title="إيقاف أو تشغيل الحركة"><i class="fa-solid fa-pause"></i></button>
         </div>
 
         <div class="content-area">
@@ -954,7 +968,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
-            <!-- 5. العروض والأسعار (تم جعل أجهزة جنتل وكلاريتي اختيارية تماماً مع تكبير وتوضيح السعر) -->
+            <!-- 5. العروض والأسعار (احترافي، بدون فراغات، أعضاء ذكية للأجهزة حسب الإدخال، وخانة ملحوظات) -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -970,17 +984,8 @@
 
                 <div class="offers-table-box">
                     <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>الخدمة / العرض</th>
-                                    <th>جهاز جنتل ماكس برو</th>
-                                    <th>جهاز كلاريتي 2</th>
-                                    <th>السعر العام للخدمه</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="offersTableBody"></tbody>
+                        <table id="offersTableElement">
+                            <!-- سيتم توليد الجدول ديناميكياً حسب الأعمدة التي تحتوي على قيم -->
                         </table>
                     </div>
                 </div>
@@ -1286,7 +1291,7 @@
         </div>
     </div>
 
-    <!-- Modal 7: Offer Modal (تم جعل الأجهزة اختيارية لتناسب خدمات الزراعة والتقويم) -->
+    <!-- Modal 7: Offer Modal (اختيارية الأجهزة بالكامل مع خانة الملاحظات) -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1309,22 +1314,28 @@
                 <input type="text" id="offCustomCategory" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>اسم الخدمة / العرض (مثال: زراعة، تقويم، تنظيف...)</label>
+                <label>اسم الخدمة / العرض (مثل: زراعة، تقويم، جلسة ليزر...)</label>
                 <input type="text" id="offName" class="form-control">
             </div>
             <div style="display:flex; gap:0.4rem;">
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>جهاز جنتل ماكس برو (اختياري)</label>
-                    <input type="text" id="offGentle" class="form-control" placeholder="اختياري أو اتركه فارغاً">
+                    <label>جهاز أول (اختياري)</label>
+                    <input type="text" id="offDevice1" class="form-control" placeholder="مثال: جنتل ماكس برو">
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>جهاز كلاريتي 2 (اختياري)</label>
-                    <input type="text" id="offClarity" class="form-control" placeholder="اختياري أو اتركه فارغاً">
+                    <label>جهاز ثاني (اختياري)</label>
+                    <input type="text" id="offDevice2" class="form-control" placeholder="مثال: كلاريتي 2">
                 </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>السعر العام للخدمة</label>
-                <input type="text" id="offPrice" class="form-control" placeholder="مثال: 1500 ريال">
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>السعر العام للخدمة</label>
+                    <input type="text" id="offPrice" class="form-control" placeholder="مثال: 1500 ريال">
+                </div>
+                <div style="flex:1.5; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>ملحوظات / شروط العرض</label>
+                    <input type="text" id="offNotes" class="form-control" placeholder="مثال: تشمل الكشفية">
+                </div>
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
         </div>
@@ -1470,6 +1481,22 @@
             const sidebar = document.getElementById('appSidebar');
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+
+        let isTickerPaused = false;
+        function toggleTickerPlay() {
+            isTickerPaused = !isTickerPaused;
+            const track = document.getElementById('tickerTrackContainer');
+            const btn = document.getElementById('tickerToggleBtn');
+            if (isTickerPaused) {
+                track.classList.add('paused');
+                btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+                btn.style.color = "var(--primary-color)";
+            } else {
+                track.classList.remove('paused');
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                btn.style.color = "inherit";
+            }
         }
 
         function syncToCloud() {
@@ -2247,14 +2274,16 @@
             coordinatorsData.filter(c => c.name.includes(search)).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 grid.innerHTML += `
-                    <div class="doc-sheet-card ${c.color || 'card-teal'}" draggable="true" ondragstart="handleCoordDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleCoordDrop(event, ${idx})">
-                        <h3><i class="fa-solid fa-grip-vertical" style="opacity:0.6; margin-left:0.3rem;"></i> ${c.name}
+                    <div class="doc-sheet-card ${c.color || 'card-teal'}">
+                        <h3>
+                            <span class="card-drag-handle" draggable="true" ondragstart="handleCoordDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleCoordDrop(event, ${idx})" title="اسحب من هنا فقط"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span style="flex:1; margin:0 0.4rem; cursor:text; user-select:text;">${c.name}</span>
                             <div style="display:flex; gap:0.2rem;">
                                 <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
-                        ${rules}
+                        <div style="user-select:text; cursor:text;">${rules}</div>
                     </div>
                 `;
             });
@@ -2326,34 +2355,65 @@
             renderOffers();
         }
         function renderOffers(search = "") {
-            const body = document.getElementById('offersTableBody');
-            if(!body) return;
-            body.innerHTML = "";
-            offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || o.price.includes(search))).forEach(item => {
-                body.innerHTML += `
+            const tableEl = document.getElementById('offersTableElement');
+            if(!tableEl) return;
+            
+            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || o.price.includes(search) || (o.notes && o.notes.includes(search))));
+            
+            // تحقق هل يوجد أي عرض في القسم يحتوي على جهاز أول أو ثانٍ
+            const hasDev1 = filteredOffers.some(o => o.device1 && o.device1.trim() !== "");
+            const hasDev2 = filteredOffers.some(o => o.device2 && o.device2.trim() !== "");
+
+            let headerHtml = `
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">الخدمة / العرض</th>
+            `;
+            if (hasDev1) headerHtml += `<th style="width: 20%;">الجهاز الأول</th>`;
+            if (hasDev2) headerHtml += `<th style="width: 20%;">الجهاز الثاني</th>`;
+            headerHtml += `
+                        <th style="width: 18%;">السعر النهائي</th>
+                        <th style="width: 27%;">الملحوظات والشروط</th>
+                        <th style="width: 10%; text-align:center;">إدارة</th>
+                    </tr>
+                </thead>
+            `;
+
+            let bodyHtml = `<tbody id="offersTableBody">`;
+            filteredOffers.forEach(item => {
+                bodyHtml += `
                     <tr>
                         <td><strong>${item.name}</strong></td>
-                        <td>${item.gentle || '-'}</td>
-                        <td>${item.clarity || '-'}</td>
+                `;
+                if (hasDev1) bodyHtml += `<td>${item.device1 || '-'}</td>`;
+                if (hasDev2) bodyHtml += `<td>${item.device2 || '-'}</td>`;
+                bodyHtml += `
                         <td><span class="price-badge">${item.price}</span></td>
-                        <td>
+                        <td style="color:var(--primary-color); font-weight:600; font-size:0.68rem;">${item.notes || '-'}</td>
+                        <td style="text-align:center;">
                             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
+            bodyHtml += `</tbody>`;
+
+            tableEl.innerHTML = headerHtml + bodyHtml;
         }
+
         function openOfferModal() {
             document.getElementById('offerId').value = "";
             document.getElementById('offName').value = "";
-            document.getElementById('offGentle').value = "";
-            document.getElementById('offClarity').value = "";
+            document.getElementById('offDevice1').value = "";
+            document.getElementById('offDevice2').value = "";
             document.getElementById('offPrice').value = "";
+            document.getElementById('offNotes').value = "";
             document.getElementById('offCategory').value = "عروض اسنان";
             document.getElementById('customCategoryBox').style.display = "none";
             document.getElementById('offerModal').classList.add('active');
         }
+
         function saveOffer() {
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
@@ -2362,9 +2422,10 @@
                 id: id ? parseInt(id) : Date.now(), 
                 category: cat, 
                 name: document.getElementById('offName').value, 
-                gentle: document.getElementById('offGentle').value.trim(), 
-                clarity: document.getElementById('offClarity').value.trim(), 
-                price: document.getElementById('offPrice').value 
+                device1: document.getElementById('offDevice1').value.trim(), 
+                device2: document.getElementById('offDevice2').value.trim(), 
+                price: document.getElementById('offPrice').value,
+                notes: document.getElementById('offNotes').value.trim()
             };
             if (!obj.name || !obj.price) return alert("يرجى إدخال اسم الخدمة والسعر على الأقل!");
             if (id) {
@@ -2377,16 +2438,19 @@
             renderOffers();
             closeModal('offerModal');
         }
+
         function editOffer(id) {
             const item = offersData.find(o => o.id === id);
             if (!item) return;
             document.getElementById('offerId').value = item.id;
             document.getElementById('offName').value = item.name;
-            document.getElementById('offGentle').value = item.gentle || "";
-            document.getElementById('offClarity').value = item.clarity || "";
+            document.getElementById('offDevice1').value = item.device1 || "";
+            document.getElementById('offDevice2').value = item.device2 || "";
             document.getElementById('offPrice').value = item.price;
+            document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offerModal').classList.add('active');
         }
+
         function deleteOffer(id) {
             if (confirm("حذف؟")) {
                 offersData = offersData.filter(o => o.id !== id);
@@ -2524,7 +2588,7 @@
                             <div>
                                 <span class="source-badge"><i class="fa-solid fa-tags"></i> قسم: العروض والأسعار (${o.category})</span>
                                 <h4 style="margin-top:0.3rem;">${o.name}</h4>
-                                <p style="font-size:0.75rem; color:var(--text-muted);">السعر العام: ${o.price} | جنتل: ${o.gentle || '-'} | كلاريتي: ${o.clarity || '-'}</p>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">السعر: ${o.price} | الملاحظات: ${o.notes || '-'}</p>
                             </div>
                             <button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض بالصفحة</button>
                         </div>
