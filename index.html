@@ -413,9 +413,10 @@
         #schedule-section th:nth-child(5), #schedule-section td:nth-child(5) { width: 25%; }
         #schedule-section th:nth-child(6), #schedule-section td:nth-child(6) { width: 15%; text-align: center; }
 
+        /* تعديلات صفحة التنبيهات المنظمة باحترافية (عمودين متناسقين وبدون تكبير مبالغ) */
         .alerts-2col-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 0.5rem;
         }
 
@@ -429,6 +430,7 @@
             justify-content: space-between;
             gap: 0.5rem;
             font-size: 0.76rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .alert-thumb-side {
@@ -442,7 +444,7 @@
         }
 
         .pdf-file-badge {
-            background: #dc2626;
+            background: var(--danger-color);
             color: #fff;
             padding: 0.2rem 0.4rem;
             border-radius: 4px;
@@ -726,7 +728,7 @@
                     <!-- فرع معشي -->
                     <div class="branch-box">
                         <div class="branch-title">
-                            <span><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
+                            <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
                             <span style="font-size:0.65rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
                         </div>
                         <div class="table-responsive">
@@ -749,7 +751,7 @@
                     <!-- فرع الوسام -->
                     <div class="branch-box">
                         <div class="branch-title">
-                            <span><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
+                            <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
                             <span style="font-size:0.65rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
                         </div>
                         <div class="table-responsive">
@@ -807,8 +809,8 @@
                             <table style="table-layout: auto;">
                                 <thead>
                                     <tr style="background:var(--bg-card); color:var(--text-main); text-align:center;">
-                                        <th colspan="2" style="border-left:1px solid var(--border-color); padding:0.4rem;">فرع معشي</th>
-                                        <th colspan="2" style="padding:0.4rem;">فرع الوسام</th>
+                                        <th colspan="2" style="border-left:1px solid var(--border-color); padding:0.4rem; color: #f59e0b; font-size:0.85rem;">فرع معشي</th>
+                                        <th colspan="2" style="padding:0.4rem; color: #f59e0b; font-size:0.85rem;">فرع الوسام</th>
                                         <th rowspan="2" style="vertical-align:middle; width:70px;">إدارة</th>
                                     </tr>
                                     <tr style="background:var(--bg-surface); color:var(--text-muted); text-align:center; font-size:0.68rem;">
@@ -953,7 +955,7 @@
 
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <input type="checkbox" id="docIsJoint" style="width:15px; height:15px;">
-                <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين</label>
+                <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين (⭐ ظهور علامة مميزة)</label>
             </div>
             <div style="display:flex; align-items:center; gap:0.4rem; background:rgba(220,38,38,0.1); padding:0.3rem 0.5rem; border-radius:6px; border:1px solid var(--danger-color);">
                 <input type="checkbox" id="docIsLeave" style="width:15px; height:15px;">
@@ -1103,6 +1105,19 @@
                     <label>الوسام - أسنان (الخدمة / الجهاز)</label>
                     <input type="text" id="wDent" class="form-control" placeholder="مثال: تقويم">
                 </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem; margin-top:0.3rem;">
+                <label>لون تمييز الصف (اختياري)</label>
+                <select id="deptCustomColor" class="form-control">
+                    <option value="">بدون تمييز (تلقائي)</option>
+                    <option value="rgba(245, 158, 11, 0.15)">برتقالي خفيف (مميز)</option>
+                    <option value="rgba(37, 99, 235, 0.15)">أزرق خفيف (مشترك)</option>
+                    <option value="rgba(22, 163, 74, 0.15)">أخضر خفيف</option>
+                </select>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem; margin-top:0.3rem;">
+                <input type="checkbox" id="deptIsJoint" style="width:15px; height:15px;">
+                <label for="deptIsJoint" style="font-weight:700; color:var(--primary-color);">خدمة/جهاز مشترك في الفرعين (⭐ إضافة علامة مميزة)</label>
             </div>
             <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveDeptService()">حفظ الصف</button>
         </div>
@@ -1291,7 +1306,7 @@
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
-                    deptServicesData = [{ id: 1, mDerm: "جنتل ماكس برو", mDent: "تنظيف جير", wDerm: "كلاريتي 2", wDent: "تقويم" }];
+                    deptServicesData = [{ id: 1, mDerm: "جنتل ماكس برو", mDent: "تنظيف جير", wDerm: "كلاريتي 2", wDent: "تقويم", isJoint: true, customColor: "rgba(37, 99, 235, 0.15)" }];
                     syncToCloud();
                 }
 
@@ -1581,7 +1596,7 @@
                 if (doc.isLeave) {
                     customBgStyle = "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);";
                 } else if (doc.customColor) {
-                    customBgStyle = `background-color: ${doc.customColor}; color: #fff;`;
+                    customBgStyle = `background-color: ${doc.customColor};`;
                 }
 
                 let scheduleHtml = `<div style="font-weight:600; margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
@@ -1617,7 +1632,7 @@
                 if (doc.isLeave) {
                     customBgStyle = "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);";
                 } else if (doc.customColor) {
-                    customBgStyle = `background-color: ${doc.customColor}; color: #fff;`;
+                    customBgStyle = `background-color: ${doc.customColor};`;
                 }
 
                 let scheduleHtml = `<div style="font-weight:600; margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
@@ -1943,9 +1958,11 @@
             if(!body) return;
             body.innerHTML = "";
             deptServicesData.filter(s => (s.mDerm && s.mDerm.includes(search)) || (s.wDerm && s.wDerm.includes(search)) || (s.mDent && s.mDent.includes(search)) || (s.wDent && s.wDent.includes(search))).forEach(item => {
+                const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
+                const rowStyle = item.customColor ? `style="background-color: ${item.customColor};"` : '';
                 body.innerHTML += `
-                    <tr>
-                        <td style="border-left:1px solid var(--border-color);">${item.mDerm || '-'}</td>
+                    <tr ${rowStyle}>
+                        <td style="border-left:1px solid var(--border-color);">${item.mDerm || '-'} ${jointBadge}</td>
                         <td style="border-left:1px solid var(--border-color);">${item.mDent || '-'}</td>
                         <td style="border-left:1px solid var(--border-color);">${item.wDerm || '-'}</td>
                         <td>${item.wDent || '-'}</td>
@@ -1979,6 +1996,8 @@
             document.getElementById('mDent').value = "";
             document.getElementById('wDerm').value = "";
             document.getElementById('wDent').value = "";
+            document.getElementById('deptCustomColor').value = "";
+            document.getElementById('deptIsJoint').checked = false;
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
@@ -1989,7 +2008,9 @@
                 mDerm: document.getElementById('mDerm').value,
                 mDent: document.getElementById('mDent').value,
                 wDerm: document.getElementById('wDerm').value,
-                wDent: document.getElementById('wDent').value
+                wDent: document.getElementById('wDent').value,
+                customColor: document.getElementById('deptCustomColor').value,
+                isJoint: document.getElementById('deptIsJoint').checked
             };
             if (id) {
                 const idx = deptServicesData.findIndex(s => s.id == id);
@@ -2008,6 +2029,8 @@
             document.getElementById('mDent').value = item.mDent || "";
             document.getElementById('wDerm').value = item.wDerm || "";
             document.getElementById('wDent').value = item.wDent || "";
+            document.getElementById('deptCustomColor').value = item.customColor || "";
+            document.getElementById('deptIsJoint').checked = !!item.isJoint;
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
