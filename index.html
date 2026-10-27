@@ -256,7 +256,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات مع السحب بالماوس يمين ويسار والوضع الافتراضي */
+        /* شريط التنبيهات بدون حركة ومخصص بالسحب للوصول للأحدث */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -264,7 +264,6 @@
             display: flex;
             align-items: center;
             gap: 0.8rem;
-            overflow: hidden;
             font-size: 0.76rem;
             user-select: text !important;
         }
@@ -281,23 +280,28 @@
             flex-shrink: 0;
         }
         .ticker-container {
-            overflow: hidden;
+            overflow-x: auto;
             white-space: nowrap;
             flex: 1;
             position: relative;
             cursor: grab;
             user-select: none;
+            scroll-behavior: smooth;
+        }
+        .ticker-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .ticker-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
         }
         .ticker-container:active {
             cursor: grabbing;
         }
         .ticker-track {
             display: inline-flex;
-            gap: 2rem;
-            animation: marqueeTicker 60s linear infinite;
-        }
-        .ticker-track.paused {
-            animation-play-state: paused !important;
+            gap: 0.8rem;
+            align-items: center;
         }
         .ticker-item {
             background: var(--bg-card);
@@ -309,14 +313,10 @@
             gap: 0.4rem;
             cursor: pointer;
             user-select: text !important;
+            flex-shrink: 0;
         }
         .ticker-item:hover {
             border-color: var(--primary-color);
-        }
-
-        @keyframes marqueeTicker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(100%); }
         }
 
         .content-area {
@@ -863,17 +863,16 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات مع السحب بالماوس يمين ويسار والوضع الافتراضي -->
+        <!-- شريط التنبيهات بدون حركة مع زر افتراضي للرجوع لأحدث الإشعارات -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-container" id="tickerWrapper">
                 <div class="ticker-track" id="tickerTrackContainer">
-                    <!-- التنبيهات المتحركة مرتبة من الأحدث للأقدم -->
+                    <!-- التنبيهات ثابتة ومترتبة من الأحدث للأقدم (الأحدث في البداية) -->
                 </div>
             </div>
-            <div style="display:flex; gap:0.2rem;">
-                <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn" title="إيقاف أو تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="resetTickerDefault()" title="إعادة تعيين وترتيب الأحدث للأقدم"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
+            <div>
+                <button class="btn btn-secondary" style="padding:0.15rem 0.5rem; font-size:0.7rem;" onclick="resetTickerDefault()" title="الرجوع لأحدث الإشعارات"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
             </div>
         </div>
 
@@ -1587,7 +1586,6 @@
                 document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
 
-            // تفعيل السحب بالماوس (Drag to Scroll) لشريط التنبيهات يمين ويسار
             initTickerDragScroll();
         });
 
@@ -1627,34 +1625,12 @@
             });
         }
 
-        let isTickerPaused = false;
-        function toggleTickerPlay() {
-            isTickerPaused = !isTickerPaused;
-            const track = document.getElementById('tickerTrackContainer');
-            const btn = document.getElementById('tickerToggleBtn');
-            if (isTickerPaused) {
-                track.classList.add('paused');
-                btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
-                btn.style.color = "var(--primary-color)";
-            } else {
-                track.classList.remove('paused');
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
-                btn.style.color = "inherit";
-            }
-        }
-
+        // زر افتراضي يرجعك لأحدث الإشعارات في أول الشريط
         function resetTickerDefault() {
-            isTickerPaused = false;
-            const track = document.getElementById('tickerTrackContainer');
-            const btn = document.getElementById('tickerToggleBtn');
-            track.classList.remove('paused');
-            btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
-            btn.style.color = "inherit";
-            
-            // إعادة ضبط سكرول الشريط للبداية وتحديث الرندر لضمان جلب الأحدث في المقدمة
             const wrapper = document.getElementById('tickerWrapper');
-            if(wrapper) wrapper.scrollLeft = 0;
-            renderAlerts();
+            if(wrapper) {
+                wrapper.scrollTo({ left: 0, behavior: 'smooth' });
+            }
         }
 
         function toggleFloatingChat() {
@@ -2147,7 +2123,7 @@
             grid.innerHTML = ""; 
             tickerTrack.innerHTML = "";
 
-            // ترتيب الإشعارات والتنبيهات من الأحدث إلى الأقدم (الأحدث في المقدمة / الأول)
+            // ترتيب التنبيهات من الأحدث للأقدم لضمان ظهور الأحدث دائماً في البداية
             const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
 
             sortedAlerts.forEach(item => {
@@ -2698,7 +2674,7 @@
             }
         }
 
-        // دالة إرسال واستقبال رسائل الشات العائم مع تصحيح نموذج Gemini API
+        // دالة شات Gemini المباشرة عبر v1 Endpoint
         async function sendGeminiMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
@@ -2714,8 +2690,7 @@
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const apiKey = "AQ.Ab8RN6JqlZAausqoTqz4SNJUJcRBaBuwiy1IUfkGASrXcHMEAQ";
-            // استخدام الموديل الصحيح تماماً والمتوافق مع مفتاح الـ API
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             try {
                 const response = await fetch(url, {
