@@ -78,10 +78,10 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
-            user-select: text !important; /* السماح بتحديد النسخ في كل الصفحة */
+            user-select: text !important;
         }
 
-        /* Sidebar Navigation */
+        /* Sidebar Navigation & Collapse Mechanism */
         .sidebar {
             width: 240px;
             background-color: var(--bg-sidebar);
@@ -90,16 +90,35 @@
             flex-direction: column;
             padding: 0.8rem;
             flex-shrink: 0;
+            transition: width 0.25s ease, padding 0.25s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 65px;
+            padding: 0.8rem 0.35rem;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .json-tools,
+        .sidebar.collapsed .nav-link span,
+        .sidebar.collapsed .theme-box label,
+        .sidebar.collapsed .theme-select {
+            display: none !important;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.5rem;
         }
 
         .brand-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 800;
             color: var(--primary-color);
             margin-bottom: 0.6rem;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            justify-content: space-between;
         }
 
         .json-tools {
@@ -174,7 +193,7 @@
 
         .search-container {
             position: relative;
-            width: 300px;
+            width: 280px;
         }
 
         .search-container input {
@@ -237,7 +256,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات الاحترافي الجديد (Ticker Bar) */
+        /* شريط التنبيهات الاحترافي البطيء والمريح للعين (Ticker Bar) */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -269,10 +288,10 @@
         .ticker-track {
             display: inline-flex;
             gap: 2rem;
-            animation: marqueeTicker 30s linear infinite;
+            animation: marqueeTicker 80s linear infinite; /* حركة بطيئة جداً ومريحة للقراءة */
         }
         .ticker-track:hover {
-            animation-play-state: paused; /* إيقاف الحركة عند وضع الماوس لسهولة القراءة والنسخ */
+            animation-play-state: paused; /* إيقاف تام عند وضع الماوس لنسخ وقراءة النص براحة */
         }
         .ticker-item {
             background: var(--bg-card);
@@ -491,7 +510,7 @@
             cursor: pointer;
         }
 
-        /* صفحة دليل المنسقين (متناسقة ومرتبة على قد الكلام) */
+        /* صفحة دليل المنسقين */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -575,12 +594,16 @@
             margin-bottom: 0.6rem;
         }
 
+        /* السعر الواضح والبارز في العروض */
         .price-badge {
-            background-color: rgba(37, 99, 235, 0.2);
+            background-color: rgba(37, 99, 235, 0.25);
             color: var(--primary-color);
-            padding: 0.08rem 0.25rem;
-            border-radius: 4px;
-            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .tag-joint {
@@ -677,11 +700,14 @@
 </head>
 <body class="theme-amoled">
 
-    <!-- الشريط الجانبي -->
-    <aside class="sidebar">
+    <!-- الشريط الجانبي مع إمكانية الطي والفتح عبر زر السهم -->
+    <aside class="sidebar" id="appSidebar">
         <div class="brand-title">
-            <i class="fa-solid fa-headset"></i>
-            <span>لوحة الكول سنتر</span>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+                <i class="fa-solid fa-headset"></i>
+                <span class="brand-text">لوحة الكول سنتر</span>
+            </div>
+            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
 
         <div class="json-tools">
@@ -691,12 +717,12 @@
         </div>
 
         <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> مواعيد الأطباء</a></li>
-            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات</a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> الأقسام والأطباء</a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> دليل المنسقين</a></li>
-            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> العروض والأسعار</a></li>
-            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> دليل الاستفسارات</a></li>
+            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
+            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
+            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
+            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
         </ul>
         
         <div class="theme-box">
@@ -732,7 +758,7 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات الاحترافي الجديد المتحرك (Ticker Bar) -->
+        <!-- شريط التنبيهات الاحترافي البطيء (Ticker Bar) -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-container">
@@ -928,7 +954,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
-            <!-- 5. العروض والأسعار -->
+            <!-- 5. العروض والأسعار (تم جعل أجهزة جنتل وكلاريتي اختيارية تماماً مع تكبير وتوضيح السعر) -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -1260,7 +1286,7 @@
         </div>
     </div>
 
-    <!-- Modal 7: Offer Modal -->
+    <!-- Modal 7: Offer Modal (تم جعل الأجهزة اختيارية لتناسب خدمات الزراعة والتقويم) -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1283,22 +1309,22 @@
                 <input type="text" id="offCustomCategory" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>اسم الخدمة / العرض</label>
+                <label>اسم الخدمة / العرض (مثال: زراعة، تقويم، تنظيف...)</label>
                 <input type="text" id="offName" class="form-control">
             </div>
             <div style="display:flex; gap:0.4rem;">
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>جهاز جنتل ماكس برو</label>
-                    <input type="text" id="offGentle" class="form-control">
+                    <label>جهاز جنتل ماكس برو (اختياري)</label>
+                    <input type="text" id="offGentle" class="form-control" placeholder="اختياري أو اتركه فارغاً">
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>جهاز كلاريتي 2</label>
-                    <input type="text" id="offClarity" class="form-control">
+                    <label>جهاز كلاريتي 2 (اختياري)</label>
+                    <input type="text" id="offClarity" class="form-control" placeholder="اختياري أو اتركه فارغاً">
                 </div>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>السعر العام للخدمه</label>
-                <input type="text" id="offPrice" class="form-control">
+                <label>السعر العام للخدمة</label>
+                <input type="text" id="offPrice" class="form-control" placeholder="مثال: 1500 ريال">
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
         </div>
@@ -1379,6 +1405,11 @@
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
             changeTheme(savedTheme);
 
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isSidebarCollapsed) {
+                document.getElementById('appSidebar').classList.add('collapsed');
+            }
+
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
             switchTab(activeTab, targetNav, false);
@@ -1434,6 +1465,12 @@
                 document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
         });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
 
         function syncToCloud() {
             const payload = {
@@ -2296,8 +2333,8 @@
                 body.innerHTML += `
                     <tr>
                         <td><strong>${item.name}</strong></td>
-                        <td>${item.gentle}</td>
-                        <td>${item.clarity}</td>
+                        <td>${item.gentle || '-'}</td>
+                        <td>${item.clarity || '-'}</td>
                         <td><span class="price-badge">${item.price}</span></td>
                         <td>
                             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
@@ -2310,8 +2347,8 @@
         function openOfferModal() {
             document.getElementById('offerId').value = "";
             document.getElementById('offName').value = "";
-            document.getElementById('offGentle').value = "-";
-            document.getElementById('offClarity').value = "-";
+            document.getElementById('offGentle').value = "";
+            document.getElementById('offClarity').value = "";
             document.getElementById('offPrice').value = "";
             document.getElementById('offCategory').value = "عروض اسنان";
             document.getElementById('customCategoryBox').style.display = "none";
@@ -2321,8 +2358,15 @@
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
             if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
-            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, name: document.getElementById('offName').value, gentle: document.getElementById('offGentle').value, clarity: document.getElementById('offClarity').value, price: document.getElementById('offPrice').value };
-            if (!obj.name) return;
+            const obj = { 
+                id: id ? parseInt(id) : Date.now(), 
+                category: cat, 
+                name: document.getElementById('offName').value, 
+                gentle: document.getElementById('offGentle').value.trim(), 
+                clarity: document.getElementById('offClarity').value.trim(), 
+                price: document.getElementById('offPrice').value 
+            };
+            if (!obj.name || !obj.price) return alert("يرجى إدخال اسم الخدمة والسعر على الأقل!");
             if (id) {
                 const idx = offersData.findIndex(o => o.id == id);
                 offersData[idx] = obj;
@@ -2338,8 +2382,8 @@
             if (!item) return;
             document.getElementById('offerId').value = item.id;
             document.getElementById('offName').value = item.name;
-            document.getElementById('offGentle').value = item.gentle;
-            document.getElementById('offClarity').value = item.clarity;
+            document.getElementById('offGentle').value = item.gentle || "";
+            document.getElementById('offClarity').value = item.clarity || "";
             document.getElementById('offPrice').value = item.price;
             document.getElementById('offerModal').classList.add('active');
         }
@@ -2480,7 +2524,7 @@
                             <div>
                                 <span class="source-badge"><i class="fa-solid fa-tags"></i> قسم: العروض والأسعار (${o.category})</span>
                                 <h4 style="margin-top:0.3rem;">${o.name}</h4>
-                                <p style="font-size:0.75rem; color:var(--text-muted);">السعر العام: ${o.price} | جنتل: ${o.gentle} | كلاريتي: ${o.clarity}</p>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">السعر العام: ${o.price} | جنتل: ${o.gentle || '-'} | كلاريتي: ${o.clarity || '-'}</p>
                             </div>
                             <button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض بالصفحة</button>
                         </div>
