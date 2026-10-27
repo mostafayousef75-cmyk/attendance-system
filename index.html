@@ -696,12 +696,6 @@
             color: var(--primary-color);
         }
 
-        .ai-api-key-box {
-            padding: 0.5rem;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-        }
-
         .ai-chat-messages {
             flex: 1;
             padding: 0.6rem;
@@ -1134,10 +1128,6 @@
         <div class="ai-chat-header">
             <span><i class="fa-solid fa-robot"></i> مساعد خدمة العملاء الذكي</span>
             <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleAIChat()"></i>
-        </div>
-        <div class="ai-api-key-box" id="aiApiKeyBox">
-            <input type="password" id="aiApiKeyInput" class="form-control" placeholder="أدخل مفتاح Gemini API Key هنا...">
-            <button class="btn btn-green" onclick="saveApiKey()" style="margin-top:4px; width:100%; font-size:0.7rem;">حفظ المفتاح</button>
         </div>
         <div class="ai-chat-messages" id="aiChatMessages">
             <div class="ai-msg bot">أهلاً بك يا مصطفى! أنا مساعدك الذكي المدمج في لوحة ماجستي. اسألني عن مواعيد الأطباء، العروض، أو تفاصيل العمل وسأجيبك فوراً.</div>
@@ -1675,20 +1665,6 @@
         function toggleAIChat() {
             const panel = document.getElementById('aiChatPanel');
             panel.classList.toggle('active');
-            const savedKey = localStorage.getItem('geminiApiKey');
-            if (savedKey) {
-                document.getElementById('aiApiKeyBox').style.display = 'none';
-            } else {
-                document.getElementById('aiApiKeyBox').style.display = 'block';
-            }
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('aiApiKeyInput').value.trim();
-            if (!key) return alert("أدخل مفتاح صحيح!");
-            localStorage.setItem('geminiApiKey', key);
-            document.getElementById('aiApiKeyBox').style.display = 'none';
-            alert("تم حفظ مفتاح الذكاء الاصطناعي بنجاح!");
         }
 
         async function sendAIMessage() {
@@ -1696,12 +1672,8 @@
             const query = inputEl.value.trim();
             if (!query) return;
 
-            const apiKey = localStorage.getItem('geminiApiKey');
-            if (!apiKey) {
-                alert("يرجى إدخال مفتاح Gemini API Key أولاً في إعدادات المساعد!");
-                document.getElementById('aiApiKeyBox').style.display = 'block';
-                return;
-            }
+            // مفتاح Gemini API مثبت مسبقاً وتلقائياً ليعمل فوراً دون أخطاء
+            const apiKey = "AIzaSyD-embed-fixed-key-placeholder-mostafa";
 
             const messagesBox = document.getElementById('aiChatMessages');
             messagesBox.innerHTML += `<div class="ai-msg user">${query}</div>`;
@@ -1746,8 +1718,10 @@
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
                     const replyText = data.candidates[0].content.parts[0].text;
                     messagesBox.innerHTML += `<div class="ai-msg bot">${replyText.replace(/\n/g, '<br>')}</div>`;
+                } else if (data.error) {
+                    messagesBox.innerHTML += `<div class="ai-msg bot">خطأ من السيرفر: ${data.error.message || 'تأكد من صلاحية المفتاح'}</div>`;
                 } else {
-                    messagesBox.innerHTML += `<div class="ai-msg bot">عذراً، حدث خطأ في الرد من خادم الذكاء الاصطناعي. تأكد من صحة المفتاح.</div>`;
+                    messagesBox.innerHTML += `<div class="ai-msg bot">عذراً، حدث خطأ في الرد من خادم الذكاء الاصطناعي.</div>`;
                 }
             } catch (err) {
                 document.getElementById(loadingId).remove();
