@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة خدمة عملاء ماجستى - العيادات (سحابي)</title>
+    <title>لوحة خدمة عملاء ماجستى - العيادات (سحابي + AI)</title>
     <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -269,7 +269,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات مع السحب اليدوي والتحكم بالبطء والزر الافتراضي */
+        /* شريط التنبيهات */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -298,7 +298,7 @@
             flex: 1;
             position: relative;
             cursor: grab;
-            scrollbar-width: none; /* إخفاء شريط التمرير */
+            scrollbar-width: none;
         }
         .ticker-container::-webkit-scrollbar { display: none; }
         .ticker-container:active { cursor: grabbing; }
@@ -306,7 +306,7 @@
         .ticker-track {
             display: inline-flex;
             gap: 2rem;
-            animation: marqueeTicker 80s linear infinite; /* حركة بطيئة جداً ومريحة */
+            animation: marqueeTicker 80s linear infinite;
         }
         .ticker-track.paused {
             animation-play-state: paused !important;
@@ -528,7 +528,7 @@
             cursor: pointer;
         }
 
-        /* الكروت القابلة للسحب (المنسقين والاستفسارات) */
+        /* الكروت */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -644,6 +644,101 @@
             padding: 0.02rem 0.2rem;
             border-radius: 3px;
             display: inline-block;
+        }
+
+        /* تنسيقات المساعد الذكي AI Chat Widget */
+        .ai-float-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        .ai-float-btn:hover { transform: scale(1.05); }
+
+        .ai-chat-panel {
+            position: fixed;
+            bottom: 75px;
+            left: 20px;
+            width: 340px;
+            height: 460px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            z-index: 1002;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .ai-chat-panel.active { display: flex; }
+
+        .ai-chat-header {
+            background: var(--bg-card);
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+        }
+
+        .ai-api-key-box {
+            padding: 0.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            padding: 0.6rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.76rem;
+        }
+
+        .ai-msg {
+            padding: 0.5rem 0.7rem;
+            border-radius: 8px;
+            max-width: 88%;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .ai-msg.user {
+            background-color: var(--accent-blue);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .ai-msg.bot {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .ai-chat-input-area {
+            padding: 0.5rem;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.3rem;
         }
 
         .modal-overlay {
@@ -791,13 +886,11 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات التفاعلي مع السحب والأزرار -->
+        <!-- شريط التنبيهات التفاعلي مع السحب والتحكم -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-container" id="tickerContainer" onmousedown="startTickerDrag(event)" onmousemove="tickerDragging(event)" onmouseup="stopTickerDrag()" onmouseleave="stopTickerDrag()">
-                <div class="ticker-track" id="tickerTrackContainer">
-                    <!-- التنبيهات -->
-                </div>
+                <div class="ticker-track" id="tickerTrackContainer"></div>
             </div>
             <div style="display:flex; gap:0.2rem;">
                 <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="resetTickerPosition()" title="الرجوع للوضع الافتراضي (أول إشعار)"><i class="fa-solid fa-rotate-right"></i></button>
@@ -807,7 +900,7 @@
 
         <div class="content-area">
 
-            <!-- لوحة نتائج البحث الشامل الموحدة -->
+            <!-- لوحة نتائج البحث الشامل -->
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
                     <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة أقسام الموقع</h2>
@@ -826,7 +919,6 @@
                     </div>
                 </div>
 
-                <!-- شريط مناوبات الجمعة العلوية -->
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
                     <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="font-weight:700;">-</span></span>
@@ -838,7 +930,6 @@
                     </div>
                 </div>
 
-                <!-- شريط البحث والفلتر -->
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem;">
                     <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
@@ -851,9 +942,7 @@
                     </div>
                 </div>
 
-                <!-- شبكة مواعيد الأطباء -->
                 <div class="split-grid">
-                    <!-- فرع معشي -->
                     <div class="branch-box">
                         <div class="branch-title">
                             <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
@@ -876,7 +965,6 @@
                         </div>
                     </div>
 
-                    <!-- فرع الوسام -->
                     <div class="branch-box">
                         <div class="branch-title">
                             <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
@@ -916,7 +1004,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (أعمدة مستقلة تماماً وخيارات عرض مرنة) -->
+            <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -933,7 +1021,6 @@
                 </div>
 
                 <div id="deptsMainGridContainer" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
-                    <!-- 1. معشي - جلدية -->
                     <div class="branch-box">
                         <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي - قسم الجلدية</span></div>
                         <div class="table-responsive">
@@ -943,7 +1030,6 @@
                             </table>
                         </div>
                     </div>
-                    <!-- 2. معشي - أسنان -->
                     <div class="branch-box">
                         <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي - قسم الأسنان</span></div>
                         <div class="table-responsive">
@@ -953,7 +1039,6 @@
                             </table>
                         </div>
                     </div>
-                    <!-- 3. الوسام - جلدية -->
                     <div class="branch-box">
                         <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام - قسم الجلدية</span></div>
                         <div class="table-responsive">
@@ -963,7 +1048,6 @@
                             </table>
                         </div>
                     </div>
-                    <!-- 4. الوسام - أسنان -->
                     <div class="branch-box">
                         <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام - قسم الأسنان</span></div>
                         <div class="table-responsive">
@@ -1014,7 +1098,7 @@
                 </div>
             </section>
 
-            <!-- 6. دليل الاستفسارات (مع إمكانية تلوين الكروت والسحب والإفلات) -->
+            <!-- 6. دليل الاستفسارات -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
@@ -1041,8 +1125,30 @@
         </div>
     </main>
 
-    <!-- MODALS -->
+    <!-- المساعد الذكي العائم (AI Assistant Floating Widget) -->
+    <div class="ai-float-btn" onclick="toggleAIChat()">
+        <i class="fa-solid fa-robot"></i> مساعد ماجستي الذكي
+    </div>
 
+    <div class="ai-chat-panel" id="aiChatPanel">
+        <div class="ai-chat-header">
+            <span><i class="fa-solid fa-robot"></i> مساعد خدمة العملاء الذكي</span>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleAIChat()"></i>
+        </div>
+        <div class="ai-api-key-box" id="aiApiKeyBox">
+            <input type="password" id="aiApiKeyInput" class="form-control" placeholder="أدخل مفتاح Gemini API Key هنا...">
+            <button class="btn btn-green" onclick="saveApiKey()" style="margin-top:4px; width:100%; font-size:0.7rem;">حفظ المفتاح</button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-msg bot">أهلاً بك يا مصطفى! أنا مساعدك الذكي المدمج في لوحة ماجستي. اسألني عن مواعيد الأطباء، العروض، أو تفاصيل العمل وسأجيبك فوراً.</div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="aiUserInput" class="form-control" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') sendAIMessage()">
+            <button class="btn btn-blue" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- MODALS -->
     <!-- Modal 1: Doctor Modal -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
@@ -1098,7 +1204,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:0.4rem; background:rgba(220,38,38,0.1); padding:0.3rem 0.5rem; border-radius:6px; border:1px solid var(--danger-color);">
                 <input type="checkbox" id="docIsLeave" style="width:15px; height:15px;">
-                <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / خارج الدوام (تلوين الكارت بالأحمر)</label>
+                <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / خارج الدوام</label>
             </div>
 
             <div class="days-section-box">
@@ -1146,7 +1252,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: Friday Full Month Schedule Modal -->
+    <!-- Modal 2: Friday Schedule Modal -->
     <div class="modal-overlay" id="fridayModal">
         <div class="modal" style="max-width: 560px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1338,7 +1444,7 @@
                 <input type="text" id="offCustomCategory" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>اسم الخدمة / العرض (مثل: زراعة، تقويم، جلسة ليزر...)</label>
+                <label>اسم الخدمة / العرض</label>
                 <input type="text" id="offName" class="form-control">
             </div>
             <div style="display:flex; gap:0.4rem;">
@@ -1446,7 +1552,7 @@
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
-        let deptsStackMode = false; // طريقة عرض الأقسام (شبكة أو تحت بعض)
+        let deptsStackMode = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -1520,7 +1626,7 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        // تحكم شريط التنبيهات (سحب بالماوس + إيقاف/تشغيل + رجوع للوضع الافتراضي)
+        // تحكم شريط التنبيهات
         let isTickerPaused = false;
         let isDraggingTicker = false;
         let tickerStartX, tickerScrollLeft;
@@ -1563,6 +1669,91 @@
 
         function stopTickerDrag() {
             isDraggingTicker = false;
+        }
+
+        // منطق المساعد الذكي AI Assistant (Gemini API Integration)
+        function toggleAIChat() {
+            const panel = document.getElementById('aiChatPanel');
+            panel.classList.toggle('active');
+            const savedKey = localStorage.getItem('geminiApiKey');
+            if (savedKey) {
+                document.getElementById('aiApiKeyBox').style.display = 'none';
+            } else {
+                document.getElementById('aiApiKeyBox').style.display = 'block';
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('aiApiKeyInput').value.trim();
+            if (!key) return alert("أدخل مفتاح صحيح!");
+            localStorage.setItem('geminiApiKey', key);
+            document.getElementById('aiApiKeyBox').style.display = 'none';
+            alert("تم حفظ مفتاح الذكاء الاصطناعي بنجاح!");
+        }
+
+        async function sendAIMessage() {
+            const inputEl = document.getElementById('aiUserInput');
+            const query = inputEl.value.trim();
+            if (!query) return;
+
+            const apiKey = localStorage.getItem('geminiApiKey');
+            if (!apiKey) {
+                alert("يرجى إدخال مفتاح Gemini API Key أولاً في إعدادات المساعد!");
+                document.getElementById('aiApiKeyBox').style.display = 'block';
+                return;
+            }
+
+            const messagesBox = document.getElementById('aiChatMessages');
+            messagesBox.innerHTML += `<div class="ai-msg user">${query}</div>`;
+            inputEl.value = "";
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+
+            const loadingId = 'loading_' + Date.now();
+            messagesBox.innerHTML += `<div class="ai-msg bot" id="${loadingId}">جاري التفكير وتحليل بيانات اللوحة...</div>`;
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+
+            const appDataContext = `
+            بيانات لوحة خدمة عملاء مجمع ماجستي الطبي الحالية:
+            - الأطباء ومواعيدهم: ${JSON.stringify(doctorsData)}
+            - مناوبات الجمعة: ${JSON.stringify(fridaySchedules)}
+            - التنبيهات: ${JSON.stringify(alertsData)}
+            - الأقسام والخدمات والأجهزة: ${JSON.stringify(deptServicesData)}
+            - ملحوظات الأقسام: ${JSON.stringify(deptNotesData)}
+            - دليل المنسقين: ${JSON.stringify(coordinatorsData)}
+            - العروض والأسعار: ${JSON.stringify(offersData)}
+            - الاستفسارات الشائعة: ${JSON.stringify(inquiriesData)}
+            `;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                role: "user",
+                                parts: [
+                                    { text: `أنت مساعد ذكي مدمج في لوحة خدمة عملاء مجمع ماجستي الطبي الخاصة بمصطفى يوسف. اجب على سؤال المستخدم بدقة مع سرد المعلومات بتسلسل الأحداث والتفاصيل المتاحة في قاعدة البيانات التالية:\n\n${appDataContext}\n\nسؤال المستخدم: ${query}` }
+                                ]
+                            }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    const replyText = data.candidates[0].content.parts[0].text;
+                    messagesBox.innerHTML += `<div class="ai-msg bot">${replyText.replace(/\n/g, '<br>')}</div>`;
+                } else {
+                    messagesBox.innerHTML += `<div class="ai-msg bot">عذراً، حدث خطأ في الرد من خادم الذكاء الاصطناعي. تأكد من صحة المفتاح.</div>`;
+                }
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                messagesBox.innerHTML += `<div class="ai-msg bot">حدث خطأ في الاتصال: ${err.message}</div>`;
+            }
+            messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
         function syncToCloud() {
@@ -2349,7 +2540,6 @@
             }
         }
 
-        // دليل المنسقين (سحب وإفلات)
         let draggedCoordIdx = null;
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
@@ -2418,7 +2608,6 @@
             }
         }
 
-        // العروض والأسعار
         function checkCustomCategory(val) {
             document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none";
         }
@@ -2544,7 +2733,6 @@
             }
         }
 
-        // دليل الاستفسارات (تلوين وسحب وإفلات)
         function checkInquiryCustomCat(val) {
             document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
         }
@@ -2641,7 +2829,6 @@
             }
         }
 
-        // البحث الشامل
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
