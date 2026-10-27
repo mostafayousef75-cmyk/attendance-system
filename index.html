@@ -696,11 +696,11 @@
                     </div>
                 </div>
 
-                <!-- شريط مناوبات الجمعة العلوية مع عكس الألوان (معشي أبيض والوسام برتقالي أو العكس حسب الطلب) -->
+                <!-- شريط مناوبات الجمعة العلوية -->
                 <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
                     <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-clock" style="color:#fff;"></i> <strong>مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="color:#fff; font-weight:700;">-</span></span>
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
+                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="font-weight:700;">-</span></span>
+                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="font-weight:700;">-</span></span>
                     </div>
                     <div style="display:flex; gap:1rem; color:#60a5fa; flex-wrap:wrap;">
                         <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:#fff;">-</span></span>
@@ -786,7 +786,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (محدث بقسم الأسنان والجلدية: الخدمة / الجهاز) -->
+            <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -1295,6 +1295,12 @@
                     syncToCloud();
                 }
 
+                // ضمان وجود خصائص الترتيب المستقل لكل فرع
+                doctorsData.forEach((d, idx) => {
+                    if (d.mashyOrder === undefined) d.mashyOrder = idx;
+                    if (d.wissamOrder === undefined) d.wissamOrder = idx;
+                });
+
                 renderDoctors();
                 renderFridayScheduleTable();
                 renderAlerts();
@@ -1522,17 +1528,24 @@
             if(!mashyBody || !wissamBody) return;
             mashyBody.innerHTML = ""; wissamBody.innerHTML = "";
             let countM = 0, countW = 0;
-            let fridayMashyName = "لم يُحدد";
-            let fridayWissamName = "لم يُحدد";
 
             const todayStr = new Date().toISOString().split('T')[0];
             const upcomingFridays = fridaySchedules.filter(f => f.date >= todayStr);
             
-            let mashyFridays = upcomingFridays.filter(f => f.branch === "معشي").map(f => `${f.doc} (${f.date})`);
-            let wissamFridays = upcomingFridays.filter(f => f.branch === "الوسام").map(f => `${f.doc} (${f.date})`);
+            let mashyFridays = upcomingFridays.filter(f => f.branch === "معشي").map(f => `<span style="color:#fff;">${f.doc}</span> <span style="color:#fde047;">(${f.date})</span>`);
+            let wissamFridays = upcomingFridays.filter(f => f.branch === "الوسام").map(f => `<span style="color:#fff;">${f.doc}</span> <span style="color:#fde047;">(${f.date})</span>`);
 
-            if (mashyFridays.length > 0) fridayMashyName = mashyFridays.join(' ، ');
-            if (wissamFridays.length > 0) fridayWissamName = wissamFridays.join(' ، ');
+            if (mashyFridays.length > 0) {
+                document.getElementById('fridayDocMashy').innerHTML = mashyFridays.join(' ، ');
+            } else {
+                document.getElementById('fridayDocMashy').innerHTML = '<span style="color:#fff;">لم يُحدد</span>';
+            }
+
+            if (wissamFridays.length > 0) {
+                document.getElementById('fridayDocWissam').innerHTML = wissamFridays.join(' ، ');
+            } else {
+                document.getElementById('fridayDocWissam').innerHTML = '<span style="color:#fff;">لم يُحدد</span>';
+            }
 
             const currentDay = getArabicDayName();
             document.getElementById('todayDayName').innerText = currentDay;
@@ -1547,6 +1560,7 @@
                 const mashyDays = d.mashyDays || d.days || [];
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || mashyDays.length > 0);
             });
+            mashyList.sort((a, b) => (a.mashyOrder ?? 0) - (b.mashyOrder ?? 0));
 
             // فرز مستقل تماماً لفرع الوسام
             const wissamList = doctorsData.filter(d => {
@@ -1555,6 +1569,7 @@
                 const wissamDays = d.wissamDays || (d.isJoint ? (d.days || []) : []);
                 return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || wissamDays.length > 0);
             });
+            wissamList.sort((a, b) => (a.wissamOrder ?? 0) - (b.wissamOrder ?? 0));
 
             mashyList.forEach((doc) => {
                 const mashyDays = doc.mashyDays || doc.days || [];
@@ -1630,8 +1645,6 @@
 
             document.getElementById('countMashy').innerText = `${countM} أطباء`;
             document.getElementById('countWissam').innerText = `${countW} أطباء`;
-            document.getElementById('fridayDocMashy').innerText = fridayMashyName;
-            document.getElementById('fridayDocWissam').innerText = fridayWissamName;
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
             document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
             updateKPIs();
@@ -1643,15 +1656,53 @@
             draggedBranch = branch;
             draggedDocId = id;
         }
+
+        // تحديث منطق السحب والإفلات ليكون مستقلاً لكل فرع على حدة (حتى للأطباء المشتركين)
         function handleBranchDrop(e, branch, targetId) {
             e.preventDefault();
             if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
             
-            const oldIdx = doctorsData.findIndex(d => d.id === draggedDocId);
-            const targetIdx = doctorsData.findIndex(d => d.id === targetId);
+            let currentList;
+            const searchInput = document.getElementById('docSearchInput');
+            const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
+            const selectedSpecialty = document.getElementById('specialtyFilter').value;
+
+            if (branch === 'mashy') {
+                currentList = doctorsData.filter(d => {
+                    const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.notes && d.notes.toLowerCase().includes(search));
+                    const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
+                    const mashyDays = d.mashyDays || d.days || [];
+                    return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || mashyDays.length > 0);
+                });
+                currentList.sort((a, b) => (a.mashyOrder ?? 0) - (b.mashyOrder ?? 0));
+            } else {
+                currentList = doctorsData.filter(d => {
+                    const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.notes && d.notes.toLowerCase().includes(search));
+                    const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
+                    const wissamDays = d.wissamDays || (d.isJoint ? (d.days || []) : []);
+                    return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || wissamDays.length > 0);
+                });
+                currentList.sort((a, b) => (a.wissamOrder ?? 0) - (b.wissamOrder ?? 0));
+            }
+
+            const oldIdx = currentList.findIndex(d => d.id === draggedDocId);
+            const targetIdx = currentList.findIndex(d => d.id === targetId);
+
             if (oldIdx !== -1 && targetIdx !== -1) {
-                const moved = doctorsData.splice(oldIdx, 1)[0];
-                doctorsData.splice(targetIdx, 0, moved);
+                const moved = currentList.splice(oldIdx, 1)[0];
+                currentList.splice(targetIdx, 0, moved);
+
+                currentList.forEach((doc, idx) => {
+                    const mainDoc = doctorsData.find(d => d.id === doc.id);
+                    if (mainDoc) {
+                        if (branch === 'mashy') {
+                            mainDoc.mashyOrder = idx;
+                        } else {
+                            mainDoc.wissamOrder = idx;
+                        }
+                    }
+                });
+
                 syncToCloud();
                 renderDoctors();
             }
@@ -1681,6 +1732,8 @@
             const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
             const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
 
+            const existingDoc = id ? doctorsData.find(d => d.id == id) : null;
+
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('docName').value,
@@ -1694,7 +1747,9 @@
                 mashyDays: mashyDays,
                 wissamDays: wissamDays,
                 timing: document.getElementById('docTiming').value,
-                notes: document.getElementById('docNotes').value
+                notes: document.getElementById('docNotes').value,
+                mashyOrder: existingDoc ? (existingDoc.mashyOrder ?? doctorsData.length) : doctorsData.length,
+                wissamOrder: existingDoc ? (existingDoc.wissamOrder ?? doctorsData.length) : doctorsData.length
             };
 
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
