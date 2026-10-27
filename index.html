@@ -78,6 +78,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            user-select: text !important; /* السماح بتحديد النسخ في كل الصفحة */
         }
 
         /* Sidebar Navigation */
@@ -236,41 +237,68 @@
             font-size: 0.8rem;
         }
 
-        .pinned-alerts-banner {
+        /* شريط التنبيهات الاحترافي الجديد (Ticker Bar) */
+        .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.25rem 1rem;
+            padding: 0.3rem 0.8rem;
             display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
+            align-items: center;
+            gap: 0.8rem;
+            overflow: hidden;
+            font-size: 0.76rem;
         }
-
-        .alert-pill {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 0.15rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.72rem;
+        .ticker-label {
+            background: var(--primary-color);
+            color: #000;
+            font-weight: 800;
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .ticker-container {
+            overflow: hidden;
             white-space: nowrap;
+            flex: 1;
+            position: relative;
+        }
+        .ticker-track {
+            display: inline-flex;
+            gap: 2rem;
+            animation: marqueeTicker 30s linear infinite;
+        }
+        .ticker-track:hover {
+            animation-play-state: paused; /* إيقاف الحركة عند وضع الماوس لسهولة القراءة والنسخ */
+        }
+        .ticker-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            user-select: text;
+        }
+        .ticker-item:hover {
+            border-color: var(--primary-color);
         }
 
-        .badge-alert {
-            background-color: var(--primary-color);
-            color: #000;
-            font-weight: bold;
-            padding: 0.02rem 0.25rem;
-            border-radius: 4px;
-            font-size: 0.62rem;
+        @keyframes marqueeTicker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
         }
 
         .content-area {
             flex: 1;
             padding: 0.6rem;
             overflow-y: auto;
+            user-select: text;
         }
 
         .page-section {
@@ -294,6 +322,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 0.6rem;
+            user-select: text;
         }
         .source-badge {
             background: rgba(245, 158, 11, 0.2);
@@ -380,6 +409,7 @@
         .table-responsive {
             width: 100%;
             overflow-x: auto;
+            user-select: text;
         }
 
         table {
@@ -387,6 +417,7 @@
             border-collapse: collapse;
             font-size: 0.7rem;
             table-layout: fixed;
+            user-select: text;
         }
 
         th, td {
@@ -397,6 +428,8 @@
             vertical-align: middle;
             overflow: hidden;
             text-overflow: ellipsis;
+            user-select: text !important;
+            cursor: text;
         }
 
         th {
@@ -413,7 +446,7 @@
         #schedule-section th:nth-child(5), #schedule-section td:nth-child(5) { width: 25%; }
         #schedule-section th:nth-child(6), #schedule-section td:nth-child(6) { width: 15%; text-align: center; }
 
-        /* صفحة التنبيهات المنظمة باحترافية */
+        /* صفحة التنبيهات */
         .alerts-2col-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -431,6 +464,7 @@
             gap: 0.5rem;
             font-size: 0.76rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            user-select: text;
         }
 
         .alert-thumb-side {
@@ -457,12 +491,13 @@
             cursor: pointer;
         }
 
-        /* تنسيق صفحة دليل المنسقين باحترافية وتناسب المحتوى */
+        /* صفحة دليل المنسقين (متناسقة ومرتبة على قد الكلام) */
         .coordinators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 0.6rem;
             align-items: start;
+            user-select: text;
         }
 
         .doc-sheet-card {
@@ -477,6 +512,8 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             position: relative;
             height: auto;
+            user-select: text !important;
+            cursor: text;
         }
 
         .doc-sheet-card h3 {
@@ -493,6 +530,7 @@
             margin: 0;
             font-size: 0.76rem;
             opacity: 0.95;
+            user-select: text !important;
         }
 
         .card-teal { background-color: #0d47a1; }
@@ -694,8 +732,15 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- التنبيهات المثبتة -->
-        <div class="pinned-alerts-banner" id="pinnedAlertsBar"></div>
+        <!-- شريط التنبيهات الاحترافي الجديد المتحرك (Ticker Bar) -->
+        <div class="professional-ticker-bar">
+            <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
+            <div class="ticker-container">
+                <div class="ticker-track" id="tickerTrackContainer">
+                    <!-- سيتم تعبئته تلقائياً بالتنبيهات -->
+                </div>
+            </div>
+        </div>
 
         <div class="content-area">
 
@@ -808,7 +853,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (مفصولين تماماً مع تلوين المربعات الفردية) -->
+            <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -824,9 +869,8 @@
                 </div>
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
-                    <!-- الجداول المفصولة للفروع -->
                     <div style="display:flex; flex-direction:column; gap:0.6rem;">
-                        <!-- فرع معشي مستقل -->
+                        <!-- فرع معشي -->
                         <div class="branch-box">
                             <div class="branch-title">
                                 <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span>
@@ -845,7 +889,7 @@
                             </div>
                         </div>
 
-                        <!-- فرع الوسام مستقل -->
+                        <!-- فرع الوسام -->
                         <div class="branch-box">
                             <div class="branch-title">
                                 <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span>
@@ -865,7 +909,6 @@
                         </div>
                     </div>
 
-                    <!-- حاوية الملحوظات البرتقالية القابلة للتعديل والتلوين -->
                     <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
                 </div>
             </section>
@@ -1118,7 +1161,7 @@
         </div>
     </div>
 
-    <!-- Modal 4: Dept Service Modal (تلوين المربع المحدد فقط وإضافة شارة مشترك) -->
+    <!-- Modal 4: Dept Service Modal -->
     <div class="modal-overlay" id="deptServiceModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1160,7 +1203,7 @@
         </div>
     </div>
 
-    <!-- Modal 5: Dept Note Modal (إضافة وتعديل وتلوين الملاحظات البرتقالية) -->
+    <!-- Modal 5: Dept Note Modal -->
     <div class="modal-overlay" id="deptNoteModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1325,7 +1368,7 @@
         let alertsData = [];
         let coordinatorsData = [];
         let deptServicesData = [];
-        let deptNotesData = []; // [{text: "...", color: "card-gold"}]
+        let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
 
@@ -1348,7 +1391,6 @@
                     alertsData = data.alertsData || [];
                     coordinatorsData = data.coordinatorsData || [];
                     deptServicesData = data.deptServicesData || [];
-                    // دعم التوافقية القديمة للملاحظات إذا كانت مصفوفة نصوص عادية
                     if (data.deptNotesData) {
                         deptNotesData = data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n);
                     } else {
@@ -1872,17 +1914,22 @@
 
         function renderAlerts(search = "") {
             const grid = document.getElementById('alertsGridList');
-            const pinnedBar = document.getElementById('pinnedAlertsBar');
-            if(!grid) return;
-            grid.innerHTML = ""; pinnedBar.innerHTML = "";
+            const tickerTrack = document.getElementById('tickerTrackContainer');
+            if(!grid || !tickerTrack) return;
+            
+            grid.innerHTML = ""; 
+            tickerTrack.innerHTML = "";
 
-            alertsData.filter(a => a.content.includes(search)).forEach(item => {
-                pinnedBar.innerHTML += `
-                    <div class="alert-pill" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
-                        <span class="badge-alert">إشعار</span> ${item.content.substring(0, 20)}...
+            alertsData.forEach(item => {
+                tickerTrack.innerHTML += `
+                    <div class="ticker-item" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
+                        <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
+                        <span>${item.content}</span>
                     </div>
                 `;
+            });
 
+            alertsData.filter(a => a.content.includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") {
