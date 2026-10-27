@@ -884,7 +884,7 @@
             document.getElementById('aiChatPanel').classList.toggle('active');
         }
 
-        // تم ضبط الـ System Prompt ليكون مختصراً ومقيداً ببيانات العيادات فقط بدون تأليف
+        // دالة الذكاء الاصطناعي المحدثة والمفلترة لمنع الهبد والتخريف تماماً
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const query = inputEl.value.trim();
@@ -896,15 +896,20 @@
             messagesBox.scrollTop = messagesBox.scrollHeight;
 
             const loadingId = 'loading_' + Date.now();
-            messagesBox.innerHTML += `<div class="ai-msg bot" id="${loadingId}">جاري البحث في اللوحة...</div>`;
+            messagesBox.innerHTML += `<div class="ai-msg bot" id="${loadingId}">جاري البحث...</div>`;
             messagesBox.scrollTop = messagesBox.scrollHeight;
 
             const OPENROUTER_API_KEY = "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";
 
-            const systemContext = `أنت مساعد خدمة عملاء لعيادات ماجستي. أجب باختصار وباللغة العربية فقط بناءً على البيانات التالية ولا تخترع معلومات:
-- الأطباء: ${JSON.stringify(doctorsData.map(d => ({الاسم: d.name, التخصص: d.specialty, الفرع: d.branch, الدوام: d.timing})))}
-- العروض: ${JSON.stringify(offersData.map(o => ({الخدمة: o.name, السعر: o.price})))}
-- التنبيهات: ${JSON.stringify(alertsData.map(a => a.content))}`;
+            let matchedDoc = doctorsData.find(d => d.name.toLowerCase().includes(query.toLowerCase()) || (d.specialty && d.specialty.toLowerCase().includes(query.toLowerCase())));
+            let matchedOffer = offersData.find(o => o.name.toLowerCase().includes(query.toLowerCase()) || o.category.toLowerCase().includes(query.toLowerCase()));
+
+            let targetedContext = "أنت مساعد خدمة عملاء لعيادات ماجستي. أجب بدقة واختصار شديد باللغة العربية بناءً على البيانات التالية فقط:\n";
+            if (matchedDoc) targetedContext += `بيانات الطبيب المطلوب: ${JSON.stringify(matchedDoc)}\n`;
+            if (matchedOffer) targetedContext += `بيانات العرض المطلوب: ${JSON.stringify(matchedOffer)}\n`;
+            if (!matchedDoc && !matchedOffer) {
+                targetedContext += `قائمة الأطباء باختصار: ${JSON.stringify(doctorsData.map(d => ({الاسم: d.name, التخصص: d.specialty, الدوام: d.timing, إجازة: d.isLeave, الفرع: d.branch}))))}\n`;
+            }
 
             try {
                 const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -918,7 +923,7 @@
                     body: JSON.stringify({
                         "model": "meta-llama/llama-3.1-8b-instruct",
                         "messages": [
-                            { "role": "system", "content": systemContext },
+                            { "role": "system", "content": targetedContext + "\nتعليمات صارمة: لا تخترع أي معلومات نهائياً. التزم فقط بالبيانات المتاحة." },
                             { "role": "user", "content": query }
                         ]
                     })
