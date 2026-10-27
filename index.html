@@ -256,7 +256,7 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات مع السحب بالماوس والتحكم */
+        /* شريط التنبيهات مع السحب بالماوس يمين ويسار والوضع الافتراضي */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -636,7 +636,7 @@
             display: inline-block;
         }
 
-        /* تنسيق شات الذكاء الاصطناعي العائم في أسفل يسار الشاشة */
+        /* تنسيق شات الذكاء الاصطناعي العائم في أسفل اليسار */
         .ai-floating-btn {
             position: fixed;
             bottom: 20px;
@@ -863,7 +863,7 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات الاحترافي مع السحب بالماوس يمين ويسار والوضع الافتراضي -->
+        <!-- شريط التنبيهات مع السحب بالماوس يمين ويسار والوضع الافتراضي -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-container" id="tickerWrapper">
@@ -873,7 +873,7 @@
             </div>
             <div style="display:flex; gap:0.2rem;">
                 <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn" title="إيقاف أو تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="resetTickerDefault()" title="الوضع الافتراضي وترتيب الأحدث للأقدم"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
+                <button class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="resetTickerDefault()" title="إعادة تعيين وترتيب الأحدث للأقدم"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
             </div>
         </div>
 
@@ -1650,7 +1650,11 @@
             track.classList.remove('paused');
             btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
             btn.style.color = "inherit";
-            renderAlerts(); // إعادة ترتيب العرض من الأحدث للأقدم
+            
+            // إعادة ضبط سكرول الشريط للبداية وتحديث الرندر لضمان جلب الأحدث في المقدمة
+            const wrapper = document.getElementById('tickerWrapper');
+            if(wrapper) wrapper.scrollLeft = 0;
+            renderAlerts();
         }
 
         function toggleFloatingChat() {
@@ -2250,10 +2254,10 @@
 
             if (id) {
                 const idx = alertsData.findIndex(a => a.id == id);
-                alertObj.id = parseInt(id); // الحفاظ على الid الأصلي عند التعديل
+                alertObj.id = parseInt(id);
                 alertsData[idx] = alertObj;
             } else { 
-                alertsData.push(alertObj); // يضاف للنهاية، وعند العرض يُرتّب الأحدث في المقدمة
+                alertsData.push(alertObj);
             }
 
             syncToCloud();
@@ -2694,7 +2698,7 @@
             }
         }
 
-        // دالة إرسال واستقبال رسائل الشات العائم مع Google Gemini API
+        // دالة إرسال واستقبال رسائل الشات العائم مع تصحيح نموذج Gemini API
         async function sendGeminiMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
@@ -2710,8 +2714,8 @@
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const apiKey = "AQ.Ab8RN6JqlZAausqoTqz4SNJUJcRBaBuwiy1IUfkGASrXcHMEAQ";
-            // تصحيح مسار الاتصال بنموذج Gemini عبر v1
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // استخدام الموديل الصحيح تماماً والمتوافق مع مفتاح الـ API
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             try {
                 const response = await fetch(url, {
@@ -2730,7 +2734,7 @@
                     const reply = data.candidates[0].content.parts[0].text;
                     msgBox.innerHTML += `<div class="ai-message gemini">${reply}</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من الحصول على رد من النموذج حالياً. تأكد من اتصالك بالإنترنت ومفتاح الـ API.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من الحصول على رد من النموذج حالياً. تأكد من اتصالك بالإنترنت.</div>`;
                 }
             } catch (error) {
                 const loadEl = document.getElementById(loadingId);
