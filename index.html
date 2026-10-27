@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة خدمة عملاء ماجستى - العيادات</title>
+    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي)</title>
+    <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK (v8 Compat للتزامن السحابي اللحظي) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <style>
         :root {
             --font-family: 'Tajawal', sans-serif;
-            --bg-base: #030305;
-            --bg-surface: #0a0a0e;
-            --bg-card: #13131a;
-            --bg-sidebar: #060609;
+            --bg-base: #000000;
+            --bg-surface: #0a0a0c;
+            --bg-card: #121216;
+            --bg-sidebar: #050507;
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --border-color: #27272a;
@@ -31,100 +33,460 @@
         }
 
         body.theme-darkblue {
-            --bg-base: #060913; --bg-surface: #0c1222; --bg-card: #111a30; --bg-sidebar: #080d1a; --text-main: #ffffff; --text-muted: #94a3b8; --border-color: #1e293b; --primary-color: #3b82f6;
+            --bg-base: #060913;
+            --bg-surface: #0c1222;
+            --bg-card: #111a30;
+            --bg-sidebar: #080d1a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --primary-color: #3b82f6;
         }
+
         body.theme-gray {
-            --bg-base: #121214; --bg-surface: #1a1a1e; --bg-card: #242429; --bg-sidebar: #161619; --text-main: #f4f4f5; --text-muted: #a1a1aa; --border-color: #27272a; --primary-color: #8b5cf6;
+            --bg-base: #121214;
+            --bg-surface: #1a1a1e;
+            --bg-card: #242429;
+            --bg-sidebar: #161619;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --primary-color: #8b5cf6;
         }
+
         body.theme-light {
-            --bg-base: #f1f5f9; --bg-surface: #ffffff; --bg-card: #f8fafc; --bg-sidebar: #0f172a; --text-main: #0f172a; --text-muted: #475569; --border-color: #cbd5e1; --primary-color: #2563eb;
+            --bg-base: #f1f5f9;
+            --bg-surface: #ffffff;
+            --bg-card: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
+            --primary-color: #2563eb;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
-        body { background-color: var(--bg-base); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; user-select: text !important; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            transition: background 0.2s, color 0.2s, border 0.2s;
+        }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; transition: width 0.25s ease, padding 0.25s ease; }
-        .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
-        .sidebar.collapsed .brand-container, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
-        .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        .brand-container { margin-bottom: 0.6rem; display: flex; flex-direction: column; gap: 0.1rem; }
-        .brand-title { font-size: 0.95rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
-        .brand-subtitle { font-size: 0.62rem; color: var(--text-muted); font-family: monospace; }
-        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; }
-        .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
-        .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
-        .theme-box { padding-top: 0.5rem; border-top: 1px solid var(--border-color); }
-        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; margin-top: 0.2rem; font-size: 0.75rem; }
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 0.8rem;
+            flex-shrink: 0;
+        }
 
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.4rem 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
-        .search-container { position: relative; width: 240px; }
-        .search-container input { width: 100%; padding: 0.3rem 1.8rem 0.3rem 0.6rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.75rem; }
-        .search-container i { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.75rem; }
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
 
-        .cloud-indicator { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(22, 163, 74, 0.2); border: 1px solid var(--accent-green); color: #4ade80; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; }
+        .json-tools {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 0.6rem;
+        }
 
-        .kpi-bar { display: flex; gap: 0.4rem; }
-        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.15rem 0.4rem; border-radius: 6px; font-size: 0.7rem; display: flex; align-items: center; gap: 0.3rem; }
-        .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.75rem; }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            flex: 1;
+        }
 
-        .professional-ticker-bar { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.25rem 0.8rem; display: flex; align-items: center; gap: 0.8rem; overflow: hidden; font-size: 0.72rem; }
-        .ticker-label { background: var(--primary-color); color: #000; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.65rem; display: inline-flex; align-items: center; gap: 0.3rem; flex-shrink: 0; }
-        .ticker-container { overflow-x: auto; white-space: nowrap; flex: 1; cursor: grab; scrollbar-width: none; }
-        .ticker-container::-webkit-scrollbar { display: none; }
-        .ticker-track { display: inline-flex; gap: 2rem; animation: marqueeTicker 80s linear infinite; }
-        .ticker-track.paused { animation-play-state: paused !important; }
-        .ticker-item { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.1rem 0.5rem; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; font-size: 0.7rem; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.45rem 0.7rem;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
 
-        @keyframes marqueeTicker { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bg-surface);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            font-weight: 700;
+        }
 
-        .content-area { flex: 1; padding: 0.5rem; overflow-y: auto; }
-        .page-section { display: none; }
-        .page-section.active { display: block; }
+        .theme-box {
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border-color);
+        }
 
-        .search-result-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.6rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; font-size: 0.75rem; }
-        .source-badge { background: rgba(245, 158, 11, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; white-space: nowrap; }
+        .theme-select {
+            width: 100%;
+            padding: 0.35rem;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            margin-top: 0.2rem;
+            font-size: 0.75rem;
+        }
 
-        .page-local-search { margin-bottom: 0.3rem; position: relative; }
-        .page-local-search input { width: 100%; padding: 0.25rem 1.8rem 0.25rem 0.5rem; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.72rem; }
-        .page-local-search i { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.7rem; }
+        /* Main Shell */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-        .btn { background-color: var(--primary-color); color: #000; font-weight: 700; border: none; padding: 0.25rem 0.5rem; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; }
+        .top-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 0.4rem 2rem 0.4rem 0.7rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.8rem;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Cloud Indicator Light */
+        .cloud-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(22, 163, 74, 0.2);
+            border: 1px solid var(--accent-green);
+            color: #4ade80;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cloud-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulseDot 1.5s infinite;
+        }
+        @keyframes pulseDot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #22c55e; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .kpi-bar {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .kpi-num {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .pinned-alerts-banner {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.25rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .alert-pill {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .badge-alert {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: bold;
+            padding: 0.02rem 0.25rem;
+            border-radius: 4px;
+            font-size: 0.62rem;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 0.6rem;
+            overflow-y: auto;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Global Search Results Panel */
+        #globalSearchResultsSection {
+            display: none;
+        }
+        #globalSearchResultsSection.active {
+            display: block;
+        }
+        .search-result-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.7rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .source-badge {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .page-local-search {
+            margin-bottom: 0.4rem;
+            position: relative;
+        }
+        .page-local-search input {
+            width: 100%;
+            padding: 0.3rem 2rem 0.3rem 0.6rem;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.78rem;
+        }
+        .page-local-search i {
+            position: absolute;
+            right: 0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.76rem;
+        }
+
         .btn-green { background-color: var(--accent-green); color: #fff; }
         .btn-blue { background-color: var(--accent-blue); color: #fff; }
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-items: start; }
-        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.4rem; display: flex; flex-direction: column; width: 100%; margin-bottom: 0.5rem; }
-        .branch-title { font-size: 0.8rem; font-weight: 700; padding-bottom: 0.25rem; margin-bottom: 0.3rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
-
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; table-layout: fixed; }
-        th, td { padding: 0.3rem 0.2rem; border-bottom: 1px solid var(--border-color); text-align: right; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 600; font-size: 0.68rem; }
-
-        .depts-custom-layout {
+        .split-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 0.6rem;
-            align-items: start;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
         }
-        .depts-right-side { display: flex; flex-direction: column; gap: 0.5rem; }
-        .depts-left-side { display: flex; flex-direction: column; gap: 0.4rem; }
 
-        .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; }
-        .alert-card-item-compact { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem 0.5rem; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; font-size: 0.72rem; }
-        .alert-thumb-side { width: 35px; height: 35px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); flex-shrink: 0; }
-        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.15rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem; }
+        .branch-box {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 0.4rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
 
-        .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.5rem; align-items: start; }
-        .doc-sheet-card { border-radius: 8px; padding: 0.6rem; color: #fff; display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.72rem; line-height: 1.3; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }
-        .doc-sheet-card h3 { font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.2rem; margin-bottom: 0.2rem; display: flex; align-items: center; justify-content: space-between; }
-        .card-drag-handle { cursor: grab; padding: 0.15rem 0.3rem; background: rgba(0,0,0,0.2); border-radius: 4px; font-size: 0.7rem; }
+        .branch-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.3rem;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        /* تقليل الفراغات والمساحات داخل الجدول */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.68rem;
+        }
+
+        th, td {
+            padding: 0.12rem 0.25rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+            font-weight: 400;
+            line-height: 1.15;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.70rem;
+        }
+
+        .doctor-on-leave {
+            background-color: rgba(220, 38, 38, 0.15) !important;
+            border-right: 3px solid var(--danger-color);
+        }
+
+        .draggable-doctor-row {
+            cursor: grab;
+        }
+        .draggable-doctor-row:active {
+            cursor: grabbing;
+        }
+
+        /* Alerts 2 Column Grid */
+        .alerts-2col-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .alert-card-item-compact {
+            background-color: #0b1329;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 0.76rem;
+        }
+
+        .alert-thumb-side {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .pdf-file-badge {
+            background: #dc2626;
+            color: #fff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            cursor: pointer;
+        }
+
+        /* Coordinators Grid */
+        .coordinators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .doc-sheet-card {
+            border-radius: 6px;
+            padding: 0.6rem;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            line-height: 1.25;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+            position: relative;
+        }
 
         .card-teal { background-color: #0d47a1; }
         .card-maroon { background-color: #4a148c; }
@@ -133,40 +495,129 @@
         .card-gold { background-color: #e65100; }
         .card-green { background-color: #1b5e20; }
 
-        .offers-tabs { display: flex; gap: 0.25rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; }
-        .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.72rem; }
-        .offer-tab-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
+        /* Offers Tabs */
+        .offers-tabs {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.25rem;
+            overflow-x: auto;
+        }
 
-        .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.5rem; }
-        .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.8rem; display: inline-block; }
-        .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.5rem; padding: 0.02rem 0.15rem; border-radius: 3px; display: inline-block; }
+        .offer-tab-btn {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 0.76rem;
+        }
 
-        .ai-float-btn { position: fixed; bottom: 20px; left: 20px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; padding: 0.4rem 0.9rem; border-radius: 30px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1001; display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; }
-        .ai-chat-panel { position: fixed; bottom: 70px; left: 20px; width: 320px; height: 420px; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); z-index: 1002; display: none; flex-direction: column; overflow: hidden; }
-        .ai-chat-panel.active { display: flex; }
-        .ai-chat-header { background: var(--bg-card); padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.8rem; color: var(--primary-color); }
-        .ai-chat-messages { flex: 1; padding: 0.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.72rem; }
-        .ai-msg { padding: 0.4rem 0.6rem; border-radius: 8px; max-width: 88%; line-height: 1.35; word-break: break-word; }
-        .ai-msg.user { background-color: var(--accent-blue); color: #fff; align-self: flex-end; }
-        .ai-msg.bot { background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; }
-        .ai-chat-input-area { padding: 0.4rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 0.3rem; }
+        .offer-tab-btn.active {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 0.6rem; }
+        .offers-table-box {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .price-badge {
+            background-color: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+            padding: 0.08rem 0.25rem;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .tag-joint {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+            color: #000;
+            font-weight: 800;
+            font-size: 0.55rem;
+            padding: 0.02rem 0.2rem;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 0.8rem;
+        }
+
         .modal-overlay.active { display: flex; }
-        .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 450px; max-height: 85vh; padding: 0.7rem; display: flex; flex-direction: column; gap: 0.4rem; overflow-y: auto; font-size: 0.75rem; }
 
-        .form-control { width: 100%; padding: 0.3rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.72rem; }
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; }
-        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem; margin-top: 0.25rem; display: none; }
-        .days-checklist.show { display: grid; }
-        .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.2rem; font-size: 0.7rem; cursor: pointer; }
-        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
+        .modal {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+        }
 
+        .form-control {
+            width: 100%;
+            padding: 0.35rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.76rem;
+        }
+
+        .days-checklist {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25rem;
+            background: var(--bg-card);
+            padding: 0.4rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .day-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.2rem;
+            font-size: 0.75rem;
+        }
+
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: 6px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        /* Mobile Responsive Support */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; overflow: auto; }
             .sidebar { width: 100%; height: auto; }
             .main-wrapper { height: auto; overflow: visible; }
-            .split-grid, .depts-custom-layout { grid-template-columns: 1fr; }
+            .split-grid { grid-template-columns: 1fr; }
             .alerts-2col-grid { grid-template-columns: 1fr; }
             .top-header { flex-direction: column; align-items: stretch; }
             .search-container { width: 100%; }
@@ -175,35 +626,30 @@
 </head>
 <body class="theme-amoled">
 
-    <aside class="sidebar" id="appSidebar">
-        <div class="brand-container">
-            <div class="brand-title">
-                <div style="display:flex; align-items:center; gap:0.3rem;">
-                    <i class="fa-solid fa-headset"></i>
-                    <span>لوحة خدمة عملاء ماجستى</span>
-                </div>
-                <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.8rem;" onclick="toggleSidebar()"></i>
-            </div>
-            <div class="brand-subtitle">Developed by Mostafa Yousef</div>
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
+        <div class="brand-title">
+            <i class="fa-solid fa-headset"></i>
+            <span>لوحة الكول سنتر</span>
         </div>
 
         <div class="json-tools">
-            <button class="btn btn-secondary" style="flex:1; font-size:0.6rem; padding:0.2rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير</button>
-            <button class="btn btn-secondary" style="flex:1; font-size:0.6rem; padding:0.2rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد</button>
+            <button class="btn btn-secondary" style="flex:1; font-size:0.65rem; padding:0.25rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير</button>
+            <button class="btn btn-secondary" style="flex:1; font-size:0.65rem; padding:0.25rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد</button>
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
         <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
-            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
-            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
+            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> مواعيد الأطباء</a></li>
+            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات</a></li>
+            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> الأقسام والأطباء</a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> دليل المنسقين</a></li>
+            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> العروض والأسعار</a></li>
+            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> دليل الاستفسارات</a></li>
         </ul>
         
         <div class="theme-box">
-            <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
+            <label style="font-size: 0.72rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
             <select class="theme-select" onchange="changeTheme(this.value)">
                 <option value="theme-amoled">OLED أسود (Amoled)</option>
                 <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
@@ -213,6 +659,7 @@
         </div>
     </aside>
 
+    <!-- المحتوى الرئيسي -->
     <main class="main-wrapper">
         <header class="top-header">
             <div class="search-container">
@@ -220,36 +667,29 @@
                 <input type="text" id="globalSearchInput" placeholder="بحث شامل في كافة أقسام الموقع..." oninput="handleTrueGlobalSearch(this.value)">
             </div>
             
-            <div class="cloud-indicator" id="cloudStatusBadge">
+            <!-- لمبة الاتصال السحابي الحية الواضحة -->
+            <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
                 <span class="cloud-dot"></span>
                 <span>متصل بالسحابة</span>
             </div>
 
             <div class="kpi-bar">
                 <div class="kpi-card"><i class="fa-solid fa-user-doctor" style="color:var(--primary-color);"></i> الأطباء: <span id="kpiDocs" class="kpi-num">0</span></div>
-                <div class="kpi-card"><i class="fa-solid fa-bell" style="color:var(--primary-color);"></i> التنبيهات: <span id="kpiAlerts" class="kpi-num">0</span></div>
-                <div class="kpi-card"><i class="fa-solid fa-tags" style="color:var(--accent-green);"></i> العروض: <span id="kpiOffers" class="kpi-num">0</span></div>
+                <div class="kpi-card"><i class="fa-solid fa-bell" style="color:#60a5fa;"></i> التنبيهات: <span id="kpiAlerts" class="kpi-num">0</span></div>
+                <div class="kpi-card"><i class="fa-solid fa-tags" style="color:#16a34a;"></i> العروض: <span id="kpiOffers" class="kpi-num">0</span></div>
             </div>
 
-            <div id="clockDisplay" style="font-weight: 600; font-size: 0.72rem;"></div>
+            <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <div class="professional-ticker-bar">
-            <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-            <div class="ticker-container" id="tickerContainer" onmousedown="startTickerDrag(event)" onmousemove="tickerDragging(event)" onmouseup="stopTickerDrag()" onmouseleave="stopTickerDrag()">
-                <div class="ticker-track" id="tickerTrackContainer"></div>
-            </div>
-            <div style="display:flex; gap:0.2rem;">
-                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.6rem;" onclick="resetTickerPosition()"><i class="fa-solid fa-rotate-right"></i></button>
-                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.6rem;" onclick="toggleTickerPlay()" id="tickerToggleBtn"><i class="fa-solid fa-pause"></i></button>
-            </div>
-        </div>
+        <!-- التنبيهات المثبتة -->
+        <div class="pinned-alerts-banner" id="pinnedAlertsBar"></div>
 
         <div class="content-area">
 
-            <!-- نتائج البحث الشامل -->
+            <!-- لوحة نتائج البحث الشامل الموحدة -->
             <section id="globalSearchResultsSection" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
                     <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة أقسام الموقع</h2>
                     <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث والعودة</button>
                 </div>
@@ -258,31 +698,32 @@
 
             <!-- 1. مواعيد الأطباء -->
             <section id="schedule-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                    <h2 style="font-size: 0.95rem;">جدول دوام الأطباء المقسم حسب الفروع</h2>
-                    <div style="display:flex; gap:0.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                    <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
+                    <div style="display:flex; gap:0.3rem;">
                         <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> مناوبات الجمعة</button>
                         <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
                     </div>
                 </div>
 
-                <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.25rem 0.4rem; border-radius:6px; margin-bottom:0.35rem; display:flex; flex-direction:column; gap:0.15rem; font-size:0.68rem;">
-                    <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.15rem; flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="font-weight:700;">-</span></span>
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="font-weight:700;">-</span></span>
+                <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
+                    <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
+                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="color:var(--primary-color); font-weight:700;">-</span></span>
+                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong>مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="color:var(--primary-color); font-weight:700;">-</span></span>
                     </div>
-                    <div style="display:flex; gap:1rem; color:var(--primary-color); flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:var(--text-main);">-</span></span>
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:var(--text-main);">-</span></span>
+                    <div style="display:flex; gap:1rem; color:#60a5fa; flex-wrap:wrap;">
+                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:#fff;">-</span></span>
+                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:#fff;">-</span></span>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:0.3rem; margin-bottom:0.35rem;">
+                <!-- شريط البحث المدمج مع فلتر التخصص المنسدل -->
+                <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem;">
                     <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
                         <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
                     </div>
-                    <div style="width: 180px;">
+                    <div style="width: 200px;">
                         <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
                             <option value="">جميع التخصصات</option>
                         </select>
@@ -290,21 +731,22 @@
                 </div>
 
                 <div class="split-grid">
+                    <!-- فرع معشي -->
                     <div class="branch-box">
                         <div class="branch-title">
-                            <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
-                            <span style="font-size:0.6rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
+                            <span><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
                         </div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th style="width: 25%;">الطبيب والجنسية</th>
-                                        <th style="width: 20%;">التخصص</th>
-                                        <th style="width: 13%;">الكشفية</th>
-                                        <th style="width: 22%;">فرع معشي والمواعيد</th>
-                                        <th style="width: 12%;">الملاحظات</th>
-                                        <th style="width: 8%; text-align:center;">إدارة</th>
+                                        <th>الطبيب والجنسية</th>
+                                        <th>التخصص</th>
+                                        <th>الكشفية</th>
+                                        <th>فرع معشي والمواعيد</th>
+                                        <th>الملاحظات</th>
+                                        <th>إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="mashyTableBody"></tbody>
@@ -312,21 +754,22 @@
                         </div>
                     </div>
 
+                    <!-- فرع الوسام -->
                     <div class="branch-box">
                         <div class="branch-title">
-                            <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
-                            <span style="font-size:0.6rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
+                            <span><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
                         </div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th style="width: 25%;">الطبيب والجنسية</th>
-                                        <th style="width: 20%;">التخصص</th>
-                                        <th style="width: 13%;">الكشفية</th>
-                                        <th style="width: 22%;">فرع الوسام والمواعيد</th>
-                                        <th style="width: 12%;">الملاحظات</th>
-                                        <th style="width: 8%; text-align:center;">إدارة</th>
+                                        <th>الطبيب والجنسية</th>
+                                        <th>التخصص</th>
+                                        <th>الكشفية</th>
+                                        <th>فرع الوسام والمواعيد</th>
+                                        <th>الملاحظات</th>
+                                        <th>إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="wissamTableBody"></tbody>
@@ -338,111 +781,114 @@
 
             <!-- 2. التنبيهات والإشعارات -->
             <section id="alerts-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
                     <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / PDF</button>
                 </div>
+
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" placeholder="بحث في التنبيهات..." oninput="renderAlerts(this.value)">
                 </div>
+
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
             <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
-                    <div style="display:flex; gap:0.25rem;">
-                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
-                        <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
+                    <div style="display:flex; gap:0.3rem;">
+                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز</button>
+                        <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> ملحوظة</button>
                     </div>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs(this.value)">
+                    <input type="text" placeholder="بحث داخلي..." oninput="renderDeptsAndDocs(this.value)">
                 </div>
 
-                <div class="depts-custom-layout">
-                    <div class="depts-right-side">
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي - قسم الجلدية</span></div>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead><tr><th>الخدمة / الجهاز</th><th style="width:60px; text-align:center;">إدارة</th></tr></thead>
-                                    <tbody id="mashyDermTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي - قسم الأسنان</span></div>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead><tr><th>الخدمة / الجهاز</th><th style="width:60px; text-align:center;">إدارة</th></tr></thead>
-                                    <tbody id="mashyDentTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام - قسم الجلدية</span></div>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead><tr><th>الخدمة / الجهاز</th><th style="width:60px; text-align:center;">إدارة</th></tr></thead>
-                                    <tbody id="wissamDermTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام - قسم الأسنان</span></div>
-                            <div class="table-responsive">
-                                <thead><tr><th>الخدمة / الجهاز</th><th style="width:60px; text-align:center;">إدارة</th></tr></thead>
-                                <tbody id="wissamDentTableBody"></tbody>
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
+                    <div class="offers-table-box">
+                        <div class="table-responsive">
+                            <table id="deptsDocsTable">
+                                <thead>
+                                    <tr style="background:#1e293b; color:#fff;">
+                                        <th colspan="2" style="text-align:center; border-left:1px solid #334155;">فرع معشي</th>
+                                        <th colspan="2" style="text-align:center;">فرع الوسام</th>
+                                        <th>إدارة</th>
+                                    </tr>
+                                    <tr>
+                                        <th>الجلدية</th>
+                                        <th style="border-left:1px solid #334155;">الأسنان</th>
+                                        <th>الجلدية</th>
+                                        <th>الأسنان</th>
+                                        <th>حذف/تعديل</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deptsDocsTableBody"></tbody>
                             </table>
                         </div>
                     </div>
-
-                    <div class="depts-left-side" id="deptNotesContainer"></div>
+                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
                 </div>
             </section>
 
             <!-- 4. دليل المنسقين -->
             <section id="coordinators-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
                     <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
                 </div>
+
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" placeholder="بحث في تعليمات ودليل المنسقين..." oninput="renderCoordinators(this.value)">
                 </div>
+
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
             <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
                     <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
                 </div>
+
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
                 </div>
+
                 <div class="offers-tabs" id="offersTabsContainer"></div>
+
                 <div class="offers-table-box">
                     <div class="table-responsive">
-                        <table id="offersTableElement"></table>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الخدمة / العرض</th>
+                                    <th>جهاز جنتل ماكس برو</th>
+                                    <th>جهاز كلاريتي 2</th>
+                                    <th>السعر العام للخدمه</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="offersTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
             <!-- 6. دليل الاستفسارات -->
             <section id="inquiries-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
                     <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
                 </div>
+                
                 <div class="offers-tabs" id="inquiriesFilterTabs">
                     <button class="offer-tab-btn active" onclick="filterInquiryCategory('الكل', this)">الكل</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
@@ -452,6 +898,7 @@
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('أخرى', this)">أخرى</button>
                 </div>
+
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" placeholder="بحث في الاستفسارات..." oninput="renderInquiries(this.value)">
@@ -462,26 +909,9 @@
         </div>
     </main>
 
-    <!-- المساعد الذكي -->
-    <div class="ai-float-btn" onclick="toggleAIChat()">
-        <i class="fa-solid fa-robot"></i> مساعد ماجستي الذكي
-    </div>
-
-    <div class="ai-chat-panel" id="aiChatPanel">
-        <div class="ai-chat-header">
-            <span><i class="fa-solid fa-robot"></i> مساعد خدمة العملاء الذكي (Real AI)</span>
-            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleAIChat()"></i>
-        </div>
-        <div class="ai-chat-messages" id="aiChatMessages">
-            <div class="ai-msg bot">أهلاً بك يا مصطفى! أنا مساعدك الذكي الحقيقي المدمج. اسألني بأي طريقة عن الأطباء والمواعيد والعروض وسأرد عليك فوراً.</div>
-        </div>
-        <div class="ai-chat-input-area">
-            <input type="text" id="aiUserInput" class="form-control" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') sendSmartAIMessage()">
-            <button class="btn btn-blue" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
-    </div>
-
     <!-- MODALS -->
+
+    <!-- Modal 1: Doctor Modal -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -489,45 +919,45 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('doctorModal')"></i>
             </div>
             <input type="hidden" id="docId">
-            <div style="display:flex; gap:0.3rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.15rem;"><label>اسم الطبيب</label><input type="text" id="docName" class="form-control" placeholder="د. أحمد"></div>
-                <div style="width:90px; display:flex; flex-direction:column; gap:0.15rem;"><label>الجنسية</label><input type="text" id="docNationality" class="form-control" placeholder="سوري"></div>
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>اسم الطبيب</label>
+                    <input type="text" id="docName" class="form-control" placeholder="د. أحمد">
+                </div>
+                <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الجنسية</label>
+                    <input type="text" id="docNationality" class="form-control" placeholder="سوري">
+                </div>
             </div>
-            <div style="display:flex; gap:0.3rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.15rem;"><label>التخصص</label><input type="text" id="docSpecialty" class="form-control" placeholder="طبيب عام أسنان"></div>
-                <div style="width:90px; display:flex; flex-direction:column; gap:0.15rem;"><label>الكشفية</label><input type="text" id="docFee" class="form-control" placeholder="75 ريال"></div>
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>التخصص</label>
+                    <input type="text" id="docSpecialty" class="form-control" placeholder="طبيب عام أسنان">
+                </div>
+                <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الكشفية</label>
+                    <input type="text" id="docFee" class="form-control" placeholder="75 ريال">
+                </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.15rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>الفرع الرئيسي</label>
-                <select id="docBranch" class="form-control"><option value="معشي">فرع معشي</option><option value="الوسام">فرع الوسام</option></select>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون الصف المخصص للطبيب:</label>
-                <select id="docCustomColor" class="form-control">
-                    <option value="">تلقائي حسب التخصص</option>
-                    <option value="#1e1b4b">أزرق داكن (Navy)</option>
-                    <option value="#4c1d95">بنفسجي (Purple)</option>
-                    <option value="#064e3b">أخضر غامق (Dark Green)</option>
-                    <option value="#78350f">برتقالي غامق (Amber)</option>
-                    <option value="#831843">أحمر داكن (Maroon)</option>
-                    <option value="#1f2937">رصاصي غامق (Dark Gray)</option>
+                <select id="docBranch" class="form-control">
+                    <option value="معشي">فرع معشي</option>
+                    <option value="الوسام">فرع الوسام</option>
                 </select>
             </div>
-            <div style="display:flex; align-items:center; gap:0.3rem;">
-                <input type="checkbox" id="docIsJoint" style="width:14px; height:14px;">
-                <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين (⭐ ظهور علامة مميزة)</label>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="checkbox" id="docIsJoint" style="width:15px; height:15px;">
+                <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين</label>
             </div>
-            <div style="display:flex; align-items:center; gap:0.3rem; background:rgba(220,38,38,0.1); padding:0.25rem 0.4rem; border-radius:6px; border:1px solid var(--danger-color);">
-                <input type="checkbox" id="docIsLeave" style="width:14px; height:14px;">
-                <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / خارج الدوام</label>
+            <div style="display:flex; align-items:center; gap:0.4rem; background:rgba(220,38,38,0.1); padding:0.3rem 0.5rem; border-radius:6px; border:1px solid var(--danger-color);">
+                <input type="checkbox" id="docIsLeave" style="width:15px; height:15px;">
+                <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / خارج الدوام (تلوين الكارت بالأحمر)</label>
             </div>
 
-            <div class="days-section-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('mashyDaysBox')">
-                    <label style="font-weight:700; color:var(--primary-color); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> تحديد أيام دوام فرع معشي</label>
-                    <i class="fa-solid fa-chevron-down" style="color:var(--primary-color); font-size:0.7rem;"></i>
-                </div>
-                <div class="days-checklist" id="mashyDaysBox">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label style="font-weight:700; color:#60a5fa;">أيام دوام فرع معشي:</label>
+                <div class="days-checklist">
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="السبت"> السبت</label>
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأحد"> الأحد</label>
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الإثنين"> الإثنين</label>
@@ -538,12 +968,9 @@
                 </div>
             </div>
 
-            <div class="days-section-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('wissamDaysBox')">
-                    <label style="font-weight:700; color:var(--accent-green); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> تحديد أيام دوام فرع الوسام</label>
-                    <i class="fa-solid fa-chevron-down" style="color:var(--accent-green); font-size:0.7rem;"></i>
-                </div>
-                <div class="days-checklist" id="wissamDaysBox">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label style="font-weight:700; color:#34d399;">أيام دوام فرع الوسام:</label>
+                <div class="days-checklist">
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="السبت"> السبت</label>
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأحد"> الأحد</label>
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الإثنين"> الإثنين</label>
@@ -554,29 +981,56 @@
                 </div>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:0.15rem;"><label>ساعات الدوام اليومية</label><input type="text" id="docTiming" class="form-control" placeholder="من 12.30 م - 8.30 م"></div>
-            <div style="display:flex; flex-direction:column; gap:0.15rem;"><label>الملاحظات والتنويهات</label><textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات..."></textarea></div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>ساعات الدوام اليومية</label>
+                <input type="text" id="docTiming" class="form-control" placeholder="من 12.30 م - 8.30 م">
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>الملاحظات والتنويهات</label>
+                <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات..."></textarea>
+            </div>
             <button class="btn btn-green" onclick="saveDoctor()">حفظ البيانات</button>
         </div>
     </div>
 
-    <!-- Modal 2: Friday Schedule Modal -->
+    <!-- Modal 2: Friday Full Month Schedule Modal -->
     <div class="modal-overlay" id="fridayModal">
-        <div class="modal" style="max-width: 520px;">
+        <div class="modal" style="max-width: 560px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3>جدولة مناوبات أيام الجمعة خلال الشهر</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('fridayModal')"></i>
             </div>
             <input type="hidden" id="fridayEditId">
-            <div style="display:flex; gap:0.3rem; align-items:flex-end; background:var(--bg-card); padding:0.4rem; border-radius:6px; flex-wrap:wrap;">
-                <div style="flex:1; min-width:110px; display:flex; flex-direction:column; gap:0.15rem;"><label>تاريخ يوم الجمعة</label><input type="date" id="fridayDate" class="form-control"></div>
-                <div style="width:90px; display:flex; flex-direction:column; gap:0.15rem;"><label>الفرع</label><select id="fridayBranch" class="form-control"><option value="معشي">معشي</option><option value="الوسام">الوسام</option></select></div>
-                <div style="flex:1.2; min-width:120px; display:flex; flex-direction:column; gap:0.15rem;"><label>الطبيب المناوب</label><input type="text" id="fridayDocName" class="form-control" placeholder="د. أبان / د. أحمد"></div>
+            <div style="display:flex; gap:0.4rem; align-items:flex-end; background:var(--bg-card); padding:0.5rem; border-radius:6px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:120px; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>تاريخ يوم الجمعة</label>
+                    <input type="date" id="fridayDate" class="form-control">
+                </div>
+                <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الفرع</label>
+                    <select id="fridayBranch" class="form-control">
+                        <option value="معشي">معشي</option>
+                        <option value="الوسام">الوسام</option>
+                    </select>
+                </div>
+                <div style="flex:1.2; min-width:130px; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الطبيب المناوب</label>
+                    <input type="text" id="fridayDocName" class="form-control" placeholder="د. أبان / د. أحمد">
+                </div>
                 <button class="btn btn-green" onclick="saveFridayDutySchedule()"><i class="fa-solid fa-save"></i> حفظ</button>
             </div>
-            <div style="max-height: 200px; overflow-y:auto; margin-top:0.3rem;">
+
+            <div style="max-height: 220px; overflow-y:auto; margin-top:0.4rem;">
                 <table style="width:100%;">
-                    <thead><tr><th>التاريخ</th><th>الفرع</th><th>الأطباء المناوبين</th><th>إدارة</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الفرع</th>
+                            <th>الأطباء المناوبين</th>
+                            <th>إدارة</th>
+                        </tr>
+                    </thead>
                     <tbody id="fridayScheduleTableBody"></tbody>
                 </table>
             </div>
@@ -591,15 +1045,18 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
             <input type="hidden" id="alertId">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>نص التنبيه أو الإشعار</label><textarea id="alertContent" class="form-control" rows="3"></textarea></div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>نص التنبيه أو الإشعار</label>
+                <textarea id="alertContent" class="form-control" rows="3"></textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>إرفاق صورة أو ملف PDF</label>
                 <input type="file" id="alertFileInput" class="form-control" accept="image/*,application/pdf" onchange="previewAndCompressMedia(this)">
                 <input type="hidden" id="alertMediaBase64">
                 <input type="hidden" id="alertMediaType">
-                <div id="mediaPreviewContainer" style="display:none; position:relative; margin-top:0.25rem;">
+                <div id="mediaPreviewContainer" style="display:none; position:relative; margin-top:0.3rem;">
                     <div id="mediaPreviewBox"></div>
-                    <button class="btn btn-danger" style="padding:0.1rem 0.25rem; position:absolute; top:4px; right:4px;" onclick="removeAlertMedia()"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn btn-danger" style="padding:0.15rem 0.3rem; position:absolute; top:4px; right:4px;" onclick="removeAlertMedia()"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             <button class="btn btn-green" onclick="saveAlert()">نشر التنبيه</button>
@@ -610,33 +1067,27 @@
     <div class="modal-overlay" id="deptServiceModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="deptModalTitle">إضافة خدمة / جهاز للأقسام</h3>
+                <h3>إضافة صف أجهزة وخدمات</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptServiceModal')"></i>
             </div>
             <input type="hidden" id="deptRowId">
-            <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                <label>الفرع</label><select id="deptBranchSelect" class="form-control"><option value="معشي">فرع معشي</option><option value="الوسام">فرع الوسام</option></select>
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <label>معشي - جلدية</label>
+                <input type="text" id="mDerm" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                <label>القسم</label><select id="deptCategorySelect" class="form-control"><option value="جلدية">قسم الجلدية</option><option value="أسنان">قسم الأسنان</option></select>
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <label>معشي - أسنان</label>
+                <input type="text" id="mDent" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                <label>اسم الخدمة / الجهاز</label><input type="text" id="deptServiceName" class="form-control" placeholder="مثال: ليزر كربوني / تنظيف جير">
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <label>الوسام - جلدية</label>
+                <input type="text" id="wDerm" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.15rem; margin-top:0.15rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون تمييز هذا الصف:</label>
-                <select id="deptCustomColor" class="form-control">
-                    <option value="">بدون تمييز (تلقائي)</option>
-                    <option value="background-color: rgba(245, 158, 11, 0.25); color: #fef08a;">برتقالي مميز (Highlight)</option>
-                    <option value="background-color: rgba(37, 99, 235, 0.25); color: #93c5fd;">أزرق مميز</option>
-                    <option value="background-color: rgba(22, 163, 74, 0.25); color: #86efac;">أخضر مميز</option>
-                </select>
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <label>الوسام - أسنان</label>
+                <input type="text" id="wDent" class="form-control">
             </div>
-            <div style="display:flex; align-items:center; gap:0.3rem; margin-top:0.25rem;">
-                <input type="checkbox" id="deptIsJoint" style="width:14px; height:14px;">
-                <label for="deptIsJoint" style="font-weight:700; color:var(--primary-color);">خدمة/جهاز مشترك (⭐ إضافة علامة مميزة)</label>
-            </div>
-            <button class="btn btn-green" style="margin-top:0.3rem;" onclick="saveDeptService()">حفظ الخدمة</button>
+            <button class="btn btn-green" onclick="saveDeptService()">حفظ الصف</button>
         </div>
     </div>
 
@@ -644,20 +1095,12 @@
     <div class="modal-overlay" id="deptNoteModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="noteModalTitle">إضافة / تعديل ملحوظة</h3>
+                <h3>إضافة ملحوظة مهمة جديدة</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptNoteModal')"></i>
             </div>
-            <input type="hidden" id="noteIndex">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>نص الملحوظة</label><textarea id="deptNoteText" class="form-control" rows="3" placeholder="اكتب نص الملحوظة هنا..."></textarea></div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <label>لون كارت الملحوظة</label>
-                <select id="deptNoteColor" class="form-control">
-                    <option value="card-gold">برتقالي ذهبي (افتراضي)</option>
-                    <option value="card-darkblue">أزرق داكن</option>
-                    <option value="card-maroon">بنفسجي غامق</option>
-                    <option value="card-green">أخضر زيتي</option>
-                    <option value="card-red">أحمر مارون</option>
-                </select>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>نص الملحوظة</label>
+                <textarea id="deptNoteText" class="form-control" rows="3"></textarea>
             </div>
             <button class="btn btn-green" onclick="saveDeptNote()">حفظ الملحوظة</button>
         </div>
@@ -671,14 +1114,25 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('coordModal')"></i>
             </div>
             <input type="hidden" id="coordId">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>اسم الطبيب / القسم</label><input type="text" id="coordName" class="form-control"></div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>اسم الطبيب / القسم</label>
+                <input type="text" id="coordName" class="form-control">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>لون الكارت</label>
                 <select id="coordColor" class="form-control">
-                    <option value="card-teal">أزرق ملكي</option><option value="card-maroon">بنفسجي غامق</option><option value="card-red">أحمر مارون</option><option value="card-darkblue">كحلي</option><option value="card-gold">برتقالي ذهبي</option><option value="card-green">أخضر زيتي</option>
+                    <option value="card-teal">أزرق ملكي</option>
+                    <option value="card-maroon">بنفسجي غامق</option>
+                    <option value="card-red">أحمر مارون</option>
+                    <option value="card-darkblue">كحلي</option>
+                    <option value="card-gold">برتقالي ذهبي</option>
+                    <option value="card-green">أخضر زيتي</option>
                 </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>التفاصيل والشروط (كل نقطة في سطر)</label><textarea id="coordRules" class="form-control" rows="4"></textarea></div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>التفاصيل والشروط (كل نقطة في سطر)</label>
+                <textarea id="coordRules" class="form-control" rows="4"></textarea>
+            </div>
             <button class="btn btn-green" onclick="saveCoordinator()">حفظ التعليمات</button>
         </div>
     </div>
@@ -691,21 +1145,37 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('offerModal')"></i>
             </div>
             <input type="hidden" id="offerId">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>قسم العرض</label>
                 <select id="offCategory" class="form-control" onchange="checkCustomCategory(this.value)">
-                    <option value="عروض اسنان">عروض اسنان</option><option value="عروض ليزر نساء">عروض ليزر نساء</option><option value="عروض ليزر رجال">عروض ليزر رجال</option><option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option><option value="أخرى">أخرى</option>
+                    <option value="عروض اسنان">عروض اسنان</option>
+                    <option value="عروض ليزر نساء">عروض ليزر نساء</option>
+                    <option value="عروض ليزر رجال">عروض ليزر رجال</option>
+                    <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
+                    <option value="أخرى">أخرى</option>
                 </select>
             </div>
-            <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.25rem;"><label>اسم القسم الجديد</label><input type="text" id="offCustomCategory" class="form-control"></div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>اسم الخدمة / العرض</label><input type="text" id="offName" class="form-control"></div>
-            <div style="display:flex; gap:0.3rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.15rem;"><label>جهاز أول (اختياري)</label><input type="text" id="offDevice1" class="form-control"></div>
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.15rem;"><label>جهاز ثاني (اختياري)</label><input type="text" id="offDevice2" class="form-control"></div>
+            <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.3rem;">
+                <label>اسم القسم الجديد</label>
+                <input type="text" id="offCustomCategory" class="form-control">
             </div>
-            <div style="display:flex; gap:0.3rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.15rem;"><label>السعر العام</label><input type="text" id="offPrice" class="form-control"></div>
-                <div style="flex:1.5; display:flex; flex-direction:column; gap:0.15rem;"><label>ملحوظات / شروط</label><input type="text" id="offNotes" class="form-control"></div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>اسم الخدمة / العرض</label>
+                <input type="text" id="offName" class="form-control">
+            </div>
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>جهاز جنتل ماكس برو</label>
+                    <input type="text" id="offGentle" class="form-control">
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>جهاز كلاريتي 2</label>
+                    <input type="text" id="offClarity" class="form-control">
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>السعر العام للخدمه</label>
+                <input type="text" id="offPrice" class="form-control">
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
         </div>
@@ -719,21 +1189,29 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('inquiryModal')"></i>
             </div>
             <input type="hidden" id="inquiryId">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>القسم</label>
                 <select id="inqCategory" class="form-control" onchange="checkInquiryCustomCat(this.value)">
-                    <option value="الليزر">الليزر</option><option value="الأطباء وخدماتها">الأطباء وخدماتها</option><option value="الأجهزة">الأجهزة</option><option value="الأشعة والمختبر">الأشعة والمختبر</option><option value="الإبر">الإبر</option><option value="أخرى">أخرى</option>
+                    <option value="الليزر">الليزر</option>
+                    <option value="الأطباء وخدماتها">الأطباء وخدماتها</option>
+                    <option value="الأجهزة">الأجهزة</option>
+                    <option value="الأشعة والمختبر">الأشعة والمختبر</option>
+                    <option value="الإبر">الإبر</option>
+                    <option value="أخرى">أخرى</option>
                 </select>
             </div>
-            <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.25rem;"><label>اسم القسم الجديد</label><input type="text" id="inqCustomCategoryText" class="form-control"></div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <label>لون الكارت</label>
-                <select id="inqColor" class="form-control">
-                    <option value="card-darkblue">أزرق داكن</option><option value="card-teal">أزرق ملكي</option><option value="card-maroon">بنفسجي غامق</option><option value="card-red">أحمر مارون</option><option value="card-gold">برتقالي ذهبي</option><option value="card-green">أخضر زيتي</option>
-                </select>
+            <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.3rem;">
+                <label>اكتب اسم القسم الجديد</label>
+                <input type="text" id="inqCustomCategoryText" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>السؤال</label><input type="text" id="inqQuestion" class="form-control"></div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;"><label>الإجابة</label><textarea id="inqAnswer" class="form-control" rows="3"></textarea></div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>السؤال أو الاستفسار</label>
+                <input type="text" id="inqQuestion" class="form-control">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الإجابة والتفاصيل</label>
+                <textarea id="inqAnswer" class="form-control" rows="3"></textarea>
+            </div>
             <button class="btn btn-green" onclick="saveInquiry()">حفظ الاستفسار</button>
         </div>
     </div>
@@ -744,19 +1222,32 @@
     </div>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        // --- FIREBASE CONFIGURATION (مربوط بقاعدة بياناتك السحابية مباشرة) ---
+        const firebaseConfig = {
+            databaseURL: "https://monasqen-default-rtdb.firebaseio.com/"
+        };
+
+        // تهيئة فايربيس
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.database();
 
+        // تتبع حالة الاتصال السحابي اللحظي (لمبة الإشعار)
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 8px #22c55e;"></span><span>متصل بالسحابة</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة</span>`;
+                badge.style.borderColor = "#16a34a";
+                badge.style.color = "#4ade80";
             } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span>غير متصل</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 10px #dc2626;"></span><span>غير متصل</span>`;
+                badge.style.borderColor = "#dc2626";
+                badge.style.color = "#f87171";
             }
         });
 
+        // --- DATA STORES (متزامنة سحابياً) ---
         let doctorsData = [];
         let fridaySchedules = [];
         let alertsData = [];
@@ -773,13 +1264,11 @@
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
             changeTheme(savedTheme);
 
-            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            if (isSidebarCollapsed) { document.getElementById('appSidebar').classList.add('collapsed'); }
-
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
             switchTab(activeTab, targetNav, false);
 
+            // الاستماع للتحديثات السحابية لحظياً من Firebase Realtime Database
             db.ref('clinicData').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -788,28 +1277,15 @@
                     alertsData = data.alertsData || [];
                     coordinatorsData = data.coordinatorsData || [];
                     deptServicesData = data.deptServicesData || [];
-                    if (data.deptNotesData) {
-                        deptNotesData = data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n);
-                    } else { deptNotesData = []; }
+                    deptNotesData = data.deptNotesData || [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                 } else {
-                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "" }];
+                    // بيانات افتراضية أولية في حال كانت القاعدة فارغة
+                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
-                    deptServicesData = [
-                        { id: 1, branch: "معشي", category: "جلدية", name: "جنتل ماكس برو", customColor: "", isJoint: true },
-                        { id: 2, branch: "معشي", category: "أسنان", name: "تنظيف جير", customColor: "", isJoint: true },
-                        { id: 3, branch: "الوسام", category: "جلدية", name: "كلاريتي 2", customColor: "", isJoint: true },
-                        { id: 4, branch: "الوسام", category: "أسنان", name: "تقويم", customColor: "", isJoint: true }
-                    ];
-                    deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 ) ( 2722 ) الاتصال بماجستي", color: "card-gold" }];
                     syncToCloud();
                 }
-
-                doctorsData.forEach((d, idx) => {
-                    if (d.mashyOrder === undefined) d.mashyOrder = idx;
-                    if (d.wissamOrder === undefined) d.wissamOrder = idx;
-                });
 
                 renderDoctors();
                 renderFridayScheduleTable();
@@ -825,154 +1301,48 @@
             
             setInterval(() => {
                 const now = new Date();
-                const clockEl = document.getElementById('clockDisplay');
-                if(clockEl) clockEl.innerText = now.toLocaleString('ar-EG');
+                document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
         });
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('appSidebar');
-            sidebar.classList.toggle('collapsed');
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-        }
-
-        let isTickerPaused = false;
-        let isDraggingTicker = false;
-        let tickerStartX, tickerScrollLeft;
-
-        function toggleTickerPlay() {
-            isTickerPaused = !isTickerPaused;
-            const track = document.getElementById('tickerTrackContainer');
-            const btn = document.getElementById('tickerToggleBtn');
-            if (isTickerPaused) {
-                track.classList.add('paused');
-                btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-                btn.style.color = "var(--primary-color)";
-            } else {
-                track.classList.remove('paused');
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-                btn.style.color = "inherit";
-            }
-        }
-
-        function resetTickerPosition() {
-            const container = document.getElementById('tickerContainer');
-            container.scrollLeft = 0;
-        }
-
-        function startTickerDrag(e) {
-            isDraggingTicker = true;
-            const container = document.getElementById('tickerContainer');
-            tickerStartX = e.pageX - container.offsetLeft;
-            tickerScrollLeft = container.scrollLeft;
-        }
-
-        function tickerDragging(e) {
-            if (!isDraggingTicker) return;
-            e.preventDefault();
-            const container = document.getElementById('tickerContainer');
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - tickerStartX) * 2;
-            container.scrollLeft = tickerScrollLeft - walk;
-        }
-
-        function stopTickerDrag() { 
-            isDraggingTicker = false; 
-        }
-
-        function toggleAIChat() {
-            document.getElementById('aiChatPanel').classList.toggle('active');
-        }
-
-        // دالة الذكاء الاصطناعي السحابي (باستخدام OpenRouter و Llama بدقة وصلاحية كاملة)
-        async function sendSmartAIMessage() {
-            const inputEl = document.getElementById('aiUserInput');
-            const query = inputEl.value.trim();
-            if (!query) return;
-
-            const messagesBox = document.getElementById('aiChatMessages');
-            messagesBox.innerHTML += `<div class="ai-msg user">${query}</div>`;
-            inputEl.value = "";
-            messagesBox.scrollTop = messagesBox.scrollHeight;
-
-            const loadingId = 'loading_' + Date.now();
-            messagesBox.innerHTML += `<div class="ai-msg bot" id="${loadingId}">جاري البحث...</div>`;
-            messagesBox.scrollTop = messagesBox.scrollHeight;
-
-            const OPENROUTER_API_KEY = "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";
-
-            let matchedDoc = doctorsData.find(d => d.name.toLowerCase().includes(query.toLowerCase()) || (d.specialty && d.specialty.toLowerCase().includes(query.toLowerCase())));
-            let matchedOffer = offersData.find(o => o.name.toLowerCase().includes(query.toLowerCase()) || o.category.toLowerCase().includes(query.toLowerCase()));
-
-            let targetedContext = "أنت مساعد خدمة عملاء لعيادات ماجستي. أجب بدقة واختصار شديد باللغة العربية بناءً على البيانات التالية فقط:\n";
-            if (matchedDoc) targetedContext += `بيانات الطبيب المطلوب: ${JSON.stringify(matchedDoc)}\n`;
-            if (matchedOffer) targetedContext += `بيانات العرض المطلوب: ${JSON.stringify(matchedOffer)}\n`;
-            if (!matchedDoc && !matchedOffer) {
-                targetedContext += `قائمة الأطباء باختصار: ${JSON.stringify(doctorsData.map(d => ({الاسم: d.name, التخصص: d.specialty, الدوام: d.timing, إجازة: d.isLeave, الفرع: d.branch}))))}\n`;
-            }
-
-            try {
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                        "Content-Type": "application/json",
-                        "HTTP-Referer": window.location.href || "https://majesty-clinics.com",
-                        "X-Title": "Majesty Clinics"
-                    },
-                    body: JSON.stringify({
-                        "model": "meta-llama/llama-3.1-8b-instruct",
-                        "messages": [
-                            { "role": "system", "content": targetedContext + "\nتعليمات صارمة: لا تخترع أي معلومات نهائياً. التزم فقط بالبيانات المتاحة." },
-                            { "role": "user", "content": query }
-                        ]
-                    })
-                });
-
-                const data = await response.json();
-                const loadingElem = document.getElementById(loadingId);
-                if (loadingElem) loadingElem.remove();
-
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    const aiReply = data.choices[0].message.content;
-                    messagesBox.innerHTML += `<div class="ai-msg bot">${aiReply.replace(/\n/g, '<br>')}</div>`;
-                } else {
-                    messagesBox.innerHTML += `<div class="ai-msg bot">عذراً، لم أتمكن من الرد. حاول مرة أخرى.</div>`;
-                }
-            } catch (err) {
-                const loadingElem = document.getElementById(loadingId);
-                if (loadingElem) loadingElem.remove();
-                messagesBox.innerHTML += `<div class="ai-msg bot">خطأ في الاتصال بالشبكة.</div>`;
-            }
-
-            messagesBox.scrollTop = messagesBox.scrollHeight;
-        }
-
+        // دالة حفظ ومزامنة البيانات في السحابة
         function syncToCloud() {
-            db.ref('clinicData').set({
-                doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData
-            });
+            const payload = {
+                doctorsData,
+                fridaySchedules,
+                alertsData,
+                coordinatorsData,
+                deptServicesData,
+                deptNotesData,
+                offersData,
+                inquiriesData
+            };
+            db.ref('clinicData').set(payload);
         }
 
         function switchTab(tabId, elem, save = true) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
+            
+            document.querySelectorAll('.page-section').forEach(s => {
+                if(s.id !== 'globalSearchResultsSection') s.classList.remove('active');
+            });
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             
             const targetSec = document.getElementById(`${tabId}-section`);
             if (targetSec) targetSec.classList.add('active');
             if (elem) elem.classList.add('active');
+
             if (save) localStorage.setItem('activeTab', tabId);
         }
 
         function changeTheme(themeName) {
             document.body.className = themeName;
             localStorage.setItem('appTheme', themeName);
-            const selectEl = document.querySelector('.theme-select');
-            if(selectEl) selectEl.value = themeName;
         }
 
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
 
         function updateKPIs() {
             document.getElementById('kpiDocs').innerText = doctorsData.length;
@@ -980,14 +1350,13 @@
             document.getElementById('kpiOffers').innerText = offersData.length;
         }
 
-        function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
-
+        // --- JSON IMPORT / EXPORT (للنسخ الاحتياطي اليدوي) ---
         function exportJSON() {
             const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `callcenter_backup_${Date.now()}.json`);
+            dlAnchor.setAttribute("download", `callcenter_cloud_backup_${Date.now()}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
@@ -1009,14 +1378,16 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        
                         syncToCloud();
-                        alert("تم الاستيراد والرفع للسحابة بنجاح!");
-                    } catch (err) { alert("ملف غير صالح!"); }
+                        alert("تم استيراد البيانات ورفعها للسحابة بنجاح!");
+                    } catch (err) { alert("ملف JSON غير صالح!"); }
                 };
                 reader.readAsText(input.files[0]);
             }
         }
 
+        // --- 1. FRIDAY SCHEDULES ---
         function openFridayScheduleModal() {
             document.getElementById('fridayEditId').value = "";
             document.getElementById('fridayDate').value = "";
@@ -1030,20 +1401,26 @@
             const dateVal = document.getElementById('fridayDate').value;
             const branchVal = document.getElementById('fridayBranch').value;
             const docVal = document.getElementById('fridayDocName').value;
-            if (!dateVal || !docVal) return alert("أدخل التاريخ واسم الطبيب!");
+            if (!dateVal || !docVal) return alert("يرجى ملء التاريخ واسم الطبيب المناوب!");
             
             if (editId) {
                 const item = fridaySchedules.find(f => f.id == editId);
-                if (item) { item.date = dateVal; item.branch = branchVal; item.doc = docVal; }
+                if (item) {
+                    item.date = dateVal;
+                    item.branch = branchVal;
+                    item.doc = docVal;
+                }
                 document.getElementById('fridayEditId').value = "";
             } else {
                 fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal });
             }
+
             syncToCloud();
             document.getElementById('fridayDocName').value = "";
             document.getElementById('fridayDate').value = "";
             renderFridayScheduleTable();
             renderDoctors();
+            alert("تم حفظ مناوبة الجمعة سحابياً بنجاح!");
         }
 
         function editFridaySchedule(id) {
@@ -1056,7 +1433,7 @@
         }
 
         function deleteFridaySchedule(id) {
-            if (confirm("حذف هذه المناوبة؟")) {
+            if (confirm("هل تريد حذف هذه المناوبة؟")) {
                 fridaySchedules = fridaySchedules.filter(f => f.id !== id);
                 syncToCloud();
                 renderFridayScheduleTable();
@@ -1069,10 +1446,21 @@
             if(!tbody) return;
             tbody.innerHTML = "";
             fridaySchedules.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => {
-                tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.branch}</td><td><strong>${item.doc}</strong></td><td><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editFridaySchedule(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteFridaySchedule(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.branch}</td>
+                        <td><strong>${item.doc}</strong></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editFridaySchedule(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteFridaySchedule(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
         }
 
+        // --- 2. DOCTORS & BRANCH SUPPORT (تصميم شارات المواعيد النظيفة، وإخفاء الفروع الفارغة) ---
         function getArabicDayName() {
             const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             return days[new Date().getDay()];
@@ -1081,18 +1469,31 @@
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
+            
             const mashyDays = doc.mashyDays || doc.days || [];
             const wissamDays = doc.wissamDays || [];
+            
             let scheduleLines = [];
-            if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
-            if (wissamDays.length > 0) scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
+            if (mashyDays.length > 0) {
+                scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
+            }
+            if (wissamDays.length > 0) {
+                scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
+            }
 
-            let clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || 'مجانية'}\nالساعات: ${doc.timing || ''}`;
-            if (scheduleLines.length > 0) clientText += `\nمواعيد الدوام:\n` + scheduleLines.join('\n');
-            if (doc.notes && doc.notes.trim() !== "") clientText += `\nالملاحظات: ${doc.notes}`;
+            let clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})
+التخصص: ${doc.specialty}
+الكشفية: ${doc.fee || 'مجانية'}
+الساعات: ${doc.timing || ''}`;
+
+            if (scheduleLines.length > 0) {
+                clientText += `\nمواعيد الدوام:\n` + scheduleLines.join('\n');
+            }
 
             navigator.clipboard.writeText(clientText).then(() => {
-                alert(`📋 تم نسخ تفاصيل الدوام للعميل بنجاح!`);
+                alert(`📋 تم نسخ تفاصيل الدوام للعميل بنجاح!\n\n${clientText}`);
+            }).catch(err => {
+                alert("تعذر النسخ تلقائياً!");
             });
         }
 
@@ -1101,105 +1502,121 @@
             const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
 
+            // تعبئة قائمة التخصصات المنسدلة تلقائياً
             const specDropdown = document.getElementById('specialtyFilter');
             const currentSpecVal = specDropdown.value;
             const uniqueSpecialties = [...new Set(doctorsData.map(d => d.specialty).filter(Boolean))];
-            specDropdown.innerHTML = `<option value="">جميع التخصصات</option>` + uniqueSpecialties.map(s => `<option value="${s}" ${s === currentSpecVal ? 'selected' : ''}>${s}</option>`).join('');
+            
+            specDropdown.innerHTML = `<option value="">جميع التخصصات</option>` + 
+                uniqueSpecialties.map(s => `<option value="${s}" ${s === currentSpecVal ? 'selected' : ''}>${s}</option>`).join('');
 
             const mashyBody = document.getElementById('mashyTableBody');
             const wissamBody = document.getElementById('wissamTableBody');
             if(!mashyBody || !wissamBody) return;
             mashyBody.innerHTML = ""; wissamBody.innerHTML = "";
             let countM = 0, countW = 0;
+            let fridayMashyName = "لم يُحدد";
+            let fridayWissamName = "لم يُحدد";
 
             const todayStr = new Date().toISOString().split('T')[0];
             const upcomingFridays = fridaySchedules.filter(f => f.date >= todayStr);
-            let mashyFridays = upcomingFridays.filter(f => f.branch === "معشي").map(f => `<span>${f.doc}</span> <span style="color:var(--primary-color);">(${f.date})</span>`);
-            let wissamFridays = upcomingFridays.filter(f => f.branch === "الوسام").map(f => `<span>${f.doc}</span> <span style="color:var(--primary-color);">(${f.date})</span>`);
+            
+            let mashyFridays = upcomingFridays.filter(f => f.branch === "معشي").map(f => `${f.doc} (${f.date})`);
+            let wissamFridays = upcomingFridays.filter(f => f.branch === "الوسام").map(f => `${f.doc} (${f.date})`);
 
-            document.getElementById('fridayDocMashy').innerHTML = mashyFridays.length > 0 ? mashyFridays.join(' ، ') : '<span>لم يُحدد</span>';
-            document.getElementById('fridayDocWissam').innerHTML = wissamFridays.length > 0 ? wissamFridays.join(' ، ') : '<span>لم يُحدد</span>';
+            if (mashyFridays.length > 0) fridayMashyName = mashyFridays.join(' ، ');
+            if (wissamFridays.length > 0) fridayWissamName = wissamFridays.join(' ، ');
 
             const currentDay = getArabicDayName();
             document.getElementById('todayDayName').innerText = currentDay;
-            let todayMashyDocs = [], todayWissamDocs = [];
 
-            const mashyList = doctorsData.filter(d => {
+            let todayMashyDocs = [];
+            let todayWissamDocs = [];
+
+            doctorsData.filter(d => {
                 const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.notes && d.notes.toLowerCase().includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                const mashyDays = d.mashyDays || d.days || [];
-                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || mashyDays.length > 0);
-            });
-            mashyList.sort((a, b) => (a.mashyOrder ?? 0) - (b.mashyOrder ?? 0));
-
-            const wissamList = doctorsData.filter(d => {
-                const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.notes && d.notes.toLowerCase().includes(search));
-                const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                const wissamDays = d.wissamDays || (d.isJoint ? (d.days || []) : []);
-                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || wissamDays.length > 0);
-            });
-            wissamList.sort((a, b) => (a.wissamOrder ?? 0) - (b.wissamOrder ?? 0));
-
-            mashyList.forEach((doc) => {
+                return matchSearch && matchSpec;
+            }).forEach((doc) => {
                 const mashyDays = doc.mashyDays || doc.days || [];
-                if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
-
-                const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                const leaveBadge = doc.isLeave ? `<span style="color:var(--danger-color); font-weight:bold; font-size:0.58rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
-                let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);" : (doc.customColor ? `background-color: ${doc.customColor};` : "");
-
-                let scheduleHtml = `<div style="font-weight:600; margin-bottom:1px; font-size:0.62rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
-                if (mashyDays.length > 0) scheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 4px; border-radius:3px; margin:1px 0; font-size:0.58rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div>`;
-
-                mashyBody.innerHTML += `<tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})"><td><strong>${doc.name}</strong> <small style="color:var(--text-muted); font-size:0.58rem;">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td><td>${doc.specialty}</td><td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td><td>${scheduleHtml}</td><td style="color:var(--primary-color); font-size:0.6rem; font-weight:600;">${doc.notes || '-'}</td><td style="text-align:center;"><button class="btn btn-green" style="padding:0.04rem 0.15rem; font-size:0.55rem;" title="نسخ رسالة" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button> <button class="btn btn-secondary" style="padding:0.04rem 0.15rem; font-size:0.55rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.04rem 0.15rem; font-size:0.55rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                countM++;
-            });
-
-            wissamList.forEach((doc) => {
                 const wissamDays = doc.wissamDays || (doc.isJoint ? (doc.days || []) : []);
-                if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
+
+                if (!doc.isLeave) {
+                    if (mashyDays.includes(currentDay) && (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0)) todayMashyDocs.push(doc.name);
+                    if (wissamDays.includes(currentDay) && (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0)) todayWissamDocs.push(doc.name);
+                }
 
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                const leaveBadge = doc.isLeave ? `<span style="color:var(--danger-color); font-weight:bold; font-size:0.58rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
-                let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.15) !important; border-right: 3px solid var(--danger-color);" : (doc.customColor ? `background-color: ${doc.customColor};` : "");
+                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;"><i class="fa-solid fa-ban"></i> إجازة</span>` : '';
+                const rowClass = doc.isLeave ? "doctor-on-leave" : "draggable-doctor-row";
 
-                let scheduleHtml = `<div style="font-weight:600; margin-bottom:1px; font-size:0.62rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
-                if (wissamDays.length > 0) scheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 4px; border-radius:3px; margin:1px 0; font-size:0.58rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
+                // تنسيق المواعيد بشكل شارات (Badges) نظيفة ومختصرة بدلاً من التكدس
+                let scheduleHtml = `<div style="font-weight:600; color:var(--text-main); margin-bottom:2px; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
+                
+                if (mashyDays.length > 0) {
+                    scheduleHtml += `<div style="display:inline-block; background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">معشي: ${mashyDays.join('، ')}</div><br>`;
+                }
+                if (wissamDays.length > 0) {
+                    scheduleHtml += `<div style="display:inline-block; background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; margin:1px 0; font-size:0.62rem; font-weight:700;">الوسام: ${wissamDays.join('، ')}</div>`;
+                }
 
-                wissamBody.innerHTML += `<tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})"><td><strong>${doc.name}</strong> <small style="color:var(--text-muted); font-size:0.58rem;">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td><td>${doc.specialty}</td><td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td><td>${scheduleHtml}</td><td style="color:var(--primary-color); font-size:0.6rem; font-weight:600;">${doc.notes || '-'}</td><td style="text-align:center;"><button class="btn btn-green" style="padding:0.04rem 0.15rem; font-size:0.55rem;" title="نسخ رسالة" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button> <button class="btn btn-secondary" style="padding:0.04rem 0.15rem; font-size:0.55rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.04rem 0.15rem; font-size:0.55rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                countW++;
+                if (doc.branch === "معشي" || doc.isJoint || mashyDays.length > 0) {
+                    mashyBody.innerHTML += `
+                        <tr class="${rowClass}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
+                            <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
+                            <td>${doc.specialty}</td>
+                            <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                            <td>${scheduleHtml}</td>
+                            <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
+                            <td>
+                                <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    countM++;
+                }
+
+                if (doc.branch === "الوسام" || doc.isJoint || wissamDays.length > 0) {
+                    wissamBody.innerHTML += `
+                        <tr class="${rowClass}" draggable="true" ondragstart="handleDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleDocDrop(event, ${doc.id})">
+                            <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
+                            <td>${doc.specialty}</td>
+                            <td><span style="color:#fde047; font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                            <td>${scheduleHtml}</td>
+                            <td style="color:#fde047; font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
+                            <td>
+                                <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" title="نسخ رسالة للعميل" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    countW++;
+                }
             });
 
             document.getElementById('countMashy').innerText = `${countM} أطباء`;
             document.getElementById('countWissam').innerText = `${countW} أطباء`;
+            document.getElementById('fridayDocMashy').innerText = fridayMashyName;
+            document.getElementById('fridayDocWissam').innerText = fridayWissamName;
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
             document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد أطباء اليوم';
             updateKPIs();
         }
 
-        let draggedBranch = null, draggedDocId = null;
-        function handleBranchDragStart(e, branch, id) { draggedBranch = branch; draggedDocId = id; }
-        function handleBranchDrop(e, branch, targetId) {
+        let draggedDocId = null;
+        function handleDocDragStart(e, id) { draggedDocId = id; }
+        function handleDocDrop(e, targetId) {
             e.preventDefault();
-            if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
-            const searchInput = document.getElementById('docSearchInput');
-            const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
-            const selectedSpecialty = document.getElementById('specialtyFilter').value;
-
-            let currentList = branch === 'mashy' ? doctorsData.filter(d => d.branch === "معشي" || d.isJoint) : doctorsData.filter(d => d.branch === "الوسام" || d.isJoint);
-            const oldIdx = currentList.findIndex(d => d.id === draggedDocId);
-            const targetIdx = currentList.findIndex(d => d.id === targetId);
-
-            if (oldIdx !== -1 && targetIdx !== -1) {
-                const moved = currentList.splice(oldIdx, 1)[0];
-                currentList.splice(targetIdx, 0, moved);
-                currentList.forEach((doc, idx) => {
-                    const mainDoc = doctorsData.find(d => d.id === doc.id);
-                    if (mainDoc) { if (branch === 'mashy') mainDoc.mashyOrder = idx; else mainDoc.wissamOrder = idx; }
-                });
-                syncToCloud();
-                renderDoctors();
-            }
+            if (draggedDocId === null || draggedDocId === targetId) return;
+            const oldIdx = doctorsData.findIndex(d => d.id === draggedDocId);
+            const targetIdx = doctorsData.findIndex(d => d.id === targetId);
+            const moved = doctorsData.splice(oldIdx, 1)[0];
+            doctorsData.splice(targetIdx, 0, moved);
+            syncToCloud();
+            renderDoctors();
         }
 
         function openDoctorModal() {
@@ -1210,11 +1627,11 @@
             document.getElementById('docFee').value = "";
             document.getElementById('docTiming').value = "";
             document.getElementById('docNotes').value = "";
-            document.getElementById('docCustomColor').value = "";
             document.getElementById('docIsJoint').checked = false;
             document.getElementById('docIsLeave').checked = false;
             document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
             document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = false);
+            document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب";
             document.getElementById('doctorModal').classList.add('active');
         }
 
@@ -1222,7 +1639,6 @@
             const id = document.getElementById('docId').value;
             const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
             const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
-            const existingDoc = id ? doctorsData.find(d => d.id == id) : null;
 
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
@@ -1231,15 +1647,14 @@
                 specialty: document.getElementById('docSpecialty').value,
                 fee: document.getElementById('docFee').value,
                 branch: document.getElementById('docBranch').value,
-                customColor: document.getElementById('docCustomColor').value,
                 isJoint: document.getElementById('docIsJoint').checked,
                 isLeave: document.getElementById('docIsLeave').checked,
-                mashyDays, wissamDays,
+                mashyDays: mashyDays,
+                wissamDays: wissamDays,
                 timing: document.getElementById('docTiming').value,
-                notes: document.getElementById('docNotes').value,
-                mashyOrder: existingDoc ? (existingDoc.mashyOrder ?? doctorsData.length) : doctorsData.length,
-                wissamOrder: existingDoc ? (existingDoc.wissamOrder ?? doctorsData.length) : doctorsData.length
+                notes: document.getElementById('docNotes').value
             };
+
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
 
             if (id) {
@@ -1261,11 +1676,16 @@
             document.getElementById('docSpecialty').value = doc.specialty;
             document.getElementById('docFee').value = doc.fee || "";
             document.getElementById('docBranch').value = doc.branch;
-            document.getElementById('docCustomColor').value = doc.customColor || "";
             document.getElementById('docIsJoint').checked = !!doc.isJoint;
             document.getElementById('docIsLeave').checked = !!doc.isLeave;
-            document.querySelectorAll('.doc-mashy-chk').forEach(c => { c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : false; });
-            document.querySelectorAll('.doc-wissam-chk').forEach(c => { c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false; });
+            
+            document.querySelectorAll('.doc-mashy-chk').forEach(c => {
+                c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : (doc.days ? doc.days.includes(c.value) : false);
+            });
+            document.querySelectorAll('.doc-wissam-chk').forEach(c => {
+                c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false;
+            });
+
             document.getElementById('docTiming').value = doc.timing;
             document.getElementById('docNotes').value = doc.notes || "";
             document.getElementById('doctorModal').classList.add('active');
@@ -1279,23 +1699,42 @@
             }
         }
 
+        // --- 3. ALERTS & PDF ---
         function renderAlerts(search = "") {
             const grid = document.getElementById('alertsGridList');
-            const tickerTrack = document.getElementById('tickerTrackContainer');
-            if(!grid || !tickerTrack) return;
-            grid.innerHTML = ""; tickerTrack.innerHTML = "";
-
-            alertsData.forEach(item => {
-                tickerTrack.innerHTML += `<div class="ticker-item" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
-            });
+            const pinnedBar = document.getElementById('pinnedAlertsBar');
+            if(!grid) return;
+            grid.innerHTML = ""; pinnedBar.innerHTML = "";
 
             alertsData.filter(a => a.content.includes(search)).forEach(item => {
+                pinnedBar.innerHTML += `
+                    <div class="alert-pill" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
+                        <span class="badge-alert">إشعار</span> ${item.content.substring(0, 20)}...
+                    </div>
+                `;
+
                 let mediaHtml = "";
                 if (item.media) {
-                    if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
-                    else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
+                    if (item.mediaType === "pdf") {
+                        mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
+                    } else {
+                        mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
+                    }
                 }
-                grid.innerHTML += `<div class="alert-card-item-compact"><div><p>${item.content}</p><span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span></div>${mediaHtml}<div style="display:flex; flex-direction:column; gap:0.2rem;"><button class="btn btn-blue" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editAlert(${item.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button></div></div>`;
+
+                grid.innerHTML += `
+                    <div class="alert-card-item-compact">
+                        <div class="alert-content-block">
+                            <p>${item.content}</p>
+                            <span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span>
+                        </div>
+                        ${mediaHtml}
+                        <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                            <button class="btn btn-blue" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editAlert(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             });
             updateKPIs();
         }
@@ -1314,13 +1753,14 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
+                
                 if (file.type === "application/pdf") {
                     reader.onload = function(e) {
                         const blob = new Blob([file], { type: 'application/pdf' });
                         const blobUrl = URL.createObjectURL(blob);
                         document.getElementById('alertMediaBase64').value = blobUrl;
                         document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${blobUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
+                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${blobUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة ملف PDF</a>`;
                         document.getElementById('mediaPreviewContainer').style.display = 'block';
                     }
                     reader.readAsArrayBuffer(file);
@@ -1336,10 +1776,11 @@
                             canvas.width = (img.width > maxW) ? maxW : img.width;
                             canvas.height = (img.width > maxW) ? img.height * scale : img.height;
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            
                             const compressed = canvas.toDataURL('image/jpeg', 0.7);
                             document.getElementById('alertMediaBase64').value = compressed;
                             document.getElementById('alertMediaType').value = "image";
-                            document.getElementById('mediaPreviewBox').innerHTML = `<img src="${compressed}" style="height:35px; border-radius:4px; object-fit:cover;">`;
+                            document.getElementById('mediaPreviewBox').innerHTML = `<img src="${compressed}" style="height:40px; border-radius:4px; object-fit:cover;">`;
                             document.getElementById('mediaPreviewContainer').style.display = 'block';
                         }
                     }
@@ -1363,10 +1804,12 @@
             if (!content) return alert("أدخل نص التنبيه!");
 
             const alertObj = { id: id ? parseInt(id) : Date.now(), content, media, mediaType, time: new Date().toLocaleString('en-US') };
+
             if (id) {
                 const idx = alertsData.findIndex(a => a.id == id);
                 alertsData[idx] = alertObj;
             } else { alertsData.unshift(alertObj); }
+
             syncToCloud();
             renderAlerts();
             closeModal('alertModal');
@@ -1380,10 +1823,15 @@
             document.getElementById('alertMediaBase64').value = item.media || "";
             document.getElementById('alertMediaType').value = item.mediaType || "";
             if (item.media) {
-                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
-                else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:35px; border-radius:4px; object-fit:cover;">`;
+                if (item.mediaType === "pdf") {
+                    document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
+                } else {
+                    document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:40px; border-radius:4px; object-fit:cover;">`;
+                }
                 document.getElementById('mediaPreviewContainer').style.display = 'block';
-            } else { document.getElementById('mediaPreviewContainer').style.display = 'none'; }
+            } else {
+                document.getElementById('mediaPreviewContainer').style.display = 'none';
+            }
             document.getElementById('alertModal').classList.add('active');
         }
 
@@ -1395,42 +1843,37 @@
             }
         }
 
+        // --- 4. DEPTS & DOCS ---
         function renderDeptsAndDocs(search = "") {
-            const mashyDermBody = document.getElementById('mashyDermTableBody');
-            const mashyDentBody = document.getElementById('mashyDentTableBody');
-            const wissamDermBody = document.getElementById('wissamDermTableBody');
-            const wissamDentBody = document.getElementById('wissamDentTableBody');
-            
-            if(!mashyDermBody || !mashyDentBody || !wissamDermBody || !wissamDentBody) return;
-            mashyDermBody.innerHTML = ""; mashyDentBody.innerHTML = ""; wissamDermBody.innerHTML = ""; wissamDentBody.innerHTML = "";
-
-            deptServicesData.filter(s => s.name && s.name.toLowerCase().includes(search.toLowerCase())).forEach(item => {
-                const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
-                const rowHtml = `<tr ${cellStyle}><td ${cellStyle}>${item.name || '-'} ${jointBadge}</td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-
-                if (item.branch === "معشي") {
-                    if (item.category === "جلدية") mashyDermBody.innerHTML += rowHtml;
-                    else mashyDentBody.innerHTML += rowHtml;
-                } else {
-                    if (item.category === "جلدية") wissamDermBody.innerHTML += rowHtml;
-                    else wissamDentBody.innerHTML += rowHtml;
-                }
+            const body = document.getElementById('deptsDocsTableBody');
+            if(!body) return;
+            body.innerHTML = "";
+            deptServicesData.filter(s => s.mDerm.includes(search) || s.wDerm.includes(search)).forEach(item => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${item.mDerm}</td>
+                        <td style="border-left:1px solid #334155;">${item.mDent}</td>
+                        <td>${item.wDerm}</td>
+                        <td>${item.wDent}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
 
             const notesContainer = document.getElementById('deptNotesContainer');
             if(!notesContainer) return;
             notesContainer.innerHTML = "";
-            deptNotesData.forEach((noteObj, idx) => {
+            deptNotesData.forEach((note, idx) => {
                 notesContainer.innerHTML += `
-                    <div class="doc-sheet-card ${noteObj.color || 'card-gold'}">
-                        <h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}
-                            <div style="display:flex; gap:0.2rem;">
-                                <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.55rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.55rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </h3>
-                        <p>${noteObj.text}</p>
+                    <div class="doc-sheet-card card-gold">
+                        <h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}</h3>
+                        <p>${note}</p>
+                        <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.2rem; padding-top:0.2rem;">
+                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
@@ -1438,11 +1881,10 @@
 
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = "";
-            document.getElementById('deptBranchSelect').value = "معشي";
-            document.getElementById('deptCategorySelect').value = "جلدية";
-            document.getElementById('deptServiceName').value = "";
-            document.getElementById('deptCustomColor').value = "";
-            document.getElementById('deptIsJoint').checked = false;
+            document.getElementById('mDerm').value = "";
+            document.getElementById('mDent').value = "";
+            document.getElementById('wDerm').value = "";
+            document.getElementById('wDent').value = "";
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
@@ -1450,13 +1892,11 @@
             const id = document.getElementById('deptRowId').value;
             const rowObj = {
                 id: id ? parseInt(id) : Date.now(),
-                branch: document.getElementById('deptBranchSelect').value,
-                category: document.getElementById('deptCategorySelect').value,
-                name: document.getElementById('deptServiceName').value.trim(),
-                customColor: document.getElementById('deptCustomColor').value,
-                isJoint: document.getElementById('deptIsJoint').checked
+                mDerm: document.getElementById('mDerm').value,
+                mDent: document.getElementById('mDent').value,
+                wDerm: document.getElementById('wDerm').value,
+                wDent: document.getElementById('wDent').value
             };
-            if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
             if (id) {
                 const idx = deptServicesData.findIndex(s => s.id == id);
                 deptServicesData[idx] = rowObj;
@@ -1470,59 +1910,39 @@
             const item = deptServicesData.find(s => s.id === id);
             if (!item) return;
             document.getElementById('deptRowId').value = item.id;
-            document.getElementById('deptBranchSelect').value = item.branch || "معشي";
-            document.getElementById('deptCategorySelect').value = item.category || "جلدية";
-            document.getElementById('deptServiceName').value = item.name || "";
-            document.getElementById('deptCustomColor').value = item.customColor || "";
-            document.getElementById('deptIsJoint').checked = !!item.isJoint;
+            document.getElementById('mDerm').value = item.mDerm;
+            document.getElementById('mDent').value = item.mDent;
+            document.getElementById('wDerm').value = item.wDerm;
+            document.getElementById('wDent').value = item.wDent;
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
         function deleteDeptService(id) {
-            if (confirm("حذف هذا الصف؟")) {
+            if (confirm("حذف الصف؟")) {
                 deptServicesData = deptServicesData.filter(s => s.id !== id);
                 syncToCloud();
                 renderDeptsAndDocs();
             }
         }
 
-        function openDeptNoteModal() {
-            document.getElementById('noteIndex').value = "";
-            document.getElementById('deptNoteText').value = "";
-            document.getElementById('deptNoteColor').value = "card-gold";
-            document.getElementById('deptNoteModal').classList.add('active');
-        }
-
+        function openDeptNoteModal() { document.getElementById('deptNoteModal').classList.add('active'); }
         function saveDeptNote() {
-            const idx = document.getElementById('noteIndex').value;
-            const text = document.getElementById('deptNoteText').value.trim();
-            const color = document.getElementById('deptNoteColor').value;
-            if (!text) return;
-            const noteObj = { text, color };
-            if (idx !== "") deptNotesData[parseInt(idx)] = noteObj;
-            else deptNotesData.push(noteObj);
+            const txt = document.getElementById('deptNoteText').value.trim();
+            if (!txt) return;
+            deptNotesData.push(txt);
             syncToCloud();
             renderDeptsAndDocs();
             closeModal('deptNoteModal');
         }
-
-        function editDeptNote(idx) {
-            const noteObj = deptNotesData[idx];
-            if (!noteObj) return;
-            document.getElementById('noteIndex').value = idx;
-            document.getElementById('deptNoteText').value = noteObj.text;
-            document.getElementById('deptNoteColor').value = noteObj.color || "card-gold";
-            document.getElementById('deptNoteModal').classList.add('active');
-        }
-
         function deleteDeptNote(idx) {
-            if (confirm("حذف هذه الملحوظة؟")) {
+            if (confirm("حذف الملحوظة؟")) {
                 deptNotesData.splice(idx, 1);
                 syncToCloud();
                 renderDeptsAndDocs();
             }
         }
 
+        // --- 5. COORDINATORS ---
         let draggedCoordIdx = null;
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
@@ -1530,7 +1950,16 @@
             grid.innerHTML = "";
             coordinatorsData.filter(c => c.name.includes(search)).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                grid.innerHTML += `<div class="doc-sheet-card ${c.color || 'card-teal'}"><h3><span class="card-drag-handle" draggable="true" ondragstart="handleCoordDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleCoordDrop(event, ${idx})"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.55rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.55rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div></div>`;
+                grid.innerHTML += `
+                    <div class="doc-sheet-card ${c.color || 'card-teal'}" draggable="true" ondragstart="handleCoordDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleCoordDrop(event, ${idx})">
+                        <h3><i class="fa-solid fa-grip-vertical" style="opacity:0.6; margin-left:0.3rem;"></i> ${c.name}</h3>
+                        ${rules}
+                        <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.2rem; padding-top:0.25rem;">
+                            <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             });
         }
 
@@ -1572,17 +2001,26 @@
             document.getElementById('coordModal').classList.add('active');
         }
         function deleteCoordinator(id) {
-            if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
+            if (confirm("حذف؟")) {
+                coordinatorsData = coordinatorsData.filter(c => c.id !== id);
+                syncToCloud();
+                renderCoordinators();
+            }
         }
 
-        function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        // --- 6. OFFERS ---
+        function checkCustomCategory(val) {
+            document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none";
+        }
         function renderOffersTabs() {
             const container = document.getElementById('offersTabsContainer');
             if(!container) return;
             container.innerHTML = "";
             const cats = [...new Set(offersData.map(o => o.category))];
             if (cats.length > 0 && !cats.includes(selectedOfferTab)) selectedOfferTab = cats[0];
-            cats.forEach(cat => { container.innerHTML += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; });
+            cats.forEach(cat => {
+                container.innerHTML += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`;
+            });
             updateKPIs();
         }
         function filterOfferCategory(cat, btn) {
@@ -1592,71 +2030,73 @@
             renderOffers();
         }
         function renderOffers(search = "") {
-            const tableEl = document.getElementById('offersTableElement');
-            if(!tableEl) return;
-            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || o.price.includes(search) || (o.notes && o.notes.includes(search))));
-            const hasDev1 = filteredOffers.some(o => o.device1 && o.device1.trim() !== "");
-            const hasDev2 = filteredOffers.some(o => o.device2 && o.device2.trim() !== "");
-
-            let headerHtml = `<thead><tr><th style="width: 25%;">الخدمة / العرض</th>`;
-            if (hasDev1) headerHtml += `<th style="width: 20%;">الجهاز الأول</th>`;
-            if (hasDev2) headerHtml += `<th style="width: 20%;">الجهاز الثاني</th>`;
-            headerHtml += `<th style="width: 18%;">السعر النهائي</th><th style="width: 27%;">الملحوظات والشروط</th><th style="width: 10%; text-align:center;">إدارة</th></tr></thead>`;
-
-            let bodyHtml = `<tbody>`;
-            filteredOffers.forEach(item => {
-                bodyHtml += `<tr><td><strong>${item.name}</strong></td>`;
-                if (hasDev1) bodyHtml += `<td>${item.device1 || '-'}</td>`;
-                if (hasDev2) bodyHtml += `<td>${item.device2 || '-'}</td>`;
-                bodyHtml += `<td><span class="price-badge">${item.price}</span></td><td style="color:var(--primary-color); font-weight:600; font-size:0.62rem;">${item.notes || '-'}</td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            const body = document.getElementById('offersTableBody');
+            if(!body) return;
+            body.innerHTML = "";
+            offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || o.price.includes(search))).forEach(item => {
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.gentle}</td>
+                        <td>${item.clarity}</td>
+                        <td><span class="price-badge">${item.price}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
-            bodyHtml += `</tbody>`;
-            tableEl.innerHTML = headerHtml + bodyHtml;
         }
-
         function openOfferModal() {
             document.getElementById('offerId').value = "";
             document.getElementById('offName').value = "";
-            document.getElementById('offDevice1').value = "";
-            document.getElementById('offDevice2').value = "";
+            document.getElementById('offGentle').value = "-";
+            document.getElementById('offClarity').value = "-";
             document.getElementById('offPrice').value = "";
-            document.getElementById('offNotes').value = "";
             document.getElementById('offCategory').value = "عروض اسنان";
             document.getElementById('customCategoryBox').style.display = "none";
             document.getElementById('offerModal').classList.add('active');
         }
-
         function saveOffer() {
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
             if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
-            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, name: document.getElementById('offName').value, device1: document.getElementById('offDevice1').value.trim(), device2: document.getElementById('offDevice2').value.trim(), price: document.getElementById('offPrice').value, notes: document.getElementById('offNotes').value.trim() };
-            if (!obj.name || !obj.price) return alert("أدخل اسم الخدمة والسعر!");
-            if (id) { const idx = offersData.findIndex(o => o.id == id); offersData[idx] = obj; } else { offersData.push(obj); }
+            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, name: document.getElementById('offName').value, gentle: document.getElementById('offGentle').value, clarity: document.getElementById('offClarity').value, price: document.getElementById('offPrice').value };
+            if (!obj.name) return;
+            if (id) {
+                const idx = offersData.findIndex(o => o.id == id);
+                offersData[idx] = obj;
+            } else { offersData.push(obj); }
             syncToCloud();
             selectedOfferTab = cat;
             renderOffersTabs();
             renderOffers();
             closeModal('offerModal');
         }
-
         function editOffer(id) {
             const item = offersData.find(o => o.id === id);
             if (!item) return;
             document.getElementById('offerId').value = item.id;
             document.getElementById('offName').value = item.name;
-            document.getElementById('offDevice1').value = item.device1 || "";
-            document.getElementById('offDevice2').value = item.device2 || "";
+            document.getElementById('offGentle').value = item.gentle;
+            document.getElementById('offClarity').value = item.clarity;
             document.getElementById('offPrice').value = item.price;
-            document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offerModal').classList.add('active');
         }
-
         function deleteOffer(id) {
-            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); renderOffersTabs(); renderOffers(); }
+            if (confirm("حذف؟")) {
+                offersData = offersData.filter(o => o.id !== id);
+                syncToCloud();
+                renderOffersTabs();
+                renderOffers();
+            }
         }
 
-        function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        // --- 7. INQUIRIES ---
+        function checkInquiryCustomCat(val) {
+            document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
+        }
         function renderInquiriesTabs() {}
         function filterInquiryCategory(cat, btn) {
             selectedInquiryFilter = cat;
@@ -1664,63 +2104,67 @@
             if (btn) btn.classList.add('active');
             renderInquiries();
         }
-
-        let draggedInquiryIdx = null;
         function renderInquiries(search = "") {
             const grid = document.getElementById('inquiryCardsGrid');
             if(!grid) return;
             grid.innerHTML = "";
-            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (i.question.includes(search) || i.answer.includes(search))).forEach((item, idx) => {
-                grid.innerHTML += `<div class="doc-sheet-card ${item.color || 'card-darkblue'}"><h3><span class="card-drag-handle" draggable="true" ondragstart="handleInquiryDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleInquiryDrop(event, ${idx})"><i class="fa-solid fa-grip-vertical"></i></span><span style="font-size:0.55rem; background:rgba(255,255,255,0.1); padding:0.05rem 0.2rem; border-radius:4px; margin:0 0.3rem;">${item.category || 'عام'}</span><span style="flex:1;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${item.answer}</p></div>`;
+            inquiriesData.filter(i => {
+                const matchCat = (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter);
+                const matchSearch = (i.question.includes(search) || i.answer.includes(search));
+                return matchCat && matchSearch;
+            }).forEach(item => {
+                grid.innerHTML += `
+                    <div class="doc-sheet-card card-darkblue">
+                        <span style="font-size:0.6rem; background:rgba(255,255,255,0.1); padding:0.05rem 0.25rem; border-radius:4px; width:fit-content;">${item.category || 'عام'}</span>
+                        <h3>${item.question}</h3>
+                        <p>${item.answer}</p>
+                        <div style="margin-top:auto; display:flex; justify-content:flex-end; gap:0.2rem; padding-top:0.25rem;">
+                            <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             });
         }
-
-        function handleInquiryDragStart(e, idx) { draggedInquiryIdx = idx; }
-        function handleInquiryDrop(e, targetIdx) {
-            e.preventDefault();
-            if (draggedInquiryIdx === null || draggedInquiryIdx === targetIdx) return;
-            const moved = inquiriesData.splice(draggedInquiryIdx, 1)[0];
-            inquiriesData.splice(targetIdx, 0, moved);
-            syncToCloud();
-            renderInquiries();
-        }
-
         function openInquiryModal() {
             document.getElementById('inquiryId').value = "";
             document.getElementById('inqQuestion').value = "";
             document.getElementById('inqAnswer').value = "";
             document.getElementById('inqCategory').value = "الليزر";
-            document.getElementById('inqColor').value = "card-darkblue";
             document.getElementById('inqCustomCatBox').style.display = "none";
             document.getElementById('inquiryModal').classList.add('active');
         }
-
         function saveInquiry() {
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
-            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, color: document.getElementById('inqColor').value, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value };
+            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value };
             if (!obj.question) return;
-            if (id) { const idx = inquiriesData.findIndex(i => i.id == id); inquiriesData[idx] = obj; } else { inquiriesData.push(obj); }
+            if (id) {
+                const idx = inquiriesData.findIndex(i => i.id == id);
+                inquiriesData[idx] = obj;
+            } else { inquiriesData.push(obj); }
             syncToCloud();
             renderInquiries();
             closeModal('inquiryModal');
         }
-
         function editInquiry(id) {
             const item = inquiriesData.find(i => i.id === id);
             if (!item) return;
             document.getElementById('inquiryId').value = item.id;
             document.getElementById('inqQuestion').value = item.question;
             document.getElementById('inqAnswer').value = item.answer;
-            document.getElementById('inqColor').value = item.color || "card-darkblue";
             document.getElementById('inquiryModal').classList.add('active');
         }
-
         function deleteInquiry(id) {
-            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
+            if (confirm("حذف؟")) {
+                inquiriesData = inquiriesData.filter(i => i.id !== id);
+                syncToCloud();
+                renderInquiries();
+            }
         }
 
+        // --- 8. TRUE GLOBAL DEEP SEARCH ---
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -1736,42 +2180,123 @@
             document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
+
             let foundCount = 0;
 
             doctorsData.forEach(d => {
-                if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q))) {
+                if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q)) || (d.notes && d.notes.toLowerCase().includes(q))) {
                     foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">مواعيد الأطباء (${d.branch})</span><h4>${d.name} - ${d.specialty}</h4><p style="font-size:0.7rem; color:var(--text-muted);">الكشفية: ${d.fee || 'مجانية'} | الدوام: ${d.timing}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule')">عرض</button></div>`;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-user-doctor"></i> قسم: مواعيد الأطباء (${d.branch})</span>
+                                <h4 style="margin-top:0.3rem;">${d.name} - ${d.specialty}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">الكشفية: ${d.fee || 'مجانية'} | الدوام: ${d.timing}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            fridaySchedules.forEach(f => {
+                if (f.doc.toLowerCase().includes(q) || f.date.includes(q) || f.branch.toLowerCase().includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-calendar-check"></i> قسم: مناوبات الجمعة</span>
+                                <h4 style="margin-top:0.3rem;">مناوبة يوم ${f.date} (${f.branch})</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">الطبيب المناوب: ${f.doc}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule')">عرض بالصفحة</button>
+                        </div>
+                    `;
                 }
             });
 
             offersData.forEach(o => {
-                if (o.name.toLowerCase().includes(q) || o.category.toLowerCase().includes(q)) {
+                if (o.name.toLowerCase().includes(q) || o.category.toLowerCase().includes(q) || o.price.toLowerCase().includes(q)) {
                     foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">العروض (${o.category})</span><h4>${o.name}</h4><p style="font-size:0.7rem; color:var(--text-muted);">السعر: ${o.price}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض</button></div>`;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-tags"></i> قسم: العروض والأسعار (${o.category})</span>
+                                <h4 style="margin-top:0.3rem;">${o.name}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">السعر العام: ${o.price} | جنتل: ${o.gentle} | كلاريتي: ${o.clarity}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض بالصفحة</button>
+                        </div>
+                    `;
                 }
             });
 
             alertsData.forEach(a => {
                 if (a.content.toLowerCase().includes(q)) {
                     foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">التنبيهات</span><h4>${a.content}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndFind('alerts')">عرض</button></div>`;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-bullhorn"></i> قسم: التنبيهات والإشعارات العامة</span>
+                                <h4 style="margin-top:0.3rem;">${a.content}</h4>
+                                <p style="font-size:0.70rem; color:var(--text-muted);">${a.time}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('alerts')">عرض بالصفحة</button>
+                        </div>
+                    `;
                 }
             });
 
-            if (foundCount === 0) resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
+            coordinatorsData.forEach(c => {
+                const matchRules = c.rules.some(r => r.toLowerCase().includes(q));
+                if (c.name.toLowerCase().includes(q) || matchRules) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-users-gear"></i> قسم: دليل وقوانين المنسقين</span>
+                                <h4 style="margin-top:0.3rem;">تعليمات: ${c.name}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">${c.rules.join(' | ').substring(0, 80)}...</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('coordinators')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            inquiriesData.forEach(i => {
+                if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `
+                        <div class="search-result-card">
+                            <div>
+                                <span class="source-badge"><i class="fa-solid fa-circle-question"></i> قسم: دليل الاستفسارات (${i.category})</span>
+                                <h4 style="margin-top:0.3rem;">س: ${i.question}</h4>
+                                <p style="font-size:0.75rem; color:var(--text-muted);">ج: ${i.answer}</p>
+                            </div>
+                            <button class="btn btn-blue" onclick="jumpToSectionAndFind('inquiries')">عرض بالصفحة</button>
+                        </div>
+                    `;
+                }
+            });
+
+            if (foundCount === 0) {
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد أي نتائج مطابقة لـ "${query}" في أي قسم من أقسام الموقع.</div>`;
+            }
         }
 
         function clearGlobalSearch() {
             document.getElementById('globalSearchInput').value = "";
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
-            switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
+            const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelectorAll('.nav-link')[0];
+            switchTab(activeTab, targetNav);
         }
 
         function jumpToSectionAndFind(tabId) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab(tabId, document.querySelector(`.nav-link[data-tab="${tabId}"]`));
+            const targetNav = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
+            switchTab(tabId, targetNav);
         }
 
         function openLightbox(src) {
