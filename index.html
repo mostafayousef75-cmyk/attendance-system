@@ -506,6 +506,7 @@
             cursor: text;
         }
 
+        /* المساعد الذكي الحقيقي الشامل */
         .ai-floating-btn {
             position: fixed;
             bottom: 25px;
@@ -532,7 +533,7 @@
             bottom: 85px;
             left: 25px;
             width: 380px;
-            height: 480px;
+            height: 520px;
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
@@ -544,11 +545,12 @@
         }
         .ai-floating-chat-window.active { display: flex; }
         .ai-messages-box { flex: 1; padding: 0.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
-        .ai-message { max-width: 92%; padding: 0.45rem 0.65rem; border-radius: 8px; font-size: 0.75rem; line-height: 1.4; }
+        .ai-message { max-width: 95%; padding: 0.5rem 0.7rem; border-radius: 8px; font-size: 0.76rem; line-height: 1.4; }
         .ai-message.user { background: var(--accent-blue); color: #fff; align-self: flex-start; }
         .ai-message.gemini { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-end; }
-        .ai-input-box { padding: 0.35rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 0.3rem; }
-        .ai-input-box input {
+        .ai-input-box { padding: 0.35rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.3rem; }
+        .ai-input-row { display: flex; gap: 0.3rem; }
+        .ai-input-row input {
             flex: 1;
             padding: 0.3rem 0.5rem;
             background: var(--bg-surface);
@@ -911,17 +913,17 @@
         </div>
     </main>
 
-    <!-- زر المساعد الذكي -->
+    <!-- زر المساعد الذكي الحقيقي -->
     <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي السريعة الهجينة -->
+    <!-- نافذة المساعد الذكي الحقيقي الشامل -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السريع + الذكاء الاصطناعي</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي الحقيقي (LLM Agent)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
                 <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح Gemini API"></i>
@@ -930,16 +932,18 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يبحث في بيانات العيادة فوراً في أقل من ثانية، ويرد عبر Gemini للأسئلة العامة.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا جاهز ومحمل ببيانات الموقع كلها. اسألني أي سؤال، ولو فيه إجابة محتاجة تصحيح قل لي بأي صيغة وسأتعلّمها وأحفظها فوراً!</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اسأل عن طبيب، سعر، أو أي سؤال عام..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
-            <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="ai-input-row">
+                <input type="text" id="aiUserInput" placeholder="اسأل أو صحح معلومة (مثلاً: غلط الصح كذا...)" onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
 
-    <!-- باقي المودالات الأساسية -->
+    <!-- مودال الأطباء -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -975,13 +979,13 @@
                 </select>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون الصف:</label>
+                <label style="font-weight:700; color:var(--primary-color);">لون الصف (تحكم يدوي كامل):</label>
                 <select id="docCustomColor" class="form-control">
-                    <option value="">تلقائي حسب التخصص</option>
-                    <option value="#064e3b">أخضر غامق</option>
-                    <option value="#831843">أحمر مارون</option>
-                    <option value="#78350f">برتقالي غامق</option>
-                    <option value="#1e1b4b">أزرق داكن</option>
+                    <option value="">اللون الافتراضي (بدون تمييز)</option>
+                    <option value="background-color: #064e3b;">أخضر غامق</option>
+                    <option value="background-color: #831843;">أحمر مارون</option>
+                    <option value="background-color: #78350f;">برتقالي غامق</option>
+                    <option value="background-color: #1e1b4b;">أزرق داكن</option>
                 </select>
             </div>
             <div style="display:flex; align-items:center; gap:0.4rem;">
@@ -1131,9 +1135,9 @@
                 </div>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem; margin-top:0.2rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون التمييز:</label>
+                <label style="font-weight:700; color:var(--primary-color);">لون التمييز (تحكم يدوي):</label>
                 <select id="deptCustomColor" class="form-control">
-                    <option value="">بدون تمييز</option>
+                    <option value="">بدون تمييز (افتراضي)</option>
                     <option value="background-color: rgba(245, 158, 11, 0.25); color: #fef08a;">برتقالي مميز</option>
                     <option value="background-color: rgba(37, 99, 235, 0.25); color: #93c5fd;">أزرق مميز</option>
                     <option value="background-color: rgba(22, 163, 74, 0.25); color: #86efac;">أخضر مميز</option>
@@ -1349,6 +1353,9 @@
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
+        // ذاكرة وتاريخ المحادثة للمساعد الذكي الحقيقي مع التعلم المستمر
+        let aiChatHistory = [];
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
             changeTheme(savedTheme);
@@ -1378,7 +1385,7 @@
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                 } else {
-                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "#064e3b" }];
+                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
                     deptServicesData = [
                         { id: 1, branch: "معشي", derm: "جنتل ماكس برو", dent: "تنظيف جير", customColor: "", isJoint: true },
@@ -1640,7 +1647,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
                 
-                let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor ? `background-color: ${doc.customColor};` : "background-color: rgba(6, 78, 59, 0.35);");
+                let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 let scheduleHtml = `<div style="font-weight:700; font-size:0.72rem; color:#facc15;"><i class="fa-regular fa-clock"></i> ${doc.timing || ''}</div>`;
@@ -1670,7 +1677,7 @@
                 if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
-                let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor ? `background-color: ${doc.customColor};` : "background-color: rgba(74, 222, 128, 0.15);");
+                let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 let scheduleHtml = `<div style="font-weight:700; font-size:0.72rem; color:#facc15;"><i class="fa-regular fa-clock"></i> ${doc.timing || ''}</div>`;
@@ -2501,7 +2508,7 @@
         }
 
         // =========================================================================
-        // الدالة المعدلة بالكامل: بحث فوري محلي + الاتصال المحسن بـ Gemini 1.5 Flash
+        // المساعد الذكي الحقيقي (LLM Agent) مع حقن بيانات الموقع والتعلّم المستمر وزر الواتساب
         // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('gemini_api_key') || '';
@@ -2510,6 +2517,13 @@
                 localStorage.setItem('gemini_api_key', newKey.trim());
                 alert("✅ تم حفظ مفتاح API بنجاح!");
             }
+        }
+
+        function copyAIAnswerToWhatsApp(textElementId) {
+            const textToCopy = document.getElementById(textElementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("📋 تم نسخ الإجابة بنجاح للواتساب!");
+            });
         }
 
         async function sendSmartAIMessage() {
@@ -2522,67 +2536,6 @@
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            const query = rawText.toLowerCase();
-
-            // 1. بحث محلي فوري (أطباء، عروض، أسئلة) - سرعة مطلقة
-            const foundDocs = doctorsData.filter(d => 
-                d.name.toLowerCase().includes(query) || 
-                (d.specialty && d.specialty.toLowerCase().includes(query))
-            );
-
-            const foundOffers = offersData.filter(o => 
-                o.name.toLowerCase().includes(query) || 
-                (o.category && o.category.toLowerCase().includes(query))
-            );
-
-            const foundInquiries = inquiriesData.filter(i => 
-                i.question.toLowerCase().includes(query) || 
-                i.answer.toLowerCase().includes(query)
-            );
-
-            // لو المعلومة متوفرة في جداولك، إظهارها فوراً بدون انتظار API
-            if (foundDocs.length > 0 || foundOffers.length > 0 || foundInquiries.length > 0) {
-                let localReply = "";
-
-                if (foundDocs.length > 0) {
-                    localReply += "<b>👨‍⚕️ الأطباء المطابقون:</b><br>";
-                    foundDocs.forEach(d => {
-                        let mDays = (d.mashyDays || d.days || []).join('، ');
-                        let wDays = (d.wissamDays || []).join('، ');
-                        let status = d.isLeave ? "<span style='color:#ef4444;'>(في إجازة)</span>" : "";
-                        localReply += `• <b>${d.name}</b> (${d.specialty}) ${status}<br>`;
-                        localReply += `  - الكشفية: <b>${d.fee || 'مجانية'}</b> | الساعات: ${d.timing || '-'}<br>`;
-                        if(mDays)  localReply += `  - معشي: ${mDays}<br>`;
-                        if(wDays)  localReply += `  - الوسام: ${wDays}<br>`;
-                        if(d.notes) localReply += `  - ملاحظات: ${d.notes}<br>`;
-                    });
-                    localReply += "<br>";
-                }
-
-                if (foundOffers.length > 0) {
-                    localReply += "<b>🏷️ العروض والأسعار:</b><br>";
-                    foundOffers.forEach(o => {
-                        localReply += `• <b>${o.name}</b> (${o.category})<br>`;
-                        if (o.device1) localReply += `  - ${o.device1}: <b>${o.price1 || ''}</b><br>`;
-                        if (o.device2) localReply += `  - ${o.device2}: <b>${o.price2 || ''}</b><br>`;
-                        if (o.price) localReply += `  - السعر العام: <b>${o.price}</b><br>`;
-                    });
-                    localReply += "<br>";
-                }
-
-                if (foundInquiries.length > 0) {
-                    localReply += "<b>❓ الاستفسارات:</b><br>";
-                    foundInquiries.forEach(i => {
-                        localReply += `• <b>س: ${i.question}</b><br>  ج: ${i.answer}<br>`;
-                    });
-                }
-
-                msgBox.innerHTML += `<div class="ai-message gemini">${localReply}</div>`;
-                msgBox.scrollTop = msgBox.scrollHeight;
-                return;
-            }
-
-            // 2. إذا لم تكن موجودة في الجداول، استدعاء موديل Gemini الرسمي الأصلي أونلاين
             let apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
                 apiKey = prompt("الرجاء إدخال مفتاح Google Studio API الخاص بك لأول مرة:");
@@ -2590,11 +2543,30 @@
                 localStorage.setItem('gemini_api_key', apiKey.trim());
             }
 
+            // حقن بيانات الموقع الحالية بالكامل في الذاكرة (Context Injection)
+            const siteContext = `
+            بيانات الموقع الحالية لعيادات ماجستي (معشي والوسام):
+            1. الأطباء: ${JSON.stringify(doctorsData)}
+            2. مواعيد الجمعة: ${JSON.stringify(fridaySchedules)}
+            3. العروض والأسعار: ${JSON.stringify(offersData)}
+            4. الأسئلة والاستفسارات الشائعة: ${JSON.stringify(inquiriesData)}
+            5. تعليمات وقوانين المنسقين: ${JSON.stringify(coordinatorsData)}
+            6. الخدمات والأجهزة بالأقسام: ${JSON.stringify(deptServicesData)}
+            `;
+
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث أونلاين...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ التفكير وتحليل بيانات الموقع...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            // تم التحديث لاستخدام الموديل الرسمي المستقر أونلاين gemini-1.5-flash
+            // بناء سجل المحادثة مع النظام الذكي وموديل Gemini Flash المحدث
+            const systemPrompt = `أنت مساعد ذكي (LLM Agent) لعيادات كول سنتر طبية. مهمتك الإجابة على أسئلة موظف الكول سنتر بدقة متناهية بالاعتماد على سياق بيانات الموقع أدناه. 
+            لو لاحظت أن المستخدم (مصطفى) يصحح معلومة أو يعطيك تصحيحاً (مثل "غلط الصح كذا")، قم بتسجيل وتعديل هذه المعلومة في ذاكرتك المباشرة واستخدمها في ردودك القادمة بنفس النمط.
+            اجعل إجاباتك منظمة ومهنية وجاهزة لتنسيقها للعملاء.
+            
+            ${siteContext}`;
+
+            aiChatHistory.push({ role: "user", parts: [{ text: rawText }] });
+
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
 
             try {
@@ -2602,7 +2574,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        "contents": [{ "parts": [{ "text": `أنت مساعد كول سنتر طبي، أجب بإيجاز شديد ومباشر على: ${rawText}` }] }]
+                        "system_instruction": { "parts": [{ "text": systemPrompt }] },
+                        "contents": aiChatHistory
                     })
                 });
 
@@ -2612,16 +2585,26 @@
 
                 if (data && data.candidates && data.candidates[0].content.parts[0].text) {
                     const aiReply = data.candidates[0].content.parts[0].text;
-                    msgBox.innerHTML += `<div class="ai-message gemini">${aiReply.replace(/\n/g, '<br>')}</div>`;
+                    aiChatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+
+                    const replyId = 'ai_reply_' + Date.now();
+                    msgBox.innerHTML += `
+                        <div class="ai-message gemini">
+                            <div id="${replyId}">${aiReply.replace(/\n/g, '<br>')}</div>
+                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
+                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+                            </button>
+                        </div>
+                    `;
                 } else if (data.error) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ في المفتاح: ${data.error.message || 'تأكد من مفتاح API'}. اضغط على أيقونة المفتاح بالترس لتعديله.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ في المفتاح أو الموديل: ${data.error.message || 'تأكد من المفتاح'}. اضغط على أيقونة المفتاح بالترس لتعديله.</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">لم يتم العثور على رد. يمكنك البحث بالجدول المباشر.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع معالجة الطلب. حاول مرة أخرى.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
-                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالإنترنت.</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالإنترنت أو الخادم.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
