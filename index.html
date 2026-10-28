@@ -424,12 +424,14 @@
         th, td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.4; vertical-align: top; }
         th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 600; font-size: 0.72rem; }
 
-        /* تعديل حر مطلق للأعمدة بدون أي قيود */
+        /* تعديل حر مطلق للأعمدة والصفوف بدون أي قيود */
         table.resizable-mode th, table.resizable-mode td {
             resize: both !important;
             overflow: auto !important;
             border-left: 1px dashed var(--primary-color);
-            min-width: 50px !important;
+            min-width: 40px !important;
+            max-width: 400px !important;
+            min-height: 25px !important;
         }
 
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
@@ -541,7 +543,6 @@
             cursor: text;
         }
 
-        /* المساعد الذكي الحقيقي عبر OpenRouter */
         .ai-floating-btn {
             position: fixed;
             bottom: 25px;
@@ -981,7 +982,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! تم التحويل إلى OpenRouter بنجاح، المساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! تم تحديث الموديل إلى Llama 3.1 بنجاح والمساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
         </div>
 
         <div class="ai-input-box">
@@ -2657,9 +2658,6 @@
             }
         }
 
-        // =========================================================================
-        // المساعد الذكي المحدث للعمل عبر OpenRouter API
-        // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('openrouter_api_key') || '';
             const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
@@ -2729,7 +2727,7 @@
                         'X-Title': 'Clinic CallCenter Agent'
                     },
                     body: JSON.stringify({
-                        "model": "meta-llama/llama-3-8b-instruct:free",
+                        "model": "meta-llama/llama-3.1-8b-instruct:free",
                         "messages": [
                             { "role": "system", "content": systemPrompt },
                             ...aiChatHistory
