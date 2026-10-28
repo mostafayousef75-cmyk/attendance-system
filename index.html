@@ -916,25 +916,25 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي الآمنة -->
+    <!-- نافذة المساعد الذكي المربوط ببيانات العيادة وجيميني -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (Google Gemini)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (مخصص للعيادة)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="إدخال / تغير مفتاح الـ API"></i>
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح الـ API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بأمان تام. إذا كانت هذه أول مرة، اضغط على أيقونة المفتاح (🔑) بالأعلى لإدخال مفتاح الـ API الخاص بك (سيتم حفظه في متصفحك محلياً ولن يُرفع أبداً على جيت هاب لضمان عدم الحظر).</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد الآن يقرأ بيانات العيادة والأطباء والأسعار مباشرة ويجيبك بدقة فائقة وسرعة. اسأل عن أي طبيب أو عرض!</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اسأل عن طبيب، موعد، أو عرض..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
             <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -2501,14 +2501,14 @@
         }
 
         // =========================================================================
-        // الدالة الآمنة للتعامل مع API Key (يُحفظ محلياً ولا يُرفع لجيت هاب نهائياً)
+        // الدالة المحدثة: تجمع داتا الأطباء والأسعار وتبعتهال لـ Gemini عشان يرد بدقة
         // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('gemini_api_key') || '';
-            const newKey = prompt("أدخل مفتاح Google Studio API الخاص بك (سيتم حفظه في متصفحك فقط بأمان ولن يرفع لجيت هاب):", currentKey);
+            const newKey = prompt("أدخل مفتاح Google Studio API الخاص بك (محفوظ في متصفحك محلياً فقط بأمان):", currentKey);
             if (newKey !== null) {
                 localStorage.setItem('gemini_api_key', newKey.trim());
-                alert("✅ تم حفظ المفتاح بنجاح في متصفحك محلياً!");
+                alert("✅ تم حفظ المفتاح بنجاح!");
             }
         }
 
@@ -2518,7 +2518,6 @@
             const rawText = inputEl.value.trim();
             if (!rawText) return;
 
-            // التأكد من وجود المفتاح محلياً
             let apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
                 apiKey = prompt("الرجاء إدخال مفتاح Google Studio API الخاص بك لأول مرة:");
@@ -2531,8 +2530,31 @@
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ الاتصال بـ Google Gemini...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث في جداول العيادة والرد...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
+
+            // تجميع داتا الأطباء والأسعار والاستفسارات لإرسالها مع السؤال ليعرفها النموذج
+            let clinicContext = "أنت مساعد ذكي لمركز طبي (كول سنتر). هذه هي بيانات العيادة الحالية:\n";
+            
+            clinicContext += "\n[الأطباء والمواعيد والفرع]:\n";
+            doctorsData.forEach(d => {
+                let mDays = (d.mashyDays || d.days || []).join('، ');
+                let wDays = (d.wissamDays || []).join('، ');
+                let status = d.isLeave ? "في إجازة" : "مداوم";
+                clinicContext += `- د. ${d.name} (${d.specialty}), الفرع: ${d.branch}, الحالة: ${status}, كشفية: ${d.fee || 'مجانية'}, معشي: [${mDays}], الوسام: [${wDays}], الساعات: ${d.timing}, ملاحظات: ${d.notes}\n`;
+            });
+
+            clinicContext += "\n[العروض والأسعار]:\n";
+            offersData.forEach(o => {
+                clinicContext += `- قسم: ${o.category} | ${o.name} | السعر: ${o.price || ''} | جهاز1: ${o.device1} (${o.price1}) | جهاز2: ${o.device2} (${o.price2})\n`;
+            });
+
+            clinicContext += "\n[الاستفسارات الشائعة]:\n";
+            inquiriesData.forEach(i => {
+                clinicContext += `- س: ${i.question} -> ج: ${i.answer}\n`;
+            });
+
+            const fullPrompt = `${clinicContext}\nسؤال المستخدم أو المنسق الذي يريد إجابة دقيقة بناءً على البيانات أعلاه: "${rawText}"`;
 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
 
@@ -2541,7 +2563,7 @@
                     {
                         "parts": [
                             {
-                                "text": rawText
+                                "text": fullPrompt
                             }
                         ]
                     }
@@ -2566,14 +2588,14 @@
                     const aiReply = data.candidates[0].content.parts[0].text;
                     msgBox.innerHTML += `<div class="ai-message gemini">${aiReply.replace(/\n/g, '<br>')}</div>`;
                 } else if (data.error) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ من الخادم: ${data.error.message || 'تأكد من صحة المفتاح.'}</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ: ${data.error.message || 'تأكد من صحة المفتاح.'}</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع الحصول على رد. تأكد من صحة المفتاح أو رصيدك.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع الحصول على رد. تأكد من صحة المفتاح.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
-                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة أو الـ API.</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
