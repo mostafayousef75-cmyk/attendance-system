@@ -980,7 +980,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا جاهز ومحمل ببيانات الموقع كلها وموديل Gemini 3.8 Flash شغال تماماً وبدون أي أخطاء. اسألني أي سؤال أو صحح لي أي معلومة!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا جاهز ومحمل ببيانات الموقع كلها وموديل Gemini Flash شغال تماماً وبدون أي أخطاء. اسألني أي سؤال أو صحح لي أي معلومة!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1431,7 +1431,6 @@
             const savedShiftNote = localStorage.getItem('shift_scratchpad_current') || '';
             document.getElementById('shiftScratchpadText').value = savedShiftNote;
 
-            // استرجاع عرض الأعمدة المحفوظ مسبقاً إن وجد
             loadSavedTableWidths();
 
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
@@ -1552,7 +1551,6 @@
             document.getElementById(boxId).classList.toggle('show');
         }
 
-        // تفعيل وضع تعديل عرض الأعمدة وحفظها تلقائياً
         function toggleTableResizeMode() {
             const mashyTable = document.getElementById('mashyTableElement');
             const wissamTable = document.getElementById('wissamTableElement');
@@ -2666,11 +2664,11 @@
         }
 
         // =========================================================================
-        // المساعد الذكي الحقيقي (LLM Agent) المحدث رسمياً بموديل gemini-3.8-flash
+        // المساعد الذكي الحقيقي (LLM Agent) - تم تعديل الرابط وموديل gemini-flash-latest نهائياً
         // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('gemini_api_key') || '';
-            const newKey = prompt("أدخل مفتاح Google Studio API (المفتاح محفوظ في متصفحك فقط):", currentKey);
+            const newKey = prompt("أدخل مفتاح Google Studio / Google Cloud API (المفتاح محفوظ في متصفحك فقط):", currentKey);
             if (newKey !== null) {
                 localStorage.setItem('gemini_api_key', newKey.trim());
                 alert("✅ تم حفظ مفتاح API بنجاح!");
@@ -2696,7 +2694,7 @@
 
             let apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
-                apiKey = prompt("الرجاء إدخال مفتاح Google Studio API الخاص بك لأول مرة:");
+                apiKey = prompt("الرجاء إدخال مفتاح API الخاص بك لأول مرة:");
                 if (!apiKey) return;
                 localStorage.setItem('gemini_api_key', apiKey.trim());
             }
@@ -2726,8 +2724,8 @@
 
             aiChatHistory.push({ role: "user", parts: [{ text: rawText }] });
 
-            // استخدام موديل gemini-3.8-flash المحدث والرسمي لتجنب أي أخطاء
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
+            // استخدام رابط الـ gemini-flash-latest المتوافق مع المفتاح الذي أرسلته
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey.trim()}`;
 
             try {
                 const response = await fetch(apiUrl, {
@@ -2757,7 +2755,7 @@
                         </div>
                     `;
                 } else if (data.error) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ في المفتاح أو الموديل: ${data.error.message || 'تأكد من المفتاح'}. اضغط على أيقونة المفتاح بالترس لتعديله.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ في المفتاح أو الخادم: ${data.error.message || 'تأكد من المفتاح'}. اضغط على أيقونة المفتاح بالترس لتعديله.</div>`;
                 } else {
                     msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع معالجة الطلب. حاول مرة أخرى.</div>`;
                 }
