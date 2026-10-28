@@ -424,6 +424,15 @@
         th, td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.4; vertical-align: top; }
         th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 600; font-size: 0.72rem; }
 
+        /* تفعيل وضع التعديل الحر للأعمدة والصفوف بدون أي قيود نهائياً */
+        table.resizable-mode th, table.resizable-mode td {
+            resize: both !important;
+            overflow: auto !important;
+            border-left: 1px dashed var(--primary-color);
+            min-width: 30px !important;
+            min-height: 20px !important;
+        }
+
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
         @keyframes pulseGlow {
             0% { background-color: rgba(245, 158, 11, 0.6); }
@@ -754,7 +763,11 @@
                         <i class="fa-solid fa-filter"></i>
                         <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
                     </div>
-                    <button class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.5rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i> إعادة الضبط</button>
+                    <!-- زرار وضع التعديل اليدوي للأعمدة بحرية تامة -->
+                    <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة
+                    </button>
+                    <button class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.5rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
                     <div style="width: 180px;">
                         <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
                             <option value="">جميع التخصصات</option>
@@ -968,7 +981,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! تم تحديث الموديل إلى Mistral المجاني والمساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! تم تحديث الموديل إلى DeepSeek المجاني والمساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1528,6 +1541,25 @@
 
         function toggleDaysChecklist(boxId) {
             document.getElementById(boxId).classList.toggle('show');
+        }
+
+        function toggleTableResizeMode() {
+            const mashyTable = document.getElementById('mashyTableElement');
+            const wissamTable = document.getElementById('wissamTableElement');
+            const btn = document.getElementById('toggleResizeBtn');
+
+            mashyTable.classList.toggle('resizable-mode');
+            wissamTable.classList.toggle('resizable-mode');
+
+            if (mashyTable.classList.contains('resizable-mode')) {
+                btn.style.background = 'var(--primary-color)';
+                btn.style.color = '#000';
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> ⚙️ وضع التعديل الحر مفعل`;
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة`;
+            }
         }
 
         function resetTableWidths() {
@@ -2659,7 +2691,7 @@
                         'X-Title': 'Clinic CallCenter Agent'
                     },
                     body: JSON.stringify({
-                        "model": "mistralai/mistral-7b-instruct:free",
+                        "model": "google/gemma-2-9b-it:free",
                         "messages": [
                             { "role": "system", "content": systemPrompt },
                             ...aiChatHistory
