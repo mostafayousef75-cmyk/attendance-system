@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي + مساعد ذكي محدد)</title>
+    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي + مرادفات ذكية)</title>
     <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1129,11 +1129,11 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">مرحباً يا مصطفى! أرحب بك. تم تحديثي بالكامل لأجيبك **على قد السؤال المباشر بالضبط** بدون أي إطالة. اسألني عن سعر أي خدمة أو دوام طبيب وسأعطيك إجابته فوراً.</div>
+            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد الآن يتعلم منك تلقائياً.<br>• لتعليم المساعد مرادف جديد، اكتب مثلاً:<br><b>[حفظ مرادف: سعر الزراعة هو زراعة الأسنان]</b> وسيتذكره للأبد!</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اسأل عن سعر الزراعة، موعد طبيب، عرض..." onkeypress="if(event.key === 'Enter') sendAdvancedLocalAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اسأل أو اكتب [حفظ مرادف: كذا هو كذا]..." onkeypress="if(event.key === 'Enter') sendAdvancedLocalAIMessage()">
             <button class="btn btn-green" style="padding:0.3rem 0.6rem; font-size:0.75rem; background:#facc15; color:#000;" onclick="sendAdvancedLocalAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -1531,8 +1531,15 @@
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
 
-        // ذاكرة المساعد المحلي الدائمة
-        let localAiMemory = JSON.parse(localStorage.getItem('custom_local_ai_memory') || '[]');
+        // قاعدة بيانات المرادفات الذكية (تتخزن محلياً وسحابياً عشان متتنساش أبداً)
+        let customSynonyms = JSON.parse(localStorage.getItem('clinic_smart_synonyms') || JSON.stringify({
+            "سعر الزراعه": "زراعة الاسنان",
+            "سعر الزراعة": "زراعة الاسنان",
+            "الزراعه": "زراعة الاسنان",
+            "تكلفة الزراعة": "زراعة الاسنان",
+            "بكم الزراعة": "زراعة الاسنان",
+            "من كام لكام": "عروض اسنان"
+        }));
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -1562,6 +1569,10 @@
                     }
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
+                    if (data.customSynonyms) {
+                        customSynonyms = data.customSynonyms;
+                        localStorage.setItem('clinic_smart_synonyms', JSON.stringify(customSynonyms));
+                    }
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "#1e1b4b" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1656,7 +1667,8 @@
                 deptServicesData,
                 deptNotesData,
                 offersData,
-                inquiriesData
+                inquiriesData,
+                customSynonyms
             };
             db.ref('clinicData').set(payload);
         }
@@ -1698,7 +1710,7 @@
         }
 
         function exportJSON() {
-            const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
+            const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, customSynonyms };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
@@ -1724,6 +1736,10 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        if (data.customSynonyms) {
+                            customSynonyms = data.customSynonyms;
+                            localStorage.setItem('clinic_smart_synonyms', JSON.stringify(customSynonyms));
+                        }
                         
                         syncToCloud();
                         alert("تم استيراد البيانات ورفعها للسحابة بنجاح!");
@@ -1934,7 +1950,7 @@
                     <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
                         <td><strong>${doc.name}</strong> <small style="color:var(--text-muted);">(${doc.nationality || ''})</small> ${jointBadge} ${leaveBadge}</td>
                         <td>${doc.specialty}</td>
-                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجائية'}</span></td>
                         <td>${scheduleHtml}</td>
                         <td style="color:var(--primary-color); font-size:0.65rem; font-weight:600;">${doc.notes || '-'}</td>
                         <td>
@@ -2695,10 +2711,9 @@
         }
 
         // =========================================================================
-        // محرك البحث المحلي الفائق (Ultra-Local Precise AI) - يحل المشكلة جذرياً
+        // محرك البحث المحلي الفائق مع ميزة "حفظ المرادفات الذكية"
         // =========================================================================
 
-        // دالة تنظيف النصوص وحذف الهمزات والتاء المربوطة والتشكيل للربط المرن
         function normalizeText(str) {
             if (!str) return "";
             return str.toLowerCase()
@@ -2716,13 +2731,12 @@
             const rawText = inputEl.value.trim();
             if (!rawText) return;
 
-            // 1. عرض سؤال المستخدم
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث المباشر...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري الفحص والبحث الذكي...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             setTimeout(() => {
@@ -2730,26 +2744,50 @@
                 if (loader) loader.remove();
 
                 const normQuery = normalizeText(rawText);
-                
-                // كلمات محددة تدل على البحث عن "سعر" أو "عرض"
-                const isPriceQuery = normQuery.includes("سعر") || normQuery.includes("بكم") || normQuery.includes("كم") || normQuery.includes("تكلفه") || normQuery.includes("عرض") || normQuery.includes("عروض");
 
-                // كلمات تنظيف للحصول على كلمة الموضوع الرئيسية (مثل: الزراعة، التقويم، دكتور احمد)
+                // 1. التفاعل المباشر لتعليم المساعد مرادف جديد للأبد:
+                // مثال: [حفظ مرادف: سعر الزراعة هو زراعة الأسنان] أو ببساطة: مرادف: سعر الزراعة هو زراعة الأسنان
+                if (rawText.includes("حفظ مرادف:") || rawText.includes("مرادف:")) {
+                    try {
+                        let cleanCmd = rawText.replace(/.*(حفظ مرادف:|مرادف:)\s*/i, '').trim();
+                        let parts = cleanCmd.split(/هو|تساوي|تعني/);
+                        if (parts.length >= 2) {
+                            let key = parts[0].trim();
+                            let val = parts[1].trim();
+                            customSynonyms[key] = val;
+                            localStorage.setItem('clinic_smart_synonyms', JSON.stringify(customSynonyms));
+                            syncToCloud(); // حفظها سحابياً عشان تبقى ثابتة
+                            msgBox.innerHTML += `<div class="ai-message gemini">✅ تم حفظ المرادف بنجاح للأبد!<br>• كلما كتبت <b>"${key}"</b> سيفهمها المساعد كـ <b>"${val}"</b> تلقائياً.</div>`;
+                            msgBox.scrollTop = msgBox.scrollHeight;
+                            return;
+                        }
+                    } catch(e) {}
+                }
+
+                // 2. تطبيق المرادفات المحفوظة على النص المدخل
+                let lookupQuery = normQuery;
+                for (let syn in customSynonyms) {
+                    if (normQuery.includes(normalizeText(syn))) {
+                        lookupQuery = normalizeText(customSynonyms[syn]);
+                        break;
+                    }
+                }
+
+                const isPriceQuery = lookupQuery.includes("سعر") || lookupQuery.includes("بكم") || lookupQuery.includes("كم") || lookupQuery.includes("تكلفه") || lookupQuery.includes("عرض") || lookupQuery.includes("عروض");
+
                 const filterWords = ["سعر", "بكم", "كم", "تكلفه", "عرض", "عروض", "متي", "دوام", "في", "من", "عن", "علي", "هو", "هي", "هل", "بتاع", "بتاعه", "عندكم", "موجود", "الخاص", "بقسم"];
                 
-                let searchWords = normQuery.split(" ").filter(w => w.length >= 2 && !filterWords.includes(w));
-                if (searchWords.length === 0) searchWords = normQuery.split(" ");
+                let searchWords = lookupQuery.split(" ").filter(w => w.length >= 2 && !filterWords.includes(w));
+                if (searchWords.length === 0) searchWords = lookupQuery.split(" ");
 
                 let matchedResult = null;
 
-                // ---------------------------------------------------------------------
-                // أ. إذا كان السؤال عن سعر أو عرض (الأولوية القصوى لجدول العروض والأسعار)
-                // ---------------------------------------------------------------------
-                if (isPriceQuery || searchWords.some(w => w.includes("زراع") || w.includes("تقويم") || w.includes("تركيب") || w.includes("تبييض") || w.includes("خلع") || w.includes("ليزر"))) {
+                // أ. البحث في العروض والأسعار أولاً
+                if (isPriceQuery || searchWords.some(w => w.includes("زراع") || w.includes("تقويم") || w.includes("تركيب") || w.includes("تبييض") || w.includes("خلع") || w.includes("ليزر") || w.includes("اسنان"))) {
                     let matchedOffer = offersData.find(o => {
                         const normName = normalizeText(o.name);
                         const normCat = normalizeText(o.category);
-                        return searchWords.some(w => normName.includes(w) || normCat.includes(w));
+                        return searchWords.some(w => normName.includes(w) || normCat.includes(w) || lookupQuery.includes(normName));
                     });
 
                     if (matchedOffer) {
@@ -2757,9 +2795,7 @@
                     }
                 }
 
-                // ---------------------------------------------------------------------
-                // ب. إذا لم نجد في العروض، نبحث في قائمة الأطباء
-                // ---------------------------------------------------------------------
+                // ب. البحث في جدول الأطباء
                 if (!matchedResult) {
                     let matchedDoc = doctorsData.find(d => {
                         const normName = normalizeText(d.name);
@@ -2777,9 +2813,7 @@
                     }
                 }
 
-                // ---------------------------------------------------------------------
-                // ج. البحث في الأقسام والخدمات بالأجهزة
-                // ---------------------------------------------------------------------
+                // ج. البحث في خدمات الأقسام والأجهزة
                 if (!matchedResult) {
                     let matchedDept = deptServicesData.find(s => {
                         const normDerm = normalizeText(s.derm);
@@ -2792,9 +2826,7 @@
                     }
                 }
 
-                // ---------------------------------------------------------------------
-                // د. البحث في دليل الاستفسارات والأسئلة الشائعة
-                // ---------------------------------------------------------------------
+                // د. البحث في الاستفسارات الشائعة
                 if (!matchedResult) {
                     let matchedInq = inquiriesData.find(i => {
                         const normQ = normalizeText(i.question);
@@ -2806,20 +2838,7 @@
                     }
                 }
 
-                // ---------------------------------------------------------------------
-                // هـ. التعلم الفوري من الذاكرة المحفوظة
-                // ---------------------------------------------------------------------
-                if (!matchedResult && (normQuery.startsWith("احفظ") || normQuery.startsWith("سجل") || normQuery.includes("علمني"))) {
-                    const cleanNote = rawText.replace(/^(احفظ|سجل|تذكر ان|افتكر|علمني)\s*/i, '');
-                    localAiMemory.push({ text: cleanNote, date: new Date().toLocaleTimeString('ar-EG') });
-                    localStorage.setItem('custom_local_ai_memory', JSON.stringify(localAiMemory));
-                    matchedResult = `✅ تم الحفظ بنجاح: "${cleanNote}"`;
-                }
-
-                // ---------------------------------------------------------------------
-                // و. إخراج الرد السريع والمباشر المخصص للسؤال فقط
-                // ---------------------------------------------------------------------
-                let finalReply = matchedResult || `❌ لم أجد نتيجة مطابقة لسؤالك حالياً.<br>تأكد من كتابة اسم الخدمة (مثال: "سعر الزراعة" أو "عرض الأسنان") أو يمكنك إضافتها في قسم العروض والأسعار.`;
+                let finalReply = matchedResult || `❌ لم أجد نتيجة مطابقة.<br>💡 <b>علمني بنفسك!</b> يمكنك كتابة:<br><code>[حفظ مرادف: ${rawText} هو اسم العرض أو القسم الأصلي]</code> وسيتذكره المساعد للأبد!`;
 
                 msgBox.innerHTML += `<div class="ai-message gemini">${finalReply}</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
