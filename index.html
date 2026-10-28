@@ -772,13 +772,13 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <!-- تم ضبط مساحات العواميد بالظبط حسب طلبك: تخصص ضيق ومضغوط، مواعيد وملاحظات أعرض -->
-                                        <th style="width: 24%;">الطبيب والجنسية</th>
-                                        <th style="width: 16%;">التخصص</th>
+                                        <!-- تم ضبط العرض تماماً: التخصص عموده أصغر ومناسب، والمواعيد والملاحظات أعرض بدون فراغات مزعجة -->
+                                        <th style="width: 26%;">الطبيب والجنسية</th>
+                                        <th style="width: 14%;">التخصص</th>
                                         <th style="width: 10%;">الكشفية</th>
-                                        <th style="width: 32%;">فرع معشي والمواعيد</th>
+                                        <th style="width: 34%;">فرع معشي والمواعيد</th>
                                         <th style="width: 10%;">ملاحظات</th>
-                                        <th style="width: 8%;">إدارة</th>
+                                        <th style="width: 6%;">إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="mashyTableBody"></tbody>
@@ -795,12 +795,12 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th style="width: 24%;">الطبيب والجنسية</th>
-                                        <th style="width: 16%;">التخصص</th>
+                                        <th style="width: 26%;">الطبيب والجنسية</th>
+                                        <th style="width: 14%;">التخصص</th>
                                         <th style="width: 10%;">الكشفية</th>
-                                        <th style="width: 32%;">فرع الوسام والمواعيد</th>
+                                        <th style="width: 34%;">فرع الوسام والمواعيد</th>
                                         <th style="width: 10%;">ملاحظات</th>
-                                        <th style="width: 8%;">إدارة</th>
+                                        <th style="width: 6%;">إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="wissamTableBody"></tbody>
@@ -1700,7 +1700,6 @@
                 const mashyDays = d.mashyDays || d.days || [];
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || mashyDays.length > 0);
             });
-            // ترتيب الأطباء المثبتين في الأعلى
             mashyList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a.mashyOrder ?? 0) - (b.mashyOrder ?? 0)));
 
             const wissamList = doctorsData.filter(d => {
@@ -2379,7 +2378,6 @@
             if(!tableEl) return;
             
             const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || (o.price && o.price.includes(search)) || (o.notes && o.notes.includes(search))));
-            // ترتيب العروض المثبتة في الأعلى
             filteredOffers.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
             let headerHtml = `
@@ -2598,7 +2596,7 @@
         }
 
         // =========================================================================
-        // المساعد الذكي الحقيقي (LLM Agent) المحدث بموديل gemini-2.5-flash
+        // المساعد الذكي الحقيقي (LLM Agent) المحدث بموديل gemini-2.5-flash الرسمي
         // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('gemini_api_key') || '';
@@ -2635,7 +2633,6 @@
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
 
-            // حقن بيانات الموقع الحالية بالكامل في الذاكرة (Context Injection) مع ملاحظات الشيفت والوسوم
             const siteContext = `
             بيانات الموقع الحالية لعيادات ماجستي (معشي والوسام):
             1. ملاحظات وردية الشيفت الحالية: ${currentShiftNote || 'لا توجد ملاحظات طارئة حالياً'}
