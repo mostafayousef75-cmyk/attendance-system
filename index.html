@@ -573,7 +573,6 @@
             display: inline-block;
         }
 
-        /* صندوق سلة عروض الأسعار المجمعة الدائم (مفتوح ولا يختفي) */
         .offers-multi-clipboard-box {
             background: var(--bg-card);
             border: 2px solid var(--primary-color);
@@ -597,7 +596,6 @@
             height: 75px;
         }
 
-        /* زر شات الذكاء الاصطناعي الأصفراء */
         .ai-floating-btn {
             position: fixed;
             bottom: 25px;
@@ -1021,7 +1019,6 @@
                     <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
                 </div>
 
-                <!-- سلة تجميع العروض المحددة للنسخ (دائمة ولا تختفي أبداً) -->
                 <div class="offers-multi-clipboard-box">
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color);">
                         <span><i class="fa-solid fa-clipboard-list"></i> سلة العروض المحددة للنسخ للعميل:</span>
@@ -1074,7 +1071,7 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي الحقيقي (بدون أسئلة مزعجة) -->
+    <!-- نافذة المساعد الذكي الحقيقي -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.6rem 0.8rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
@@ -1364,7 +1361,7 @@
         </div>
     </div>
 
-    <!-- Modal 7: Offer Modal -->
+    <!-- Modal 7: Offer Modal (المحدث حسب طلبك للأجهزة والأسعار) -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1388,27 +1385,39 @@
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>اسم الخدمة / العرض</label>
-                <input type="text" id="offName" class="form-control">
+                <input type="text" id="offName" class="form-control" placeholder="3 جلسات جسم كامل">
             </div>
-            <div style="display:flex; gap:0.4rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>جهاز أول (اختياري)</label>
+            
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.4rem; background:var(--bg-card); padding:0.4rem; border-radius:6px; border:1px solid var(--border-color);">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>اسم الجهاز الأول (اختياري)</label>
                     <input type="text" id="offDevice1" class="form-control" placeholder="جنتل ماكس برو">
                 </div>
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>جهاز ثاني (اختياري)</label>
-                    <input type="text" id="offDevice2" class="form-control" placeholder="كلاريتي 2">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>سعر الجهاز 1</label>
+                    <input type="text" id="offPrice1" class="form-control" placeholder="444 مع الرتوش">
                 </div>
             </div>
-            <div style="display:flex; gap:0.4rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>السعر النهائي</label>
-                    <input type="text" id="offPrice" class="form-control" placeholder="33 ريال">
+
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.4rem; background:var(--bg-card); padding:0.4rem; border-radius:6px; border:1px solid var(--border-color);">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>اسم الجهاز الثاني (اختياري)</label>
+                    <input type="text" id="offDevice2" class="form-control" placeholder="كلاريتي 2">
                 </div>
-                <div style="flex:1.5; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>ملحوظات / شروط (لا تظهر عند النسخ للعميل)</label>
-                    <input type="text" id="offNotes" class="form-control" placeholder="تشمل الكشفية">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>سعر الجهاز 2</label>
+                    <input type="text" id="offPrice2" class="form-control" placeholder="477 ريال">
                 </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>السعر العام / النهائي (لو العرض بدون أجهزة متعددة)</label>
+                <input type="text" id="offPrice" class="form-control" placeholder="مثال: 33 ريال">
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>ملحوظات / شروط (لا تظهر عند النسخ للعميل)</label>
+                <input type="text" id="offNotes" class="form-control" placeholder="تشمل الكشفية">
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
         </div>
@@ -1485,7 +1494,7 @@
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
 
-        let selectedOfferIds = []; // سلة العروض المحددة دائمًا
+        let selectedOfferIds = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -2342,15 +2351,30 @@
         }
 
         // =========================================================================
-        // قسم العروض والأسعار (سلة تجميع دائمة عبر كافة التبويبات)
+        // قسم العروض والأسعار (صيغة النسخ الجديدة للأجهزة والأسعار المستقلة)
         // =========================================================================
 
         function formatOfferLineForClient(item) {
-            let line = `${item.name}`;
-            if (item.device1 && item.device1.trim() !== "") line += ` (${item.device1})`;
-            if (item.device2 && item.device2.trim() !== "") line += ` و(${item.device2})`;
-            line += ` بـ ${item.price}`;
-            return line;
+            let lines = [`${item.name}`];
+            
+            let hasDeviceLines = false;
+            if (item.device1 && item.device1.trim() !== "") {
+                let p1Str = item.price1 ? ` بـ ${item.price1}` : "";
+                lines.path = `- جهاز ${item.device1}${p1Str}`;
+                lines.push(`جهاز ${item.device1}${p1Str}`);
+                hasDeviceLines = true;
+            }
+            if (item.device2 && item.device2.trim() !== "") {
+                let p2Str = item.price2 ? ` بـ ${item.price2}` : "";
+                lines.push(`جهاز ${item.device2}${p2Str}`);
+                hasDeviceLines = true;
+            }
+
+            if (!hasDeviceLines && item.price) {
+                lines.push(`السعر: ${item.price}`);
+            }
+
+            return lines.join('\n');
         }
 
         function copySingleOffer(id) {
@@ -2381,14 +2405,14 @@
                 return;
             }
 
-            let lines = [];
+            let blocks = [];
             selectedOfferIds.forEach(id => {
                 const item = offersData.find(o => o.id === id);
                 if (item) {
-                    lines.push(formatOfferLineForClient(item));
+                    blocks.push(formatOfferLineForClient(item));
                 }
             });
-            textarea.value = lines.join('\n');
+            textarea.value = blocks.join('\n\n');
         }
 
         function copyMultiOffersText() {
@@ -2409,20 +2433,15 @@
             const tableEl = document.getElementById('offersTableElement');
             if(!tableEl) return;
             
-            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || o.price.includes(search)));
-            const hasDev1 = filteredOffers.some(o => o.device1 && o.device1.trim() !== "");
-            const hasDev2 = filteredOffers.some(o => o.device2 && o.device2.trim() !== "");
+            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || (o.price && o.price.includes(search))));
 
             let headerHtml = `
                 <thead>
                     <tr>
                         <th style="width: 35px; text-align:center;"><i class="fa-solid fa-check-square"></i></th>
-                        <th style="width: 25%;">الخدمة / العرض</th>
-            `;
-            if (hasDev1) headerHtml += `<th style="width: 20%;">الجهاز الأول</th>`;
-            if (hasDev2) headerHtml += `<th style="width: 20%;">الجهاز الثاني</th>`;
-            headerHtml += `
-                        <th style="width: 16%;">السعر</th>
+                        <th style="width: 30%;">الخدمة / العرض</th>
+                        <th style="width: 25%;">الأجهزة والأسعار</th>
+                        <th style="width: 15%;">السعر العام</th>
                         <th style="width: 15%; text-align:center;">إدارة النسخ</th>
                         <th style="width: 10%; text-align:center;">تعديل</th>
                     </tr>
@@ -2432,15 +2451,17 @@
             let bodyHtml = `<tbody>`;
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
+                let devicesDisplay = "";
+                if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
+                if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
+                if (!devicesDisplay) devicesDisplay = "-";
+
                 bodyHtml += `
                     <tr>
                         <td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td>
                         <td><strong>${item.name}</strong></td>
-                `;
-                if (hasDev1) bodyHtml += `<td>${item.device1 || '-'}</td>`;
-                if (hasDev2) bodyHtml += `<td>${item.device2 || '-'}</td>`;
-                bodyHtml += `
-                        <td><span class="price-badge">${item.price}</span></td>
+                        <td>${devicesDisplay}</td>
+                        <td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td>
                         <td style="text-align:center;">
                             <button class="btn btn-green" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copySingleOffer(${item.id})"><i class="fa-solid fa-copy"></i> نسخ</button>
                         </td>
@@ -2460,7 +2481,9 @@
             document.getElementById('offerId').value = "";
             document.getElementById('offName').value = "";
             document.getElementById('offDevice1').value = "";
+            document.getElementById('offPrice1').value = "";
             document.getElementById('offDevice2').value = "";
+            document.getElementById('offPrice2').value = "";
             document.getElementById('offPrice').value = "";
             document.getElementById('offNotes').value = "";
             document.getElementById('offCategory').value = "عروض اسنان";
@@ -2477,11 +2500,13 @@
                 category: cat, 
                 name: document.getElementById('offName').value, 
                 device1: document.getElementById('offDevice1').value.trim(), 
+                price1: document.getElementById('offPrice1').value.trim(),
                 device2: document.getElementById('offDevice2').value.trim(), 
-                price: document.getElementById('offPrice').value,
+                price2: document.getElementById('offPrice2').value.trim(),
+                price: document.getElementById('offPrice').value.trim(),
                 notes: document.getElementById('offNotes').value.trim()
             };
-            if (!obj.name || !obj.price) return alert("أدخل اسم الخدمة والسعر!");
+            if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
             if (id) {
                 const idx = offersData.findIndex(o => o.id == id);
                 offersData[idx] = obj;
@@ -2499,8 +2524,10 @@
             document.getElementById('offerId').value = item.id;
             document.getElementById('offName').value = item.name;
             document.getElementById('offDevice1').value = item.device1 || "";
+            document.getElementById('offPrice1').value = item.price1 || "";
             document.getElementById('offDevice2').value = item.device2 || "";
-            document.getElementById('offPrice').value = item.price;
+            document.getElementById('offPrice2').value = item.price2 || "";
+            document.getElementById('offPrice').value = item.price || "";
             document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offerModal').classList.add('active');
         }
@@ -2585,7 +2612,7 @@
         }
 
         // =========================================================================
-        // المساعد الذكي الحقيقي الفوري (يبحث في الاستفسارات، الأطباء، العروض أوتوماتيك)
+        // المساعد الذكي الحقيقي الفوري
         // =========================================================================
 
         function normalizeText(str) {
@@ -2633,7 +2660,6 @@
 
                 let matchedResult = null;
 
-                // 1. البحث في الاستفسارات (الأهم!)
                 let matchedInq = inquiriesData.find(i => {
                     const normQ = normalizeText(i.question);
                     const normA = normalizeText(i.answer);
@@ -2643,7 +2669,6 @@
                     matchedResult = `❓ <b>${matchedInq.question}</b><br>💡 ${matchedInq.answer}`;
                 }
 
-                // 2. البحث في العروض والأسعار
                 if (!matchedResult) {
                     let matchedOffer = offersData.find(o => {
                         const normName = normalizeText(o.name);
@@ -2652,12 +2677,12 @@
                         return normQuery.includes(normName) || normName.includes(normQuery) || normQuery.includes(normCat);
                     });
                     if (matchedOffer) {
-                        matchedResult = `🏷️ <b>${matchedOffer.name}</b> (${matchedOffer.category})<br>💰 السعر: <span style="color:#4ade80; font-weight:bold;">${matchedOffer.price}</span>`;
-                        if(matchedOffer.device1) matchedResult += `<br>• الجهاز: ${matchedOffer.device1}`;
+                        matchedResult = `🏷️ <b>${matchedOffer.name}</b> (${matchedOffer.category})<br>💰 السعر: <span style="color:#4ade80; font-weight:bold;">${matchedOffer.price || ''}</span>`;
+                        if(matchedOffer.device1) matchedResult += `<br>• ${matchedOffer.device1}: ${matchedOffer.price1 || ''}`;
+                        if(matchedOffer.device2) matchedResult += `<br>• ${matchedOffer.device2}: ${matchedOffer.price2 || ''}`;
                     }
                 }
 
-                // 3. البحث في الأطباء
                 if (!matchedResult) {
                     let foundDoc = doctorsData.find(d => {
                         const normName = normalizeText(d.name);
@@ -2700,7 +2725,6 @@
             resultsList.innerHTML = "";
             let foundCount = 0;
 
-            // 1. بحث في الاستفسارات
             inquiriesData.forEach(i => {
                 if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q)) {
                     foundCount++;
@@ -2708,7 +2732,6 @@
                 }
             });
 
-            // 2. بحث في الأطباء
             doctorsData.forEach(d => {
                 if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q))) {
                     foundCount++;
@@ -2716,11 +2739,10 @@
                 }
             });
 
-            // 3. بحث في العروض
             offersData.forEach(o => {
-                if (o.name.toLowerCase().includes(q) || o.price.toLowerCase().includes(q)) {
+                if (o.name.toLowerCase().includes(q) || (o.price && o.price.toLowerCase().includes(q))) {
                     foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#4ade80; border-color:#16a34a;">العروض</span><h4>${o.name} - ${o.price}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض</button></div>`;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#4ade80; border-color:#16a34a;">العروض</span><h4>${o.name}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndFind('offers')">عرض</button></div>`;
                 }
             });
 
