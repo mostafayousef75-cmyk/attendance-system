@@ -476,7 +476,6 @@
         .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.88rem; display: inline-block; }
         .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.55rem; padding: 0.02rem 0.2rem; border-radius: 3px; }
 
-        /* صندوق سلة العروض المتحرك */
         .offers-multi-clipboard-box {
             display: none;
             position: fixed;
@@ -865,7 +864,6 @@
                     <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
                 </div>
 
-                <!-- صندوق سلة العروض المتحرك -->
                 <div class="offers-multi-clipboard-box" id="multiOffersClipboardBox" onmousedown="startDragClipboard(event)">
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color); cursor:move;">
                         <span><i class="fa-solid fa-arrows-up-down-left-right"></i> سلة العروض (اسحب):</span>
@@ -918,22 +916,25 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي المحدثة للبحث التلقائي بدون إدخال يدوي -->
+    <!-- نافذة المساعد الذكي الآمنة -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي الشامل (بحث تلقائي بالأنماط)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (Google Gemini)</h4>
             </div>
-            <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="إدخال / تغير مفتاح الـ API"></i>
+                <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
+            </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد شغال دلوقتي بمحرك الأنماط التلقائي لكل الجداول (أسعار، أطباء، استفسارات، خدمات) بدون أي إدخال يدوي. اسأل وسيجلب النتيجة فوراً!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بأمان تام. إذا كانت هذه أول مرة، اضغط على أيقونة المفتاح (🔑) بالأعلى لإدخال مفتاح الـ API الخاص بك (سيتم حفظه في متصفحك محلياً ولن يُرفع أبداً على جيت هاب لضمان عدم الحظر).</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اسأل عن أي سعر، طبيب، إجازة، أو خدمة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
             <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -2500,89 +2501,81 @@
         }
 
         // =========================================================================
-        // محرك البحث الذكي التلقائي الحقيقي لجميع الأنماط (بدون إدخال يدوي)
+        // الدالة الآمنة للتعامل مع API Key (يُحفظ محلياً ولا يُرفع لجيت هاب نهائياً)
         // =========================================================================
-
-        function normalizeText(str) {
-            if (!str) return "";
-            return str.toLowerCase()
-                .replace(/[\u064B-\u0652]/g, "")
-                .replace(/[أإآ]/g, "ا")
-                .replace(/ة/g, "ه")
-                .replace(/ى/g, "ي")
-                .replace(/\s+/g, " ")
-                .trim();
+        function setApiKeyPrompt() {
+            const currentKey = localStorage.getItem('gemini_api_key') || '';
+            const newKey = prompt("أدخل مفتاح Google Studio API الخاص بك (سيتم حفظه في متصفحك فقط بأمان ولن يرفع لجيت هاب):", currentKey);
+            if (newKey !== null) {
+                localStorage.setItem('gemini_api_key', newKey.trim());
+                alert("✅ تم حفظ المفتاح بنجاح في متصفحك محلياً!");
+            }
         }
 
-        function sendSmartAIMessage() {
+        async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim();
             if (!rawText) return;
 
+            // التأكد من وجود المفتاح محلياً
+            let apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                apiKey = prompt("الرجاء إدخال مفتاح Google Studio API الخاص بك لأول مرة:");
+                if (!apiKey) return;
+                localStorage.setItem('gemini_api_key', apiKey.trim());
+            }
+
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            let query = normalizeText(rawText);
-
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث في كافة جداول النظام تلقائياً...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ الاتصال بـ Google Gemini...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            setTimeout(() => {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+
+            const requestBody = {
+                "contents": [
+                    {
+                        "parts": [
+                            {
+                                "text": rawText
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-goog-api-key': apiKey.trim()
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
 
-                let results = [];
-                let queryWords = query.split(" ").filter(w => w.length > 1);
-
-                // 1. البحث التلقائي في الأسعار والعروض
-                offersData.forEach(o => {
-                    let oName = normalizeText(o.name);
-                    let oCat = normalizeText(o.category);
-                    if (queryWords.some(w => oName.includes(w) || oCat.includes(w))) {
-                        let priceText = o.price ? `💰 السعر: <b>${o.price}</b>` : '';
-                        let devText = (o.device1 ? `• ${o.device1}: <b>${o.price1 || ''}</b>` : '') + (o.device2 ? `<br>• ${o.device2}: <b>${o.price2 || ''}</b>` : '');
-                        results.push(`🏷️ <b>${o.name}</b> (${o.category})<br>${priceText}${devText}`);
-                    }
-                });
-
-                // 2. البحث التلقائي في الأطباء والحالات (إجازة / مداوم)
-                doctorsData.forEach(d => {
-                    let dName = normalizeText(d.name);
-                    let dSpec = normalizeText(d.specialty);
-                    if (queryWords.some(w => dName.includes(w) || dSpec.includes(w))) {
-                        let leaveStatus = d.isLeave ? "🔴 <b>في إجازة / خارج الدوام</b>" : "🟢 <b>مداوم ومتاح</b>";
-                        results.push(`🩺 <b>${d.name}</b> (${d.specialty})<br>• الحالة: ${leaveStatus}<br>• الفرع: ${d.branch}<br>• الكشفية: ${d.fee || 'مجانية'}<br>• الساعات: ${d.timing || ''}`);
-                    }
-                });
-
-                // 3. البحث التلقائي في الاستفسارات الشائعة
-                inquiriesData.forEach(i => {
-                    let iQ = normalizeText(i.question);
-                    let iA = normalizeText(i.answer);
-                    if (queryWords.some(w => w.length > 2 && (iQ.includes(w) || iA.includes(w)))) {
-                        results.push(`💡 <b>${i.question}</b><br>${i.answer}`);
-                    }
-                });
-
-                // 4. البحث التلقائي في الأجهزة والخدمات والأقسام
-                deptServicesData.forEach(s => {
-                    let derm = normalizeText(s.derm || '');
-                    let dent = normalizeText(s.dent || '');
-                    if (queryWords.some(w => w.length > 2 && (derm.includes(w) || dent.includes(w)))) {
-                        results.push(`🏥 <b>فرع ${s.branch}:</b><br>• الجلدية: <b>${s.derm || '-'}</b><br>• الأسنان: <b>${s.dent || '-'}</b>`);
-                    }
-                });
-
-                if (results.length === 0) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">❌ لم أجد مطابقة مباشرة. تأكد من إضافة الخدمة أو اسم الطبيب في جدولها الأساسي وسيقرؤها المساعد فوراً بالأنماط بدون تدريب!</div>`;
+                if (data && data.candidates && data.candidates[0].content.parts[0].text) {
+                    const aiReply = data.candidates[0].content.parts[0].text;
+                    msgBox.innerHTML += `<div class="ai-message gemini">${aiReply.replace(/\n/g, '<br>')}</div>`;
+                } else if (data.error) {
+                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ من الخادم: ${data.error.message || 'تأكد من صحة المفتاح.'}</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">وجدت النتائج التالية مطابقة في النظام:<br><br>` + results.slice(0, 3).join('<hr style="margin:5px 0; border-color:#27272a;">') + `</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع الحصول على رد. تأكد من صحة المفتاح أو رصيدك.</div>`;
                 }
-                msgBox.scrollTop = msgBox.scrollHeight;
-            }, 100);
+            } catch (error) {
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة أو الـ API.</div>`;
+            }
+            msgBox.scrollTop = msgBox.scrollHeight;
         }
 
         function handleTrueGlobalSearch(query) {
