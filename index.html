@@ -912,16 +912,16 @@
     </main>
 
     <!-- زر المساعد الذكي -->
-    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي الشامل">
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي السريع">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي المربوط ببيانات العيادة وجيميني -->
+    <!-- نافذة المساعد الذكي السريعة -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
-                <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (مخصص للعيادة)</h4>
+                <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السريع للعملاء (Local AI)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
                 <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح الـ API"></i>
@@ -930,11 +930,11 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد الآن يقرأ بيانات العيادة والأطباء والأسعار مباشرة ويجيبك بدقة فائقة وسرعة. اسأل عن أي طبيب أو عرض!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد الآن يعطيك نتائج فورية في أقل من ثانية لأي طبيب أو عرض لتسعفك وأنت مع العملاء.</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اسأل عن طبيب، موعد، أو عرض..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اكتب اسم الطبيب أو العرض هنا..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
             <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -2501,7 +2501,7 @@
         }
 
         // =========================================================================
-        // الدالة المحدثة: تجمع داتا الأطباء والأسعار وتبعتهال لـ Gemini عشان يرد بدقة
+        // الدالة السريعة جداً: تبحث محلياً أولاً لتوفير أسرع رد، وتستعين بـ Gemini عند اللزوم
         // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('gemini_api_key') || '';
@@ -2518,6 +2518,73 @@
             const rawText = inputEl.value.trim();
             if (!rawText) return;
 
+            msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
+            inputEl.value = "";
+            msgBox.scrollTop = msgBox.scrollHeight;
+
+            const query = rawText.toLowerCase();
+
+            // 1. بحث محلي فوري في الأطباء (سرعة البرق)
+            const foundDocs = doctorsData.filter(d => 
+                d.name.toLowerCase().includes(query) || 
+                (d.specialty && d.specialty.toLowerCase().includes(query))
+            );
+
+            // 2. بحث محلي فوري في العروض والأسعار
+            const foundOffers = offersData.filter(o => 
+                o.name.toLowerCase().includes(query) || 
+                (o.category && o.category.toLowerCase().includes(query))
+            );
+
+            // 3. بحث محلي فوري في دليل الاستفسارات
+            const foundInquiries = inquiriesData.filter(i => 
+                i.question.toLowerCase().includes(query) || 
+                i.answer.toLowerCase().includes(query)
+            );
+
+            // إذا وُجدت نتائج مباشرة في بياناتك، يتم عرضها فوراً بدون أي انتظار
+            if (foundDocs.length > 0 || foundOffers.length > 0 || foundInquiries.length > 0) {
+                let localReply = "";
+
+                if (foundDocs.length > 0) {
+                    localReply += "<b>👨‍⚕️ الأطباء المطابقون:</b><br>";
+                    foundDocs.forEach(d => {
+                        let mDays = (d.mashyDays || d.days || []).join('، ');
+                        let wDays = (d.wissamDays || []).join('، ');
+                        let status = d.isLeave ? "<span style='color:#ef4444;'>(في إجازة)</span>" : "";
+                        localReply += `• <b>${d.name}</b> (${d.specialty}) ${status}<br>`;
+                        localReply += `  - الكشفية: <b>${d.fee || 'مجانية'}</b> | الساعات: ${d.timing || '-'}<br>`;
+                        if(mDays) localReply += `  - معشي: ${mDays}<br>`;
+                        if(wDays) localReply += `  - الوسام: ${wDays}<br>`;
+                        if(d.notes) localReply += `  - ملاحظات: ${d.notes}<br>`;
+                    });
+                    localReply += "<br>";
+                }
+
+                if (foundOffers.length > 0) {
+                    localReply += "<b>🏷️ العروض والأسعار:</b><br>";
+                    foundOffers.forEach(o => {
+                        localReply += `• <b>${o.name}</b> (${o.category})<br>`;
+                        if (o.device1) localReply += `  - ${o.device1}: <b>${o.price1 || ''}</b><br>`;
+                        if (o.device2) localReply += `  - ${o.device2}: <b>${o.price2 || ''}</b><br>`;
+                        if (o.price) localReply += `  - السعر العام: <b>${o.price}</b><br>`;
+                    });
+                    localReply += "<br>";
+                }
+
+                if (foundInquiries.length > 0) {
+                    localReply += "<b>❓ الاستفسارات المباشرة:</b><br>";
+                    foundInquiries.forEach(i => {
+                        localReply += `• <b>س: ${i.question}</b><br>  ج: ${i.answer}<br>`;
+                    });
+                }
+
+                msgBox.innerHTML += `<div class="ai-message gemini">${localReply}</div>`;
+                msgBox.scrollTop = msgBox.scrollHeight;
+                return; // إجابة فورية بدون انتظار شبكة
+            }
+
+            // إذا لم تكن الإجابة مسجلة محلياً، يتم استدعاء Gemini مع السؤال بمرونة
             let apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
                 apiKey = prompt("الرجاء إدخال مفتاح Google Studio API الخاص بك لأول مرة:");
@@ -2525,50 +2592,11 @@
                 localStorage.setItem('gemini_api_key', apiKey.trim());
             }
 
-            msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
-            inputEl.value = "";
-            msgBox.scrollTop = msgBox.scrollHeight;
-
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث في جداول العيادة والرد...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ التفكير والرد...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
-
-            // تجميع داتا الأطباء والأسعار والاستفسارات لإرسالها مع السؤال ليعرفها النموذج
-            let clinicContext = "أنت مساعد ذكي لمركز طبي (كول سنتر). هذه هي بيانات العيادة الحالية:\n";
-            
-            clinicContext += "\n[الأطباء والمواعيد والفرع]:\n";
-            doctorsData.forEach(d => {
-                let mDays = (d.mashyDays || d.days || []).join('، ');
-                let wDays = (d.wissamDays || []).join('، ');
-                let status = d.isLeave ? "في إجازة" : "مداوم";
-                clinicContext += `- د. ${d.name} (${d.specialty}), الفرع: ${d.branch}, الحالة: ${status}, كشفية: ${d.fee || 'مجانية'}, معشي: [${mDays}], الوسام: [${wDays}], الساعات: ${d.timing}, ملاحظات: ${d.notes}\n`;
-            });
-
-            clinicContext += "\n[العروض والأسعار]:\n";
-            offersData.forEach(o => {
-                clinicContext += `- قسم: ${o.category} | ${o.name} | السعر: ${o.price || ''} | جهاز1: ${o.device1} (${o.price1}) | جهاز2: ${o.device2} (${o.price2})\n`;
-            });
-
-            clinicContext += "\n[الاستفسارات الشائعة]:\n";
-            inquiriesData.forEach(i => {
-                clinicContext += `- س: ${i.question} -> ج: ${i.answer}\n`;
-            });
-
-            const fullPrompt = `${clinicContext}\nسؤال المستخدم أو المنسق الذي يريد إجابة دقيقة بناءً على البيانات أعلاه: "${rawText}"`;
 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
-
-            const requestBody = {
-                "contents": [
-                    {
-                        "parts": [
-                            {
-                                "text": fullPrompt
-                            }
-                        ]
-                    }
-                ]
-            };
 
             try {
                 const response = await fetch(apiUrl, {
@@ -2577,7 +2605,9 @@
                         'Content-Type': 'application/json',
                         'X-goog-api-key': apiKey.trim()
                     },
-                    body: JSON.stringify(requestBody)
+                    body: JSON.stringify({
+                        "contents": [{ "parts": [{ "text": `أنت مساعد كول سنتر طبي، أجب بإيجاز وسرعة على السؤال التالي: ${rawText}` }] }]
+                    })
                 });
 
                 const data = await response.json();
@@ -2587,15 +2617,13 @@
                 if (data && data.candidates && data.candidates[0].content.parts[0].text) {
                     const aiReply = data.candidates[0].content.parts[0].text;
                     msgBox.innerHTML += `<div class="ai-message gemini">${aiReply.replace(/\n/g, '<br>')}</div>`;
-                } else if (data.error) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ: ${data.error.message || 'تأكد من صحة المفتاح.'}</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع الحصول على رد. تأكد من صحة المفتاح.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">لم يتم العثور على نتيجة سريعة. يمكنك مراجعة جداول الموقع مباشرة.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
-                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة.</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
