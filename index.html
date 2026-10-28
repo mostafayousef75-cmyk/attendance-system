@@ -253,14 +253,14 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات كمسطرة أفقية تتحرك يمين ويسار بالماوس مع زر أحدث إشعار */
+        /* مسطرة التنبيهات العرض والأداء المحسن */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.35rem 0.8rem;
+            padding: 0.45rem 1rem;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 1rem;
             font-size: 0.76rem;
             user-select: text !important;
         }
@@ -268,7 +268,7 @@
             background: var(--primary-color);
             color: #000;
             font-weight: 800;
-            padding: 0.15rem 0.5rem;
+            padding: 0.15rem 0.55rem;
             border-radius: 4px;
             font-size: 0.7rem;
             display: inline-flex;
@@ -285,7 +285,7 @@
             -webkit-overflow-scrolling: touch;
         }
         .ticker-container::-webkit-scrollbar {
-            height: 4px;
+            height: 5px;
         }
         .ticker-container::-webkit-scrollbar-thumb {
             background: var(--primary-color);
@@ -304,24 +304,28 @@
             font-weight: 600;
             color: var(--text-main);
             background: var(--bg-card);
-            padding: 0.15rem 0.5rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 4px;
             border: 1px solid var(--border-color);
             cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .ticker-item:hover {
+            border-color: var(--primary-color);
         }
         .latest-alert-btn {
             background: var(--accent-blue);
             color: #fff;
             border: none;
-            padding: 0.15rem 0.45rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 4px;
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.3rem;
         }
 
         .content-area {
@@ -469,6 +473,15 @@
             font-size: 0.72rem;
         }
 
+        .highlight-pulse {
+            animation: pulseGlow 1.5s infinite;
+        }
+        @keyframes pulseGlow {
+            0% { background-color: rgba(245, 158, 11, 0.4); }
+            50% { background-color: rgba(245, 158, 11, 0.1); }
+            100% { background-color: rgba(245, 158, 11, 0.4); }
+        }
+
         .alerts-2col-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -611,17 +624,21 @@
             display: inline-block;
         }
 
-        /* صندوق سلة العروض المخفي افتراضياً ولا يظهر إلا عند التحديد */
+        /* صندوق سلة العروض الجانبي الصغير والمدمج تماماً */
         .offers-multi-clipboard-box {
             display: none;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 300px;
             background: var(--bg-card);
             border: 2px solid var(--primary-color);
-            border-radius: var(--radius-md);
-            padding: 0.5rem;
-            margin-bottom: 0.6rem;
+            border-radius: var(--radius-lg);
+            padding: 0.6rem;
             flex-direction: column;
             gap: 0.3rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 9999;
         }
         .offers-multi-clipboard-box.active {
             display: flex;
@@ -633,9 +650,9 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             padding: 0.4rem;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             resize: vertical;
-            height: 75px;
+            height: 90px;
         }
 
         .ai-floating-btn {
@@ -866,7 +883,7 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات (مسطرة أفقية تتحرك بالماوس مع زر أحدث إشعار افتراضي) -->
+        <!-- مسطرة التنبيهات (عرض مناسب وزر أحدث إشعار مع الانتقال المباشر للإشعار المحدد) -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <button class="latest-alert-btn" onclick="scrollToLatestAlert()" title="الذهاب لأحدث إشعار"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
@@ -1059,16 +1076,16 @@
                     <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
                 </div>
 
-                <!-- سلة العروض الجانبية (تظهر فقط عند تحديد خدمات) -->
+                <!-- صندوق سلة العروض الجانبي الصغير -->
                 <div class="offers-multi-clipboard-box" id="multiOffersClipboardBox">
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color);">
-                        <span><i class="fa-solid fa-clipboard-list"></i> سلة العروض المحددة للنسخ للعميل:</span>
+                        <span><i class="fa-solid fa-clipboard-list"></i> سلة العروض المحددة للنسخ:</span>
                         <div style="display:flex; gap:0.3rem;">
-                            <button class="btn btn-green" style="padding:0.1rem 0.4rem; font-size:0.68rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i> نسخ الكل</button>
-                            <button class="btn btn-danger" style="padding:0.1rem 0.4rem; font-size:0.68rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-trash"></i> إلغاء التحديد</button>
+                            <button class="btn btn-green" style="padding:0.1rem 0.35rem; font-size:0.65rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i> نسخ</button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.35rem; font-size:0.65rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-trash"></i> إلغاء</button>
                         </div>
                     </div>
-                    <textarea id="multiOffersTextarea" class="clipboard-textarea" readonly placeholder="اضغط على علامة الصح (✔️) بجانب أي عروض في الجدول لتتجمع هنا وتنسخها دفعة واحدة..."></textarea>
+                    <textarea id="multiOffersTextarea" class="clipboard-textarea" readonly placeholder="العروض المحددة..."></textarea>
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -1112,21 +1129,21 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي المزودة بنظام الذاكرة والتعلم الذاتي -->
+    <!-- نافذة المساعد الذكي مع الذاكرة والتعلم التلقائي والتعميم -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.6rem 0.8rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1.1rem;"></i>
-                <h4 style="font-size:0.82rem; color:var(--text-main); font-weight:700;">المساعد الذكي (ذاكرة التعلم الفوري)</h4>
+                <h4 style="font-size:0.82rem; color:var(--text-main); font-weight:700;">المساعد الذكي (ذاكرة التعلم والتعميم)</h4>
             </div>
             <div style="display:flex; gap:0.3rem; align-items:center;">
-                <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.62rem;" onclick="openTeachModal()" title="علم المساعد كلمة جديدة"><i class="fa-solid fa-graduation-cap"></i> تعلم</button>
+                <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.62rem;" onclick="openTeachModal()" title="علم المساعد مصطلح جديد"><i class="fa-solid fa-graduation-cap"></i> تعلم</button>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد بيجيب تفاصيل الأطباء والعروض والدوام كاملة. ولو فيه مصطلح جديد، اضغط <b>(تعلم)</b> فوق وربطه باللي تحبه وسيحفظه فوراً!</div>
+            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد الآن يطبق الأنماط تلقائياً (مثل فهم "دوام الدكتور [الاسم]" لأي طبيب). ولو أحببت تعديل أي معلومة أو إضافة مرادف، اضغط <b>(تعلم)</b> في الأعلى!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1135,22 +1152,22 @@
         </div>
     </div>
 
-    <!-- MODAL: نافذة تعليم المساعد المصطلحات والكلمات البديلة -->
+    <!-- MODAL: نافذة تعليم المساعد المصطلحات وتعديل الذاكرة -->
     <div class="modal-overlay" id="teachModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>🎓 تعليم المساعد مرادف أو سؤال جديد</h3>
+                <h3>🎓 تعليم المساعد أو تعديل معلومة</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('teachModal')"></i>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الكلمة أو السؤال الذي يكتبه العميل:</label>
-                <input type="text" id="teachKeyword" class="form-control" placeholder="مثال: سعر تشقير الحواجب">
+                <label>الكلمة أو السؤال الجديد الذي يكتبه العميل (أو مصدر الكلمة مثل: ابان / دكتور ابان):</label>
+                <input type="text" id="teachKeyword" class="form-control" placeholder="مثال: ابان أو دكتور ابان">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الكلمة الأصلية أو النص المطابق في النظام لربطها به:</label>
-                <input type="text" id="teachTarget" class="form-control" placeholder="مثال: تشقير الحواجب">
+                <label>الكلمة الأصلية أو اسم الطبيب المطابق في النظام لربطها به:</label>
+                <input type="text" id="teachTarget" class="form-control" placeholder="مثال: د. أبان ابراهيم">
             </div>
-            <button class="btn btn-green" onclick="saveAITeaching()">حفظ وتدريب المساعد</button>
+            <button class="btn btn-green" onclick="saveAITeaching()">حفظ وتحديث الذاكرة</button>
         </div>
     </div>
 
@@ -1649,7 +1666,7 @@
             aiSynonyms[normalizeText(key)] = normalizeText(target);
             syncToCloud();
             closeModal('teachModal');
-            alert(`🎓 تم تعليم المساعد بنجاح! الآن أي سؤال بـ "${key}" سيعرض إجابة "${target}".`);
+            alert(`🎓 تم تحديث ذاكرة المساعد بنجاح!`);
         }
 
         function syncToCloud() {
@@ -1819,7 +1836,7 @@
             });
         }
 
-        function renderDoctors() {
+        function renderDoctors(highlightId = null) {
             const searchInput = document.getElementById('docSearchInput');
             const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
@@ -1871,6 +1888,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:var(--danger-color); font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
                 let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.15) !important;" : (doc.customColor ? `background-color: ${doc.customColor};` : "");
+                const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 let scheduleHtml = `<div style="font-weight:600; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 if (mashyDays.length > 0) scheduleHtml += `<div style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; font-size:0.62rem;">معشي: ${mashyDays.join('، ')}</div>`;
@@ -1878,7 +1896,7 @@
                 if (wDays.length > 0) scheduleHtml += `<div style="background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; font-size:0.62rem; margin-top:2px;">الوسام: ${wDays.join('، ')}</div>`;
 
                 mashyBody.innerHTML += `
-                    <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
                         <td><strong>${doc.name}</strong> (${doc.nationality || ''}) ${jointBadge} ${leaveBadge}</td>
                         <td>${doc.specialty}</td>
                         <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
@@ -1900,6 +1918,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:var(--danger-color); font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
                 let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.15) !important;" : (doc.customColor ? `background-color: ${doc.customColor};` : "");
+                const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 let scheduleHtml = `<div style="font-weight:600; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 if (wissamDays.length > 0) scheduleHtml += `<div style="background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; font-size:0.62rem;">الوسام: ${wissamDays.join('، ')}</div>`;
@@ -1907,7 +1926,7 @@
                 if (mDays.length > 0) scheduleHtml += `<div style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; font-size:0.62rem; margin-top:2px;">معشي: ${mDays.join('، ')}</div>`;
 
                 wissamBody.innerHTML += `
-                    <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
                         <td><strong>${doc.name}</strong> (${doc.nationality || ''}) ${jointBadge} ${leaveBadge}</td>
                         <td>${doc.specialty}</td>
                         <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
@@ -2062,6 +2081,10 @@
             }
         }
 
+        function jumpToAlertsTab() {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+        }
+
         function renderAlerts(search = "") {
             const grid = document.getElementById('alertsGridList');
             const tickerTrack = document.getElementById('tickerTrackContainer');
@@ -2071,7 +2094,7 @@
 
             sortedAlerts.forEach(item => {
                 tickerTrack.innerHTML += `
-                    <div class="ticker-item">
+                    <div class="ticker-item" onclick="jumpToAlertsTab()">
                         <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
                         <span>${item.content}</span>
                     </div>
@@ -2479,7 +2502,7 @@
             const textarea = document.getElementById('multiOffersTextarea');
             if (!textarea || !textarea.value) return;
             navigator.clipboard.writeText(textarea.value).then(() => {
-                alert(`📋 تم نسخ جميع العروض المحددة للعميل بنجاح!`);
+                alert(`📋 تم نسخ العروض المحددة بنجاح!`);
             });
         }
 
@@ -2672,7 +2695,7 @@
         }
 
         // =========================================================================
-        // المساعد الذكي المزوّد بذاكرة المرادفات القابلة للتعلم ودعم إجابات الأطباء الشاملة
+        // المساعد الذكي المزوّد بنظام التعميم التلقائي (Patterns) والذاكرة الذكية
         // =========================================================================
 
         function normalizeText(str) {
@@ -2703,7 +2726,7 @@
             }
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث في الذاكرة الذكية...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث والتحليل الذكي...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             setTimeout(() => {
@@ -2712,12 +2735,26 @@
 
                 let matchedResult = null;
 
-                // 1. البحث في الأطباء أولاً (لعرض الدوام والفرع وساعات العمل والكشفية بدقة)
-                let foundDoc = doctorsData.find(d => {
-                    const normName = normalizeText(d.name);
-                    const normSpec = normalizeText(d.specialty);
-                    return query.includes(normName) || normName.includes(query) || query.includes(normSpec);
-                });
+                // 1. نظام التعميم الذكي للأنماط (Patterns) مثل "دوام الدكتور [اسم]" أو "مواعيد [اسم]"
+                // يكتشف اسم الطبيب تلقائياً من أي نص بدون الحاجة لإضافته فردياً
+                let cleanQueryForDoc = query.replace(/دوام|الدكتور|دكتور|طبيب|موعد|سعر|تكلفة/g, "").trim();
+                let foundDoc = null;
+
+                if (cleanQueryForDoc.length > 1) {
+                    foundDoc = doctorsData.find(d => {
+                        let normName = normalizeText(d.name);
+                        return normName.includes(cleanQueryForDoc) || cleanQueryForDoc.split(" ").some(word => word.length > 2 && normName.includes(word));
+                    });
+                }
+
+                // لو لم يجد بالأنماط، يبحث بالطريقة المباشرة
+                if (!foundDoc) {
+                    foundDoc = doctorsData.find(d => {
+                        const normName = normalizeText(d.name);
+                        return query.includes(normName) || normName.includes(query);
+                    });
+                }
+
                 if (foundDoc) {
                     let mDays = (foundDoc.mashyDays || []).join('، ') || 'لا يوجد';
                     let wDays = (foundDoc.wissamDays || []).join('، ') || 'لا يوجد';
@@ -2753,7 +2790,7 @@
                 }
 
                 if (!matchedResult) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">❌ عذراً لم أتعرف على هذا المصطلح. اضغط على زر <b>(تعلم)</b> في الأعلى وعلّمني أن <i>("${rawText}")</i> يتبع أي سؤال، وسأحفظه للأبد!</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">❌ عذراً لم أتعرف على هذا المصطلح. اضغط على زر <b>(تعلم)</b> فوق وعلّمني أن <i>("${rawText}")</i> يتبع أي سؤال وسأحفظه للأبد!</div>`;
                     msgBox.scrollTop = msgBox.scrollHeight;
                     return;
                 }
@@ -2790,7 +2827,7 @@
             doctorsData.forEach(d => {
                 if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q))) {
                     foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">الأطباء</span><h4>${d.name} (${d.specialty})</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndFind('schedule')">عرض</button></div>`;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">الأطباء</span><h4>${d.name} (${d.specialty})</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndFindAndHighlightDoc(${d.id})">عرض ومعرفة المكان</button></div>`;
                 }
             });
 
@@ -2801,7 +2838,7 @@
                 }
             });
 
-            if (foundCount === 0) resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الاستفسارات أو الأطباء أو العروض.</div>`;
+            if (foundCount === 0) resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
         }
 
         function clearGlobalSearch() {
@@ -2814,6 +2851,18 @@
         function jumpToSectionAndFind(tabId) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab(tabId, document.querySelector(`.nav-link[data-tab="${tabId}"]`));
+        }
+
+        function jumpToSectionAndFindAndHighlightDoc(docId) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
+            setTimeout(() => {
+                renderDoctors(docId);
+                const rowEl = document.getElementById(`doc_row_${docId}`);
+                if (rowEl) {
+                    rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
         }
 
         function openLightbox(src) {
