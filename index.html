@@ -541,7 +541,7 @@
             cursor: text;
         }
 
-        /* المساعد الذكي الحقيقي */
+        /* المساعد الذكي الحقيقي عبر OpenRouter */
         .ai-floating-btn {
             position: fixed;
             bottom: 25px;
@@ -962,31 +962,31 @@
         </div>
     </main>
 
-    <!-- زر المساعد الذكي الحقيقي -->
+    <!-- زر المساعد الذكي عبر OpenRouter -->
     <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي الحقيقي -->
+    <!-- نافذة المساعد الذكي -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي الحقيقي (LLM Agent)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (OpenRouter)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح Gemini API"></i>
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا جاهز ومحمل ببيانات الموقع كلها وموديل Gemini Flash شغال تماماً وبدون أي أخطاء. اسألني أي سؤال أو صحح لي أي معلومة!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! تم التحويل إلى OpenRouter بنجاح، المساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل أو صحح معلومة (مثلاً: غلط الصح كذا...)" onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اسأل أو صحح معلومة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1098,7 +1098,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: Friday Schedule -->
+    <!-- باقي المودالات -->
     <div class="modal-overlay" id="fridayModal">
         <div class="modal" style="max-width: 560px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1140,7 +1140,6 @@
         </div>
     </div>
 
-    <!-- Modal 3: Alert -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1166,7 +1165,6 @@
         </div>
     </div>
 
-    <!-- Modal 4: Dept Service -->
     <div class="modal-overlay" id="deptServiceModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1208,7 +1206,6 @@
         </div>
     </div>
 
-    <!-- Modal 5: Dept Note -->
     <div class="modal-overlay" id="deptNoteModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1234,7 +1231,6 @@
         </div>
     </div>
 
-    <!-- Modal 6: Coordinator -->
     <div class="modal-overlay" id="coordModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1265,7 +1261,6 @@
         </div>
     </div>
 
-    <!-- Modal 7: Offer -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1331,7 +1326,6 @@
         </div>
     </div>
 
-    <!-- Modal 8: Inquiry -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1381,7 +1375,6 @@
         </div>
     </div>
 
-    <!-- Lightbox -->
     <div class="modal-overlay" id="lightboxModal" onclick="closeModal('lightboxModal')">
         <img id="lightboxImg" class="lightbox-img" src="">
     </div>
@@ -2665,14 +2658,14 @@
         }
 
         // =========================================================================
-        // المساعد الذكي الحقيقي (LLM Agent) - مع نظام إعادة المحاولة التلقائية (Retry)
+        // المساعد الذكي المحدث للعمل عبر OpenRouter API
         // =========================================================================
         function setApiKeyPrompt() {
-            const currentKey = localStorage.getItem('gemini_api_key') || '';
-            const newKey = prompt("أدخل مفتاح Google Studio / Google Cloud API (المفتاح محفوظ في متصفحك فقط):", currentKey);
+            const currentKey = localStorage.getItem('openrouter_api_key') || '';
+            const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
             if (newKey !== null) {
-                localStorage.setItem('gemini_api_key', newKey.trim());
-                alert("✅ تم حفظ مفتاح API بنجاح!");
+                localStorage.setItem('openrouter_api_key', newKey.trim());
+                alert("✅ تم حفظ مفتاح OpenRouter API بنجاح!");
             }
         }
 
@@ -2693,11 +2686,11 @@
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            let apiKey = localStorage.getItem('gemini_api_key');
+            let apiKey = localStorage.getItem('openrouter_api_key');
             if (!apiKey) {
-                apiKey = prompt("الرجاء إدخال مفتاح API الخاص بك لأول مرة:");
+                apiKey = prompt("الرجاء إدخال مفتاح OpenRouter API الخاص بك:");
                 if (!apiKey) return;
-                localStorage.setItem('gemini_api_key', apiKey.trim());
+                localStorage.setItem('openrouter_api_key', apiKey.trim());
             }
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
@@ -2714,69 +2707,62 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ التفكير وتحليل بيانات الموقع...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ التفكير عبر OpenRouter...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const systemPrompt = `أنت مساعد ذكي (LLM Agent) لعيادات كول سنتر طبية. مهمتك الإجابة على أسئلة موظف الكول سنتر بدقة متناهية بالاعتماد على سياق بيانات الموقع أدناه والوسوم (Tags). 
-            لو لاحظت أن المستخدم (مصطفى) يصحح معلومة أو يعطيك تصحيحاً (مثل "غلط الصح كذا")، قم بتسجيل وتعديل هذه المعلومة في ذاكرتك المباشرة واستخدمها في ردودك القادمة بنفس النمط.
-            اجعل إجاباتك منظمة ومهنية وجاهزة لتنسيقها للعملاء.
+            لو لاحظت أن المستخدم (مصطفى) يصحح معلومة أو يعطيك تصحيحاً، قم بتسجيل وتعديل هذه المعلومة واستخدمها في ردودك القادمة.
             
             ${siteContext}`;
 
-            aiChatHistory.push({ role: "user", parts: [{ text: rawText }] });
+            aiChatHistory.push({ role: "user", content: rawText });
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey.trim()}`;
+            const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
 
-            let success = false;
-            let data = null;
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey.trim()}`,
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'Clinic CallCenter Agent'
+                    },
+                    body: JSON.stringify({
+                        "model": "meta-llama/llama-3-8b-instruct:free",
+                        "messages": [
+                            { "role": "system", "content": systemPrompt },
+                            ...aiChatHistory
+                        ]
+                    })
+                });
 
-            // نظام إعادة المحاولة التلقائية (Retry) لو السيرفر عليه ضغط مؤقت
-            for (let attempt = 1; attempt <= 3; attempt++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            "system_instruction": { "parts": [{ "text": systemPrompt }] },
-                            "contents": aiChatHistory
-                        })
-                    });
-                    data = await response.json();
-                    if (data && data.candidates && data.candidates[0].content.parts[0].text) {
-                        success = true;
-                        break;
-                    } else if (data.error && data.error.code === 429) {
-                        // لو ضغط عالٍ، ننتظر ثانية ونعيد المحاولة
-                        await new Promise(r => setTimeout(r, 1500));
-                        continue;
-                    } else {
-                        break;
-                    }
-                } catch (err) {
-                    await new Promise(r => setTimeout(r, 1500));
+                const data = await response.json();
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+
+                if (data && data.choices && data.choices[0].message.content) {
+                    const aiReply = data.choices[0].message.content;
+                    aiChatHistory.push({ role: "assistant", content: aiReply });
+
+                    const replyId = 'ai_reply_' + Date.now();
+                    msgBox.innerHTML += `
+                        <div class="ai-message gemini">
+                            <div id="${replyId}">${aiReply.replace(/\n/g, '<br>')}</div>
+                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
+                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+                            </button>
+                        </div>
+                    `;
+                } else if (data.error) {
+                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ في OpenRouter: ${data.error.message || 'تأكد من المفتاح'}</div>`;
+                } else {
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أستطع المعالجة. حاول مرة أخرى.</div>`;
                 }
-            }
-
-            const loader = document.getElementById(loadingId);
-            if (loader) loader.remove();
-
-            if (success && data) {
-                const aiReply = data.candidates[0].content.parts[0].text;
-                aiChatHistory.push({ role: "model", parts: [{ text: aiReply }] });
-
-                const replyId = 'ai_reply_' + Date.now();
-                msgBox.innerHTML += `
-                    <div class="ai-message gemini">
-                        <div id="${replyId}">${aiReply.replace(/\n/g, '<br>')}</div>
-                        <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                            <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                        </button>
-                    </div>
-                `;
-            } else if (data && data.error) {
-                msgBox.innerHTML += `<div class="ai-message gemini">خطأ في السيرفر أو الضغط مؤقت: ${data.error.message || 'حاول مرة أخرى'}.</div>`;
-            } else {
-                msgBox.innerHTML += `<div class="ai-message gemini">عذراً، السيرفر عليه ضغط حالياً. حاول بعد ثوانٍ.</div>`;
+            } catch (error) {
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالإنترنت.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
