@@ -253,10 +253,11 @@
             font-size: 0.8rem;
         }
 
+        /* شريط التنبيهات الكلاسيكي السلس كما طلبت تماماً (الصورة الأخيرة) */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.5rem 0.8rem 0.7rem 0.8rem;
+            padding: 0.4rem 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.8rem;
@@ -267,23 +268,38 @@
             background: var(--primary-color);
             color: #000;
             font-weight: 800;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 4px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
             flex-shrink: 0;
         }
         .ticker-container {
-            overflow-x: auto;
+            overflow: hidden;
             white-space: nowrap;
             flex: 1;
             position: relative;
-            cursor: grab;
-            user-select: none;
-            scroll-behavior: smooth;
-            padding-bottom: 8px;
+            cursor: pointer;
+        }
+        .ticker-track {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 25s linear infinite;
+        }
+        .ticker-track:hover {
+            animation-play-state: paused;
+        }
+        .ticker-item {
+            display: inline-block;
+            margin-left: 3rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
         }
 
         .content-area {
@@ -624,8 +640,8 @@
             position: fixed;
             bottom: 90px;
             left: 25px;
-            width: 380px;
-            height: 500px;
+            width: 390px;
+            height: 520px;
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
@@ -824,14 +840,11 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- Ticker -->
+        <!-- Ticker (رجع مظبوط وسلس كلاسيكي تماماً زي الصورة الأخيرة) -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-            <div class="ticker-container" id="tickerWrapper">
+            <div class="ticker-container" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
                 <div class="ticker-track" id="tickerTrackContainer"></div>
-            </div>
-            <div>
-                <button class="btn btn-secondary" style="padding:0.15rem 0.5rem; font-size:0.7rem;" onclick="resetTickerDefault()"><i class="fa-solid fa-rotate-right"></i> افتراضي</button>
             </div>
         </div>
 
@@ -1067,34 +1080,53 @@
     </main>
 
     <!-- زر المساعد الذكي -->
-    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي التفاعلي">
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي الفوري">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي الحقيقي -->
+    <!-- نافذة المساعد الذكي المزودة بنظام الذاكرة والتعلم الذاتي -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.6rem 0.8rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1.1rem;"></i>
-                <h4 style="font-size:0.82rem; color:var(--text-main); font-weight:700;">المساعد الذكي الفوري</h4>
+                <h4 style="font-size:0.82rem; color:var(--text-main); font-weight:700;">المساعد الذكي (ذاكرة التعلم الفوري)</h4>
             </div>
-            <div style="display:flex; gap:0.4rem; align-items:center;">
-                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="triggerManualMenu()" title="التحكم اليدوي"><i class="fa-solid fa-sliders"></i> القائمة</button>
+            <div style="display:flex; gap:0.3rem; align-items:center;">
+                <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.62rem;" onclick="openTeachModal()" title="علم المساعد كلمة جديدة"><i class="fa-solid fa-graduation-cap"></i> تعلم</button>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد شغال أوتوماتيك الآن:<br>• اكتب أي سؤال أو خدمة (مثل: <i>سعر التشقير</i>، أو <i>دكتور أبان</i>) وهيجيبلك الإجابة فوراً من كافة الأقسام والاستفسارات بدقة!</div>
+            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد دلوقتي بيتعلم منك:<br>• اكتب أي سؤال بلغتك العادية. ولو كلمة مش متشابهة مع السؤال الأصلي، اضغط زر <b>(تعلم)</b> فوق وقوله (الكلمة دي تعني السؤال الفلاني) وهيحفظها وينفذها فوراً للأبد!</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اسأل عن أي خدمة، سعر، أو استفسار..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اسأل عن أي خدمة أو استفسار..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
             <button class="btn btn-green" style="padding:0.3rem 0.6rem; font-size:0.75rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODAL: نافذة تعليم المساعد المصطلحات والكلمات البديلة -->
+    <div class="modal-overlay" id="teachModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>🎓 تعليم المساعد مرادف أو كلمة جديدة</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('teachModal')"></i>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الكلمة أو الصياغة التي يكتبها العميل / الكول سنتر:</label>
+                <input type="text" id="teachKeyword" class="form-control" placeholder="مثال: سعر تشقير الحواجب">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الإجابة المطابقة أو عنوان الاستفسار الموجود في النظام:</label>
+                <input type="text" id="teachTarget" class="form-control" placeholder="مثال: التشقير">
+            </div>
+            <button class="btn btn-green" onclick="saveAITeaching()">حفظ وتدريب المساعد</button>
+        </div>
+    </div>
+
+    <!-- MODALS الأخرى -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1361,7 +1393,7 @@
         </div>
     </div>
 
-    <!-- Modal 7: Offer Modal (المحدث حسب طلبك للأجهزة والأسعار) -->
+    <!-- Modal 7: Offer Modal -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1490,10 +1522,10 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
+        let aiSynonyms = {}; // ذاكرة مرادفات المساعد الذكي
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
-
         let selectedOfferIds = [];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1524,6 +1556,10 @@
                     }
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
+                    aiSynonyms = data.aiSynonyms || {
+                        "تشقير الحواجب": "التشقير",
+                        "سعر التشقير": "التشقير"
+                    };
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "#1e1b4b" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1534,6 +1570,7 @@
                     deptNotesData = [
                         { text: "مجمع ماجستي الطبي والدوام ( 920031480 ) ( 2722 )", color: "card-gold" }
                     ];
+                    aiSynonyms = { "تشقير الحواجب": "التشقير", "سعر التشقير": "التشقير" };
                     syncToCloud();
                 }
 
@@ -1558,8 +1595,6 @@
                 const now = new Date();
                 document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
-
-            initTickerDragScroll();
         });
 
         function toggleSidebar() {
@@ -1568,41 +1603,31 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        function initTickerDragScroll() {
-            const slider = document.getElementById('tickerWrapper');
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-
-            slider.addEventListener('mousedown', (e) => {
-                isDown = true;
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-            });
-            slider.addEventListener('mouseleave', () => { isDown = false; });
-            slider.addEventListener('mouseup', () => { isDown = false; });
-            slider.addEventListener('mousemove', (e) => {
-                if(!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 2;
-                slider.scrollLeft = scrollLeft - walk;
-            });
-        }
-
-        function resetTickerDefault() {
-            const wrapper = document.getElementById('tickerWrapper');
-            if(wrapper) wrapper.scrollTo({ left: 0, behavior: 'smooth' });
-        }
-
         function toggleFloatingChat() {
             document.getElementById('aiFloatingChatWindow').classList.toggle('active');
+        }
+
+        function openTeachModal() {
+            document.getElementById('teachKeyword').value = "";
+            document.getElementById('teachTarget').value = "";
+            document.getElementById('teachModal').classList.add('active');
+        }
+
+        function saveAITeaching() {
+            const key = document.getElementById('teachKeyword').value.trim();
+            const target = document.getElementById('teachTarget').value.trim();
+            if (!key || !target) return alert("يرجى إدخال الكلمة وما تطابقها!");
+            
+            aiSynonyms[normalizeText(key)] = normalizeText(target);
+            syncToCloud();
+            closeModal('teachModal');
+            alert(`🎓 تم تعليم المساعد بنجاح! الآن أي سؤال بـ "${key}" سيفهم أنه يخص "${target}".`);
         }
 
         function syncToCloud() {
             const payload = {
                 doctorsData, fridaySchedules, alertsData, coordinatorsData,
-                deptServicesData, deptNotesData, offersData, inquiriesData
+                deptServicesData, deptNotesData, offersData, inquiriesData, aiSynonyms
             };
             db.ref('clinicData').set(payload);
         }
@@ -1642,7 +1667,7 @@
         }
 
         function exportJSON() {
-            const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
+            const backupObj = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, aiSynonyms };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
@@ -1668,6 +1693,7 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        if (data.aiSynonyms) aiSynonyms = data.aiSynonyms;
                         syncToCloud();
                         alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
@@ -2006,7 +2032,7 @@
 
             sortedAlerts.forEach(item => {
                 tickerTrack.innerHTML += `
-                    <div class="ticker-item" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
+                    <div class="ticker-item">
                         <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
                         <span>${item.content}</span>
                     </div>
@@ -2350,17 +2376,11 @@
             renderOffers();
         }
 
-        // =========================================================================
-        // قسم العروض والأسعار (صيغة النسخ الجديدة للأجهزة والأسعار المستقلة)
-        // =========================================================================
-
         function formatOfferLineForClient(item) {
             let lines = [`${item.name}`];
-            
             let hasDeviceLines = false;
             if (item.device1 && item.device1.trim() !== "") {
                 let p1Str = item.price1 ? ` بـ ${item.price1}` : "";
-                lines.path = `- جهاز ${item.device1}${p1Str}`;
                 lines.push(`جهاز ${item.device1}${p1Str}`);
                 hasDeviceLines = true;
             }
@@ -2369,11 +2389,9 @@
                 lines.push(`جهاز ${item.device2}${p2Str}`);
                 hasDeviceLines = true;
             }
-
             if (!hasDeviceLines && item.price) {
                 lines.push(`السعر: ${item.price}`);
             }
-
             return lines.join('\n');
         }
 
@@ -2612,7 +2630,7 @@
         }
 
         // =========================================================================
-        // المساعد الذكي الحقيقي الفوري
+        // المساعد الذكي المزوّد بذاكرة المرادفات القابلة للتعلم (بواسطتك)
         // =========================================================================
 
         function normalizeText(str) {
@@ -2626,18 +2644,6 @@
                 .trim();
         }
 
-        function triggerManualMenu() {
-            const msgBox = document.getElementById('aiMessagesBox');
-            msgBox.innerHTML += `
-                <div class="ai-message gemini">
-                    <b>🎛️ قائمة التحكم:</b><br>
-                    • المساعد يبحث الآن بذكاء فوري في كافة أقسام العيادة (الاستفسارات، العروض، الأطباء) أوتوماتيكياً دون الحاجة لتعليم مسبق.<br>
-                    • لأي تعديل يدوي، استعرض الأقسام مباشرة.
-                </div>
-            `;
-            msgBox.scrollTop = msgBox.scrollHeight;
-        }
-
         function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
@@ -2648,10 +2654,15 @@
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            const normQuery = normalizeText(rawText);
+            let query = normalizeText(rawText);
+
+            // فحص ذاكرة المرادفات (التعلم) لو انت علّمته الكلمة دي قبل كدة
+            if (aiSynonyms[query]) {
+                query = aiSynonyms[query];
+            }
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث الذكي...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث في الذاكرة الذكية...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             setTimeout(() => {
@@ -2660,21 +2671,22 @@
 
                 let matchedResult = null;
 
+                // 1. البحث في الاستفسارات بالكلمة أو المرادف
                 let matchedInq = inquiriesData.find(i => {
                     const normQ = normalizeText(i.question);
                     const normA = normalizeText(i.answer);
-                    return normQ.includes(normQuery) || normQuery.includes(normQ) || normA.includes(normQuery);
+                    return normQ.includes(query) || query.includes(normQ) || normA.includes(query);
                 });
                 if (matchedInq) {
                     matchedResult = `❓ <b>${matchedInq.question}</b><br>💡 ${matchedInq.answer}`;
                 }
 
+                // 2. البحث في العروض
                 if (!matchedResult) {
                     let matchedOffer = offersData.find(o => {
                         const normName = normalizeText(o.name);
                         const normCat = normalizeText(o.category);
-                        const normPrice = normalizeText(o.price);
-                        return normQuery.includes(normName) || normName.includes(normQuery) || normQuery.includes(normCat);
+                        return query.includes(normName) || normName.includes(query) || query.includes(normCat);
                     });
                     if (matchedOffer) {
                         matchedResult = `🏷️ <b>${matchedOffer.name}</b> (${matchedOffer.category})<br>💰 السعر: <span style="color:#4ade80; font-weight:bold;">${matchedOffer.price || ''}</span>`;
@@ -2683,11 +2695,12 @@
                     }
                 }
 
+                // 3. البحث في الأطباء
                 if (!matchedResult) {
                     let foundDoc = doctorsData.find(d => {
                         const normName = normalizeText(d.name);
                         const normSpec = normalizeText(d.specialty);
-                        return normQuery.includes(normName) || normName.includes(normQuery) || normQuery.includes(normSpec);
+                        return query.includes(normName) || normName.includes(query) || query.includes(normSpec);
                     });
                     if (foundDoc) {
                         let mDays = (foundDoc.mashyDays || []).join('، ') || 'لا يوجد';
@@ -2698,7 +2711,7 @@
                 }
 
                 if (!matchedResult) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">❌ عذراً، لم أجد إجابة مطابقة لـ <i>("${rawText}")</i> في الاستفسارات أو العروض أو الأطباء. تأكد من كتابة الكلمة الصحيحة أو أضفها في القسم المختص.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">❌ عذراً لم أتعرف على هذا المصطلح. اضغط على زر <b>(تعلم)</b> الأخضر فوق في المساعد وعلّمني أن <i>("${rawText}")</i> يتبع أي سؤال، وسأحفظه للأبد!</div>`;
                     msgBox.scrollTop = msgBox.scrollHeight;
                     return;
                 }
