@@ -420,11 +420,19 @@
         }
 
         .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; table-layout: auto !important; }
-        th, td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.4; vertical-align: top; }
-        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 600; font-size: 0.72rem; }
+        
+        /* 🎯 ضبط وتثبيت حدود جدول الأطباء وتصميم الاسم والجنسية والتخصص */
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; table-layout: fixed; }
+        th, td { padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.35; vertical-align: middle; }
+        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 700; font-size: 0.75rem; }
 
-        /* تفعيل وضع التعديل الحر للأعمدة والصفوف بدون أي قيود نهائياً */
+        /* تنسيق اسم الطبيب بخط بارز والجنسية أسفله مباشرة */
+        .doc-name-box { font-weight: 800; font-size: 0.82rem; color: #ffffff; display: block; word-break: break-word; }
+        .doc-nat-badge { font-weight: 600; font-size: 0.7rem; color: #38bdf8; display: block; margin-top: 2px; }
+        /* تنسيق التخصص ينزل على سطرين لو طويل */
+        .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: #f3f4f6; }
+
+        /* وضع التعديل الحر للأعمدة والصفوف */
         table.resizable-mode th, table.resizable-mode td {
             resize: both !important;
             overflow: auto !important;
@@ -785,12 +793,9 @@
                             <table id="mashyTableElement">
                                 <thead>
                                     <tr>
-                                        <th style="width: auto;">الطبيب والجنسية</th>
-                                        <th style="width: auto;">التخصص</th>
-                                        <th style="width: auto;">الكشفية</th>
-                                        <th style="width: auto;">فرع معشي والمواعيد</th>
-                                        <th style="width: auto;">ملاحظات</th>
-                                        <th style="width: 50px;">إدارة</th>
+                                        <th style="width: 38%;">الطبيب والجنسية</th>
+                                        <th style="width: 32%;">التخصص</th>
+                                        <th style="width: 30%;">الكشفية والدوام</th>
                                     </tr>
                                 </thead>
                                 <tbody id="mashyTableBody"></tbody>
@@ -807,12 +812,9 @@
                             <table id="wissamTableElement">
                                 <thead>
                                     <tr>
-                                        <th style="width: auto;">الطبيب والجنسية</th>
-                                        <th style="width: auto;">التخصص</th>
-                                        <th style="width: auto;">الكشفية</th>
-                                        <th style="width: auto;">فرع الوسام والمواعيد</th>
-                                        <th style="width: auto;">ملاحظات</th>
-                                        <th style="width: 50px;">إدارة</th>
+                                        <th style="width: 38%;">الطبيب والجنسية</th>
+                                        <th style="width: 32%;">التخصص</th>
+                                        <th style="width: 30%;">الكشفية والدوام</th>
                                     </tr>
                                 </thead>
                                 <tbody id="wissamTableBody"></tbody>
@@ -948,7 +950,7 @@
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الأطباء وخدماتها', this)">الأطباء وخدماتها</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الأجهزة', this)">الأجهزة</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الأشعة والمختبر', this)">الأشعة والمختبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</option>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('أخرى', this)">أخرى</button>
                 </div>
 
@@ -962,17 +964,17 @@
         </div>
     </main>
 
-    <!-- زر المساعد الذكي عبر OpenRouter -->
-    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي">
+    <!-- زر المساعد الذكي السريع -->
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي الفوري">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي -->
+    <!-- نافذة المساعد الذكي السريع والمربوط بالذاكرة المحلية -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (OpenRouter)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي السريع (Cache System)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
                 <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
@@ -981,7 +983,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! تم تحديث الموديل إلى DeepSeek المجاني والمساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد الذكي شغال ومربوط بالذاكرة المحلية السريعة (Cache). الإجابات التي تبحث عنها تتسجل لترد بلمح البصر المرة القادمة!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1005,15 +1007,15 @@
                     <label>اسم الطبيب</label>
                     <input type="text" id="docName" class="form-control" placeholder="د. أحمد">
                 </div>
-                <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
-                    <label>الجنسية</label>
-                    <input type="text" id="docNationality" class="form-control" placeholder="سوري">
+                <div style="width:120px; display:flex; flex-direction:column; gap:0.2rem;">
+                    <label>الجنسية (تظهر أسفل الاسم)</label>
+                    <input type="text" id="docNationality" class="form-control" placeholder="(سوري)">
                 </div>
             </div>
             <div style="display:flex; gap:0.4rem;">
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>التخصص</label>
-                    <input type="text" id="docSpecialty" class="form-control" placeholder="طبيب عام أسنان">
+                    <input type="text" id="docSpecialty" class="form-control" placeholder="طبيب عام أسنان / طوارئ">
                 </div>
                 <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>الكشفية</label>
@@ -1412,6 +1414,8 @@
         let selectedOfferIds = [];
 
         let aiChatHistory = [];
+        // ⚡ ذاكرة الـ Cache المحلية لإجابات المساعد الذكي
+        let localAiMemory = JSON.parse(localStorage.getItem('local_ai_cache_memory') || '{}');
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -1445,7 +1449,7 @@
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                 } else {
-                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, isPinned: true, tags: "أسنان, معشي", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "" }];
+                    doctorsData = [{ id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين"], timing: "من 12.30 م - 8.30 م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
                     deptServicesData = [
                         { id: 1, branch: "معشي", derm: "جنتل ماكس برو", dent: "تنظيف جير", customColor: "", isJoint: true },
@@ -1682,7 +1686,7 @@
             if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
             if (wissamDays.length > 0) scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
 
-            let clientText = `الدكتور: ${doc.name} (${doc.nationality || ''})\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || 'مجانية'}\nالساعات: ${doc.timing || ''}`;
+            let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || 'مجانية'}\nالساعات: ${doc.timing || ''}`;
             if (scheduleLines.length > 0) clientText += `\nمواعيد الدوام:\n` + scheduleLines.join('\n');
             if (doc.notes) clientText += `\nالملاحظات: ${doc.notes}`;
 
@@ -1691,6 +1695,7 @@
             });
         }
 
+        /* 🎯 عرض جدول الأطباء بتنسيق الجنسية أسفل الاسم والتخصص المنسق */
         function renderDoctors(highlightId = null) {
             const searchInput = document.getElementById('docSearchInput');
             const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -1747,24 +1752,21 @@
                 let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
-                let scheduleHtml = `<div style="font-weight:700; font-size:0.72rem; color:#facc15;"><i class="fa-regular fa-clock"></i> ${doc.timing || ''}</div>`;
-                if (mashyDays.length > 0) scheduleHtml += `<div style="font-size:0.65rem; color:#cbd5e1; margin-top:2px;">معشي: ${mashyDays.join('، ')}</div>`;
-                const wDays = doc.wissamDays || [];
-                if (wDays.length > 0) scheduleHtml += `<div style="font-size:0.65rem; color:#86efac; margin-top:1px;">الوسام: ${wDays.join('، ')}</div>`;
-
-                let tagsHtml = doc.tags ? `<br><span class="tag-badge">${doc.tags}</span>` : '';
+                // تنسيق التخصص ينزل سطرين
+                const formattedSpec = doc.specialty ? doc.specialty.replace('/', '/\n') : '';
 
                 mashyBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
-                        <td><strong>${doc.name}</strong> (${doc.nationality || ''}) ${pinnedBadge} ${jointBadge} ${leaveBadge}</td>
-                        <td>${doc.specialty}</td>
-                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                        <td>${scheduleHtml}</td>
-                        <td style="color:#fde047; font-size:0.68rem; font-weight:600; white-space:pre-wrap;">${doc.notes || '-'}${tagsHtml}</td>
                         <td>
-                            <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
-                            <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                            <span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
+                        <td>
+                            <div class="doc-spec-box">${formattedSpec}</div>
+                        </td>
+                        <td>
+                            <strong style="color:var(--primary-color); font-size:0.8rem;">${doc.fee || '75 ريال'}</strong>
+                            <div style="font-size:0.65rem; color:#facc15; margin-top:2px;">${doc.timing || 'دوام رسمي'}</div>
                         </td>
                     </tr>
                 `;
@@ -1780,24 +1782,20 @@
                 let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
-                let scheduleHtml = `<div style="font-weight:700; font-size:0.72rem; color:#facc15;"><i class="fa-regular fa-clock"></i> ${doc.timing || ''}</div>`;
-                if (wissamDays.length > 0) scheduleHtml += `<div style="font-size:0.65rem; color:#86efac; margin-top:2px;">الوسام: ${wissamDays.join('، ')}</div>`;
-                const mDays = doc.mashyDays || doc.days || [];
-                if (mDays.length > 0) scheduleHtml += `<div style="font-size:0.65rem; color:#cbd5e1; margin-top:1px;">معشي: ${mDays.join('، ')}</div>`;
-
-                let tagsHtml = doc.tags ? `<br><span class="tag-badge">${doc.tags}</span>` : '';
+                const formattedSpec = doc.specialty ? doc.specialty.replace('/', '/\n') : '';
 
                 wissamBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
-                        <td><strong>${doc.name}</strong> (${doc.nationality || ''}) ${pinnedBadge} ${jointBadge} ${leaveBadge}</td>
-                        <td>${doc.specialty}</td>
-                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                        <td>${scheduleHtml}</td>
-                        <td style="color:#fde047; font-size:0.68rem; font-weight:600; white-space:pre-wrap;">${doc.notes || '-'}${tagsHtml}</td>
                         <td>
-                            <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
-                            <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
+                            <span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
+                        <td>
+                            <div class="doc-spec-box">${formattedSpec}</div>
+                        </td>
+                        <td>
+                            <strong style="color:var(--primary-color); font-size:0.8rem;">${doc.fee || '75 ريال'}</strong>
+                            <div style="font-size:0.65rem; color:#facc15; margin-top:2px;">${doc.timing || 'دوام رسمي'}</div>
                         </td>
                     </tr>
                 `;
@@ -2638,6 +2636,7 @@
             });
         }
 
+        /* ⚡ دالة إرسال المساعد الذكي والمزودة بالتخزين المحلي للـ Cache */
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
@@ -2647,6 +2646,22 @@
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
+
+            // ⚡ الفحص المسبق في الذاكرة المحلية (Cache) لرد فوري بدون انتظار
+            if (localAiMemory[rawText]) {
+                const cacheReplyId = 'ai_cache_reply_' + Date.now();
+                msgBox.innerHTML += `
+                    <div class="ai-message gemini">
+                        ⚡ <strong>[استجابة فورية من الذاكرة المحلية]:</strong>
+                        <div id="${cacheReplyId}">${localAiMemory[rawText].replace(/\n/g, '<br>')}</div>
+                        <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${cacheReplyId}')">
+                            <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+                        </button>
+                    </div>
+                `;
+                msgBox.scrollTop = msgBox.scrollHeight;
+                return;
+            }
 
             let apiKey = localStorage.getItem('openrouter_api_key');
             if (!apiKey) {
@@ -2669,11 +2684,11 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ التفكير عبر OpenRouter...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ المعالجة من OpenRouter...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const systemPrompt = `أنت مساعد ذكي (LLM Agent) لعيادات كول سنتر طبية. مهمتك الإجابة على أسئلة موظف الكول سنتر بدقة متناهية بالاعتماد على سياق بيانات الموقع أدناه والوسوم (Tags). 
-            لو لاحظت أن المستخدم (مصطفى) يصحح معلومة أو يعطيك تصحيحاً، قم بتسجيل وتعديل هذه المعلومة واستخدمها في ردودك القادمة.
+            لو لاحظت أن المستخدم يصحح معلومة أو يعطيك تصحيحاً، قم بتسجيل وتعديل هذه المعلومة واستخدمها في ردودك القادمة.
             
             ${siteContext}`;
 
@@ -2706,6 +2721,10 @@
                 if (data && data.choices && data.choices[0].message.content) {
                     const aiReply = data.choices[0].message.content;
                     aiChatHistory.push({ role: "assistant", content: aiReply });
+
+                    // ⚡ تخزين الرد في الذاكرة المحلية (Cache)
+                    localAiMemory[rawText] = aiReply;
+                    localStorage.setItem('local_ai_cache_memory', JSON.stringify(localAiMemory));
 
                     const replyId = 'ai_reply_' + Date.now();
                     msgBox.innerHTML += `
