@@ -912,29 +912,29 @@
     </main>
 
     <!-- زر المساعد الذكي -->
-    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي السريع">
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي السريعة -->
+    <!-- نافذة المساعد الذكي السريعة الهجينة -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السريع للعملاء (Local AI)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السريع + الذكاء الاصطناعي</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح الـ API"></i>
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح Gemini API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد الآن يعطيك نتائج فورية في أقل من ثانية لأي طبيب أو عرض لتسعفك وأنت مع العملاء.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يبحث في بيانات العيادة فوراً في أقل من ثانية، ويرد عبر Gemini للأسئلة العامة.</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اكتب اسم الطبيب أو العرض هنا..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اسأل عن طبيب، سعر، أو أي سؤال عام..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
             <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -2501,14 +2501,14 @@
         }
 
         // =========================================================================
-        // الدالة السريعة جداً: تبحث محلياً أولاً لتوفير أسرع رد، وتستعين بـ Gemini عند اللزوم
+        // الدالة المعدلة بالكامل: بحث فوري محلي + الاتصال المحسن بـ Gemini 1.5 Flash
         // =========================================================================
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('gemini_api_key') || '';
-            const newKey = prompt("أدخل مفتاح Google Studio API الخاص بك (محفوظ في متصفحك محلياً فقط بأمان):", currentKey);
+            const newKey = prompt("أدخل مفتاح Google Studio API (المفتاح محفوظ في متصفحك فقط):", currentKey);
             if (newKey !== null) {
                 localStorage.setItem('gemini_api_key', newKey.trim());
-                alert("✅ تم حفظ المفتاح بنجاح!");
+                alert("✅ تم حفظ مفتاح API بنجاح!");
             }
         }
 
@@ -2524,25 +2524,23 @@
 
             const query = rawText.toLowerCase();
 
-            // 1. بحث محلي فوري في الأطباء (سرعة البرق)
+            // 1. بحث محلي فوري (أطباء، عروض، أسئلة) - سرعة مطلقة
             const foundDocs = doctorsData.filter(d => 
                 d.name.toLowerCase().includes(query) || 
                 (d.specialty && d.specialty.toLowerCase().includes(query))
             );
 
-            // 2. بحث محلي فوري في العروض والأسعار
             const foundOffers = offersData.filter(o => 
                 o.name.toLowerCase().includes(query) || 
                 (o.category && o.category.toLowerCase().includes(query))
             );
 
-            // 3. بحث محلي فوري في دليل الاستفسارات
             const foundInquiries = inquiriesData.filter(i => 
                 i.question.toLowerCase().includes(query) || 
                 i.answer.toLowerCase().includes(query)
             );
 
-            // إذا وُجدت نتائج مباشرة في بياناتك، يتم عرضها فوراً بدون أي انتظار
+            // لو المعلومة متوفرة في جداولك، إظهارها فوراً بدون انتظار API
             if (foundDocs.length > 0 || foundOffers.length > 0 || foundInquiries.length > 0) {
                 let localReply = "";
 
@@ -2554,8 +2552,8 @@
                         let status = d.isLeave ? "<span style='color:#ef4444;'>(في إجازة)</span>" : "";
                         localReply += `• <b>${d.name}</b> (${d.specialty}) ${status}<br>`;
                         localReply += `  - الكشفية: <b>${d.fee || 'مجانية'}</b> | الساعات: ${d.timing || '-'}<br>`;
-                        if(mDays) localReply += `  - معشي: ${mDays}<br>`;
-                        if(wDays) localReply += `  - الوسام: ${wDays}<br>`;
+                        if(mDays)  localReply += `  - معشي: ${mDays}<br>`;
+                        if(wDays)  localReply += `  - الوسام: ${wDays}<br>`;
                         if(d.notes) localReply += `  - ملاحظات: ${d.notes}<br>`;
                     });
                     localReply += "<br>";
@@ -2573,7 +2571,7 @@
                 }
 
                 if (foundInquiries.length > 0) {
-                    localReply += "<b>❓ الاستفسارات المباشرة:</b><br>";
+                    localReply += "<b>❓ الاستفسارات:</b><br>";
                     foundInquiries.forEach(i => {
                         localReply += `• <b>س: ${i.question}</b><br>  ج: ${i.answer}<br>`;
                     });
@@ -2581,10 +2579,10 @@
 
                 msgBox.innerHTML += `<div class="ai-message gemini">${localReply}</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
-                return; // إجابة فورية بدون انتظار شبكة
+                return;
             }
 
-            // إذا لم تكن الإجابة مسجلة محلياً، يتم استدعاء Gemini مع السؤال بمرونة
+            // 2. إذا لم تكن موجودة في الجداول، استدعاء موديل Gemini الرسمي الأصلي أونلاين
             let apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
                 apiKey = prompt("الرجاء إدخال مفتاح Google Studio API الخاص بك لأول مرة:");
@@ -2593,20 +2591,18 @@
             }
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ التفكير والرد...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جارِ البحث أونلاين...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+            // تم التحديث لاستخدام الموديل الرسمي المستقر أونلاين gemini-1.5-flash
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
 
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-goog-api-key': apiKey.trim()
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        "contents": [{ "parts": [{ "text": `أنت مساعد كول سنتر طبي، أجب بإيجاز وسرعة على السؤال التالي: ${rawText}` }] }]
+                        "contents": [{ "parts": [{ "text": `أنت مساعد كول سنتر طبي، أجب بإيجاز شديد ومباشر على: ${rawText}` }] }]
                     })
                 });
 
@@ -2617,13 +2613,15 @@
                 if (data && data.candidates && data.candidates[0].content.parts[0].text) {
                     const aiReply = data.candidates[0].content.parts[0].text;
                     msgBox.innerHTML += `<div class="ai-message gemini">${aiReply.replace(/\n/g, '<br>')}</div>`;
+                } else if (data.error) {
+                    msgBox.innerHTML += `<div class="ai-message gemini">خطأ في المفتاح: ${data.error.message || 'تأكد من مفتاح API'}. اضغط على أيقونة المفتاح بالترس لتعديله.</div>`;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">لم يتم العثور على نتيجة سريعة. يمكنك مراجعة جداول الموقع مباشرة.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">لم يتم العثور على رد. يمكنك البحث بالجدول المباشر.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
-                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال.</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالإنترنت.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
