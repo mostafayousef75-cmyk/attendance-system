@@ -253,11 +253,11 @@
             font-size: 0.8rem;
         }
 
-        /* شريط التنبيهات الكلاسيكي السلس كما طلبت تماماً (الصورة الأخيرة) */
+        /* شريط التنبيهات كمسطرة أفقية تتحرك يمين ويسار بالماوس مع زر أحدث إشعار */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.4rem 0.8rem;
+            padding: 0.35rem 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.8rem;
@@ -277,29 +277,51 @@
             flex-shrink: 0;
         }
         .ticker-container {
-            overflow: hidden;
+            overflow-x: auto;
             white-space: nowrap;
             flex: 1;
             position: relative;
-            cursor: pointer;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .ticker-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .ticker-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
         }
         .ticker-track {
-            display: inline-block;
+            display: inline-flex;
+            gap: 2.5rem;
             white-space: nowrap;
-            animation: marquee 25s linear infinite;
-        }
-        .ticker-track:hover {
-            animation-play-state: paused;
+            align-items: center;
         }
         .ticker-item {
-            display: inline-block;
-            margin-left: 3rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
             font-weight: 600;
             color: var(--text-main);
+            background: var(--bg-card);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
         }
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(100%); }
+        .latest-alert-btn {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         .content-area {
@@ -589,16 +611,20 @@
             display: inline-block;
         }
 
+        /* صندوق سلة العروض المخفي افتراضياً ولا يظهر إلا عند التحديد */
         .offers-multi-clipboard-box {
+            display: none;
             background: var(--bg-card);
             border: 2px solid var(--primary-color);
             border-radius: var(--radius-md);
             padding: 0.5rem;
             margin-bottom: 0.6rem;
-            display: flex;
             flex-direction: column;
             gap: 0.3rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .offers-multi-clipboard-box.active {
+            display: flex;
         }
         .clipboard-textarea {
             width: 100%;
@@ -840,10 +866,11 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- Ticker (رجع مظبوط وسلس كلاسيكي تماماً زي الصورة الأخيرة) -->
+        <!-- شريط التنبيهات (مسطرة أفقية تتحرك بالماوس مع زر أحدث إشعار افتراضي) -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-            <div class="ticker-container" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])">
+            <button class="latest-alert-btn" onclick="scrollToLatestAlert()" title="الذهاب لأحدث إشعار"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
+            <div class="ticker-container" id="tickerContainerBox">
                 <div class="ticker-track" id="tickerTrackContainer"></div>
             </div>
         </div>
@@ -1032,12 +1059,13 @@
                     <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
                 </div>
 
-                <div class="offers-multi-clipboard-box">
+                <!-- سلة العروض الجانبية (تظهر فقط عند تحديد خدمات) -->
+                <div class="offers-multi-clipboard-box" id="multiOffersClipboardBox">
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color);">
                         <span><i class="fa-solid fa-clipboard-list"></i> سلة العروض المحددة للنسخ للعميل:</span>
                         <div style="display:flex; gap:0.3rem;">
                             <button class="btn btn-green" style="padding:0.1rem 0.4rem; font-size:0.68rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i> نسخ الكل</button>
-                            <button class="btn btn-danger" style="padding:0.1rem 0.4rem; font-size:0.68rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-trash"></i> إلغاء وإعادة تحديد</button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.4rem; font-size:0.68rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-trash"></i> إلغاء التحديد</button>
                         </div>
                     </div>
                     <textarea id="multiOffersTextarea" class="clipboard-textarea" readonly placeholder="اضغط على علامة الصح (✔️) بجانب أي عروض في الجدول لتتجمع هنا وتنسخها دفعة واحدة..."></textarea>
@@ -1098,7 +1126,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد دلوقتي بيتعلم منك:<br>• اكتب أي سؤال بلغتك العادية. ولو كلمة مش متشابهة مع السؤال الأصلي، اضغط زر <b>(تعلم)</b> فوق وقوله (الكلمة دي تعني السؤال الفلاني) وهيحفظها وينفذها فوراً للأبد!</div>
+            <div class="ai-message gemini">مرحباً يا مصطفى! المساعد بيجيب تفاصيل الأطباء والعروض والدوام كاملة. ولو فيه مصطلح جديد، اضغط <b>(تعلم)</b> فوق وربطه باللي تحبه وسيحفظه فوراً!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1111,16 +1139,16 @@
     <div class="modal-overlay" id="teachModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>🎓 تعليم المساعد مرادف أو كلمة جديدة</h3>
+                <h3>🎓 تعليم المساعد مرادف أو سؤال جديد</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('teachModal')"></i>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الكلمة أو الصياغة التي يكتبها العميل / الكول سنتر:</label>
+                <label>الكلمة أو السؤال الذي يكتبه العميل:</label>
                 <input type="text" id="teachKeyword" class="form-control" placeholder="مثال: سعر تشقير الحواجب">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الإجابة المطابقة أو عنوان الاستفسار الموجود في النظام:</label>
-                <input type="text" id="teachTarget" class="form-control" placeholder="مثال: التشقير">
+                <label>الكلمة الأصلية أو النص المطابق في النظام لربطها به:</label>
+                <input type="text" id="teachTarget" class="form-control" placeholder="مثال: تشقير الحواجب">
             </div>
             <button class="btn btn-green" onclick="saveAITeaching()">حفظ وتدريب المساعد</button>
         </div>
@@ -1522,7 +1550,7 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        let aiSynonyms = {}; // ذاكرة مرادفات المساعد الذكي
+        let aiSynonyms = {};
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1558,7 +1586,7 @@
                     inquiriesData = data.inquiriesData || [];
                     aiSynonyms = data.aiSynonyms || {
                         "تشقير الحواجب": "التشقير",
-                        "سعر التشقير": "التشقير"
+                        "سعر تشقير الحواجب": "التشقير"
                     };
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "سعودي", specialty: "طبيب عام أسنان", fee: "مجانية", branch: "معشي", isJoint: false, isLeave: false, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: [], timing: "من 12.30 م - 8.30 م", notes: "مناوبة الجمعة", customColor: "#1e1b4b" }];
@@ -1570,7 +1598,7 @@
                     deptNotesData = [
                         { text: "مجمع ماجستي الطبي والدوام ( 920031480 ) ( 2722 )", color: "card-gold" }
                     ];
-                    aiSynonyms = { "تشقير الحواجب": "التشقير", "سعر التشقير": "التشقير" };
+                    aiSynonyms = { "تشقير الحواجب": "التشقير", "سعر تشقير الحواجب": "التشقير" };
                     syncToCloud();
                 }
 
@@ -1621,7 +1649,7 @@
             aiSynonyms[normalizeText(key)] = normalizeText(target);
             syncToCloud();
             closeModal('teachModal');
-            alert(`🎓 تم تعليم المساعد بنجاح! الآن أي سؤال بـ "${key}" سيفهم أنه يخص "${target}".`);
+            alert(`🎓 تم تعليم المساعد بنجاح! الآن أي سؤال بـ "${key}" سيعرض إجابة "${target}".`);
         }
 
         function syncToCloud() {
@@ -1846,6 +1874,8 @@
 
                 let scheduleHtml = `<div style="font-weight:600; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 if (mashyDays.length > 0) scheduleHtml += `<div style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; font-size:0.62rem;">معشي: ${mashyDays.join('، ')}</div>`;
+                const wDays = doc.wissamDays || [];
+                if (wDays.length > 0) scheduleHtml += `<div style="background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; font-size:0.62rem; margin-top:2px;">الوسام: ${wDays.join('، ')}</div>`;
 
                 mashyBody.innerHTML += `
                     <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
@@ -1873,6 +1903,8 @@
 
                 let scheduleHtml = `<div style="font-weight:600; font-size:0.7rem;"><i class="fa-regular fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div>`;
                 if (wissamDays.length > 0) scheduleHtml += `<div style="background:rgba(74, 222, 128, 0.15); color:#4ade80; padding:1px 5px; border-radius:4px; font-size:0.62rem;">الوسام: ${wissamDays.join('، ')}</div>`;
+                const mDays = doc.mashyDays || doc.days || [];
+                if (mDays.length > 0) scheduleHtml += `<div style="background:rgba(56, 189, 248, 0.15); color:#38bdf8; padding:1px 5px; border-radius:4px; font-size:0.62rem; margin-top:2px;">معشي: ${mDays.join('، ')}</div>`;
 
                 wissamBody.innerHTML += `
                     <tr style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
@@ -2020,6 +2052,13 @@
                 doctorsData = doctorsData.filter(d => d.id !== id);
                 syncToCloud();
                 renderDoctors();
+            }
+        }
+
+        function scrollToLatestAlert() {
+            const container = document.getElementById('tickerContainerBox');
+            if (container) {
+                container.scrollLeft = container.scrollWidth;
             }
         }
 
@@ -2415,14 +2454,17 @@
         }
 
         function updateMultiOffersClipboard() {
+            const box = document.getElementById('multiOffersClipboardBox');
             const textarea = document.getElementById('multiOffersTextarea');
-            if (!textarea) return;
+            if (!box || !textarea) return;
 
             if (selectedOfferIds.length === 0) {
+                box.classList.remove('active');
                 textarea.value = "";
                 return;
             }
 
+            box.classList.add('active');
             let blocks = [];
             selectedOfferIds.forEach(id => {
                 const item = offersData.find(o => o.id === id);
@@ -2630,7 +2672,7 @@
         }
 
         // =========================================================================
-        // المساعد الذكي المزوّد بذاكرة المرادفات القابلة للتعلم (بواسطتك)
+        // المساعد الذكي المزوّد بذاكرة المرادفات القابلة للتعلم ودعم إجابات الأطباء الشاملة
         // =========================================================================
 
         function normalizeText(str) {
@@ -2656,7 +2698,6 @@
 
             let query = normalizeText(rawText);
 
-            // فحص ذاكرة المرادفات (التعلم) لو انت علّمته الكلمة دي قبل كدة
             if (aiSynonyms[query]) {
                 query = aiSynonyms[query];
             }
@@ -2671,17 +2712,33 @@
 
                 let matchedResult = null;
 
-                // 1. البحث في الاستفسارات بالكلمة أو المرادف
-                let matchedInq = inquiriesData.find(i => {
-                    const normQ = normalizeText(i.question);
-                    const normA = normalizeText(i.answer);
-                    return normQ.includes(query) || query.includes(normQ) || normA.includes(query);
+                // 1. البحث في الأطباء أولاً (لعرض الدوام والفرع وساعات العمل والكشفية بدقة)
+                let foundDoc = doctorsData.find(d => {
+                    const normName = normalizeText(d.name);
+                    const normSpec = normalizeText(d.specialty);
+                    return query.includes(normName) || normName.includes(query) || query.includes(normSpec);
                 });
-                if (matchedInq) {
-                    matchedResult = `❓ <b>${matchedInq.question}</b><br>💡 ${matchedInq.answer}`;
+                if (foundDoc) {
+                    let mDays = (foundDoc.mashyDays || []).join('، ') || 'لا يوجد';
+                    let wDays = (foundDoc.wissamDays || []).join('، ') || 'لا يوجد';
+                    let status = foundDoc.isLeave ? "🔴 (إجازة / خارج الدوام)" : "🟢 (مداوم)";
+                    matchedResult = `🩺 <b>${foundDoc.name}</b> (${foundDoc.specialty})<br>• الحالة: ${status}<br>• الكشفية: <b>${foundDoc.fee || 'مجانية'}</b><br>• ساعات الدوام: <b>${foundDoc.timing || 'غير محدد'}</b><br>• 🏛️ دوام فرع معشي: ${mDays}<br>• 🏛️ دوام فرع الوسام: ${wDays}`;
+                    if(foundDoc.notes) matchedResult += `<br>• ملاحظات: ${foundDoc.notes}`;
                 }
 
-                // 2. البحث في العروض
+                // 2. البحث في الاستفسارات
+                if (!matchedResult) {
+                    let matchedInq = inquiriesData.find(i => {
+                        const normQ = normalizeText(i.question);
+                        const normA = normalizeText(i.answer);
+                        return normQ.includes(query) || query.includes(normQ) || normA.includes(query);
+                    });
+                    if (matchedInq) {
+                        matchedResult = `❓ <b>${matchedInq.question}</b><br>💡 ${matchedInq.answer}`;
+                    }
+                }
+
+                // 3. البحث في العروض
                 if (!matchedResult) {
                     let matchedOffer = offersData.find(o => {
                         const normName = normalizeText(o.name);
@@ -2695,23 +2752,8 @@
                     }
                 }
 
-                // 3. البحث في الأطباء
                 if (!matchedResult) {
-                    let foundDoc = doctorsData.find(d => {
-                        const normName = normalizeText(d.name);
-                        const normSpec = normalizeText(d.specialty);
-                        return query.includes(normName) || normName.includes(query) || query.includes(normSpec);
-                    });
-                    if (foundDoc) {
-                        let mDays = (foundDoc.mashyDays || []).join('، ') || 'لا يوجد';
-                        let wDays = (foundDoc.wissamDays || []).join('، ') || 'لا يوجد';
-                        let status = foundDoc.isLeave ? "🔴 (إجازة)" : "🟢 (مداوم)";
-                        matchedResult = `🩺 <b>${foundDoc.name}</b> (${foundDoc.specialty})<br>• الحالة: ${status}<br>• الكشفية: <b>${foundDoc.fee || 'مجانية'}</b><br>• معشي: ${mDays}<br>• الوسام: ${wDays}`;
-                    }
-                }
-
-                if (!matchedResult) {
-                    msgBox.innerHTML += `<div class="ai-message gemini">❌ عذراً لم أتعرف على هذا المصطلح. اضغط على زر <b>(تعلم)</b> الأخضر فوق في المساعد وعلّمني أن <i>("${rawText}")</i> يتبع أي سؤال، وسأحفظه للأبد!</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">❌ عذراً لم أتعرف على هذا المصطلح. اضغط على زر <b>(تعلم)</b> في الأعلى وعلّمني أن <i>("${rawText}")</i> يتبع أي سؤال، وسأحفظه للأبد!</div>`;
                     msgBox.scrollTop = msgBox.scrollHeight;
                     return;
                 }
