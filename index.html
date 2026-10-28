@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي + مساعد ذكي شامل)</title>
+    <title>لوحة الكول سنتر والمنسقين الشاملة - العيادات (سحابي + مساعد ذكي محدد)</title>
     <!-- خط تجول واستيراد الأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1123,17 +1123,17 @@
         <div style="padding:0.6rem 0.8rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1.1rem;"></i>
-                <h4 style="font-size:0.82rem; color:var(--text-main); font-weight:700;">المساعد الشامل المحلي (Omni AI)</h4>
+                <h4 style="font-size:0.82rem; color:var(--text-main); font-weight:700;">المساعد المباشر والسرع (Omni AI)</h4>
             </div>
             <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingChat()"></i>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">مرحباً يا مصطفى! أنا مساعدك الذكي السريع. اسألني عن أي دكتور، سعر، خدمة (مثل الزراعة)، إجازة، أو تنبيه، وسأرد عليك بإجابة مباشرة ومختصرة فوراً!</div>
+            <div class="ai-message gemini">مرحباً يا مصطفى! أرحب بك. تم تحديثي بالكامل لأجيبك **على قد السؤال المباشر بالضبط** بدون أي إطالة. اسألني عن سعر أي خدمة أو دوام طبيب وسأعطيك إجابته فوراً.</div>
         </div>
 
         <div class="ai-input-box">
-            <input type="text" id="aiUserInput" placeholder="اسأل عن أي طبيب، سعر، موعد..." onkeypress="if(event.key === 'Enter') sendAdvancedLocalAIMessage()">
+            <input type="text" id="aiUserInput" placeholder="اسأل عن سعر الزراعة، موعد طبيب، عرض..." onkeypress="if(event.key === 'Enter') sendAdvancedLocalAIMessage()">
             <button class="btn btn-green" style="padding:0.3rem 0.6rem; font-size:0.75rem; background:#facc15; color:#000;" onclick="sendAdvancedLocalAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -2695,129 +2695,135 @@
         }
 
         // =========================================================================
-        // المحرك المحلي الذكي المختصر والدقيق (Omni-Local AI - Direct & Precise)
-        // يرد على قد السؤال مباشرة وبدون أي "مواضيع تعبير" وبحث شامل لكل شيئ
+        // محرك البحث المحلي الفائق (Ultra-Local Precise AI) - يحل المشكلة جذرياً
         // =========================================================================
+
+        // دالة تنظيف النصوص وحذف الهمزات والتاء المربوطة والتشكيل للربط المرن
+        function normalizeText(str) {
+            if (!str) return "";
+            return str.toLowerCase()
+                .replace(/[\u064B-\u0652]/g, "") // حذف التشكيل
+                .replace(/[أإآآ]/g, "ا")       // توحيد الألفات
+                .replace(/ة/g, "ه")            // تحويل التاء المربوطة لـ هـ
+                .replace(/ى/g, "ي")            // تحويل الياء المقصورة
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
         function sendAdvancedLocalAIMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
-            const text = inputEl.value.trim();
-            if (!text) return;
+            const rawText = inputEl.value.trim();
+            if (!rawText) return;
 
             // 1. عرض سؤال المستخدم
-            msgBox.innerHTML += `<div class="ai-message user">${text}</div>`;
+            msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث المباشر...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             setTimeout(() => {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
 
-                const rawQuery = text.trim();
-                const q = rawQuery.toLowerCase();
-                let answers = [];
+                const normQuery = normalizeText(rawText);
+                
+                // كلمات محددة تدل على البحث عن "سعر" أو "عرض"
+                const isPriceQuery = normQuery.includes("سعر") || normQuery.includes("بكم") || normQuery.includes("كم") || normQuery.includes("تكلفه") || normQuery.includes("عرض") || normQuery.includes("عروض");
 
-                // استخراج الكلمات المفتاحية الذكية بعد تنظيف حروف الزيادة والاستفهام
-                const stopWords = ['عن', 'كام', 'كم', 'متى', 'موعد', 'مواعيد', 'هل', 'في', 'من', 'ما', 'هو', 'هي', 'الساعة', 'ساعة', 'يوم', 'سعر', 'تكلفة', 'خدمة', 'جهاز', 'دكتور', 'دكتوره', 'الدكتور', 'الدكتوره', 'طبيب', 'اريد', 'ابحث', 'فين', 'ايه', 'هو', 'لو سمحت', 'اي'];
-                const keywords = q.split(/\s+/).filter(w => w.length >= 2 && !stopWords.includes(w));
+                // كلمات تنظيف للحصول على كلمة الموضوع الرئيسية (مثل: الزراعة، التقويم، دكتور احمد)
+                const filterWords = ["سعر", "بكم", "كم", "تكلفه", "عرض", "عروض", "متي", "دوام", "في", "من", "عن", "علي", "هو", "هي", "هل", "بتاع", "بتاعه", "عندكم", "موجود", "الخاص", "بقسم"];
+                
+                let searchWords = normQuery.split(" ").filter(w => w.length >= 2 && !filterWords.includes(w));
+                if (searchWords.length === 0) searchWords = normQuery.split(" ");
 
-                // أ. التعلم الفوري وحفظ الذاكرة
-                if (q.startsWith("احفظ") || q.startsWith("سجل") || q.includes("تذكر ان") || q.includes("افتكر") || q.includes("علمني")) {
-                    const cleanNote = rawQuery.replace(/^(احفظ|سجل|تذكر ان|افتكر|علمني)\s*/i, '');
+                let matchedResult = null;
+
+                // ---------------------------------------------------------------------
+                // أ. إذا كان السؤال عن سعر أو عرض (الأولوية القصوى لجدول العروض والأسعار)
+                // ---------------------------------------------------------------------
+                if (isPriceQuery || searchWords.some(w => w.includes("زراع") || w.includes("تقويم") || w.includes("تركيب") || w.includes("تبييض") || w.includes("خلع") || w.includes("ليزر"))) {
+                    let matchedOffer = offersData.find(o => {
+                        const normName = normalizeText(o.name);
+                        const normCat = normalizeText(o.category);
+                        return searchWords.some(w => normName.includes(w) || normCat.includes(w));
+                    });
+
+                    if (matchedOffer) {
+                        matchedResult = `🏷️ <b>${matchedOffer.name}</b> (${matchedOffer.category})<br>💰 السعر: <span style="color:#4ade80; font-weight:bold; font-size:0.95rem;">${matchedOffer.price}</span>${matchedOffer.notes ? '<br>📌 ملاحظة: ' + matchedOffer.notes : ''}`;
+                    }
+                }
+
+                // ---------------------------------------------------------------------
+                // ب. إذا لم نجد في العروض، نبحث في قائمة الأطباء
+                // ---------------------------------------------------------------------
+                if (!matchedResult) {
+                    let matchedDoc = doctorsData.find(d => {
+                        const normName = normalizeText(d.name);
+                        const normSpec = normalizeText(d.specialty);
+                        return searchWords.some(w => normName.includes(w) || (w.length >= 3 && normSpec.includes(w)));
+                    });
+
+                    if (matchedDoc) {
+                        const mDays = (matchedDoc.mashyDays || []).join('، ') || 'لا يوجد';
+                        const wDays = (matchedDoc.wissamDays || []).join('، ') || 'لا يوجد';
+                        const status = matchedDoc.isLeave ? "🔴 (الطبيب في إجازة)" : "🟢 (مداوم)";
+                        const colorName = getColorNameByHex(matchedDoc.customColor);
+
+                        matchedResult = `🩺 <b>${matchedDoc.name}</b> (${matchedDoc.specialty})<br>• الحالة: ${status} | الكشفية: <b>${matchedDoc.fee || 'مجانية'}</b><br>• لون الجدول: ${colorName}<br>• معشي: ${mDays}<br>• الوسام: ${wDays}${matchedDoc.notes ? '<br>• ملاحظة: ' + matchedDoc.notes : ''}`;
+                    }
+                }
+
+                // ---------------------------------------------------------------------
+                // ج. البحث في الأقسام والخدمات بالأجهزة
+                // ---------------------------------------------------------------------
+                if (!matchedResult) {
+                    let matchedDept = deptServicesData.find(s => {
+                        const normDerm = normalizeText(s.derm);
+                        const normDent = normalizeText(s.dent);
+                        return searchWords.some(w => normDerm.includes(w) || normDent.includes(w));
+                    });
+
+                    if (matchedDept) {
+                        matchedResult = `🏥 فرع <b>${matchedDept.branch}</b>:<br>• خدمة/جهاز الجلدية: ${matchedDept.derm || '-'}<br>• خدمة/جهاز الأسنان: ${matchedDept.dent || '-'}`;
+                    }
+                }
+
+                // ---------------------------------------------------------------------
+                // د. البحث في دليل الاستفسارات والأسئلة الشائعة
+                // ---------------------------------------------------------------------
+                if (!matchedResult) {
+                    let matchedInq = inquiriesData.find(i => {
+                        const normQ = normalizeText(i.question);
+                        return searchWords.some(w => normQ.includes(w));
+                    });
+
+                    if (matchedInq) {
+                        matchedResult = `❓ <b>${matchedInq.question}</b><br>💡 ${matchedInq.answer}`;
+                    }
+                }
+
+                // ---------------------------------------------------------------------
+                // هـ. التعلم الفوري من الذاكرة المحفوظة
+                // ---------------------------------------------------------------------
+                if (!matchedResult && (normQuery.startsWith("احفظ") || normQuery.startsWith("سجل") || normQuery.includes("علمني"))) {
+                    const cleanNote = rawText.replace(/^(احفظ|سجل|تذكر ان|افتكر|علمني)\s*/i, '');
                     localAiMemory.push({ text: cleanNote, date: new Date().toLocaleTimeString('ar-EG') });
                     localStorage.setItem('custom_local_ai_memory', JSON.stringify(localAiMemory));
-                    msgBox.innerHTML += `<div class="ai-message gemini">✅ تم الحفظ بنجاح: "${cleanNote}"</div>`;
-                    msgBox.scrollTop = msgBox.scrollHeight;
-                    return;
+                    matchedResult = `✅ تم الحفظ بنجاح: "${cleanNote}"`;
                 }
 
-                // ب. البحث في الأطباء (مباشر ومختصر)
-                let matchedDocs = doctorsData.filter(d => {
-                    const docName = d.name.toLowerCase();
-                    const spec = (d.specialty || "").toLowerCase();
-                    return q.includes(docName) || keywords.some(k => docName.includes(k) || spec.includes(k));
-                });
-
-                if (matchedDocs.length > 0) {
-                    matchedDocs.forEach(doc => {
-                        const mDays = (doc.mashyDays || []).join('، ') || 'لا يوجد';
-                        const wDays = (doc.wissamDays || []).join('، ') || 'لا يوجد';
-                        const status = doc.isLeave ? "🔴 إجازة" : "🟢 مداوم";
-                        const colorName = getColorNameByHex(doc.customColor);
-                        
-                        // فحص التنبيهات المرتبطة بالطبيب
-                        const docAlerts = alertsData.filter(a => a.content.toLowerCase().includes(doc.name.toLowerCase()));
-                        let alertStr = docAlerts.length ? `<br>🚨 تنبيه: ${docAlerts[0].content}` : '';
-
-                        answers.push(`🩺 <b>${doc.name}</b> (${doc.specialty})<br>• الحالة: ${status} | الكشفية: ${doc.fee || 'مجانية'}<br>• لون الجدول: ${colorName}<br>• معشي: ${mDays}<br>• الوسام: ${wDays}${doc.notes ? '<br>• ملاحظة: ' + doc.notes : ''}${alertStr}`);
-                    });
-                }
-
-                // ج. البحث الشامل في العروض والأسعار (مع دعم الجذور مثل زراعة/زرعة، تقويم، تنظيف)
-                let matchedOffers = offersData.filter(o => {
-                    const name = o.name.toLowerCase();
-                    const cat = (o.category || "").toLowerCase();
-                    return q.includes(name) || keywords.some(k => name.includes(k) || cat.includes(k) || (k.length >= 3 && name.includes(k)));
-                });
-
-                if (matchedOffers.length > 0) {
-                    matchedOffers.forEach(o => {
-                        answers.push(`🏷️ <b>${o.name}</b> (${o.category})<br>💰 السعر: <span style="color:#4ade80; font-weight:bold;">${o.price}</span>${o.notes ? '<br>📌 ملاحظة: ' + o.notes : ''}`);
-                    });
-                }
-
-                // د. البحث في الأقسام والخدمات والأجهزة
-                let matchedDepts = deptServicesData.filter(s => {
-                    const derm = (s.derm || "").toLowerCase();
-                    const dent = (s.dent || "").toLowerCase();
-                    return keywords.some(k => derm.includes(k) || dent.includes(k));
-                });
-
-                if (matchedDepts.length > 0) {
-                    matchedDepts.forEach(s => {
-                        answers.push(`🏥 فرع <b>${s.branch}</b>:<br>• جلدية: ${s.derm || '-'}<br>• أسنان: ${s.dent || '-'}`);
-                    });
-                }
-
-                // هـ. البحث في الاستفسارات والأسئلة الشائعة
-                let matchedInqs = inquiriesData.filter(i => {
-                    const qText = i.question.toLowerCase();
-                    const aText = i.answer.toLowerCase();
-                    return keywords.some(k => qText.includes(k) || aText.includes(k));
-                });
-
-                if (matchedInqs.length > 0) {
-                    matchedInqs.forEach(i => {
-                        answers.push(`❓ <b>${i.question}</b><br>💡 ${i.answer}`);
-                    });
-                }
-
-                // و. البحث في الذاكرة الدائمة المحفوظة
-                let memMatches = localAiMemory.filter(m => keywords.some(k => m.text.toLowerCase().includes(k)));
-                if (memMatches.length > 0) {
-                    memMatches.forEach(m => {
-                        answers.push(`🧠 من الذاكرة المحفوظة: "${m.text}"`);
-                    });
-                }
-
-                // الرد النهائي المباشر والمختصر (أول نتيجة مطابقة فقط لعدم التشتت)
-                let finalReply = "";
-                if (answers.length > 0) {
-                    finalReply = answers[0];
-                    if (answers.length > 1) {
-                        finalReply += `<br><br><small style="color:var(--text-muted);">+ يوجد ${answers.length - 1} نتائج أخرى مطابقة.</small>`;
-                    }
-                } else {
-                    finalReply = `❌ لم أجد إجابة مطابقة. يمكنك تعليمي فوراً بكتابة:<br><code>احفظ أن [الخدمة أو السؤال] هو [الإجابة أو السعر]</code>`;
-                }
+                // ---------------------------------------------------------------------
+                // و. إخراج الرد السريع والمباشر المخصص للسؤال فقط
+                // ---------------------------------------------------------------------
+                let finalReply = matchedResult || `❌ لم أجد نتيجة مطابقة لسؤالك حالياً.<br>تأكد من كتابة اسم الخدمة (مثال: "سعر الزراعة" أو "عرض الأسنان") أو يمكنك إضافتها في قسم العروض والأسعار.`;
 
                 msgBox.innerHTML += `<div class="ai-message gemini">${finalReply}</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
-            }, 150);
+            }, 100);
         }
 
         function handleTrueGlobalSearch(query) {
