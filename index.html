@@ -420,17 +420,34 @@
         }
 
         .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; table-layout: auto !important; }
-        th, td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.4; vertical-align: top; }
+        
+        /* تفعيل التداخل الحر المطلق للخطوط والنصوص وتداخل الخلايا */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.7rem; 
+            table-layout: auto !important; 
+            word-break: break-word;
+            white-space: normal !important;
+        }
+        th, td { 
+            padding: 0.4rem 0.3rem; 
+            border-bottom: 1px solid var(--border-color); 
+            text-align: right; 
+            line-height: 1.3; 
+            vertical-align: top; 
+            white-space: normal !important;
+            word-wrap: break-word;
+        }
         th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 600; font-size: 0.72rem; }
 
-        /* تفعيل وضع التعديل الحر للأعمدة والصفوف بدون أي قيود نهائياً */
+        /* وضع التعديل الحر للأعمدة */
         table.resizable-mode th, table.resizable-mode td {
             resize: both !important;
             overflow: auto !important;
             border-left: 1px dashed var(--primary-color);
-            min-width: 30px !important;
-            min-height: 20px !important;
+            min-width: 25px !important;
+            min-height: 15px !important;
         }
 
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
@@ -763,7 +780,6 @@
                         <i class="fa-solid fa-filter"></i>
                         <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
                     </div>
-                    <!-- زرار وضع التعديل اليدوي للأعمدة بحرية تامة -->
                     <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة
                     </button>
@@ -962,7 +978,7 @@
         </div>
     </main>
 
-    <!-- زر المساعد الذكي عبر OpenRouter -->
+    <!-- زر المساعد الذكي -->
     <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي">
         <i class="fa-solid fa-robot"></i>
     </div>
@@ -981,7 +997,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! تم تحديث الموديل إلى DeepSeek المجاني والمساعد شغال تماماً وبسرعة فائقة. اسألني أي سؤال!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد شغال بأعلى ذكاء وموديل Flint المجاني. اسألني أي سؤال!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1756,12 +1772,12 @@
 
                 mashyBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
-                        <td><strong>${doc.name}</strong> (${doc.nationality || ''}) ${pinnedBadge} ${jointBadge} ${leaveBadge}</td>
-                        <td>${doc.specialty}</td>
-                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                        <td>${scheduleHtml}</td>
-                        <td style="color:#fde047; font-size:0.68rem; font-weight:600; white-space:pre-wrap;">${doc.notes || '-'}${tagsHtml}</td>
-                        <td>
+                        <td style="white-space:normal; word-break:break-word;"><strong>${doc.name}</strong> (${doc.nationality || ''}) ${pinnedBadge} ${jointBadge} ${leaveBadge}</td>
+                        <td style="white-space:normal; word-break:break-word;">${doc.specialty}</td>
+                        <td style="white-space:normal;"><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                        <td style="white-space:normal; word-break:break-word;">${scheduleHtml}</td>
+                        <td style="color:#fde047; font-size:0.68rem; font-weight:600; white-space:normal; word-break:break-word;">${doc.notes || '-'}${tagsHtml}</td>
+                        <td style="white-space:nowrap;">
                             <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
                             <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
@@ -1789,12 +1805,12 @@
 
                 wissamBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
-                        <td><strong>${doc.name}</strong> (${doc.nationality || ''}) ${pinnedBadge} ${jointBadge} ${leaveBadge}</td>
-                        <td>${doc.specialty}</td>
-                        <td><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
-                        <td>${scheduleHtml}</td>
-                        <td style="color:#fde047; font-size:0.68rem; font-weight:600; white-space:pre-wrap;">${doc.notes || '-'}${tagsHtml}</td>
-                        <td>
+                        <td style="white-space:normal; word-break:break-word;"><strong>${doc.name}</strong> (${doc.nationality || ''}) ${pinnedBadge} ${jointBadge} ${leaveBadge}</td>
+                        <td style="white-space:normal; word-break:break-word;">${doc.specialty}</td>
+                        <td style="white-space:normal;"><span style="color:var(--primary-color); font-weight:bold;">${doc.fee || 'مجانية'}</span></td>
+                        <td style="white-space:normal; word-break:break-word;">${scheduleHtml}</td>
+                        <td style="color:#fde047; font-size:0.68rem; font-weight:600; white-space:normal; word-break:break-word;">${doc.notes || '-'}${tagsHtml}</td>
+                        <td style="white-space:nowrap;">
                             <button class="btn btn-green" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button>
                             <button class="btn btn-secondary" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.06rem 0.18rem; font-size:0.58rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button>
@@ -2096,9 +2112,9 @@
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const rowHtml = `
                     <tr id="dept_row_${item.id}">
-                        <td ${cellStyle} style="border-left:1px solid var(--border-color);">${item.derm || '-'} ${jointBadge}</td>
-                        <td ${cellStyle}>${item.dent || '-'}</td>
-                        <td style="text-align:center;">
+                        <td ${cellStyle} style="border-left:1px solid var(--border-color); white-space:normal; word-break:break-word;">${item.derm || '-'} ${jointBadge}</td>
+                        <td ${cellStyle} style="white-space:normal; word-break:break-word;">${item.dent || '-'}</td>
+                        <td style="text-align:center; white-space:nowrap;">
                             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -2432,13 +2448,13 @@
                 bodyHtml += `
                     <tr id="offer_row_${item.id}">
                         <td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td>
-                        <td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td>
-                        <td>${devicesDisplay}</td>
-                        <td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td>
-                        <td style="text-align:center;">
+                        <td style="white-space:normal; word-break:break-word;">${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td>
+                        <td style="white-space:normal; word-break:break-word;">${devicesDisplay}</td>
+                        <td style="white-space:normal;">${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td>
+                        <td style="text-align:center; white-space:nowrap;">
                             <button class="btn btn-green" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copySingleOffer(${item.id})"><i class="fa-solid fa-copy"></i> نسخ</button>
                         </td>
-                        <td style="text-align:center;">
+                        <td style="text-align:center; white-space:nowrap;">
                             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -2690,16 +2706,17 @@
                         'HTTP-Referer': window.location.origin,
                         'X-Title': 'Clinic CallCenter Agent'
                     },
-                   body: JSON.stringify({
-    "model": "recursive/flint-v1.0:free",
-    "reasoning": {
-        "enabled": true
-    },
-    "messages": [
-        { "role": "system", "content": systemPrompt },
-        ...aiChatHistory
-    ]
-})
+                    body: JSON.stringify({
+                        "model": "recursive/flint-v1.0:free",
+                        "reasoning": {
+                            "enabled": true
+                        },
+                        "messages": [
+                            { "role": "system", "content": systemPrompt },
+                            ...aiChatHistory
+                        ]
+                    })
+                });
 
                 const data = await response.json();
                 const loader = document.getElementById(loadingId);
@@ -2725,7 +2742,7 @@
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
-                if (loader) loader.remove();
+                if, (loader) loader.remove();
                 msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالإنترنت.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
@@ -2766,7 +2783,7 @@
         }
 
         function clearGlobalSearch() {
-            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchInput').value = "",
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
