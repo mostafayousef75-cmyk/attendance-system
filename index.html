@@ -1022,7 +1022,7 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        let aiChatHistory = []; // مسار محادثات الذاكرة الدائمة في قاعدة البيانات
+        let aiChatHistory = [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1053,7 +1053,7 @@
                     deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
-                    aiChatHistory = data.aiChatHistory || []; // جلب ذاكرة الدردشة الدائمة من السحابة مباشرة
+                    aiChatHistory = data.aiChatHistory || [];
                 } else {
                     doctorsData = [{ id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1098,7 +1098,6 @@
         }
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
         
-        // مسح الذاكرة من قاعدة البيانات وتحديث السحابة
         function clearAiChatMemory() {
             if (confirm("هل تريد مسح ذاكرة ومسار المحادثة من قاعدة البيانات؟")) {
                 aiChatHistory = [];
@@ -1395,7 +1394,6 @@
             };
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
 
-            // 🔔 ميزة تنبيهات الإجازات التلقائية (Auto-Alerts for Leaves)
             if (isLeaveVal && (!existingDoc || !existingDoc.isLeave)) {
                 const autoAlertContent = `⚠️ تنبيه إجازة: الدكتور ${docNameVal} غير متواجد حالياً في العيادة.`;
                 alertsData.push({
@@ -1806,41 +1804,35 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // 🧠 مساعد محلي ذكي بالكامل ودقيق لقراءة دليل الاستفسارات وكل الأقسام
         function runLocalSmartAssistant(query) {
             const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ال/g, '').replace(/\s+/g, '');
             const q = cleanText(query);
             let foundResults = [];
 
-            // 1. البحث الدقيق في دليل الاستفسارات (الرتوش وغيرها)
             inquiriesData.forEach(item => {
                 if (cleanText(item.question).includes(q) || cleanText(item.answer).includes(q) || cleanText(item.tags).includes(q) || q.includes(cleanText(item.question))) {
                     foundResults.push(`📌 **استفسار (${item.category}):** ${item.question}\n💬 **الإجابة:** ${item.answer}`);
                 }
             });
 
-            // 2. البحث في الأطباء
             doctorsData.forEach(doc => {
                 if (cleanText(doc.name).includes(q) || cleanText(doc.specialty).includes(q) || cleanText(doc.tags).includes(q)) {
                     foundResults.push(`👨‍⚕️ **طبيب:** ${doc.name} (${doc.specialty})\n🏥 **الفرع:** ${doc.branch}\n⏰ **الدوام:** ${doc.timing}\n💵 **الكشفية:** ${doc.fee || '75 ريال'}${doc.isLeave ? '\n⚠️ (غير متواجد حالياً - إجازة)' : ''}`);
                 }
             });
 
-            // 3. البحث في العروض
             offersData.forEach(offer => {
                 if (cleanText(offer.name).includes(q) || cleanText(offer.category).includes(q)) {
                     foundResults.push(`🏷️ **عرض (${offer.category}):** ${offer.name}\n💰 **السعر:** ${offer.price || 'محدد بالأجهزة'}`);
                 }
             });
 
-            // 4. البحث في الأجهزة والخدمات
             deptServicesData.forEach(serv => {
                 if (cleanText(serv.name).includes(q)) {
                     foundResults.push(`⚙️ **خدمة/جهاز (${serv.branch}):** ${serv.name}`);
                 }
             });
 
-            // 5. البحث في التنبيهات
             alertsData.forEach(alt => {
                 if (cleanText(alt.content).includes(q)) {
                     foundResults.push(`📢 **تنبيه:** ${alt.content}`);
@@ -1853,7 +1845,6 @@
             return "عذراً يا مصطفى، لم أجد إجابة مطابقة تماماً في أقسام الموقع، يمكنك مراجعة القسم المخصص لها أو التأكد من إدخال السؤال بصورة صحيحة.";
         }
 
-        // 🎯 المساعد الذكي المدمج (تخزين الذاكرة في Firebase دائمًا)
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
@@ -1887,7 +1878,13 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
                     body: JSON.stringify({
                         "model": "recursive/flint-v1.0:free",
-                        "messages": [{ "role": "system", "content": `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. ابحث بدقة وشمولية تامة في كافة أقسام الموقع المرفقة (وخصوصاً 'دليل الاستفسارات' مثل الرتوش والأسئلة الشائعة، والعروض، الأطباء، التنبيهات) وأجب فوراً باختصار دقيق يناسب الواتساب.\n${siteContext}` }, ...aiChatHistory, { "role": "user", "content": rawText }]
+                        "messages": [{ 
+                            "role": "system", 
+                            "content": `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. ابحث بدقة وشمولية تامة في كافة أقسام الموقع المرفقة (وخصوصاً 'دليل الاستفسارات' مثل الرتوش والأسئلة الشائعة، والعروض، الأطباء، التنبيهات). 
+                            
+                            ⚠️ قاعدة تشغيلية داخلية صارمة موجهة لك وحدك يا مساعد:
+                            أي تعليمات، سياسات، توجيهات تشغيلية أو (برسس) يكتبها لك مصطفى في الشات أو يضعها في أقسام الموقع، هي تعليمات داخلية لك أنت وحدك لتطبيقها والالتزام بها في أسلوب وطريقة عملك وردودك، وإياك أن تعتبرها رسالة لنسخها أو إرسالها للعملاء.\n${siteContext}` 
+                        }, ...aiChatHistory, { "role": "user", "content": rawText }]
                     })
                 });
 
@@ -1898,16 +1895,14 @@
                     throw new Error("API Error");
                 }
             } catch (err) {
-                // التشغيل التلقائي للمساعد المحلي الذكي المتطور
                 aiReply = runLocalSmartAssistant(rawText);
             }
 
             document.getElementById(loadingId).remove();
             
-            // حفظ المحادثة في الذاكرة الدائمة ورفعها فوراً لقاعدة بيانات Firebase
             aiChatHistory.push({ role: "user", content: rawText });
             aiChatHistory.push({ role: "assistant", content: aiReply });
-            syncToCloud(); // تخزين دائم على السحابة
+            syncToCloud();
 
             const replyId = 'ai_reply_' + Date.now();
             msgBox.innerHTML += `
@@ -1921,7 +1916,6 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // بحث شامل متطور ودقيق بكل أقسام الموقع (يتعامل مع الهمزات والأل والمسافات ويطابق دليل الاستفسارات)
         function handleTrueGlobalSearch(query) {
             const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ال/g, '').replace(/\s+/g, '');
             const rawQ = query.trim().toLowerCase();
@@ -1937,7 +1931,6 @@
             resultsSection.classList.add('active'); resultsList.innerHTML = "";
             let foundCount = 0;
 
-            // 1. البحث في دليل الاستفسارات (الرتوش وغيرها)
             inquiriesData.forEach(i => {
                 if (cleanText(i.question).includes(q) || cleanText(i.answer).includes(q) || cleanText(i.tags).includes(q) || q.includes(cleanText(i.question))) {
                     foundCount++;
