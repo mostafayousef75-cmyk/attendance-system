@@ -1774,7 +1774,7 @@
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
 
-            msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
+            msgBox.innerHTML += <div class="ai-message user">${rawText}</div>;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
@@ -1790,7 +1790,7 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً وتنفيذه في قاعدة البيانات...</div>`;
+            msgBox.innerHTML += <div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً...</div>;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
@@ -1798,17 +1798,27 @@
 
             try {
                 if (!apiKey) throw new Error("No API Key");
+                
                 const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': Bearer ${apiKey.trim()},
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'Clinic CallCenter Agent'
+                    },
                     body: JSON.stringify({
                         "model": "recursive/flint-v1.0:free",
-                        "messages": [{ 
-                            "role": "system", 
-                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة، وفهم الأوامر البشرية (إضافة، تعديل، حذف بيانات في الموقع مثل العروض، الاستفسارات، الأطباء، التنبيهات).
-                            
-                            إذا طلب المستخدم إضافة أو تعديل أو حذف أي شيء، قم بإرجاع رد يتضمن نص الإجابة للعميل (أو تأكيد التنفيذ)، وإذا استدعى الامر تعديل البيانات، يمكنك صياغة الأوامر. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
-                        }, { "role": "user", "content": rawText }]
+                        "messages": [
+                            { 
+                                "role": "system", 
+                                "content": أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الإجابة بدقة على الاستفسارات وتسهيل مهام الكول سنتر بناءً على قاعدة البيانات التالية:\n${siteContext} 
+                            },
+                            { 
+                                "role": "user", 
+                                "content": rawText 
+                            }
+                        ]
                     })
                 });
 
@@ -1819,7 +1829,7 @@
                     throw new Error("API Error");
                 }
             } catch (err) {
-                aiReply = "عذراً يا مصطفى، تأكد من إدخال مفتاح OpenRouter API الصحيح من أيقونة المفتاح بالأعلى لتفعيل المساعد السحابي.";
+                aiReply = "عذراً يا مصطفى، حدث خطأ في الاتصال أو أن مفتاح OpenRouter API غير مسجل. اضغط على أيقونة المفتاح بالأعلى وتأكد من إدخاله.";
             }
 
             document.getElementById(loadingId).remove();
