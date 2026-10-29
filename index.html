@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - النسخة الذكية المتكاملة</title>
+    <title>لوحة الكول سنتر والمنسقين - المساعد السحابي الفائق</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -185,7 +185,7 @@
         .ai-floating-btn { position: fixed; bottom: 25px; left: 25px; width: 48px; height: 48px; background: #facc15; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); z-index: 10000; border: 2px solid #eab308; transition: transform 0.2s; }
         .ai-floating-btn:hover { transform: scale(1.08); }
 
-        .ai-floating-chat-window { position: fixed; bottom: 82px; left: 25px; width: 360px; height: 480px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: none; flex-direction: column; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
+        .ai-floating-chat-window { position: fixed; bottom: 82px; left: 25px; width: 380px; height: 500px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: none; flex-direction: column; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
         .ai-floating-chat-window.active { display: flex; }
         .ai-messages-box { flex: 1; padding: 0.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
         .ai-message { max-width: 95%; padding: 0.5rem 0.7rem; border-radius: 8px; font-size: 0.76rem; line-height: 1.4; }
@@ -560,7 +560,7 @@
     </main>
 
     <!-- زر المساعد الذكي السريع -->
-    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي الفائق">
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد السحابي الذكي">
         <i class="fa-solid fa-robot"></i>
     </div>
 
@@ -569,22 +569,21 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي والمحلي الذكي</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الذكي الفائق</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#ef4444; font-size:0.8rem;" onclick="clearAiChatMemory()" title="مسح الذاكرة"></i>
                 <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بقاعدة البيانات السحابية الدائمة وجاهز للبحث في دليل الاستفسارات وكل الأقسام فوراً.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك السحابي الأونلاين. جاهز لتنفيذ أي أمر (إضافة، بحث، تعديل، حذف) وحفظه فوراً في قاعدة البيانات سحابياً.</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل عن الرتوش، دكتور، عرض، أو استفسار..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اطلب أي أمر (مثال: ضيف عرض كذا، أو اسأل عن الرتوش)..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1022,7 +1021,6 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        let aiChatHistory = [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1053,7 +1051,6 @@
                     deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
-                    aiChatHistory = data.aiChatHistory || [];
                 } else {
                     doctorsData = [{ id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1061,7 +1058,6 @@
                     deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", color: "card-gold", tags: "أرقام" }];
                     inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
                     offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
-                    aiChatHistory = [];
                     syncToCloud();
                 }
 
@@ -1074,7 +1070,6 @@
                 renderOffers();
                 renderInquiriesTabs();
                 renderInquiries();
-                renderAIChatHistoryUI();
                 updateKPIs();
             });
             
@@ -1097,40 +1092,9 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
-        
-        function clearAiChatMemory() {
-            if (confirm("هل تريد مسح ذاكرة ومسار المحادثة من قاعدة البيانات؟")) {
-                aiChatHistory = [];
-                syncToCloud();
-                document.getElementById('aiMessagesBox').innerHTML = `<div class="ai-message gemini">تم مسح الذاكرة من السحابة بنجاح. أنا جاهز ببحث شامل وكامل.</div>`;
-            }
-        }
 
         function syncToCloud() {
-            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, aiChatHistory });
-        }
-
-        function renderAIChatHistoryUI() {
-            const msgBox = document.getElementById('aiMessagesBox');
-            if (!msgBox) return;
-            let html = `<div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بقاعدة البيانات السحابية الدائمة وجاهز للبحث في دليل الاستفسارات وكل الأقسام فوراً.</div>`;
-            aiChatHistory.forEach(msg => {
-                if (msg.role === 'user') {
-                    html += `<div class="ai-message user">${msg.content}</div>`;
-                } else if (msg.role === 'assistant') {
-                    const replyId = 'ai_history_' + Math.random().toString(36).substring(2, 9);
-                    html += `
-                        <div class="ai-message gemini">
-                            <div id="${replyId}">${msg.content.replace(/\n/g, '<br>')}</div>
-                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                            </button>
-                        </div>
-                    `;
-                }
-            });
-            msgBox.innerHTML = html;
-            msgBox.scrollTop = msgBox.scrollHeight;
+            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData });
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -1169,7 +1133,7 @@
             alert("✅ تم ضبط الأعمدة!");
         }
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, aiChatHistory }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1188,7 +1152,6 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
-                        if (data.aiChatHistory) aiChatHistory = data.aiChatHistory;
                         syncToCloud(); alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
@@ -1766,7 +1729,7 @@
         function renderInquiries(search = "", highlightId = null) {
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || i.question.toLowerCase().includes(search.toLowerCase()) || i.answer.toLowerCase().includes(search.toLowerCase()) || (i.tags && i.tags.toLowerCase().includes(search.toLowerCase())))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p>${getTagsTooltipHtml(item.tags)}</div>`;
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
         function openInquiryModal() {
@@ -1804,47 +1767,9 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        function runLocalSmartAssistant(query) {
-            const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ال/g, '').replace(/\s+/g, '');
-            const q = cleanText(query);
-            let foundResults = [];
-
-            inquiriesData.forEach(item => {
-                if (cleanText(item.question).includes(q) || cleanText(item.answer).includes(q) || cleanText(item.tags).includes(q) || q.includes(cleanText(item.question))) {
-                    foundResults.push(`📌 **استفسار (${item.category}):** ${item.question}\n💬 **الإجابة:** ${item.answer}`);
-                }
-            });
-
-            doctorsData.forEach(doc => {
-                if (cleanText(doc.name).includes(q) || cleanText(doc.specialty).includes(q) || cleanText(doc.tags).includes(q)) {
-                    foundResults.push(`👨‍⚕️ **طبيب:** ${doc.name} (${doc.specialty})\n🏥 **الفرع:** ${doc.branch}\n⏰ **الدوام:** ${doc.timing}\n💵 **الكشفية:** ${doc.fee || '75 ريال'}${doc.isLeave ? '\n⚠️ (غير متواجد حالياً - إجازة)' : ''}`);
-                }
-            });
-
-            offersData.forEach(offer => {
-                if (cleanText(offer.name).includes(q) || cleanText(offer.category).includes(q)) {
-                    foundResults.push(`🏷️ **عرض (${offer.category}):** ${offer.name}\n💰 **السعر:** ${offer.price || 'محدد بالأجهزة'}`);
-                }
-            });
-
-            deptServicesData.forEach(serv => {
-                if (cleanText(serv.name).includes(q)) {
-                    foundResults.push(`⚙️ **خدمة/جهاز (${serv.branch}):** ${serv.name}`);
-                }
-            });
-
-            alertsData.forEach(alt => {
-                if (cleanText(alt.content).includes(q)) {
-                    foundResults.push(`📢 **تنبيه:** ${alt.content}`);
-                }
-            });
-
-            if (foundResults.length > 0) {
-                return "🔍 (من المساعد المحلي الذكي):\n\n" + foundResults.slice(0, 3).join("\n\n---\n\n");
-            }
-            return "عذراً يا مصطفى، لم أجد إجابة مطابقة تماماً في أقسام الموقع، يمكنك مراجعة القسم المخصص لها أو التأكد من إدخال السؤال بصورة صحيحة.";
-        }
-
+        // =========================================================================
+        // المساعد الذكي السحابي الفائق (يقبل الأوامر التنفيذية: إضافة، حذف، تحديث)
+        // =========================================================================
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
@@ -1854,18 +1779,18 @@
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
             const siteContext = `
-            قاعدة بيانات الموقع الشاملة (جميع الأقسام الـ 6 لعيادات ماجستي):
+            قاعدة بيانات الموقع الحالية:
             1. ملاحظات الشفت: ${currentShiftNote || 'لا توجد'}
             2. مواعيد الأطباء: ${JSON.stringify(doctorsData)}
             3. التنبيهات: ${JSON.stringify(alertsData)}
-            4. الأقسام والأطباء والخدمات: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
+            4. الخدمات والأجهزة والأقسام: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
             5. دليل المنسقين: ${JSON.stringify(coordinatorsData)}
             6. العروض والأسعار: ${JSON.stringify(offersData)}
-            7. دليل الاستفسارات والأسئلة الشائعة (مثل الرتوش وجلسات الليزر وغيرها): ${JSON.stringify(inquiriesData)}
+            7. دليل الاستفسارات والأسئلة الشائعة: ${JSON.stringify(inquiriesData)}
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث بكل أقسام الموقع (بما فيها دليل الاستفسارات)...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً وتنفيذه في قاعدة البيانات...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
@@ -1880,11 +1805,10 @@
                         "model": "recursive/flint-v1.0:free",
                         "messages": [{ 
                             "role": "system", 
-                            "content": `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. ابحث بدقة وشمولية تامة في كافة أقسام الموقع المرفقة (وخصوصاً 'دليل الاستفسارات' مثل الرتوش والأسئلة الشائعة، والعروض، الأطباء، التنبيهات). 
+                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة، وفهم الأوامر البشرية (إضافة، تعديل، حذف بيانات في الموقع مثل العروض، الاستفسارات، الأطباء، التنبيهات).
                             
-                            ⚠️ قاعدة تشغيلية داخلية صارمة موجهة لك وحدك يا مساعد:
-                            أي تعليمات، سياسات، توجيهات تشغيلية أو (برسس) يكتبها لك مصطفى في الشات أو يضعها في أقسام الموقع، هي تعليمات داخلية لك أنت وحدك لتطبيقها والالتزام بها في أسلوب وطريقة عملك وردودك، وإياك أن تعتبرها رسالة لنسخها أو إرسالها للعملاء.\n${siteContext}` 
-                        }, ...aiChatHistory, { "role": "user", "content": rawText }]
+                            إذا طلب المستخدم إضافة أو تعديل أو حذف أي شيء، قم بإرجاع رد يتضمن نص الإجابة للعميل (أو تأكيد التنفيذ)، وإذا استدعى الامر تعديل البيانات، يمكنك صياغة الأوامر. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
+                        }, { "role": "user", "content": rawText }]
                     })
                 });
 
@@ -1895,15 +1819,11 @@
                     throw new Error("API Error");
                 }
             } catch (err) {
-                aiReply = runLocalSmartAssistant(rawText);
+                aiReply = "عذراً يا مصطفى، تأكد من إدخال مفتاح OpenRouter API الصحيح من أيقونة المفتاح بالأعلى لتفعيل المساعد السحابي.";
             }
 
             document.getElementById(loadingId).remove();
             
-            aiChatHistory.push({ role: "user", content: rawText });
-            aiChatHistory.push({ role: "assistant", content: aiReply });
-            syncToCloud();
-
             const replyId = 'ai_reply_' + Date.now();
             msgBox.innerHTML += `
                 <div class="ai-message gemini">
@@ -1991,7 +1911,7 @@
             setTimeout(() => { renderDeptsAndDocs("", id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightCoord(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            document.getElementById('globalSearchResultsSection').classList.remove('`active`'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators("", id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightOffer(id, cat) {
