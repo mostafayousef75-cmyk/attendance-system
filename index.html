@@ -578,12 +578,12 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك السحابي الأونلاين. جاهز لتنفيذ أي أمر (إضافة، بحث، تعديل، حذف) وحفظه فوراً في قاعدة البيانات سحابياً.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك السحابي الأونلاين. جاهز للإجابة بدقة فورية وسرعة فائقة من قاعدة بيانات الموقع.</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اطلب أي أمر (مثال: ضيف عرض كذا، أو اسأل عن الرتوش)..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اسأل عن أي طبيب، عرض، أو استفسار..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1768,13 +1768,13 @@
         }
 
         // =========================================================================
-        // المساعد الذكي السحابي الفائق (يقبل الأوامر التنفيذية: إضافة، حذف، تحديث)
+        // المساعد الذكي السحابي الفائق (معالجة صحيحة وسريعة بدون أخطاء)
         // =========================================================================
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
 
-            msgBox.innerHTML += <div class="ai-message user">${rawText}</div>;
+            msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
@@ -1790,7 +1790,7 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += <div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً...</div>;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
@@ -1803,7 +1803,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': Bearer ${apiKey.trim()},
+                        'Authorization': `Bearer ${apiKey.trim()}`,
                         'HTTP-Referer': window.location.origin,
                         'X-Title': 'Clinic CallCenter Agent'
                     },
@@ -1812,7 +1812,7 @@
                         "messages": [
                             { 
                                 "role": "system", 
-                                "content": أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الإجابة بدقة على الاستفسارات وتسهيل مهام الكول سنتر بناءً على قاعدة البيانات التالية:\n${siteContext} 
+                                "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الإجابة بدقة على الاستفسارات وتسهيل مهام الكول سنتر بناءً على قاعدة البيانات التالية:\n${siteContext}` 
                             },
                             { 
                                 "role": "user", 
@@ -1829,7 +1829,7 @@
                     throw new Error("API Error");
                 }
             } catch (err) {
-                aiReply = "عذراً يا مصطفى، حدث خطأ في الاتصال أو أن مفتاح OpenRouter API غير مسجل. اضغط على أيقونة المفتاح بالأعلى وتأكد من إدخاله.";
+                aiReply = "عذراً يا مصطفى، تأكد من إدخال مفتاح OpenRouter API الصحيح من أيقونة المفتاح بالأعلى لتفعيل المساعد السحابي.";
             }
 
             document.getElementById(loadingId).remove();
@@ -1921,7 +1921,7 @@
             setTimeout(() => { renderDeptsAndDocs("", id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightCoord(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('`active`'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators("", id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightOffer(id, cat) {
