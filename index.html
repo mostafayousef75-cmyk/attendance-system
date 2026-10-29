@@ -443,6 +443,49 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.7rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: #f3f4f6; }
 
+        /* 🎯 تصميم الوسوم المصغرة جداً (أيقونة تلميح سيمبل) */
+        .tags-tooltip-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 3px;
+            cursor: pointer;
+        }
+        .tags-icon-badge {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.05rem 0.3rem;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .tags-tooltip-popup {
+            visibility: hidden;
+            background-color: var(--bg-card);
+            color: var(--primary-color);
+            text-align: right;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--primary-color);
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            right: 0;
+            white-space: nowrap;
+            font-size: 0.68rem;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .tags-tooltip-wrapper:hover .tags-tooltip-popup {
+            visibility: visible;
+            opacity: 1;
+        }
+
         table.resizable-mode th, table.resizable-mode td {
             resize: both !important;
             overflow: auto !important;
@@ -536,7 +579,7 @@
             color: #fde047;
             font-weight: 600;
         }
-        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
+        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6يديا; display: inline-block; margin-top: 2px; }
 
         .offers-multi-clipboard-box {
             display: none;
@@ -1029,26 +1072,26 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي السريع المحدثة (سريعة وعملية) -->
+    <!-- نافذة المساعد الذكي السريع المحدثة (سرعة فائقة Groq) -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الشامل (6 أقسام متصلة)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الشامل (Groq السريع)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح Groq API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد السحابي السريع جاهز للرد الفوري وربط كل أقسام الموقع الـ 6 ببعضها.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد شغال دلوقتي بسرعة Groq الخارقة ومتصل بجميع أقسام الموقع الـ 6 لحظياً.</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل عن أي دكتور، عرض، تنبيه، أو خدمة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اسأل عن أي دكتور، عرض، تنبيه، أو استفسار..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1775,6 +1818,17 @@
             });
         }
 
+        // دالة توليد وسم سيمبل وخفيف (Tooltip)
+        function getTagsTooltipHtml(tagsStr) {
+            if (!tagsStr || !tagsStr.trim()) return '';
+            return `
+                <div class="tags-tooltip-wrapper" title="${tagsStr}">
+                    <span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> تلميح الوسوم</span>
+                    <div class="tags-tooltip-popup">🏷️ ${tagsStr}</div>
+                </div>
+            `;
+        }
+
         function renderDoctors(highlightId = null) {
             const searchInput = document.getElementById('docSearchInput');
             const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -1827,7 +1881,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;" title="مثبت">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
-                const tagsFooter = doc.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${doc.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(doc.tags);
                 
                 let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
@@ -1871,7 +1925,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;" title="مثبت">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
-                const tagsFooter = doc.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${doc.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(doc.tags);
                 let customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 const formattedSpec = doc.specialty ? doc.specialty.replace('/', '/\n') : '';
@@ -2092,7 +2146,7 @@
                     if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
                     else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                 }
-                const tagsFooter = item.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${item.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(item.tags);
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 grid.innerHTML += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
@@ -2238,7 +2292,7 @@
             deptServicesData.filter(s => s.name && (s.name.toLowerCase().includes(search.toLowerCase()) || (s.tags && s.tags.toLowerCase().includes(search.toLowerCase())))).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
-                const tagsFooter = item.tags ? `<div class="card-tags-footer" style="margin-top:2px;">🏷️ ${item.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(item.tags);
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
                 const rowHtml = `
                     <tr id="dept_service_row_${item.id}" class="${isHighlighted}">
@@ -2262,7 +2316,7 @@
             if(!notesContainer) return;
             notesContainer.innerHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
-                const tagsFooter = noteObj.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${noteObj.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(noteObj.tags);
                 notesContainer.innerHTML += `
                     <div class="doc-sheet-card ${noteObj.color || 'card-gold'}">
                         <h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}
@@ -2379,7 +2433,7 @@
             grid.innerHTML = "";
             coordinatorsData.filter(c => c.name.includes(search) || (c.tags && c.tags.includes(search))).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                const tagsFooter = c.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${c.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(c.tags);
                 const isHighlighted = (c.id === highlightId) ? 'highlight-pulse' : '';
                 grid.innerHTML += `
                     <div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${isHighlighted}">
@@ -2708,7 +2762,7 @@
 
             filtered.forEach((item, idx) => {
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
-                const tagsFooter = item.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${item.tags}</div>` : '';
+                const tagsFooter = getTagsTooltipHtml(item.tags);
                 grid.innerHTML += `
                     <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${isHighlighted}" style="position:relative;">
                         <h3>
@@ -2790,11 +2844,11 @@
         }
 
         function setApiKeyPrompt() {
-            const currentKey = localStorage.getItem('openrouter_api_key') || '';
-            const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
+            const currentKey = localStorage.getItem('groq_api_key') || '';
+            const newKey = prompt("أدخل مفتاح Groq API (يبدأ بـ gsk_...):", currentKey);
             if (newKey !== null) {
-                localStorage.setItem('openrouter_api_key', newKey.trim());
-                alert("✅ تم حفظ مفتاح OpenRouter API بنجاح!");
+                localStorage.setItem('groq_api_key', newKey.trim());
+                alert("✅ تم حفظ مفتاح Groq API بنجاح!");
             }
         }
 
@@ -2829,42 +2883,40 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري التحليل السريع...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-bolt fa-spin" style="color:#facc15;"></i> جاري الرد بذكاء وسرعة Groq الفورية...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            let apiKey = localStorage.getItem('openrouter_api_key');
+            let apiKey = localStorage.getItem('groq_api_key');
             if (!apiKey) {
-                const loader = document.getElementById(loadingId);
-                if (loader) loader.remove();
-                alert("⚠️ يرجى إدخال مفتاح OpenRouter API أولاً من علامة المفتاح (🔑) أعلى نافذة المساعد!");
-                return;
+                apiKey = prompt("أدخل مفتاح Groq API الخاص بك (يبدأ بـ gsk_...):");
+                if (apiKey) localStorage.setItem('groq_api_key', apiKey.trim());
+                else {
+                    const loader = document.getElementById(loadingId);
+                    if (loader) loader.remove();
+                    return;
+                }
             }
 
-            const systemPrompt = `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. 
-            قواعدك الصارمة:
-            1. لديك ارتباط كامل وشامل بجميع أقسام الموقع الـ 6.
-            2. أجب فوراً بدقة عالية واختصار مناسب للواتساب بناءً على البيانات المرفقة.
-            ${siteContext}`;
+            const systemPrompt = `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. أجب فوراً بدقة واختصار مناسب للواتساب بناءً على البيانات المرفقة.\n${siteContext}`;
 
             aiChatHistory.push({ role: "user", content: rawText });
 
-            const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+            const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
 
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey.trim()}`,
-                        'HTTP-Referer': window.location.origin,
-                        'X-Title': 'Clinic CallCenter Agent'
+                        'Authorization': `Bearer ${apiKey.trim()}`
                     },
                     body: JSON.stringify({
-                        "model": "recursive/flint-v1.0:free",
+                        "model": "llama-3.1-8b-instant",
                         "messages": [
                             { "role": "system", "content": systemPrompt },
                             ...aiChatHistory
-                        ]
+                        ],
+                        "temperature": 0.3
                     })
                 });
 
@@ -2886,7 +2938,7 @@
                         </div>
                     `;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد من الخادم السحابي. تأكد من صحة المفتاح.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد. تأكد من صحة مفتاح Groq API.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
@@ -2896,6 +2948,7 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
+        // 🎯 بحث متقدم شامل يربط جميع الأقسام الـ 6 (بما فيها دليل الاستفسارات)
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -2942,16 +2995,16 @@
             });
 
             offersData.forEach(o => {
-                if (o.name.toLowerCase().includes(q) || (o.notes && o.notes.toLowerCase().includes(q))) {
+                if (o.name.toLowerCase().includes(q) || (o.notes && o.notes.toLowerCase().includes(q)) || (o.category && o.category.toLowerCase().includes(q))) {
                     foundCount++;
                     resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#86efac; border-color:#16a34a;">العروض والأسعار</span><h4>${o.name}</h4><p style="font-size:0.7rem; color:var(--text-muted);">السعر: ${o.price || 'حسب الأجهزة'} (${o.notes || ''})</p></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')">عرض العرض</button></div>`;
                 }
             });
 
             inquiriesData.forEach(i => {
-                if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || (i.tags && i.tags.toLowerCase().includes(q))) {
+                if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || (i.tags && i.tags.toLowerCase().includes(q)) || (i.category && i.category.toLowerCase().includes(q))) {
                     foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">دليل الاستفسارات</span><h4>${i.question}</h4><p style="font-size:0.7rem; color:var(--text-muted);">${i.answer}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightInquiry(${i.id})">عرض الاستفسار</button></div>`;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(245,158,11,0.2); color:var(--primary-color);">دليل الاستفسارات</span><h4>${i.question}</h4><p style="font-size:0.7rem; color:var(--text-muted);">${i.answer}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightInquiry(${i.id})">عرض الاستفسار</button></div>`;
                 }
             });
 
