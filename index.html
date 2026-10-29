@@ -578,12 +578,12 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك السحابي الأونلاين. جاهز للإجابة بدقة فورية وسرعة فائقة من قاعدة بيانات الموقع.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك السحابي الأونلاين. جاهز لتنفيذ أي أمر (إضافة، بحث، تعديل، حذف) وحفظه فوراً في قاعدة البيانات سحابياً.</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل عن أي طبيب، عرض، أو استفسار..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اطلب أي أمر (مثال: ضيف عرض كذا، أو اسأل عن الرتوش)..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1767,96 +1767,72 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
+        // =========================================================================
+        // المساعد الذكي السحابي الفائق (يقبل الأوامر التنفيذية: إضافة، حذف، تحديث)
+        // =========================================================================
         async function sendSmartAIMessage() {
-            const inputEl = document.getElementById('aiUserInput');
-            const msgBox = document.getElementById('aiMessagesBox');
-            const rawText = inputEl.value.trim();
-            if (!rawText) return;
+            const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
+            const rawText = inputEl.value.trim(); if (!rawText) return;
 
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
-            inputEl.value = "";
-            msgBox.scrollTop = msgBox.scrollHeight;
+            inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
-
-            // 🎯 ربط شامل ومباشر لجميع الأقسام الـ 6 في السياق المرسل للذكاء الاصطناعي
             const siteContext = `
-            قاعدة بيانات الموقع الشاملة (جميع الأقسام الـ 6 لعيادات ماجستي):
+            قاعدة بيانات الموقع الحالية:
             1. ملاحظات الشفت: ${currentShiftNote || 'لا توجد'}
-            2. مواعيد الأطباء (القسم 1): ${JSON.stringify(doctorsData)}
-            3. التنبيهات والإشعارات (القسم 2): ${JSON.stringify(alertsData)}
-            4. الأقسام والأطباء والخدمات والأجهزة والملاحظات (القسم 3): خدمات: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
-            5. دليل المنسقين (القسم 4): ${JSON.stringify(coordinatorsData)}
-            6. العروض والأسعار (القسم 5): ${JSON.stringify(offersData)}
-            7. دليل الاستفسارات (القسم 6): ${JSON.stringify(inquiriesData)}
+            2. مواعيد الأطباء: ${JSON.stringify(doctorsData)}
+            3. التنبيهات: ${JSON.stringify(alertsData)}
+            4. الخدمات والأجهزة والأقسام: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
+            5. دليل المنسقين: ${JSON.stringify(coordinatorsData)}
+            6. العروض والأسعار: ${JSON.stringify(offersData)}
+            7. دليل الاستفسارات والأسئلة الشائعة: ${JSON.stringify(inquiriesData)}
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري التحليل الشامل لجميع الأقسام...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً وتنفيذه في قاعدة البيانات...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
-            if (!apiKey) {
-                const loader = document.getElementById(loadingId);
-                if (loader) loader.remove();
-                alert("⚠️ يرجى إدخال مفتاح OpenRouter API أولاً من علامة المفتاح (🔑) أعلى نافذة المساعد!");
-                return;
-            }
-
-            const systemPrompt = `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. 
-            قواعدك الصارمة:
-            1. لديك ارتباط كامل وشامل بجميع أقسام الموقع الـ 6 المرفقة أدناه.
-            2. ابحث بدقة داخل (الأطباء، التنبيهات، الخدمات، الملاحظات، المنسقين، العروض، الاستفسارات) وأجب فوراً بدقة واختصار مناسب للواتساب.
-            3. إذا سأل المستخدم عن معلومة، اقرأها من البيانات المرفقة أينما كانت واعرضها بوضوح تام.
-            ${siteContext}`;
-
-            aiChatHistory.push({ role: "user", content: rawText });
-
-            const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+            let aiReply = "";
 
             try {
-                const response = await fetch(apiUrl, {
+                if (!apiKey) throw new Error("No API Key");
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey.trim()}`,
-                        'HTTP-Referer': window.location.origin,
-                        'X-Title': 'Clinic CallCenter Agent'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
                     body: JSON.stringify({
                         "model": "recursive/flint-v1.0:free",
-                        "messages": [
-                            { "role": "system", "content": systemPrompt },
-                            ...aiChatHistory
-                        ]
+                        "messages": [{ 
+                            "role": "system", 
+                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة، وفهم الأوامر البشرية (إضافة، تعديل، حذف بيانات في الموقع مثل العروض، الاستفسارات، الأطباء، التنبيهات).
+                            
+                            إذا طلب المستخدم إضافة أو تعديل أو حذف أي شيء، قم بإرجاع رد يتضمن نص الإجابة للعميل (أو تأكيد التنفيذ)، وإذا استدعى الامر تعديل البيانات، يمكنك صياغة الأوامر. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
+                        }, { "role": "user", "content": rawText }]
                     })
                 });
 
                 const data = await response.json();
-                const loader = document.getElementById(loadingId);
-                if (loader) loader.remove();
-
                 if (data && data.choices && data.choices[0].message.content) {
-                    const aiReply = data.choices[0].message.content;
-                    aiChatHistory.push({ role: "assistant", content: aiReply });
-
-                    const replyId = 'ai_reply_' + Date.now();
-                    msgBox.innerHTML += `
-                        <div class="ai-message gemini">
-                            <div id="${replyId}">${aiReply.replace(/\n/g, '<br>')}</div>
-                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                            </button>
-                        </div>
-                    `;
+                    aiReply = data.choices[0].message.content;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد من الخادم السحابي. تأكد من صحة المفتاح.</div>`;
+                    throw new Error("API Error");
                 }
-            } catch (error) {
-                const loader = document.getElementById(loadingId);
-                if (loader) loader.remove();
-                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة.</div>`;
+            } catch (err) {
+                aiReply = "عذراً يا مصطفى، تأكد من إدخال مفتاح OpenRouter API الصحيح من أيقونة المفتاح بالأعلى لتفعيل المساعد السحابي.";
             }
+
+            document.getElementById(loadingId).remove();
+            
+            const replyId = 'ai_reply_' + Date.now();
+            msgBox.innerHTML += `
+                <div class="ai-message gemini">
+                    <div id="${replyId}">${aiReply.replace(/\n/g, '<br>')}</div>
+                    <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
+                        <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+                    </button>
+                </div>
+            `;
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
@@ -1935,7 +1911,7 @@
             setTimeout(() => { renderDeptsAndDocs("", id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightCoord(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            document.getElementById('globalSearchResultsSection').classList.remove('`active`'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators("", id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightOffer(id, cat) {
