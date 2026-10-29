@@ -253,16 +253,16 @@
             font-size: 0.8rem;
         }
 
-        /* 🎯 إنزال مسطرة التنبيهات بمسافة كافية وآمنة تماماً بعيداً عن الإشعارات فوق */
+        /* 🎯 مسطرة التنبيهات منزلة لتحت بمسافة كافية وآمنة تماماً عن الإشعارات فوق */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
             border-top: 1px solid var(--border-color);
             padding: 0.6rem 1rem;
-            margin-top: 50px; 
+            margin-top: 55px; 
             display: flex;
             align-items: center;
-            gap: 1.2rem;
+            gap: 0.8rem;
             font-size: 0.76rem;
             position: relative;
             z-index: 10;
@@ -280,39 +280,49 @@
             flex-shrink: 0;
         }
         .ticker-container {
-            overflow-x: auto;
+            overflow: hidden;
             white-space: nowrap;
             flex: 1;
             position: relative;
-            scroll-behavior: smooth;
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 0.3rem 0.5rem;
+            border: 1px solid var(--border-color);
         }
-        .ticker-container::-webkit-scrollbar { height: 6px; }
-        .ticker-container::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
-        .ticker-track { display: inline-flex; gap: 2.5rem; align-items: center; }
+        .ticker-track {
+            display: inline-block;
+            white-space: nowrap;
+            /* 🎯 حركة بطيئة جداً (مريحة للقراءة) */
+            animation: tickerSlowMove 55s linear infinite;
+        }
+        .ticker-track.paused {
+            animation-play-state: paused;
+        }
+        @keyframes tickerSlowMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
         .ticker-item {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
             font-weight: 600;
             color: var(--text-main);
-            background: var(--bg-card);
-            padding: 0.25rem 0.7rem;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
+            margin-left: 3rem;
             cursor: pointer;
         }
-        .latest-alert-btn {
-            background: var(--accent-blue);
-            color: #fff;
-            border: none;
-            padding: 0.25rem 0.6rem;
+        .ticker-btn {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.5rem;
             border-radius: 4px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
-            margin-left: 0.5rem;
         }
+        .ticker-btn:hover { background: var(--primary-color); color: #000; }
 
         .content-area {
             flex: 1;
@@ -715,10 +725,11 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- 🎯 مسطرة التنبيهات (تم رفع مسافتها ونزلت لتحت بمسافة كافية وآمنة تماماً) -->
+        <!-- 🎯 مسطرة التنبيهات المحسنة (منزلة لتحت، حركة بطيئة جداً، أزرار تشغيل وتحديث أحدث إشعار) -->
         <div class="professional-ticker-bar">
             <div class="ticker-label"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-            <button class="latest-alert-btn" onclick="scrollToLatestAlert()" title="الذهاب لأحدث إشعار"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
+            <button class="ticker-btn" id="tickerToggleBtn" onclick="toggleTickerMovement()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
+            <button class="ticker-btn" onclick="jumpToLatestAlert()" title="الذهاب لأحدث إشعار"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
             <div class="ticker-container" id="tickerContainerBox">
                 <div class="ticker-track" id="tickerTrackContainer"></div>
             </div>
@@ -841,7 +852,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (تم فصل كل عمود وجدول تماماً ليكون كل قسم مستقل) -->
+            <!-- 3. الأقسام والأطباء (كل عمود مستقل بذاته تماماً) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -1009,12 +1020,12 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي السريع مع لوحة تعديل وتوجيه سريعة -->
+    <!-- نافذة المساعد الذكي السريع -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الهجين (ذكي ومرن تماماً)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الأونلاين (مع الذاكرة الذكية)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
                 <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
@@ -1023,15 +1034,12 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد دلوقتي مرتب بكل الأقسام (التنبيهات، الأطباء، العروض، الاستفسارات، ملاحظات الشفت) وبيقدر يفهم أي أمر إضافة أو تعديل أو استعلام فوراً من غير ما يعطلنا!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد شغال أونلاين بالـ API بتاعك وبيقرا كل قاعدة البيانات لحظياً عشان يخدمك بأعلى ذكاء وسرعة.</div>
         </div>
 
         <div class="ai-input-box">
-            <div style="font-size:0.65rem; color:var(--primary-color); display:flex; gap:0.5rem;">
-                <span>💡 أمثلة للتوجيه: "أضف تنبيه أن د. محمود إجازة" أو "ما مواعيد د. فؤاد؟"</span>
-            </div>
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل أو وجه المساعد بأي تعديل أو إضافة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اسأل عن أي دكتور، عرض، تنبيه، أو إجازة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -1457,7 +1465,6 @@
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
-
         let aiChatHistory = [];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1493,8 +1500,7 @@
                     inquiriesData = data.inquiriesData || [];
                 } else {
                     doctorsData = [
-                        { id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" },
-                        { id: 2, name: "د. إيهاب هاشم", nationality: "(مصري)", specialty: "طبيب عام\nأسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: false, tags: "أسنان", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م لـ 10م", notes: "الكشوفيه يوم الجمعه بـ 100 ريال بيعمل تنظيف جير", customColor: "" }
+                        { id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }
                     ];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
                     deptServicesData = [
@@ -2007,9 +2013,19 @@
             }
         }
 
+        function toggleTickerMovement() {
+            const track = document.getElementById('tickerTrackContainer');
+            const btn = document.getElementById('tickerToggleBtn');
+            track.classList.toggle('paused');
+            if (track.classList.contains('paused')) {
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
+            }
+        }
+
         function scrollToLatestAlert() {
-            const container = document.getElementById('tickerContainerBox');
-            if (container) container.scrollLeft = container.scrollWidth;
+            jumpToAlertsTab();
         }
 
         function jumpToAlertsTab() {
@@ -2023,14 +2039,17 @@
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
             const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
 
+            let alertItemsHtml = "";
             sortedAlerts.forEach(item => {
-                tickerTrack.innerHTML += `
+                alertItemsHtml += `
                     <div class="ticker-item" onclick="jumpToAlertsTab()">
                         <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
                         <span>${item.content}</span>
                     </div>
                 `;
             });
+            // 🎯 تكرار العناصر لضمان استمرارية الحركة البطيئة بسلاسة
+            tickerTrack.innerHTML = alertItemsHtml + alertItemsHtml;
 
             sortedAlerts.filter(a => a.content.includes(search)).forEach(item => {
                 let mediaHtml = "";
@@ -2152,7 +2171,6 @@
             }
         }
 
-        /* 🎯 دالة عرض الأقسام والأطباء بحيث كل عمود (جلدية / أسنان) مستقل بذاته تماماً وتحت بعض */
         function renderDeptsAndDocs(search = "") {
             const mashyDermBody = document.getElementById('mashyDermTableBody');
             const mashyDentBody = document.getElementById('mashyDentTableBody');
@@ -2717,64 +2735,6 @@
             });
         }
 
-        /* 🎯 محرك البحث الذكي المحلي (Local Smart AI Engine) - يبحث جزئياً وبقوة في كل الأقسام للرد الفوري */
-        function runLocalSmartAI(query) {
-            const q = query.toLowerCase().trim();
-            const keywords = q.split(/\s+/);
-            let matches = [];
-
-            // 1. فحص ملاحظات الشفت الطارئة
-            const scratchpad = document.getElementById('shiftScratchpadText').value;
-            if (scratchpad && keywords.some(k => scratchpad.toLowerCase().includes(k))) {
-                matches.push(`📝 **ملاحظات الشفت الطارئة:** ${scratchpad}`);
-            }
-
-            // 2. فحص التنبيهات والإشعارات
-            alertsData.forEach(a => {
-                if (keywords.some(k => a.content.toLowerCase().includes(k))) {
-                    matches.push(`🚨 **من التنبيهات:** ${a.content}`);
-                }
-            });
-
-            // 3. فحص الأطباء ومواعيدهم وإجازاتهم
-            doctorsData.forEach(d => {
-                let docText = `${d.name} ${d.specialty} ${d.timing} ${d.notes || ''} ${d.tags || ''}`.toLowerCase();
-                if (keywords.some(k => docText.includes(k))) {
-                    let st = `👨‍⚕️ **الدكتور:** ${d.name} (${d.nationality || ''}) - التخصص: ${d.specialty} - الكشفية: ${d.fee || '75 ريال'}`;
-                    if (d.isLeave) st += ` [⚠️ تنبيه: الدكتور غير متواجد / إجازة حالياً!]`;
-                    if (d.notes) st += ` - ملاحظات: ${d.notes}`;
-                    matches.push(st);
-                }
-            });
-
-            // 4. فحص العروض والأسعار
-            offersData.forEach(o => {
-                let offerText = `${o.name} ${o.category} ${o.notes || ''} ${o.device1 || ''} ${o.device2 || ''}`.toLowerCase();
-                if (keywords.some(k => offerText.includes(k))) {
-                    matches.push(`🏷️ **العرض:** ${o.name} - السعر: ${o.price || 'حسب الأجهزة'} (${o.notes || ''})`);
-                }
-            });
-
-            // 5. فحص الاستفسارات والدليل
-            inquiriesData.forEach(i => {
-                let inqText = `${i.question} ${i.answer} ${i.category} ${i.tags || ''}`.toLowerCase();
-                if (keywords.some(k => inqText.includes(k))) {
-                    matches.push(`💡 **الاستفسار (${i.category}):** س: ${i.question} \n ج: ${i.answer}`);
-                }
-            });
-
-            if (matches.length > 0) {
-                return `⚡ **[النتيجة المرتبطة من أقسام الموقع]:**\n\n` + matches.slice(0, 4).join('\n\n');
-            }
-
-            // إذا أردت إضافة أو تعديل معلومة مباشرة عبر المساعد
-            if (q.includes('أضف') || q.includes('حط') || q.includes('سجل')) {
-                return `فهمت طلبك، ولكن يمكنك استخدام أزرار الإضافة السريعة في الأقسام لتنفيذها بدقة فوراً، أو إخباري بالقسم المستهدف لأساعدك فيها!`;
-            }
-
-            return `عذراً، لم أجد تطابقاً تاماً لكلمة "${query}". يمكنك إعادة صياغة السؤال بكلمة مفتاحية واضحة (مثل اسم الدكتور أو العرض) وسأجلبها فوراً من الأقسام!`;
-        }
-
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput');
             const msgBox = document.getElementById('aiMessagesBox');
@@ -2798,35 +2758,21 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث في كافة أقسام الموقع...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري التحليل عبر الأونلاين...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
-
-            // إذا كان النت مفصولاً أو المفتاح غير موجود، يعمل المساعد المحلي الذكي الفوري
-            if (!navigator.onLine || !apiKey) {
-                setTimeout(() => {
-                    const loader = document.getElementById(loadingId);
-                    if (loader) loader.remove();
-                    const localReply = runLocalSmartAI(rawText);
-                    const replyId = 'ai_reply_' + Date.now();
-                    msgBox.innerHTML += `
-                        <div class="ai-message gemini">
-                            <div id="${replyId}">${localReply.replace(/\n/g, '<br>')}</div>
-                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                            </button>
-                        </div>
-                    `;
-                    msgBox.scrollTop = msgBox.scrollHeight;
-                }, 300);
+            if (!apiKey) {
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                alert("⚠️ يرجى إدخال مفتاح OpenRouter API أولاً من علامة المفتاح (🔑) أعلى نافذة المساعد!");
                 return;
             }
 
             const systemPrompt = `أنت مساعد ذكي مرن جداً لخدمة عملاء الكول سنتر الطبي. 
             قواعدك الصارمة:
-            1. ابحث بدقة في جميع بيانات الموقع المرفقة أدناه (التنبيهات، الأطباء، العروض، الاستفسارات) ورد فوراً باختصار.
-            2. إذا سأل المستخدم عن دكتور أو إجازة، ابحث في التنبيهات وأقسام الأطباء واربطهما معاً.
+            1. ابحث بدقة في جميع بيانات الموقع المرفقة أدناه (التنبيهات، الأطباء، العروض، الاستفسارات) ورد فوراً باختصار شديد ومناسب للواتساب.
+            2. اربط بين الأقسام (التنبيهات والأطباء وإجازاتهم والعروض).
             ${siteContext}`;
 
             aiChatHistory.push({ role: "user", content: rawText });
@@ -2869,35 +2815,16 @@
                         </div>
                     `;
                 } else {
-                    const localReply = runLocalSmartAI(rawText);
-                    const replyId = 'ai_reply_' + Date.now();
-                    msgBox.innerHTML += `
-                        <div class="ai-message gemini">
-                            <div id="${replyId}">${localReply.replace(/\n/g, '<br>')}</div>
-                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                            </button>
-                        </div>
-                    `;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد من الخادم السحابي. تأكد من صحة المفتاح.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
-                const localReply = runLocalSmartAI(rawText);
-                const replyId = 'ai_reply_' + Date.now();
-                msgBox.innerHTML += `
-                    <div class="ai-message gemini">
-                        <div id="${replyId}">${localReply.replace(/\n/g, '<br>')}</div>
-                        <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                            <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                        </button>
-                    </div>
-                `;
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        /* 🎯 البحث الشامل المرتبط بكل الأقسام بالترتيب */
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -2915,7 +2842,6 @@
             resultsList.innerHTML = "";
             let foundCount = 0;
 
-            // 1. التنبيهات والإشعارات أولاً
             alertsData.forEach(a => {
                 if (a.content.toLowerCase().includes(q)) {
                     foundCount++;
@@ -2923,7 +2849,6 @@
                 }
             });
 
-            // 2. الأطباء
             doctorsData.forEach(d => {
                 if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q)) || (d.tags && d.tags.toLowerCase().includes(q)) || (d.notes && d.notes.toLowerCase().includes(q))) {
                     foundCount++;
@@ -2931,7 +2856,6 @@
                 }
             });
 
-            // 3. العروض
             offersData.forEach(o => {
                 if (o.name.toLowerCase().includes(q) || (o.notes && o.notes.toLowerCase().includes(q))) {
                     foundCount++;
@@ -2939,7 +2863,6 @@
                 }
             });
 
-            // 4. الاستفسارات
             inquiriesData.forEach(i => {
                 if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || (i.tags && i.tags.toLowerCase().includes(q))) {
                     foundCount++;
