@@ -579,7 +579,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بكامل القوة (سحابي + محلي احتياطي) وجاهز للبحث في كل الأقسام فوراً.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بقاعدة البيانات السحابية الدائمة وجاهز للبحث في دليل الاستفسارات وكل الأقسام فوراً.</div>
         </div>
 
         <div class="ai-input-box">
@@ -645,7 +645,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:0.4rem; background:rgba(220,38,38,0.1); padding:0.3rem 0.5rem; border-radius:6px; border:1px solid var(--danger-color);">
                 <input type="checkbox" id="docIsLeave" style="width:15px; height:15px;">
-                <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / غير متواجد</label>
+                <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / غير متواجد (توليد تنبيه تلقائي)</label>
             </div>
 
             <div class="days-section-box">
@@ -1022,12 +1022,11 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
+        let aiChatHistory = []; // مسار محادثات الذاكرة الدائمة في قاعدة البيانات
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
-        let aiChatHistory = [];
-        let aiSmartCache = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -1038,32 +1037,6 @@
 
             const savedShiftNote = localStorage.getItem('shift_scratchpad_current') || '';
             document.getElementById('shiftScratchpadText').value = savedShiftNote;
-
-            const savedCache = localStorage.getItem('ai_smart_cache_store');
-            if (savedCache) { try { aiSmartCache = JSON.parse(savedCache); } catch(e) {} }
-
-            const savedAiHistory = localStorage.getItem('ai_persistent_chat_history');
-            if (savedAiHistory) {
-                try {
-                    aiChatHistory = JSON.parse(savedAiHistory);
-                    const msgBox = document.getElementById('aiMessagesBox');
-                    aiChatHistory.forEach(msg => {
-                        if (msg.role === 'user') {
-                            msgBox.innerHTML += `<div class="ai-message user">${msg.content}</div>`;
-                        } else if (msg.role === 'assistant') {
-                            const replyId = 'ai_history_' + Math.random();
-                            msgBox.innerHTML += `
-                                <div class="ai-message gemini">
-                                    <div id="${replyId}">${msg.content.replace(/\n/g, '<br>')}</div>
-                                    <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                                        <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                                    </button>
-                                </div>
-                            `;
-                        }
-                    });
-                } catch(e) {}
-            }
 
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
@@ -1080,6 +1053,7 @@
                     deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
+                    aiChatHistory = data.aiChatHistory || []; // جلب ذاكرة الدردشة الدائمة من السحابة مباشرة
                 } else {
                     doctorsData = [{ id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1087,6 +1061,7 @@
                     deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", color: "card-gold", tags: "أرقام" }];
                     inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
                     offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
+                    aiChatHistory = [];
                     syncToCloud();
                 }
 
@@ -1099,6 +1074,7 @@
                 renderOffers();
                 renderInquiriesTabs();
                 renderInquiries();
+                renderAIChatHistoryUI();
                 updateKPIs();
             });
             
@@ -1121,18 +1097,43 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
+        
+        // مسح الذاكرة من قاعدة البيانات وتحديث السحابة
         function clearAiChatMemory() {
-            if (confirm("هل تريد مسح ذاكرة ومسار المحادثة؟")) {
+            if (confirm("هل تريد مسح ذاكرة ومسار المحادثة من قاعدة البيانات؟")) {
                 aiChatHistory = [];
-                aiSmartCache = {};
-                localStorage.removeItem('ai_persistent_chat_history');
-                localStorage.removeItem('ai_smart_cache_store');
-                document.getElementById('aiMessagesBox').innerHTML = `<div class="ai-message gemini">تم مسح الذاكرة بنجاح. أنا جاهز ببحث شامل وكامل.</div>`;
+                syncToCloud();
+                document.getElementById('aiMessagesBox').innerHTML = `<div class="ai-message gemini">تم مسح الذاكرة من السحابة بنجاح. أنا جاهز ببحث شامل وكامل.</div>`;
             }
         }
+
         function syncToCloud() {
-            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData });
+            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, aiChatHistory });
         }
+
+        function renderAIChatHistoryUI() {
+            const msgBox = document.getElementById('aiMessagesBox');
+            if (!msgBox) return;
+            let html = `<div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل بقاعدة البيانات السحابية الدائمة وجاهز للبحث في دليل الاستفسارات وكل الأقسام فوراً.</div>`;
+            aiChatHistory.forEach(msg => {
+                if (msg.role === 'user') {
+                    html += `<div class="ai-message user">${msg.content}</div>`;
+                } else if (msg.role === 'assistant') {
+                    const replyId = 'ai_history_' + Math.random().toString(36).substring(2, 9);
+                    html += `
+                        <div class="ai-message gemini">
+                            <div id="${replyId}">${msg.content.replace(/\n/g, '<br>')}</div>
+                            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
+                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+            msgBox.innerHTML = html;
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
         function switchTab(tabId, elem, save = true) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
@@ -1169,7 +1170,7 @@
             alert("✅ تم ضبط الأعمدة!");
         }
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, aiChatHistory }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1188,6 +1189,7 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        if (data.aiChatHistory) aiChatHistory = data.aiChatHistory;
                         syncToCloud(); alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
@@ -1234,6 +1236,7 @@
             if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
             if (wissamDays.length > 0) scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
             let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\nالساعات والدوام: ${doc.timing || ''}`;
+            if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
             if (scheduleLines.length > 0) clientText += `\nأيام الدوام:\n` + scheduleLines.join('\n');
             navigator.clipboard.writeText(clientText).then(() => alert(`📋 تم نسخ بيانات الدكتور للعميل:\n\n${clientText}`));
         }
@@ -1283,7 +1286,7 @@
                 if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
-                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
+                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">⚠️ غير متواجد (إجازة)</span>` : '';
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
@@ -1304,7 +1307,7 @@
                 if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
-                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
+                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">⚠️ غير متواجد (إجازة)</span>` : '';
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
@@ -1363,14 +1366,18 @@
             document.getElementById('mashyDaysBox').classList.remove('show'); document.getElementById('wissamDaysBox').classList.remove('show');
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; document.getElementById('doctorModal').classList.add('active');
         }
+
         function saveDoctor() {
             const id = document.getElementById('docId').value;
             const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
             const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
             const existingDoc = id ? doctorsData.find(d => d.id == id) : null;
+            const isLeaveVal = document.getElementById('docIsLeave').checked;
+            const docNameVal = document.getElementById('docName').value;
+
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('docName').value,
+                name: docNameVal,
                 nationality: document.getElementById('docNationality').value,
                 specialty: document.getElementById('docSpecialty').value,
                 fee: document.getElementById('docFee').value,
@@ -1378,7 +1385,7 @@
                 customColor: document.getElementById('docCustomColor').value,
                 isJoint: document.getElementById('docIsJoint').checked,
                 isPinned: document.getElementById('docIsPinned').checked,
-                isLeave: document.getElementById('docIsLeave').checked,
+                isLeave: isLeaveVal,
                 mashyDays, wissamDays,
                 timing: document.getElementById('docTiming').value,
                 notes: document.getElementById('docNotes').value,
@@ -1387,9 +1394,24 @@
                 wissamOrder: existingDoc ? (existingDoc.wissamOrder ?? doctorsData.length) : doctorsData.length
             };
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
+
+            // 🔔 ميزة تنبيهات الإجازات التلقائية (Auto-Alerts for Leaves)
+            if (isLeaveVal && (!existingDoc || !existingDoc.isLeave)) {
+                const autoAlertContent = `⚠️ تنبيه إجازة: الدكتور ${docNameVal} غير متواجد حالياً في العيادة.`;
+                alertsData.push({
+                    id: Date.now(),
+                    content: autoAlertContent,
+                    tags: "إجازة، أطباء",
+                    media: "",
+                    mediaType: "",
+                    time: new Date().toLocaleString('en-US')
+                });
+            }
+
             if (id) { doctorsData[doctorsData.findIndex(d => d.id == id)] = docObj; } else { doctorsData.push(docObj); }
             syncToCloud(); renderDoctors(); closeModal('doctorModal');
         }
+
         function editDoctor(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
@@ -1784,42 +1806,43 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // 🧠 مساعد محلي ذكي بالكامل (Fallback Engine يعمل حتى لو الإنترنت أو السيرفر قطع)
+        // 🧠 مساعد محلي ذكي بالكامل ودقيق لقراءة دليل الاستفسارات وكل الأقسام
         function runLocalSmartAssistant(query) {
-            const q = query.toLowerCase().trim().replace(/ال/g, ''); // إزالة الأل التعريف للبحث المرن
+            const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ال/g, '').replace(/\s+/g, '');
+            const q = cleanText(query);
             let foundResults = [];
 
-            // 1. البحث في دليل الاستفسارات (مثل الرتوش وغيرها)
+            // 1. البحث الدقيق في دليل الاستفسارات (الرتوش وغيرها)
             inquiriesData.forEach(item => {
-                if (item.question.toLowerCase().replace(/ال/g, '').includes(q) || item.answer.toLowerCase().replace(/ال/g, '').includes(q) || (item.tags && item.tags.toLowerCase().includes(q))) {
+                if (cleanText(item.question).includes(q) || cleanText(item.answer).includes(q) || cleanText(item.tags).includes(q) || q.includes(cleanText(item.question))) {
                     foundResults.push(`📌 **استفسار (${item.category}):** ${item.question}\n💬 **الإجابة:** ${item.answer}`);
                 }
             });
 
             // 2. البحث في الأطباء
             doctorsData.forEach(doc => {
-                if (doc.name.toLowerCase().replace(/ال/g, '').includes(q) || (doc.specialty && doc.specialty.toLowerCase().includes(q)) || (doc.tags && doc.tags.toLowerCase().includes(q))) {
-                    foundResults.push(`👨‍⚕️ **طبيب:** ${doc.name} (${doc.specialty})\n🏥 **الفرع:** ${doc.branch}\n⏰ **الدوام:** ${doc.timing}\n💵 **الكشفية:** ${doc.fee || '75 ريال'}`);
+                if (cleanText(doc.name).includes(q) || cleanText(doc.specialty).includes(q) || cleanText(doc.tags).includes(q)) {
+                    foundResults.push(`👨‍⚕️ **طبيب:** ${doc.name} (${doc.specialty})\n🏥 **الفرع:** ${doc.branch}\n⏰ **الدوام:** ${doc.timing}\n💵 **الكشفية:** ${doc.fee || '75 ريال'}${doc.isLeave ? '\n⚠️ (غير متواجد حالياً - إجازة)' : ''}`);
                 }
             });
 
             // 3. البحث في العروض
             offersData.forEach(offer => {
-                if (offer.name.toLowerCase().replace(/ال/g, '').includes(q) || (offer.category && offer.category.toLowerCase().includes(q))) {
+                if (cleanText(offer.name).includes(q) || cleanText(offer.category).includes(q)) {
                     foundResults.push(`🏷️ **عرض (${offer.category}):** ${offer.name}\n💰 **السعر:** ${offer.price || 'محدد بالأجهزة'}`);
                 }
             });
 
             // 4. البحث في الأجهزة والخدمات
             deptServicesData.forEach(serv => {
-                if (serv.name.toLowerCase().replace(/ال/g, '').includes(q)) {
+                if (cleanText(serv.name).includes(q)) {
                     foundResults.push(`⚙️ **خدمة/جهاز (${serv.branch}):** ${serv.name}`);
                 }
             });
 
             // 5. البحث في التنبيهات
             alertsData.forEach(alt => {
-                if (alt.content.toLowerCase().replace(/ال/g, '').includes(q)) {
+                if (cleanText(alt.content).includes(q)) {
                     foundResults.push(`📢 **تنبيه:** ${alt.content}`);
                 }
             });
@@ -1827,36 +1850,16 @@
             if (foundResults.length > 0) {
                 return "🔍 (من المساعد المحلي الذكي):\n\n" + foundResults.slice(0, 3).join("\n\n---\n\n");
             }
-            return "عذراً يا مصطفى، لم أجد إجابة مطابقة تماماً في أقسام الموقع، يمكنك مراجعة القسم المخصص لها أو سؤال المساعد السحابي.";
+            return "عذراً يا مصطفى، لم أجد إجابة مطابقة تماماً في أقسام الموقع، يمكنك مراجعة القسم المخصص لها أو التأكد من إدخال السؤال بصورة صحيحة.";
         }
 
-        // 🎯 المساعد الذكي المدمج (سحابي أولاً + محلي احتياطي تلقائي)
+        // 🎯 المساعد الذكي المدمج (تخزين الذاكرة في Firebase دائمًا)
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
 
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
-
-            const cleanQueryKey = rawText.toLowerCase().replace(/\s+/g, ' ');
-            if (aiSmartCache[cleanQueryKey]) {
-                const cachedReply = aiSmartCache[cleanQueryKey];
-                aiChatHistory.push({ role: "user", content: rawText });
-                aiChatHistory.push({ role: "assistant", content: cachedReply });
-                localStorage.setItem('ai_persistent_chat_history', JSON.stringify(aiChatHistory));
-
-                const replyId = 'ai_reply_' + Date.now();
-                msgBox.innerHTML += `
-                    <div class="ai-message gemini">
-                        <div id="${replyId}">${cachedReply.replace(/\n/g, '<br>')} (ذاكرة فورية ⚡)</div>
-                        <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                            <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                        </button>
-                    </div>
-                `;
-                msgBox.scrollTop = msgBox.scrollHeight;
-                return;
-            }
 
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
             const siteContext = `
@@ -1867,11 +1870,11 @@
             4. الأقسام والأطباء والخدمات: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
             5. دليل المنسقين: ${JSON.stringify(coordinatorsData)}
             6. العروض والأسعار: ${JSON.stringify(offersData)}
-            7. دليل الاستفسارات والأسئلة الشائعة (مثل الرتوش وغيرها): ${JSON.stringify(inquiriesData)}
+            7. دليل الاستفسارات والأسئلة الشائعة (مثل الرتوش وجلسات الليزر وغيرها): ${JSON.stringify(inquiriesData)}
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث بكل أقسام الموقع...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري البحث بكل أقسام الموقع (بما فيها دليل الاستفسارات)...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
@@ -1884,7 +1887,7 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
                     body: JSON.stringify({
                         "model": "recursive/flint-v1.0:free",
-                        "messages": [{ "role": "system", "content": `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. ابحث بدقة وشمولية في كافة أقسام الموقع المرفقة (بما فيها دليل الاستفسارات مثل الرتوش، العروض، الأطباء، التنبيهات) وأجب فوراً باختصار دقيق يناسب الواتساب.\n${siteContext}` }, ...aiChatHistory]
+                        "messages": [{ "role": "system", "content": `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. ابحث بدقة وشمولية تامة في كافة أقسام الموقع المرفقة (وخصوصاً 'دليل الاستفسارات' مثل الرتوش والأسئلة الشائعة، والعروض، الأطباء، التنبيهات) وأجب فوراً باختصار دقيق يناسب الواتساب.\n${siteContext}` }, ...aiChatHistory, { "role": "user", "content": rawText }]
                     })
                 });
 
@@ -1895,18 +1898,16 @@
                     throw new Error("API Error");
                 }
             } catch (err) {
-                // التشغيل التلقائي للمساعد المحلي الذكي لو السحابي وقف أو حصلت مشكلة
+                // التشغيل التلقائي للمساعد المحلي الذكي المتطور
                 aiReply = runLocalSmartAssistant(rawText);
             }
 
             document.getElementById(loadingId).remove();
             
-            aiSmartCache[cleanQueryKey] = aiReply;
-            localStorage.setItem('ai_smart_cache_store', JSON.stringify(aiSmartCache));
-
+            // حفظ المحادثة في الذاكرة الدائمة ورفعها فوراً لقاعدة بيانات Firebase
             aiChatHistory.push({ role: "user", content: rawText });
             aiChatHistory.push({ role: "assistant", content: aiReply });
-            localStorage.setItem('ai_persistent_chat_history', JSON.stringify(aiChatHistory));
+            syncToCloud(); // تخزين دائم على السحابة
 
             const replyId = 'ai_reply_' + Date.now();
             msgBox.innerHTML += `
@@ -1920,10 +1921,11 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // بحث شامل بكل أقسام الموقع (مرن ومتطور جداً لاكتشاف الكلمات مثل الرتوش)
+        // بحث شامل متطور ودقيق بكل أقسام الموقع (يتعامل مع الهمزات والأل والمسافات ويطابق دليل الاستفسارات)
         function handleTrueGlobalSearch(query) {
+            const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ال/g, '').replace(/\s+/g, '');
             const rawQ = query.trim().toLowerCase();
-            const q = rawQ.replace(/ال/g, ''); // إزالة الأل التعريف للبحث المرن
+            const q = cleanText(rawQ);
             const resultsSection = document.getElementById('globalSearchResultsSection'), resultsList = document.getElementById('globalSearchResultsList');
             
             if (!rawQ) {
@@ -1935,44 +1937,46 @@
             resultsSection.classList.add('active'); resultsList.innerHTML = "";
             let foundCount = 0;
 
-            alertsData.forEach(a => {
-                if (a.content.toLowerCase().replace(/ال/g, '').includes(q) || (a.tags && a.tags.toLowerCase().includes(q))) {
-                    foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(220,38,38,0.2); color:#ef4444; border-color:#dc2626;">التنبيهات</span><h4>${a.content}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightAlert(${a.id})">عرض</button></div>`;
-                }
-            });
-            doctorsData.forEach(d => {
-                if (d.name.toLowerCase().replace(/ال/g, '').includes(q) || (d.specialty && d.specialty.toLowerCase().replace(/ال/g, '').includes(q)) || (d.tags && d.tags.toLowerCase().includes(q))) {
-                    foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(37,99,235,0.2); color:#93c5fd; border-color:#2563eb;">الأطباء</span><h4>${d.name} (${d.specialty})</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightDoc(${d.id})">عرض</button></div>`;
-                }
-            });
-            deptServicesData.forEach(s => {
-                if (s.name.toLowerCase().replace(/ال/g, '').includes(q) || (s.tags && s.tags.toLowerCase().includes(q))) {
-                    foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#86efac; border-color:#16a34a;">الأقسام</span><h4>${s.name} (${s.branch})</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightService(${s.id})">عرض</button></div>`;
-                }
-            });
-            coordinatorsData.forEach(c => {
-                if (c.name.toLowerCase().replace(/ال/g, '').includes(q) || (c.tags && c.tags.toLowerCase().includes(q)) || c.rules.some(r => r.toLowerCase().replace(/ال/g, '').includes(q))) {
-                    foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(74,20,140,0.2); color:#d8b4fe; border-color:#7c3aed;">المنسقين</span><h4>${c.name}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightCoord(${c.id})">عرض</button></div>`;
-                }
-            });
-            offersData.forEach(o => {
-                if (o.name.toLowerCase().replace(/ال/g, '').includes(q) || (o.notes && o.notes.toLowerCase().replace(/ال/g, '').includes(q)) || (o.category && o.category.toLowerCase().includes(q))) {
-                    foundCount++;
-                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#86efac; border-color:#16a34a;">العروض</span><h4>${o.name}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')">عرض</button></div>`;
-                }
-            });
+            // 1. البحث في دليل الاستفسارات (الرتوش وغيرها)
             inquiriesData.forEach(i => {
-                if (i.question.toLowerCase().replace(/ال/g, '').includes(q) || i.answer.toLowerCase().replace(/ال/g, '').includes(q) || (i.tags && i.tags.toLowerCase().includes(q))) {
+                if (cleanText(i.question).includes(q) || cleanText(i.answer).includes(q) || cleanText(i.tags).includes(q) || q.includes(cleanText(i.question))) {
                     foundCount++;
                     resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(245,158,11,0.2); color:var(--primary-color);">دليل الاستفسارات</span><h4>${i.question}</h4><p style="font-size:0.7rem; color:var(--text-muted);">${i.answer}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightInquiry(${i.id})">عرض</button></div>`;
                 }
             });
 
-            if (foundCount === 0) resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج لـ "${query}" في الموقع.</div>`;
+            alertsData.forEach(a => {
+                if (cleanText(a.content).includes(q) || cleanText(a.tags).includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(220,38,38,0.2); color:#ef4444; border-color:#dc2626;">التنبيهات</span><h4>${a.content}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightAlert(${a.id})">عرض</button></div>`;
+                }
+            });
+            doctorsData.forEach(d => {
+                if (cleanText(d.name).includes(q) || cleanText(d.specialty).includes(q) || cleanText(d.tags).includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(37,99,235,0.2); color:#93c5fd; border-color:#2563eb;">الأطباء</span><h4>${d.name} (${d.specialty})</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightDoc(${d.id})">عرض</button></div>`;
+                }
+            });
+            deptServicesData.forEach(s => {
+                if (cleanText(s.name).includes(q) || cleanText(s.tags).includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#86efac; border-color:#16a34a;">الأقسام</span><h4>${s.name} (${s.branch})</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightService(${s.id})">عرض</button></div>`;
+                }
+            });
+            coordinatorsData.forEach(c => {
+                if (cleanText(c.name).includes(q) || cleanText(c.tags).includes(q) || c.rules.some(r => cleanText(r).includes(q))) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(74,20,140,0.2); color:#d8b4fe; border-color:#7c3aed;">المنسقين</span><h4>${c.name}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightCoord(${c.id})">عرض</button></div>`;
+                }
+            });
+            offersData.forEach(o => {
+                if (cleanText(o.name).includes(q) || cleanText(o.notes).includes(q) || cleanText(o.category).includes(q)) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#86efac; border-color:#16a34a;">العروض</span><h4>${o.name}</h4></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')">عرض</button></div>`;
+                }
+            });
+
+            if (foundCount === 0) resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الموقع.</div>`;
         }
 
         function clearGlobalSearch() {
