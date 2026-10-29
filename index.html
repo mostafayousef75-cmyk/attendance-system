@@ -253,7 +253,7 @@
             font-size: 0.8rem;
         }
 
-        /* 🎯 مسطرة التنبيهات الصفراء العريضة والمتحركة ببطء لليمين */
+        /* 🎯 مسطرة التنبيهات الصفراء العريضة واليدوية (غير لازقة) */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 2px solid var(--primary-color);
@@ -265,42 +265,38 @@
             font-size: 0.76rem;
             position: relative;
             z-index: 10;
+            margin-bottom: 6px; /* مفصوله عن المحتوى بمسافة مريحة */
         }
         .ticker-yellow-ruler {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #000;
             font-weight: 800;
-            padding: 0.3rem 0.9rem;
+            padding: 0.4rem 1.1rem;
             border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
             flex-shrink: 0;
+            border: 1px solid #fbbf24;
         }
         .ticker-container {
-            overflow: hidden;
+            overflow-x: auto; /* تحكم يدوي بالتمرير */
             white-space: nowrap;
             flex: 1;
             position: relative;
             background: var(--bg-card);
             border-radius: 6px;
-            padding: 0.35rem 0.6rem;
+            padding: 0.4rem 0.7rem;
             border: 1px solid var(--border-color);
+            scroll-behavior: smooth;
         }
         .ticker-track {
-            display: inline-block;
+            display: inline-flex;
             white-space: nowrap;
-            /* 🎯 حركة بطيئة جداً باتجاه اليمين (Right) */
-            animation: tickerMoveRight 50s linear infinite;
-        }
-        .ticker-track.paused {
-            animation-play-state: paused;
-        }
-        @keyframes tickerMoveRight {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
+            gap: 2.5rem;
+            align-items: center;
         }
         .ticker-item {
             display: inline-flex;
@@ -308,17 +304,16 @@
             gap: 0.4rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-right: 3rem;
-            margin-left: 0;
             cursor: pointer;
         }
+        .ticker-item:hover { color: var(--primary-color); }
         .ticker-btn {
             background: var(--bg-card);
             color: var(--text-main);
             border: 1px solid var(--border-color);
-            padding: 0.3rem 0.6rem;
+            padding: 0.35rem 0.7rem;
             border-radius: 6px;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
@@ -579,7 +574,7 @@
             color: #fde047;
             font-weight: 600;
         }
-        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6يديا; display: inline-block; margin-top: 2px; }
+        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
 
         .offers-multi-clipboard-box {
             display: none;
@@ -777,10 +772,11 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- 🎯 مسطرة التنبيهات الصفراء العريضة والمتحركة ببطء اتجاه اليمين -->
+        <!-- 🎯 مسطرة التنبيهات الصفراء العريضة واليدوية تماماً (منفصلة وغير لازقة) -->
         <div class="professional-ticker-bar">
             <div class="ticker-yellow-ruler"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-            <button class="ticker-btn" id="tickerToggleBtn" onclick="toggleTickerMovement()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
+            <button class="ticker-btn" onclick="scrollTickerLeft()" title="تحريك يمين"><i class="fa-solid fa-arrow-right"></i></button>
+            <button class="ticker-btn" onclick="scrollTickerRight()" title="تحريك يسار"><i class="fa-solid fa-arrow-left"></i></button>
             <button class="ticker-btn" onclick="jumpToLatestAlert()" title="الذهاب لأحدث إشعار في التنبيهات"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
             <div class="ticker-container" id="tickerContainerBox">
                 <div class="ticker-track" id="tickerTrackContainer"></div>
@@ -1072,21 +1068,21 @@
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي السريع المحدثة (سرعة فائقة Groq) -->
+    <!-- نافذة المساعد الذكي السريع المحدثة (OpenRouter) -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-bolt" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الشامل (Groq السريع)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الشامل (OpenRouter)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح Groq API"></i>
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد شغال دلوقتي بسرعة Groq الخارقة ومتصل بجميع أقسام الموقع الـ 6 لحظياً.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد يعمل الآن عبر OpenRouter ومتصل بجميع أقسام الموقع الـ 6 لحظياً.</div>
         </div>
 
         <div class="ai-input-box">
@@ -2098,15 +2094,14 @@
             }
         }
 
-        function toggleTickerMovement() {
-            const track = document.getElementById('tickerTrackContainer');
-            const btn = document.getElementById('tickerToggleBtn');
-            track.classList.toggle('paused');
-            if (track.classList.contains('paused')) {
-                btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
-            }
+        function scrollTickerLeft() {
+            const box = document.getElementById('tickerContainerBox');
+            if(box) box.scrollLeft -= 150;
+        }
+
+        function scrollTickerRight() {
+            const box = document.getElementById('tickerContainerBox');
+            if(box) box.scrollLeft += 150;
         }
 
         function jumpToLatestAlert() {
@@ -2117,7 +2112,11 @@
                 renderAlerts();
                 setTimeout(() => {
                     const cardEl = document.getElementById(`alert_card_${latestId}`);
-                    if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (cardEl) {
+                        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        cardEl.classList.add('highlight-pulse');
+                        setTimeout(() => cardEl.classList.remove('highlight-pulse'), 3000);
+                    }
                 }, 100);
             }
         }
@@ -2138,7 +2137,7 @@
                     </div>
                 `;
             });
-            tickerTrack.innerHTML = alertItemsHtml + alertItemsHtml;
+            tickerTrack.innerHTML = alertItemsHtml;
 
             sortedAlerts.filter(a => a.content.includes(search) || (a.tags && a.tags.includes(search))).forEach(item => {
                 let mediaHtml = "";
@@ -2844,11 +2843,11 @@
         }
 
         function setApiKeyPrompt() {
-            const currentKey = localStorage.getItem('groq_api_key') || '';
-            const newKey = prompt("أدخل مفتاح Groq API (يبدأ بـ gsk_...):", currentKey);
+            const currentKey = localStorage.getItem('openrouter_api_key') || '';
+            const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
             if (newKey !== null) {
-                localStorage.setItem('groq_api_key', newKey.trim());
-                alert("✅ تم حفظ مفتاح Groq API بنجاح!");
+                localStorage.setItem('openrouter_api_key', newKey.trim());
+                alert("✅ تم حفظ مفتاح OpenRouter API بنجاح!");
             }
         }
 
@@ -2883,13 +2882,13 @@
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-bolt fa-spin" style="color:#facc15;"></i> جاري الرد بذكاء وسرعة Groq الفورية...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري التحليل السريع عبر OpenRouter...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            let apiKey = localStorage.getItem('groq_api_key');
+            let apiKey = localStorage.getItem('openrouter_api_key');
             if (!apiKey) {
-                apiKey = prompt("أدخل مفتاح Groq API الخاص بك (يبدأ بـ gsk_...):");
-                if (apiKey) localStorage.setItem('groq_api_key', apiKey.trim());
+                apiKey = prompt("أدخل مفتاح OpenRouter API الخاص بك (يبدأ بـ sk-or-v1-...):");
+                if (apiKey) localStorage.setItem('openrouter_api_key', apiKey.trim());
                 else {
                     const loader = document.getElementById(loadingId);
                     if (loader) loader.remove();
@@ -2901,23 +2900,23 @@
 
             aiChatHistory.push({ role: "user", content: rawText });
 
-            const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+            const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
 
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey.trim()}`
+                        'Authorization': `Bearer ${apiKey.trim()}`,
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'Clinic CallCenter Agent'
                     },
                     body: JSON.stringify({
-                        "messages": [],
-         "model": "meta-llama/llama-prompt-guard-2-22m",
-         "temperature": 1,
-         "max_completion_tokens": 1,
-         "top_p": 1,
-         "stream": false,
-         "stop": null
+                        "model": "meta/llama-3-8b-instruct:free",
+                        "messages": [
+                            { "role": "system", "content": systemPrompt },
+                            ...aiChatHistory
+                        ]
                     })
                 });
 
@@ -2939,7 +2938,7 @@
                         </div>
                     `;
                 } else {
-                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد. تأكد من صحة مفتاح Groq API.</div>`;
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد. تأكد من صحة المفتاح.</div>`;
                 }
             } catch (error) {
                 const loader = document.getElementById(loadingId);
@@ -2949,7 +2948,7 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // 🎯 بحث متقدم شامل يربط جميع الأقسام الـ 6 (بما فيها دليل الاستفسارات)
+        // 🎯 بحث متقدم شامل يربط جميع الأقسام الـ 6 (بما فيها دليل الاستفسارات بدقة تامة)
         function handleTrueGlobalSearch(query) {
             const q = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -3077,7 +3076,11 @@
             setTimeout(() => {
                 renderInquiries("", inqId);
                 const cardEl = document.getElementById(`inquiry_card_${inqId}`);
-                if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (cardEl) {
+                    cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    cardEl.classList.add('highlight-pulse');
+                    setTimeout(() => cardEl.classList.remove('highlight-pulse'), 3000);
+                }
             }, 100);
         }
 
