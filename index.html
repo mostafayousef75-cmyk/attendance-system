@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - المساعد السحابي الفائق</title>
+    <title>لوحة الكول سنتر والمنسقين - المحرك المحلي المترابط والمساعد السحابي</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -185,12 +185,12 @@
         .ai-floating-btn { position: fixed; bottom: 25px; left: 25px; width: 48px; height: 48px; background: #facc15; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); z-index: 10000; border: 2px solid #eab308; transition: transform 0.2s; }
         .ai-floating-btn:hover { transform: scale(1.08); }
 
-        .ai-floating-chat-window { position: fixed; bottom: 82px; left: 25px; width: 380px; height: 500px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: none; flex-direction: column; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
+        .ai-floating-chat-window { position: fixed; bottom: 82px; left: 25px; width: 410px; height: 530px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: none; flex-direction: column; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
         .ai-floating-chat-window.active { display: flex; }
         .ai-messages-box { flex: 1; padding: 0.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
         .ai-message { max-width: 95%; padding: 0.5rem 0.7rem; border-radius: 8px; font-size: 0.76rem; line-height: 1.4; }
         .ai-message.user { background: var(--accent-blue); color: #fff; align-self: flex-start; }
-        .ai-message.gemini { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-end; }
+        .ai-message.gemini { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-end; width: 100%; }
         .ai-input-box { padding: 0.35rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.3rem; }
         .ai-input-row { display: flex; gap: 0.3rem; }
         .ai-input-row input { flex: 1; padding: 0.3rem 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.75rem; }
@@ -241,6 +241,7 @@
             <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
+            <li><a class="nav-link" data-tab="synonyms" onclick="switchTab('synonyms', this)"><i class="fa-solid fa-language"></i> <span>قاموس المترادفات</span></a></li>
         </ul>
         
         <div class="theme-box">
@@ -556,11 +557,24 @@
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
 
+            <!-- 7. قسم المترادفات والكلمات المفتاحية -->
+            <section id="synonyms-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <h2>قاموس المترادفات والكلمات المفتاحية للمساعد</h2>
+                    <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة مترادف جديد</button>
+                </div>
+                <div class="page-local-search">
+                    <i class="fa-solid fa-filter"></i>
+                    <input type="text" placeholder="بحث في قاموس المترادفات..." oninput="renderSynonyms(this.value)">
+                </div>
+                <div class="coordinators-grid" id="synonymsGrid"></div>
+            </section>
+
         </div>
     </main>
 
     <!-- زر المساعد الذكي السريع -->
-    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد السحابي الذكي">
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد المترابط الذكي">
         <i class="fa-solid fa-robot"></i>
     </div>
 
@@ -569,7 +583,7 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد السحابي الذكي الفائق</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد المترابط (يربط الأحداث والتنبيهات)</h4>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
                 <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
@@ -578,12 +592,12 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك السحابي الأونلاين. جاهز لتنفيذ أي أمر (إضافة، بحث، تعديل، حذف) وحفظه فوراً في قاعدة البيانات سحابياً.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا محرك المساعد المترابط. اسألني عن أي طبيب وسأعرض لك مواعيده وتنبيهاته وإجازاته وقواعد المنسقين المترابطة محلياً أو سحابياً!</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اطلب أي أمر (مثال: ضيف عرض كذا، أو اسأل عن الرتوش)..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اطلب أي امر أو اسأل (مثال: مواعيد دكتور أحمد وهل عليه إجازة؟)..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -995,6 +1009,26 @@
         </div>
     </div>
 
+    <!-- مودال المترادفات -->
+    <div class="modal-overlay" id="synonymModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>إضافة مترادف جديد للمساعد</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('synonymModal')"></i>
+            </div>
+            <input type="hidden" id="synId">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الكلمة الأصلية (مثال: تشقير)</label>
+                <input type="text" id="synKey" class="form-control" placeholder="تشقير">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>المترادفات والكلمات الشائعة (فواصل بين الكلمات)</label>
+                <input type="text" id="synValues" class="form-control" placeholder="حواجب, حاف, صبغة حواجب">
+            </div>
+            <button class="btn btn-green" onclick="saveSynonym()">حفظ المترادف</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="lightboxModal" onclick="closeModal('lightboxModal')">
         <img id="lightboxImg" class="lightbox-img" src="">
     </div>
@@ -1021,6 +1055,7 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
+        let synonymsData = [];
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
@@ -1051,6 +1086,7 @@
                     deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
+                    synonymsData = data.synonymsData || [{ id: 1, key: "تشقير", values: "حواجب, حاف" }];
                 } else {
                     doctorsData = [{ id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1058,6 +1094,7 @@
                     deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", color: "card-gold", tags: "أرقام" }];
                     inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
                     offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
+                    synonymsData = [{ id: 1, key: "تشقير", values: "حواجب, حاف" }];
                     syncToCloud();
                 }
 
@@ -1070,6 +1107,7 @@
                 renderOffers();
                 renderInquiriesTabs();
                 renderInquiries();
+                renderSynonyms();
                 updateKPIs();
             });
             
@@ -1094,7 +1132,7 @@
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
 
         function syncToCloud() {
-            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData });
+            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData });
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -1133,7 +1171,7 @@
             alert("✅ تم ضبط الأعمدة!");
         }
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1152,6 +1190,7 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        if (data.synonymsData) synonymsData = data.synonymsData;
                         syncToCloud(); alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
@@ -1729,7 +1768,7 @@
         function renderInquiries(search = "", highlightId = null) {
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || i.question.toLowerCase().includes(search.toLowerCase()) || i.answer.toLowerCase().includes(search.toLowerCase()) || (i.tags && i.tags.toLowerCase().includes(search.toLowerCase())))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
         function openInquiryModal() {
@@ -1758,6 +1797,33 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
+        // إشراف وعرض قسم المترادفات
+        function renderSynonyms(search = "") {
+            const grid = document.getElementById('synonymsGrid'); if(!grid) return; grid.innerHTML = "";
+            synonymsData.filter(s => s.key.includes(search) || s.values.includes(search)).forEach(s => {
+                grid.innerHTML += `<div class="doc-sheet-card card-gold"><h3><span>${s.key}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editSynonym(${s.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteSynonym(${s.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.75rem;">${s.values}</p></div>`;
+            });
+        }
+        function openSynonymModal() {
+            document.getElementById('synId').value = ""; document.getElementById('synKey').value = ""; document.getElementById('synValues').value = "";
+            document.getElementById('synonymModal').classList.add('active');
+        }
+        function saveSynonym() {
+            const id = document.getElementById('synId').value, key = document.getElementById('synKey').value.trim(), values = document.getElementById('synValues').value.trim();
+            if (!key || !values) return alert("املأ الكلمة والمترادفات!");
+            const obj = { id: id ? parseInt(id) : Date.now(), key, values };
+            if (id) synonymsData[synonymsData.findIndex(s => s.id == id)] = obj; else synonymsData.push(obj);
+            syncToCloud(); renderSynonyms(); closeModal('synonymModal');
+        }
+        function editSynonym(id) {
+            const item = synonymsData.find(s => s.id === id); if (!item) return;
+            document.getElementById('synId').value = item.id; document.getElementById('synKey').value = item.key;
+            document.getElementById('synValues').value = item.values; document.getElementById('synonymModal').classList.add('active');
+        }
+        function deleteSynonym(id) {
+            if (confirm("حذف المترادف؟")) { synonymsData = synonymsData.filter(s => s.id !== id); syncToCloud(); renderSynonyms(); }
+        }
+
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('openrouter_api_key') || '';
             const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
@@ -1768,7 +1834,7 @@
         }
 
         // =========================================================================
-        // المساعد الذكي السحابي الفائق (يقبل الأوامر التنفيذية: إضافة، حذف، تحديث)
+        // المحرك الذكي السحابي والمحلي المترابط (Cross-Context Engine)
         // =========================================================================
         async function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
@@ -1777,25 +1843,72 @@
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
+            const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, '');
+            let q = cleanText(rawText);
+
+            // تفعيل محرك المترادفات محلياً
+            synonymsData.forEach(syn => {
+                syn.values.split(',').forEach(v => { if (q.includes(cleanText(v))) q += " " + cleanText(syn.key); });
+            });
+
+            // 1. محرك الربط المحلي والمباشر للأحداث والأقسام (Cross-Context Fast Engine)
+            let responseParts = [];
+            let matchedDocs = doctorsData.filter(d => cleanText(d.name).includes(q) || cleanText(d.specialty).includes(q));
+            matchedDocs.forEach(d => {
+                let mashyDays = (d.mashyDays || []).join('، ');
+                let wissamDays = (d.wissamDays || []).join('، ');
+                let docInfo = `👨‍⚕️ <strong>الدكتور:</strong> ${d.name} (${d.nationality || ''}) - التخصص: ${d.specialty}<br>• الكشفية: ${d.fee || '75 ريال'} | الفرع: ${d.branch}<br>• المواعيد: ${d.timing || ''} (معشي: ${mashyDays || 'طوال الأسبوع'} | الوسام: ${wissamDays || 'طوال الأسبوع'})`;
+                
+                // ربط الأحداث بالإجازات والتنبيهات
+                let relatedAlerts = alertsData.filter(a => cleanText(a.content).includes(cleanText(d.name)));
+                if (d.isLeave || relatedAlerts.length > 0) {
+                    let alertMsg = relatedAlerts.map(a => a.content).join(' | ');
+                    docInfo += `<br><span style="color:#ef4444; font-weight:700;">⚠️ تنبيه/إجازة مرتبطة: ${d.isLeave ? 'الطبيب في إجازة حالياً!' : ''} ${alertMsg}</span>`;
+                } else {
+                    docInfo += `<br><span style="color:#4ade80; font-weight:700;">✅ الحالة: لا توجد إجازات أو تنبيهات مسجلة له حالياً.</span>`;
+                }
+                responseParts.push(docInfo);
+            });
+
+            let matchedOffers = offersData.filter(o => cleanText(o.name).includes(q) || cleanText(o.category).includes(q));
+            matchedOffers.forEach(o => {
+                responseParts.push(`🏷️ <strong>عرض:</strong> ${o.name} (${o.category}) - السعر: ${o.price || 'موضح بالتفاصيل'}`);
+            });
+
+            let matchedCoords = coordinatorsData.filter(c => cleanText(c.name).includes(q));
+            matchedCoords.forEach(c => {
+                responseParts.push(`📋 <strong>قواعد المنسقين (${c.name}):</strong><br>• ${c.rules.join('<br>• ')}`);
+            });
+
+            let apiKey = localStorage.getItem('openrouter_api_key');
+
+            // لو مفيش API كีย์ أو المحرك المحلي جاب نتائج مباشرة لربط الأحداث
+            if (!apiKey && responseParts.length > 0) {
+                let localHtml = `<div style="font-weight:700; color:var(--primary-color); margin-bottom:0.3rem;">نتائج المحرك المحلي المترابط:</div>` + responseParts.map(p => `<div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.4rem; border-radius:6px; margin-bottom:0.3rem;">${p}</div>`).join('');
+                const replyId = 'ai_reply_' + Date.now();
+                msgBox.innerHTML += `<div class="ai-message gemini"><div id="${replyId}">${localHtml}</div><button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')"><i class="fa-solid fa-copy"></i> 📋 نسخ للواتساب</button></div>`;
+                msgBox.scrollTop = msgBox.scrollHeight;
+                return;
+            }
+
+            // الاستعانة بالمساعد السحابي (OpenRouter) إن وجد
             const currentShiftNote = document.getElementById('shiftScratchpadText').value;
             const siteContext = `
             قاعدة بيانات الموقع الحالية:
             1. ملاحظات الشفت: ${currentShiftNote || 'لا توجد'}
             2. مواعيد الأطباء: ${JSON.stringify(doctorsData)}
             3. التنبيهات: ${JSON.stringify(alertsData)}
-            4. الخدمات والأجهزة والأقسام: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
+            4. الأقسام والخدمات: ${JSON.stringify(deptServicesData)}
             5. دليل المنسقين: ${JSON.stringify(coordinatorsData)}
             6. العروض والأسعار: ${JSON.stringify(offersData)}
-            7. دليل الاستفسارات والأسئلة الشائعة: ${JSON.stringify(inquiriesData)}
+            7. دليل الاستفسارات: ${JSON.stringify(inquiriesData)}
             `;
 
             const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً وتنفيذه في قاعدة البيانات...</div>`;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري ربط البيانات ومعالجة طلبك...</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
 
-            let apiKey = localStorage.getItem('openrouter_api_key');
             let aiReply = "";
-
             try {
                 if (!apiKey) throw new Error("No API Key");
                 const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -1805,9 +1918,7 @@
                         "model": "liquid/lfm-2.5-embedding-350m:free",
                         "messages": [{ 
                             "role": "system", 
-                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة، وفهم الأوامر البشرية (إضافة، تعديل، حذف بيانات في الموقع مثل العروض، الاستفسارات، الأطباء، التنبيهات).
-                            
-                            إذا طلب المستخدم إضافة أو تعديل أو حذف أي شيء، قم بإرجاع رد يتضمن نص الإجابة للعميل (أو تأكيد التنفيذ)، وإذا استدعى الامر تعديل البيانات، يمكنك صياغة الأوامر. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
+                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الربط التلقائي بين مواعيد الأطباء والتنبيهات والإجازات وقواعد التشغيل والعروض. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
                         }, { "role": "user", "content": rawText }]
                     })
                 });
@@ -1815,15 +1926,16 @@
                 const data = await response.json();
                 if (data && data.choices && data.choices[0].message.content) {
                     aiReply = data.choices[0].message.content;
-                } else {
-                    throw new Error("API Error");
-                }
+                } else { throw new Error("API Error"); }
             } catch (err) {
-                aiReply = "عذراً يا مصطفى، تأكد من إدخال مفتاح OpenRouter API الصحيح من أيقونة المفتاح بالأعلى لتفعيل المساعد السحابي.";
+                if (responseParts.length > 0) {
+                    aiReply = `<div style="font-weight:700; color:var(--primary-color); margin-bottom:0.3rem;">نتائج ربط الأحداث محلياً:</div>` + responseParts.map(p => `<div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.4rem; border-radius:6px; margin-bottom:0.3rem;">${p}</div>`).join('');
+                } else {
+                    aiReply = "عذراً يا مصطفى، لم أجد نتائج مطابقة، كما يمكنك تفعيل مفتاح OpenRouter API من الأيقونة الصفراء بالأعلى لأجابات أوسع.";
+                }
             }
 
-            document.getElementById(loadingId).remove();
-            
+            document.getElementById(loadingId)?.remove();
             const replyId = 'ai_reply_' + Date.now();
             msgBox.innerHTML += `
                 <div class="ai-message gemini">
@@ -1911,7 +2023,7 @@
             setTimeout(() => { renderDeptsAndDocs("", id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightCoord(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('`active`'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators("", id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightOffer(id, cat) {
