@@ -3,261 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - الإصدار الشامل المطور</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>لوحة الكول سنتر والمنسقين - المساعد الهجين</title>
+    <!-- مكتبة الأيقونات والخطوط -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDK (v8 Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
         :root {
-            --font-family: 'Tajawal', sans-serif;
-            --bg-base: #030305;
-            --bg-surface: #0a0a0e;
-            --bg-card: #13131a;
-            --bg-sidebar: #060609;
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --border-color: #27272a;
-            --primary-color: #f59e0b;
-            --accent-blue: #2563eb;
-            --accent-green: #16a34a;
-            --danger-color: #dc2626;
-            --radius-md: 6px;
-            --radius-lg: 10px;
-        }
-
-        body.theme-darkblue {
-            --bg-base: #060913;
-            --bg-surface: #0c1222;
-            --bg-card: #111a30;
-            --bg-sidebar: #080d1a;
-            --text-main: #ffffff;
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --border-color: #1e293b;
-            --primary-color: #3b82f6;
+            --border-color: #334155;
+            --primary-color: #f59e0b;
         }
-
-        body.theme-gray {
-            --bg-base: #121214;
-            --bg-surface: #1a1a1e;
-            --bg-card: #242429;
-            --bg-sidebar: #161619;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --border-color: #27272a;
-            --primary-color: #8b5cf6;
-        }
-
-        body.theme-light {
-            --bg-base: #f1f5f9;
-            --bg-surface: #ffffff;
-            --bg-card: #f8fafc;
-            --bg-sidebar: #0f172a;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --border-color: #cbd5e1;
-            --primary-color: #2563eb;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-family);
-        }
-
         body {
             background-color: var(--bg-base);
             color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            user-select: text !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
         }
 
-        .sidebar {
-            width: 240px;
-            background-color: var(--bg-sidebar);
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 0.8rem;
-            flex-shrink: 0;
-            transition: width 0.25s ease, padding 0.25s ease;
-        }
-
-        .sidebar.collapsed {
-            width: 65px;
-            padding: 0.8rem 0.35rem;
-        }
-
-        .sidebar.collapsed .brand-text,
-        .sidebar.collapsed .json-tools,
-        .sidebar.collapsed .nav-link span,
-        .sidebar.collapsed .theme-box label,
-        .sidebar.collapsed .theme-select {
-            display: none !important;
-        }
-
-        .sidebar.collapsed .nav-link {
-            justify-content: center;
-            padding: 0.5rem;
-        }
-
-        .brand-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin-bottom: 0.6rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .json-tools {
-            display: flex;
-            gap: 0.3rem;
-            margin-bottom: 0.6rem;
-        }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-            flex: 1;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.45rem 0.7rem;
-            border-radius: var(--radius-md);
-            color: var(--text-muted);
-            text-decoration: none;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: var(--bg-surface);
-            color: var(--primary-color);
-            border: 1px solid var(--border-color);
-            font-weight: 700;
-        }
-
-        .theme-box {
-            padding-top: 0.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .theme-select {
-            width: 100%;
-            padding: 0.35rem;
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            margin-top: 0.2rem;
-            font-size: 0.75rem;
-        }
-
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .top-header {
-            background-color: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-        .search-container {
-            position: relative;
-            width: 220px;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 0.4rem 2rem 0.4rem 0.7rem;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            outline: none;
-            font-size: 0.8rem;
-        }
-
-        .search-container i {
-            position: absolute;
-            right: 0.7rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        .cloud-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: rgba(22, 163, 74, 0.2);
-            border: 1px solid var(--accent-green);
-            color: #4ade80;
-            padding: 0.25rem 0.7rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        .cloud-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #22c55e;
-        }
-
-        .kpi-bar {
-            display: flex;
-            gap: 0.4rem;
-        }
-        .kpi-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .kpi-num {
-            color: var(--primary-color);
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        /* 🎯 مسطرة التنبيهات باللون الأصفر البريمي وإلغاء الخلفيات البيضاء كلياً */
-        /* 🎯 تصميم شريط التنبيهات والأزرار المطابق تماماً للصورة */
+        /* 🎯 مسطرة التنبيهات مع شريط السحب الأصفر السفلي المنفصل تماماً */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
             border-top: 1px solid var(--border-color);
             padding: 0.5rem 1rem;
             display: flex;
@@ -266,9 +37,8 @@
             font-size: 0.76rem;
             position: relative;
             z-index: 50;
-            overflow-x: auto;
-            margin-bottom: 0.6rem;
         }
+        
         .ticker-yellow-ruler {
             background: #f59e0b;
             color: #000;
@@ -282,6 +52,7 @@
             flex-shrink: 0;
             cursor: pointer;
         }
+
         .ticker-latest-btn {
             background: #2563eb;
             color: #fff;
@@ -299,18 +70,40 @@
         .ticker-latest-btn:hover { background: #1d4ed8; }
 
         .ticker-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             overflow-x: auto;
             white-space: nowrap;
             flex: 1;
-            background: transparent !important;
-            padding: 0;
-            border: none;
+            position: relative;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
         }
-        
-        /* شكل التنبيهات كأزرار داكنة زي الصورة تماماً مع المسطرة التحتية عند الاختيار */
+
+        /* 🟡 شريط السحب البارز باللون الأصفر البريمي للماوس */
+        .ticker-container::-webkit-scrollbar {
+            height: 10px;
+        }
+        .ticker-container::-webkit-scrollbar-track {
+            background: #111827;
+            border-radius: 6px;
+        }
+        .ticker-container::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 6px;
+            border: 2px solid #111827;
+        }
+        .ticker-container::-webkit-scrollbar-thumb:hover {
+            background: #d97706;
+        }
+
+        .ticker-static-list {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
         .ticker-item-pill {
             background-color: #111827;
             color: #f3f4f6;
@@ -325,409 +118,54 @@
             cursor: pointer;
             white-space: nowrap;
             flex-shrink: 0;
-            position: relative;
-            transition: all 0.2s;
         }
         .ticker-item-pill:hover {
             border-color: #f59e0b;
         }
-        /* المسطرة الصفراء العريضة تحت الزرار المختار زي الصورة */
-        .ticker-item-pill.active-ruler {
-            border-color: #f59e0b;
-        }
-        .ticker-item-pill.active-ruler::after {
-            content: '';
-            position: absolute;
-            bottom: -7px;
-            left: 10%;
-            width: 80%;
-            height: 3px;
-            background-color: #f59e0b;
-            border-radius: 2px;
-        }
-        .ticker-static-list {
-            display: inline-flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .ticker-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-weight: 700;
-            color: #000000 !important; /* نص أسود واضح ومميز فوق الخلفية الصفراء البريمي */
-            cursor: pointer;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        .ticker-item i {
-            color: #1e1b4b !important; /* أيقونة التنبيه بلون غامق وواضح */
-        }
-        .ticker-item:hover {
-            background: rgba(0, 0, 0, 0.15);
-        }
-        .ticker-btn {
-            background: var(--bg-card);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .ticker-btn:hover { background: var(--primary-color); color: #000; }
 
-        .content-area {
-            flex: 1;
-            padding: 0.6rem;
-            overflow-y: auto;
-        }
-
-        .page-section { display: none; }
-        .page-section.active { display: block; }
-        #globalSearchResultsSection.active { display: block; }
-
-        .search-result-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.7rem;
-            margin-bottom: 0.5rem;
+        /* 🎛️ زر التبديل (Switch) بين المساعد السحابي والمحلي */
+        .ai-switch-container {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 0.6rem;
-        }
-        .source-badge {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            padding: 0.15rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-
-        .page-local-search { margin-bottom: 0.4rem; position: relative; }
-        .page-local-search input {
-            width: 100%;
-            padding: 0.3rem 2rem 0.3rem 0.6rem;
-            background-color: var(--bg-surface);
+            gap: 0.5rem;
+            background: var(--bg-card);
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            outline: none;
-            font-size: 0.78rem;
         }
-        .page-local-search i { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: #000;
-            font-weight: 700;
+        .switch-toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #374151; transition: .4s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #10b981; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .whatsapp-copy-btn {
+            background-color: #25d366;
+            color: #fff;
             border: none;
             padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-md);
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: bold;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            font-size: 0.76rem;
+            margin-top: 0.4rem;
         }
-        .btn-green { background-color: var(--accent-green); color: #fff; }
-        .btn-blue { background-color: var(--accent-blue); color: #fff; }
-        .btn-danger { background-color: var(--danger-color); color: #fff; }
-        .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
-
-        .shift-scratchpad-box {
-            background: var(--bg-surface);
-            border: 1px solid var(--primary-color);
-            border-radius: var(--radius-lg);
-            padding: 0.5rem 0.8rem;
-            margin-bottom: 0.6rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
-        }
-        .scratchpad-textarea {
-            width: 100%;
-            background: var(--bg-card);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 0.4rem;
-            font-size: 0.75rem;
-            resize: vertical;
-            height: 55px;
-            outline: none;
-        }
-
-        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; align-items: start; }
-        .branch-box {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 0.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-        .branch-title {
-            font-size: 0.88rem;
-            font-weight: 700;
-            padding-bottom: 0.3rem;
-            margin-bottom: 0.4rem;
-            border-bottom: 2px solid var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .table-responsive { width: 100%; overflow-x: auto; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; table-layout: fixed; }
-        th, td { padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.35; vertical-align: middle; }
-        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 700; font-size: 0.75rem; }
-
-        .doc-name-box { font-weight: 800; font-size: 0.82rem; color: #ffffff; display: block; word-break: break-word; }
-        .doc-nat-badge { font-weight: 600; font-size: 0.7rem; color: #38bdf8; display: block; margin-top: 2px; }
-        .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: #f3f4f6; }
-
-        table.resizable-mode th, table.resizable-mode td {
-            resize: both !important;
-            overflow: auto !important;
-            border-left: 1px dashed var(--primary-color);
-            min-width: 30px !important;
-            min-height: 20px !important;
-        }
-
-        .highlight-pulse { animation: pulseGlow 1.5s infinite; }
-        @keyframes pulseGlow {
-            0% { background-color: rgba(245, 158, 11, 0.6); }
-            50% { background-color: rgba(245, 158, 11, 0.1); }
-            100% { background-color: rgba(245, 158, 11, 0.6); }
-        }
-
-        .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-        .alert-card-item-compact {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 0.4rem 0.6rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            font-size: 0.76rem;
-        }
-        .alert-thumb-side { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
-        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem; }
-
-        .coordinators-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 0.4rem; 
-            align-items: start; 
-        }
-        .doc-sheet-card {
-            border-radius: 8px;
-            padding: 0.5rem 0.6rem;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-            font-size: 0.75rem;
-            line-height: 1.3;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            position: relative;
-        }
-        .doc-sheet-card h3 {
-            font-size: 0.82rem;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-            padding-bottom: 0.2rem;
-            margin-bottom: 0.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .card-drag-handle { cursor: grab; padding: 0.1rem 0.25rem; color: #facc15; font-size: 0.75rem; }
-        .card-drag-handle:active { cursor: grabbing; }
-
-        .card-teal { background-color: #0d47a1; }
-        .card-maroon { background-color: #4a148c; }
-        .card-red { background-color: #b71c1c; }
-        .card-darkblue { background-color: #1a237e; }
-        .card-gold { background-color: #e65100; }
-        .card-green { background-color: #1b5e20; }
-
-        .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; overflow-x: auto; }
-        .offer-tab-btn {
-            background: var(--bg-surface);
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 0.3rem 0.7rem;
-            border-radius: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-weight: 600;
-            font-size: 0.76rem;
-        }
-        .offer-tab-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
-
-        .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.6rem; }
-        .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.88rem; display: inline-block; }
-        .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.55rem; padding: 0.02rem 0.2rem; border-radius: 3px; }
-        
-        /* 🎯 تصميم الوسوم الصغيرة أسفل الكارت */
-        .card-tags-footer {
-            margin-top: 0.3rem;
-            padding-top: 0.2rem;
-            border-top: 1px dashed rgba(255,255,255,0.25);
-            font-size: 0.68rem;
-            color: #fde047;
-            font-weight: 600;
-        }
-        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
-
-        .offers-multi-clipboard-box {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 40px;
-            width: 280px;
-            background: var(--bg-card);
-            border: 2px solid var(--primary-color);
-            border-radius: var(--radius-lg);
-            padding: 0.5rem;
-            flex-direction: column;
-            gap: 0.3rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            z-index: 9999;
-            cursor: move;
-        }
-        .offers-multi-clipboard-box.active { display: flex; }
-        .clipboard-textarea {
-            width: 100%;
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0.4rem;
-            font-size: 0.73rem;
-            resize: vertical;
-            height: 80px;
-            cursor: text;
-        }
-
-        .ai-floating-btn {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            width: 48px;
-            height: 48px;
-            background: #facc15;
-            color: #1e1b4b;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-            z-index: 10000;
-            border: 2px solid #eab308;
-            transition: transform 0.2s;
-        }
-        .ai-floating-btn:hover { transform: scale(1.08); }
-
-        .ai-floating-chat-window {
-            position: fixed;
-            bottom: 82px;
-            left: 25px;
-            width: 360px;
-            height: 480px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            display: none;
-            flex-direction: column;
-            z-index: 10000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            overflow: hidden;
-        }
-        .ai-floating-chat-window.active { display: flex; }
-        .ai-messages-box { flex: 1; padding: 0.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
-        .ai-message { max-width: 95%; padding: 0.5rem 0.7rem; border-radius: 8px; font-size: 0.76rem; line-height: 1.4; }
-        .ai-message.user { background: var(--accent-blue); color: #fff; align-self: flex-start; }
-        .ai-message.gemini { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-end; }
-        .ai-input-box { padding: 0.35rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.3rem; }
-        .ai-input-row { display: flex; gap: 0.3rem; }
-        .ai-input-row input {
-            flex: 1;
-            padding: 0.3rem 0.5rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            outline: none;
-            font-size: 0.75rem;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.75);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 0.8rem;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 520px;
-            max-height: 90vh;
-            padding: 0.9rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            overflow-y: auto;
-        }
-        .form-control {
-            width: 100%;
-            padding: 0.35rem;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            outline: none;
-            font-size: 0.76rem;
-        }
-
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; }
-        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; margin-top: 0.3rem; display: none; }
-        .days-checklist.show { display: grid; }
-        .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.2rem; font-size: 0.75rem; cursor: pointer; }
-        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: 100%; height: auto; }
-            .main-wrapper { height: auto; overflow: visible; }
-            .split-grid { grid-template-columns: 1fr; }
-            .alerts-2col-grid { grid-template-columns: 1fr; }
-            .top-header { flex-direction: column; align-items: stretch; }
-            .search-container { width: 100%; }
-        }
+        .whatsapp-copy-btn:hover { background-color: #128c7e; }
     </style>
 </head>
 <body class="theme-amoled">
@@ -790,17 +228,38 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-       <!-- مسطرة التنبيهات المطابقة للصورة تماماً -->
+       <!-- هيكل الواجهة الأساسي -->
+    <div class="main-wrapper" style="padding: 1rem;">
+        
+        <!-- مسطرة التنبيهات المحدثة بالمسطرة الصفراء السفلية -->
         <div class="professional-ticker-bar">
             <div class="ticker-yellow-ruler" onclick="jumpToAlertsTab()"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <button class="ticker-latest-btn" onclick="resetAndSortTickerLatest()"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
             
-            <div class="ticker-container" id="tickerTrackContainer">
-                <!-- يتم تعبئتها تلقائياً بالأزرار الثابتة -->
+            <!-- زر سويتش الذكاء الاصطناعي الهجين -->
+            <div class="ai-switch-container">
+                <span id="aiModeLabel" style="font-size:0.7rem; font-weight:bold; color:#10b981;">☁️ متصل بالسحابة</span>
+                <label class="switch-toggle">
+                    <input type="checkbox" id="aiModeSwitch" checked onchange="toggleAIMode(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="ticker-container" id="tickerContainerBox">
+                <div class="ticker-static-list" id="tickerTrackContainer">
+                    <!-- يتم تعبئتها أوتوماتيكياً بالتنبيهات مرتبة من الأحدث -->
+                </div>
             </div>
         </div>
 
-        <div class="content-area">
+        <!-- قسم محتوى الأقسام وعرض البيانات -->
+        <div id="contentArea" style="margin-top: 1rem;">
+            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <h3>مرحباً بك يا مصطفى في لوحة الكول سنتر</h3>
+                <p>النظام الهجين والمساعد المحلي يعملان بكفاءة تامة. استخدم شريط السحب الأصفر بالأعلى للتصفح المريح.</p>
+            </div>
+        </div>
+    </div>
 
             <!-- سجل ملاحظات وردية الشيفت -->
             <div class="shift-scratchpad-box">
@@ -1536,14 +995,171 @@
             }
         });
 
-        let doctorsData = [];
-        let fridaySchedules = [];
-        let alertsData = [];
-        let coordinatorsData = [];
-        let deptServicesData = [];
-        let deptNotesData = [];
-        let offersData = [];
-        let inquiriesData = [];
+        // بيانات تجريبية أولية للأقسام
+        let alertsData = [
+            { id: 1, content: "عروض أكتوبر المميزة متاحة الآن لفترة محدودة.", time: "10:30 AM" },
+            { id: 2, content: "إجازة الدكتور إيهاب يوم الخميس القادم.", time: "11:00 AM" }
+        ];
+        let doctorsData = [
+            { name: "إهاب مصطفى", specialty: "أسنان", notes: "متواجد من 2 لـ 10" }
+        ];
+        let offersData = [
+            { name: "عرض الليزر", notes: "جلسة جنتل ماكس برو شاملة الرتوش" }
+        ];
+        let inquiriesData = [
+            { question: "مواعيد العمل", answer: "العمل يومياً من الساعة 10 صباحاً حتى 10 مساءً" }
+        ];
+
+        // 1. حالة المساعد (سحابي افتراضياً) وقاعدة البيانات المحلية للتعلم التراكمي
+        let isCloudAI = true;
+        let localLearnedKnowledge = JSON.parse(localStorage.getItem('localLearnedKnowledge') || '[]');
+
+        // قاموس المترادفات والكلمات المفتاحية للكول سنتر
+        const synonymDictionary = {
+            "تشقير": ["حواجب", "حواف", "تفتيح", "صبغة"],
+            "حواجب": ["تشقير", "حواف"],
+            "حاف": ["تشقير", "حواجب"],
+            "رتوش": ["جلسة مجانية", "مراجعة", "تأكيد"],
+            "كشف": ["سعر", "تكلفة", "بكم", "موعد"],
+            "ليزر": ["جنتل ماكس برو", "كلاريتي", "شعر"]
+        };
+
+        // 2. دالة تنظيف الجذور والهمزات والألف واللام
+        function stemAndCleanText(text) {
+            if (!text) return "";
+            return text.toString().toLowerCase()
+                .replace(/(آ|أ|إ)/g, "ا")
+                .replace(/(ة)/g, "ه")
+                .replace(/(ى)/g, "ي")
+                .replace(/^ال/g, "")
+                .replace(/[\u064b-\u0652]/g, "");
+        }
+
+        // 3. التبديل بين السحابي والمحلي عبر زر Switch
+        function toggleAIMode(checked) {
+            isCloudAI = checked;
+            const label = document.getElementById('aiModeLabel');
+            if (isCloudAI) {
+                label.innerHTML = "☁️ متصل بالسحابة (OpenRouter)";
+                label.style.color = "#10b981";
+            } else {
+                label.innerHTML = "💻 المساعد المحلي (Offline)";
+                label.style.color = "#f59e0b";
+            }
+        }
+
+        // 4. زر أحدث إشعار لإعادة ضبط وتدوير التنبيهات من الأحدث في مكانها
+        function resetAndSortTickerLatest() {
+            const container = document.getElementById('tickerContainerBox');
+            if (container) container.scrollLeft = 0;
+            renderAlerts();
+        }
+
+        // 5. محرك المساعد المحلي الذكي (يبحث في الأقسام الـ 6 + يتعلم أوفلاين)
+        function processLocalAIQuery(userQuery) {
+            const cleanedQuery = stemAndCleanText(userQuery);
+            let searchKeywords = [cleanedQuery];
+
+            for (let key in synonymDictionary) {
+                if (cleanedQuery.includes(stemAndCleanText(key))) {
+                    synonymDictionary[key].forEach(s => searchKeywords.push(stemAndCleanText(s)));
+                }
+            }
+
+            // البحث في الذاكرة التراكمية المتعلمة من السحابة
+            const learnedMatch = localLearnedKnowledge.find(item => searchKeywords.some(kw => stemAndCleanText(item.query).includes(kw)));
+            if (learnedMatch) {
+                return formatAIResponse(learnedMatch.response, "الذاكرة التراكمية المتعلمة");
+            }
+
+            // المسح الشامل للأقسام الـ 6
+            let results = [];
+
+            if (typeof doctorsData !== 'undefined') {
+                doctorsData.forEach(d => {
+                    if (searchKeywords.some(kw => stemAndCleanText(`${d.name} ${d.specialty} ${d.notes}`).includes(kw))) {
+                        results.push(`الدكتور/ة: ${d.name} - التخصص: ${d.specialty} - المواعيد: ${d.notes || 'متواجد'}`);
+                    }
+                });
+            }
+
+            if (typeof offersData !== 'undefined') {
+                offersData.forEach(o => {
+                    if (searchKeywords.some(kw => stemAndCleanText(`${o.name} ${o.notes}`).includes(kw))) {
+                        results.push(`عرض: ${o.name} - التفاصيل: ${o.notes}`);
+                    }
+                });
+            }
+
+            if (typeof inquiriesData !== 'undefined') {
+                inquiriesData.forEach(i => {
+                    if (searchKeywords.some(kw => stemAndCleanText(`${i.question} ${i.answer}`).includes(kw))) {
+                        results.push(`دليل المنسقين: ${i.answer}`);
+                    }
+                });
+            }
+
+            if (typeof alertsData !== 'undefined') {
+                alertsData.forEach(a => {
+                    if (searchKeywords.some(kw => stemAndCleanText(a.content).includes(kw))) {
+                        results.push(`تنبيه: ${a.content}`);
+                    }
+                });
+            }
+
+            if (results.length > 0) {
+                return formatAIResponse(results.join('\n\n'), "قاعدة البيانات المحلية");
+            } else {
+                return formatAIResponse(`عذراً، لم أجد معلومة مطابقة حالياً. يمكنك إضافتها لتغذية النظام المحلي ليتعلمها.`, "توجيه محلي");
+            }
+        }
+
+        // 6. حفظ إجابات السحابة تلقائياً ليتعلم منها المساعد المحلي
+        function saveCloudResponseToLocalMemory(query, response) {
+            localLearnedKnowledge.push({ query, response, timestamp: new Date() });
+            localStorage.setItem('localLearnedKnowledge', JSON.stringify(localLearnedKnowledge));
+        }
+
+        // 7. تنسيق الرد وزر النسخ للواتساب
+        function formatAIResponse(text, source) {
+            const cleanWhatsappText = text.replace(/'/g, "\\'");
+            return `
+                <div style="background:var(--bg-card); border-right:4px solid #f59e0b; padding:0.6rem; border-radius:6px; margin-top:0.4rem;">
+                    <p style="margin:0; font-size:0.8rem; line-height:1.4;">${text}</p>
+                    <button class="whatsapp-copy-btn" onclick="copyForWhatsApp('${cleanWhatsappText}')">
+                        <i class="fa-brands fa-whatsapp"></i> نسخ النص للعميل
+                    </button>
+                </div>
+            `;
+        }
+
+        function copyForWhatsApp(text) {
+            navigator.clipboard.writeText(text);
+            alert("تم نسخ النص بنجاح وجاهز للإرسال على الواتساب!");
+        }
+
+        // 8. عرض التنبيهات مرتبة تنازلياً من الأحدث
+        function renderAlerts() {
+            const tickerTrack = document.getElementById('tickerTrackContainer');
+            if(!tickerTrack || typeof alertsData === 'undefined') return;
+            tickerTrack.innerHTML = "";
+            
+            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
+
+            sortedAlerts.forEach(item => {
+                tickerTrack.innerHTML += `
+                    <div class="ticker-item-pill" onclick="jumpToAlertAndHighlight(${item.id})">
+                        <i class="fa-solid fa-circle-exclamation" style="color:#f59e0b;"></i>
+                        <span>${item.content}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // تشغيل عرض التنبيهات عند فتح الصفحة
+        window.onload = function() {
+            renderAlerts();
+        };
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
