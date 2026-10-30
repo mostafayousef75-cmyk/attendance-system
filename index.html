@@ -6,6 +6,9 @@
     <title>لوحة الكول سنتر والمنسقين - المساعد الهجين</title>
     <!-- مكتبة الأيقونات والخطوط -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبات Firebase الأساسية -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root {
             --bg-base: #0f172a;
@@ -15,6 +18,8 @@
             --text-muted: #94a3b8;
             --border-color: #334155;
             --primary-color: #f59e0b;
+            --accent-green: #10b981;
+            --danger-color: #ef4444;
         }
         body {
             background-color: var(--bg-base);
@@ -23,7 +28,44 @@
             margin: 0;
             padding: 0;
             direction: rtl;
+            display: flex;
+            min-height: 100vh;
         }
+
+        /* القائمة الجانبية Sidebar */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-surface);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 0.8rem;
+            gap: 1rem;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .sidebar.collapsed { width: 60px; }
+        .sidebar.collapsed .brand-text, 
+        .sidebar.collapsed .nav-link span, 
+        .sidebar.collapsed .json-tools, 
+        .sidebar.collapsed .theme-box { display: none; }
+
+        .brand-title { display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 0.9rem; color: var(--primary-color); }
+        .json-tools { display: flex; gap: 0.3rem; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+        .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.8rem; border-radius: 6px; color: var(--text-main); text-decoration: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(245, 158, 11, 0.15); color: var(--primary-color); }
+
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+        .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .search-container { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem 0.6rem; flex: 1; max-width: 350px; }
+        .search-container input { background: transparent; border: none; color: var(--text-main); outline: none; width: 100%; font-size: 0.75rem; }
+
+        .cloud-indicator { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 700; }
+        .cloud-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .kpi-bar { display: flex; gap: 0.8rem; font-size: 0.72rem; font-weight: 700; }
+        .kpi-card { background: var(--bg-base); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); }
 
         /* 🎯 مسطرة التنبيهات مع شريط السحب الأصفر السفلي المنفصل تماماً */
         .professional-ticker-bar {
@@ -82,95 +124,62 @@
         }
 
         /* 🟡 شريط السحب البارز باللون الأصفر البريمي للماوس */
-        .ticker-container::-webkit-scrollbar {
-            height: 10px;
-        }
-        .ticker-container::-webkit-scrollbar-track {
-            background: #111827;
-            border-radius: 6px;
-        }
-        .ticker-container::-webkit-scrollbar-thumb {
-            background: #f59e0b;
-            border-radius: 6px;
-            border: 2px solid #111827;
-        }
-        .ticker-container::-webkit-scrollbar-thumb:hover {
-            background: #d97706;
-        }
+        .ticker-container::-webkit-scrollbar { height: 10px; }
+        .ticker-container::-webkit-scrollbar-track { background: #111827; border-radius: 6px; }
+        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 6px; border: 2px solid #111827; }
+        .ticker-container::-webkit-scrollbar-thumb:hover { background: #d97706; }
 
-        .ticker-static-list {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .ticker-item-pill {
-            background-color: #111827;
-            color: #f3f4f6;
-            border: 1px solid #374151;
-            padding: 0.35rem 0.7rem;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .ticker-item-pill:hover {
-            border-color: #f59e0b;
-        }
+        .ticker-static-list { display: inline-flex; align-items: center; gap: 0.6rem; }
+        .ticker-item-pill { background-color: #111827; color: #f3f4f6; border: 1px solid #374151; padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+        .ticker-item-pill:hover { border-color: #f59e0b; }
 
         /* 🎛️ زر التبديل (Switch) بين المساعد السحابي والمحلي */
-        .ai-switch-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--bg-card);
-            padding: 0.3rem 0.6rem;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-        .switch-toggle {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
+        .ai-switch-container { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-card); padding: 0.3rem 0.6rem; border-radius: 20px; border: 1px solid var(--border-color); }
+        .switch-toggle { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch-toggle input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #374151; transition: .4s; border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-            background-color: white; transition: .4s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        .whatsapp-copy-btn {
-            background-color: #25d366;
-            color: #fff;
-            border: none;
-            padding: 0.3rem 0.6rem;
-            border-radius: 5px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            margin-top: 0.4rem;
-        }
+        .whatsapp-copy-btn { background-color: #25d366; color: #fff; border: none; padding: 0.3rem 0.6rem; border-radius: 5px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.4rem; }
         .whatsapp-copy-btn:hover { background-color: #128c7e; }
+
+        .page-section { display: none; padding: 1rem; }
+        .page-section.active { display: block; }
+
+        /* الشات العائم والمودالات */
+        .ai-floating-btn { position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; z-index: 999; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+        .ai-floating-chat-window { position: fixed; bottom: 80px; left: 20px; width: 360px; height: 480px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; }
+        .ai-floating-chat-window.active { display: flex; }
+        .ai-messages-box { flex: 1; padding: 0.8rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; }
+        .ai-message { padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 0.75rem; max-width: 85%; line-height: 1.4; }
+        .ai-message.user { background: #2563eb; color: #fff; align-self: flex-start; }
+        .ai-message.gemini { background: var(--bg-card); color: var(--text-main); align-self: flex-end; border: 1px solid var(--border-color); }
+        .ai-input-box { padding: 0.5rem; background: var(--bg-card); border-top: 1px solid var(--border-color); }
+        .ai-input-row { display: flex; gap: 0.4rem; }
+        .ai-input-row input { flex: 1; background: var(--bg-base); border: 1px solid var(--border-color); color: #fff; padding: 0.4rem; border-radius: 6px; font-size: 0.75rem; outline: none; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; width: 90%; max-width: 500px; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; max-height: 90vh; overflow-y: auto; }
+        .form-control { background: var(--bg-base); border: 1px solid var(--border-color); color: #fff; padding: 0.4rem; border-radius: 6px; font-size: 0.75rem; outline: none; }
+        .btn { border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .btn-green { background: #10b981; color: #fff; }
+        .btn-blue { background: #2563eb; color: #fff; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-secondary { background: #475569; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid var(--border-color); padding: 0.4rem; text-align: right; }
+        th { background: var(--bg-card); color: var(--primary-color); }
+        .highlight-pulse { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0% { background-color: rgba(245, 158, 11, 0.5); } 50% { background-color: transparent; } 100% { background-color: rgba(245, 158, 11, 0.5); } }
     </style>
 </head>
 <body class="theme-amoled">
 
-    <!-- Sidebar -->
+    <!-- القائمة الجانبية Sidebar -->
     <aside class="sidebar" id="appSidebar">
         <div class="brand-title">
             <div style="display:flex; align-items:center; gap:0.4rem;">
@@ -187,7 +196,7 @@
         </div>
 
         <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
+            <li><a class="nav-link active" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
             <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
             <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
             <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
@@ -197,16 +206,15 @@
         
         <div class="theme-box">
             <label style="font-size: 0.72rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
-            <select class="theme-select" onchange="changeTheme(this.value)">
+            <select class="form-control theme-select" onchange="changeTheme(this.value)">
                 <option value="theme-amoled">OLED أسود (Amoled)</option>
                 <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
                 <option value="theme-gray">رصاصي فحمي (Charcoal Gray)</option>
-                <option value="theme-light">مضيء فاتح (Light Mode)</option>
             </select>
         </div>
     </aside>
 
-    <!-- Main Shell -->
+    <!-- Main Wrapper -->
     <main class="main-wrapper">
         <header class="top-header">
             <div class="search-container">
@@ -214,9 +222,9 @@
                 <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الأقسام..." oninput="handleTrueGlobalSearch(this.value)">
             </div>
             
-            <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
-                <span class="cloud-dot"></span>
-                <span>متصل بالسحابة</span>
+            <div class="cloud-indicator" id="cloudStatusBadge">
+                <span class="cloud-dot" style="background:#22c55e;"></span>
+                <span>جاري الاتصال...</span>
             </div>
 
             <div class="kpi-bar">
@@ -228,12 +236,9 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-       <!-- هيكل الواجهة الأساسي -->
-    <div class="main-wrapper" style="padding: 1rem;">
-        
         <!-- مسطرة التنبيهات المحدثة بالمسطرة الصفراء السفلية -->
         <div class="professional-ticker-bar">
-            <div class="ticker-yellow-ruler" onclick="jumpToAlertsTab()"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
+            <div class="ticker-yellow-ruler" onclick="switchTab('alerts', document.querySelectorAll('.nav-link')[1])"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <button class="ticker-latest-btn" onclick="resetAndSortTickerLatest()"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
             
             <!-- زر سويتش الذكاء الاصطناعي الهجين -->
@@ -246,298 +251,122 @@
             </div>
 
             <div class="ticker-container" id="tickerContainerBox">
-                <div class="ticker-static-list" id="tickerTrackContainer">
-                    <!-- يتم تعبئتها أوتوماتيكياً بالتنبيهات مرتبة من الأحدث -->
-                </div>
+                <div class="ticker-static-list" id="tickerTrackContainer"></div>
             </div>
         </div>
 
-        <!-- قسم محتوى الأقسام وعرض البيانات -->
-        <div id="contentArea" style="margin-top: 1rem;">
-            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                <h3>مرحباً بك يا مصطفى في لوحة الكول سنتر</h3>
-                <p>النظام الهجين والمساعد المحلي يعملان بكفاءة تامة. استخدم شريط السحب الأصفر بالأعلى للتصفح المريح.</p>
+        <!-- نتائج البحث الشامل -->
+        <section id="globalSearchResultsSection" class="page-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل</h2>
+                <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
+            </div>
+            <div id="globalSearchResultsList"></div>
+        </section>
+
+        <!-- 1. مواعيد الأطباء -->
+        <section id="schedule-section" class="page-section active">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
+                <div style="display:flex; gap:0.3rem;">
+                    <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> مناوبات الجمعة</button>
+                    <button class="btn btn-green" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center;">
+                <input type="text" id="docSearchInput" class="form-control" style="flex:1;" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
+                <select id="specialtyFilter" class="form-control" style="width:160px;" onchange="renderDoctors()">
+                    <option value="">جميع التخصصات</option>
+                </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
+                <div>
+                    <h3 style="color:#f59e0b;">فرع معشي</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الطبيب</th>
+                                <th>التخصص</th>
+                                <th>الكشف</th>
+                                <th>المواعيد</th>
+                                <th>إدارة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mashyTableBody"></tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3 style="color:#f59e0b;">فرع الوسام</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الطبيب</th>
+                                <th>التخصص</th>
+                                <th>الكشف</th>
+                                <th>المواعيد</th>
+                                <th>إدارة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wissamTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. التنبيهات والإشعارات -->
+        <section id="alerts-section" class="page-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
+                <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه</button>
+            </div>
+            <div id="alertsGridList" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;"></div>
+        </section>
+
+        <!-- 3. الأقسام والأطباء -->
+        <section id="depts-docs-section" class="page-section">
+            <h2>أقسام وخدمات العيادات</h2>
+            <div id="deptNotesContainer"></div>
+        </section>
+
+        <!-- 4. دليل المنسقين -->
+        <section id="coordinators-section" class="page-section">
+            <h2>دليل المنسقين</h2>
+            <div id="coordinatorsGrid"></div>
+        </section>
+
+        <!-- 5. العروض والأسعار -->
+        <section id="offers-section" class="page-section">
+            <h2>العروض والأسعار</h2>
+            <div id="offersTabsContainer"></div>
+            <table id="offersTableElement" style="margin-top:0.5rem;"></table>
+        </section>
+
+        <!-- 6. دليل الاستفسارات -->
+        <section id="inquiries-section" class="page-section">
+            <h2>دليل الاستفسارات</h2>
+            <div id="inquiryCardsGrid"></div>
+        </section>
+    </main>
+
+    <!-- المساعد الذكي السريع العائم -->
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()"><i class="fa-solid fa-robot"></i></div>
+    <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
+        <div style="padding:0.5rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:700; font-size:0.8rem;">🤖 المساعد الذكي الهجين</span>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingChat()"></i>
+        </div>
+        <div class="ai-messages-box" id="aiMessagesBox">
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد متصل وجاهز بخدمتك في الأقسام الـ 6.</div>
+        </div>
+        <div class="ai-input-box">
+            <div class="ai-input-row">
+                <input type="text" id="aiUserInput" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key === 'Enter') handleSmartChatSubmit()">
+                <button class="btn btn-green" onclick="handleSmartChatSubmit()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
-
-            <!-- سجل ملاحظات وردية الشيفت -->
-            <div class="shift-scratchpad-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color);">
-                    <span><i class="fa-solid fa-clipboard-list"></i> سجل ملاحظات وطوارئ وردية الشيفت (مؤقت):</span>
-                    <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.6rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الشيفت</button>
-                </div>
-                <textarea id="shiftScratchpadText" class="scratchpad-textarea" placeholder="اكتب هنا أي تنبيه طارئ أو ملاحظة سريعة أثناء الوردية وتتمسح بعد انتهاء الشفت..." oninput="saveShiftScratchpad()"></textarea>
-            </div>
-
-            <!-- Global Search Results -->
-            <section id="globalSearchResultsSection" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل (مترتبة حسب الأقسام)</h2>
-                    <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
-                </div>
-                <div id="globalSearchResultsList"></div>
-            </section>
-
-            <!-- 1. مواعيد الأطباء -->
-            <section id="schedule-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-                    <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
-                    <div style="display:flex; gap:0.3rem;">
-                        <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> مناوبات الجمعة</button>
-                        <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
-                    </div>
-                </div>
-
-                <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
-                    <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="font-weight:700;">-</span></span>
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="font-weight:700;">-</span></span>
-                    </div>
-                    <div style="display:flex; gap:1rem; color:var(--primary-color); flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:var(--text-main);">-</span></span>
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:var(--text-main);">-</span></span>
-                    </div>
-                </div>
-
-                <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center;">
-                    <div class="page-local-search" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
-                    </div>
-                    <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
-                        <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة
-                    </button>
-                    <button class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.5rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
-                    <div style="width: 180px;">
-                        <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
-                            <option value="">جميع التخصصات</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="split-grid">
-                    <div class="branch-box">
-                        <div class="branch-title">
-                            <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
-                            <span style="font-size:0.65rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="mashyTableElement">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 20%;">الطبيب والجنسية</th>
-                                        <th style="width: 15%;">التخصص</th>
-                                        <th style="width: 10%;">الكشف</th>
-                                        <th style="width: 25%;">فرع معشي والمواعيد</th>
-                                        <th style="width: 20%;">الملاحظات</th>
-                                        <th style="width: 10%; text-align:center;">إدارة</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="mashyTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="branch-box">
-                        <div class="branch-title">
-                            <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
-                            <span style="font-size:0.65rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="wissamTableElement">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 20%;">الطبيب والجنسية</th>
-                                        <th style="width: 15%;">التخصص</th>
-                                        <th style="width: 10%;">الكشف</th>
-                                        <th style="width: 25%;">فرع الوسام والمواعيد</th>
-                                        <th style="width: 20%;">الملاحظات</th>
-                                        <th style="width: 10%; text-align:center;">إدارة</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="wissamTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 2. التنبيهات والإشعارات -->
-            <section id="alerts-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
-                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / PDF</button>
-                </div>
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في التنبيهات..." oninput="renderAlerts(this.value)">
-                </div>
-                <div class="alerts-2col-grid" id="alertsGridList"></div>
-            </section>
-
-            <!-- 3. الأقسام والأطباء -->
-            <section id="depts-docs-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h2>أقسام وفروع وخدمات العيادات</h2>
-                    <div style="display:flex; gap:0.3rem;">
-                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
-                        <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
-                    </div>
-                </div>
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs(this.value)">
-                </div>
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
-                    <div style="display:flex; flex-direction:column; gap:0.6rem;">
-                        
-                        <!-- فرع معشي -->
-                        <div class="branch-box">
-                            <div class="branch-title">
-                                <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة مستقلة لكل عمود)</span>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-                                <!-- عمود الجلدية معشي -->
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع معشي - الجلدية</div>
-                                    <table style="margin-top:0;">
-                                        <thead>
-                                            <tr>
-                                                <th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th>
-                                                <th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="mashyDermTableBody"></tbody>
-                                    </table>
-                                </div>
-                                <!-- عمود الأسنان معشي -->
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع معشي - الأسنان</div>
-                                    <table style="margin-top:0;">
-                                        <thead>
-                                            <tr>
-                                                <th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th>
-                                                <th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="mashyDentTableBody"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- فرع الوسام -->
-                        <div class="branch-box">
-                            <div class="branch-title">
-                                <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة مستقلة لكل عمود)</span>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-                                <!-- عمود الجلدية الوسام -->
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع الوسام - الجلدية</div>
-                                    <table style="margin-top:0;">
-                                        <thead>
-                                            <tr>
-                                                <th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th>
-                                                <th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="wissamDermTableBody"></tbody>
-                                    </table>
-                                </div>
-                                <!-- عمود الأسنان الوسام -->
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع الوسام - الأسنان</div>
-                                    <table style="margin-top:0;">
-                                        <thead>
-                                            <tr>
-                                                <th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th>
-                                                <th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="wissamDentTableBody"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
-                </div>
-            </section>
-
-            <!-- 4. دليل المنسقين -->
-            <section id="coordinators-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
-                    <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
-                </div>
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في تعليمات ودليل المنسقين..." oninput="renderCoordinators(this.value)">
-                </div>
-                <div class="coordinators-grid" id="coordinatorsGrid"></div>
-            </section>
-
-            <!-- 5. العروض والأسعار -->
-            <section id="offers-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
-                    <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
-                </div>
-
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
-                </div>
-
-                <div class="offers-multi-clipboard-box" id="multiOffersClipboardBox" onmousedown="startDragClipboard(event)">
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color); cursor:move;">
-                        <span><i class="fa-solid fa-arrows-up-down-left-right"></i> سلة العروض (اسحب):</span>
-                        <div style="display:flex; gap:0.3rem;">
-                            <button class="btn btn-green" style="padding:0.1rem 0.35rem; font-size:0.62rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i></button>
-                            <button class="btn btn-danger" style="padding:0.1rem 0.35rem; font-size:0.62rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                    </div>
-                    <textarea id="multiOffersTextarea" class="clipboard-textarea" readonly placeholder="العروض المحددة..."></textarea>
-                </div>
-
-                <div class="offers-tabs" id="offersTabsContainer"></div>
-
-                <div class="offers-table-box">
-                    <div class="table-responsive">
-                        <table id="offersTableElement"></table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 6. دليل الاستفسارات -->
-            <section id="inquiries-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
-                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
-                </div>
-                
-                <div class="offers-tabs" id="inquiriesFilterTabs">
-                    <button class="offer-tab-btn active" onclick="filterInquiryCategory('الكل', this)">الكل</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأطباء وخدماتها', this)">الأطباء وخدماتها</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأجهزة', this)">الأجهزة</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأشعة والمختبر', this)">الأشعة والمختبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('أخرى', this)">أخرى</button>
-                </div>
-
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في الاستفسارات..." oninput="renderInquiries(this.value)">
-                </div>
-                <div class="coordinators-grid" id="inquiryCardsGrid"></div>
-            </section>
-
-        </div>
-    </main>
 
     <!-- زر المساعد الذكي السريع -->
     <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي الهجين">
@@ -977,188 +806,138 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            databaseURL: "https://monasqen-default-rtdb.firebaseio.com/"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        db.ref('.info/connected').on('value', function(snap) {
-            const badge = document.getElementById('cloudStatusBadge');
-            if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة</span>`;
-            } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 10px #dc2626;"></span><span>غير متصل</span>`;
-            }
-        });
-
-        // بيانات تجريبية أولية للأقسام
-        let alertsData = [
-            { id: 1, content: "عروض أكتوبر المميزة متاحة الآن لفترة محدودة.", time: "10:30 AM" },
-            { id: 2, content: "إجازة الدكتور إيهاب يوم الخميس القادم.", time: "11:00 AM" }
-        ];
-        let doctorsData = [
-            { name: "إهاب مصطفى", specialty: "أسنان", notes: "متواجد من 2 لـ 10" }
-        ];
-        let offersData = [
-            { name: "عرض الليزر", notes: "جلسة جنتل ماكس برو شاملة الرتوش" }
-        ];
-        let inquiriesData = [
-            { question: "مواعيد العمل", answer: "العمل يومياً من الساعة 10 صباحاً حتى 10 مساءً" }
-        ];
-
-        // 1. حالة المساعد (سحابي افتراضياً) وقاعدة البيانات المحلية للتعلم التراكمي
+        let doctorsData = [], alertsData = [], offersData = [], inquiriesData = [], coordinatorsData = [], deptServicesData = [], deptNotesData = [];
         let isCloudAI = true;
         let localLearnedKnowledge = JSON.parse(localStorage.getItem('localLearnedKnowledge') || '[]');
 
-        // قاموس المترادفات والكلمات المفتاحية للكول سنتر
         const synonymDictionary = {
             "تشقير": ["حواجب", "حواف", "تفتيح", "صبغة"],
             "حواجب": ["تشقير", "حواف"],
             "حاف": ["تشقير", "حواجب"],
-            "رتوش": ["جلسة مجانية", "مراجعة", "تأكيد"],
-            "كشف": ["سعر", "تكلفة", "بكم", "موعد"],
-            "ليزر": ["جنتل ماكس برو", "كلاريتي", "شعر"]
+            "كشف": ["سعر", "تكلفة", "بكم"],
+            "ليزر": ["جنتل ماكس برو", "كلاريتي"]
         };
 
-        // 2. دالة تنظيف الجذور والهمزات والألف واللام
         function stemAndCleanText(text) {
             if (!text) return "";
-            return text.toString().toLowerCase()
-                .replace(/(آ|أ|إ)/g, "ا")
-                .replace(/(ة)/g, "ه")
-                .replace(/(ى)/g, "ي")
-                .replace(/^ال/g, "")
-                .replace(/[\u064b-\u0652]/g, "");
+            return text.toString().toLowerCase().replace(/(آ|أ|إ)/g, "ا").replace(/(ة)/g, "ه").replace(/(ى)/g, "ي").replace(/^ال/g, "").replace(/[\u064b-\u0652]/g, "");
         }
 
-        // 3. التبديل بين السحابي والمحلي عبر زر Switch
         function toggleAIMode(checked) {
             isCloudAI = checked;
             const label = document.getElementById('aiModeLabel');
             if (isCloudAI) {
-                label.innerHTML = "☁️ متصل بالسحابة (OpenRouter)";
-                label.style.color = "#10b981";
+                label.innerHTML = "☁️ متصل بالسحابة (OpenRouter)"; label.style.color = "#10b981";
             } else {
-                label.innerHTML = "💻 المساعد المحلي (Offline)";
-                label.style.color = "#f59e0b";
+                label.innerHTML = "💻 المساعد المحلي (Offline)"; label.style.color = "#f59e0b";
             }
         }
 
-        // 4. زر أحدث إشعار لإعادة ضبط وتدوير التنبيهات من الأحدث في مكانها
+        function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+        function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
+
+        function switchTab(tabId, elem) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            const sec = document.getElementById(`${tabId}-section`);
+            if (sec) sec.classList.add('active');
+            if (elem) elem.classList.add('active');
+        }
+
         function resetAndSortTickerLatest() {
             const container = document.getElementById('tickerContainerBox');
             if (container) container.scrollLeft = 0;
             renderAlerts();
         }
 
-        // 5. محرك المساعد المحلي الذكي (يبحث في الأقسام الـ 6 + يتعلم أوفلاين)
-        function processLocalAIQuery(userQuery) {
-            const cleanedQuery = stemAndCleanText(userQuery);
-            let searchKeywords = [cleanedQuery];
-
-            for (let key in synonymDictionary) {
-                if (cleanedQuery.includes(stemAndCleanText(key))) {
-                    synonymDictionary[key].forEach(s => searchKeywords.push(stemAndCleanText(s)));
-                }
-            }
-
-            // البحث في الذاكرة التراكمية المتعلمة من السحابة
-            const learnedMatch = localLearnedKnowledge.find(item => searchKeywords.some(kw => stemAndCleanText(item.query).includes(kw)));
-            if (learnedMatch) {
-                return formatAIResponse(learnedMatch.response, "الذاكرة التراكمية المتعلمة");
-            }
-
-            // المسح الشامل للأقسام الـ 6
-            let results = [];
-
-            if (typeof doctorsData !== 'undefined') {
-                doctorsData.forEach(d => {
-                    if (searchKeywords.some(kw => stemAndCleanText(`${d.name} ${d.specialty} ${d.notes}`).includes(kw))) {
-                        results.push(`الدكتور/ة: ${d.name} - التخصص: ${d.specialty} - المواعيد: ${d.notes || 'متواجد'}`);
-                    }
-                });
-            }
-
-            if (typeof offersData !== 'undefined') {
-                offersData.forEach(o => {
-                    if (searchKeywords.some(kw => stemAndCleanText(`${o.name} ${o.notes}`).includes(kw))) {
-                        results.push(`عرض: ${o.name} - التفاصيل: ${o.notes}`);
-                    }
-                });
-            }
-
-            if (typeof inquiriesData !== 'undefined') {
-                inquiriesData.forEach(i => {
-                    if (searchKeywords.some(kw => stemAndCleanText(`${i.question} ${i.answer}`).includes(kw))) {
-                        results.push(`دليل المنسقين: ${i.answer}`);
-                    }
-                });
-            }
-
-            if (typeof alertsData !== 'undefined') {
-                alertsData.forEach(a => {
-                    if (searchKeywords.some(kw => stemAndCleanText(a.content).includes(kw))) {
-                        results.push(`تنبيه: ${a.content}`);
-                    }
-                });
-            }
-
-            if (results.length > 0) {
-                return formatAIResponse(results.join('\n\n'), "قاعدة البيانات المحلية");
-            } else {
-                return formatAIResponse(`عذراً، لم أجد معلومة مطابقة حالياً. يمكنك إضافتها لتغذية النظام المحلي ليتعلمها.`, "توجيه محلي");
-            }
-        }
-
-        // 6. حفظ إجابات السحابة تلقائياً ليتعلم منها المساعد المحلي
-        function saveCloudResponseToLocalMemory(query, response) {
-            localLearnedKnowledge.push({ query, response, timestamp: new Date() });
-            localStorage.setItem('localLearnedKnowledge', JSON.stringify(localLearnedKnowledge));
-        }
-
-        // 7. تنسيق الرد وزر النسخ للواتساب
-        function formatAIResponse(text, source) {
-            const cleanWhatsappText = text.replace(/'/g, "\\'");
-            return `
-                <div style="background:var(--bg-card); border-right:4px solid #f59e0b; padding:0.6rem; border-radius:6px; margin-top:0.4rem;">
-                    <p style="margin:0; font-size:0.8rem; line-height:1.4;">${text}</p>
-                    <button class="whatsapp-copy-btn" onclick="copyForWhatsApp('${cleanWhatsappText}')">
-                        <i class="fa-brands fa-whatsapp"></i> نسخ النص للعميل
-                    </button>
-                </div>
-            `;
-        }
-
-        function copyForWhatsApp(text) {
-            navigator.clipboard.writeText(text);
-            alert("تم نسخ النص بنجاح وجاهز للإرسال على الواتساب!");
-        }
-
-        // 8. عرض التنبيهات مرتبة تنازلياً من الأحدث
         function renderAlerts() {
-            const tickerTrack = document.getElementById('tickerTrackContainer');
-            if(!tickerTrack || typeof alertsData === 'undefined') return;
-            tickerTrack.innerHTML = "";
-            
-            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
-
-            sortedAlerts.forEach(item => {
-                tickerTrack.innerHTML += `
-                    <div class="ticker-item-pill" onclick="jumpToAlertAndHighlight(${item.id})">
-                        <i class="fa-solid fa-circle-exclamation" style="color:#f59e0b;"></i>
-                        <span>${item.content}</span>
-                    </div>
-                `;
-            });
+            const container = document.getElementById('tickerTrackContainer');
+            const grid = document.getElementById('alertsGridList');
+            if (container) {
+                container.innerHTML = "";
+                alertsData.forEach(a => {
+                    container.innerHTML += `<div class="ticker-item-pill" onclick="jumpToAlertAndHighlight(${a.id})"><i class="fa-solid fa-circle-exclamation" style="color:#f59e0b;"></i> ${a.content}</div>`;
+                });
+            }
+            if (grid) {
+                grid.innerHTML = "";
+                alertsData.forEach(a => {
+                    grid.innerHTML += `<div id="alert_card_${a.id}" class="doc-card" style="background:var(--bg-card); padding:0.6rem; border-radius:6px; border:1px solid var(--border-color);"><h4>${a.content}</h4><span style="font-size:0.65rem; color:var(--text-muted);">${a.time || ''}</span></div>`;
+                });
+            }
         }
 
-        // تشغيل عرض التنبيهات عند فتح الصفحة
-        window.onload = function() {
+        function jumpToAlertAndHighlight(id) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            setTimeout(() => {
+                const el = document.getElementById(`alert_card_${id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function renderDoctors() {
+            const mashy = document.getElementById('mashyTableBody');
+            const wissam = document.getElementById('wissamTableBody');
+            if (!mashy || !wissam) return;
+            mashy.innerHTML = ""; wissam.innerHTML = "";
+            doctorsData.forEach(d => {
+                const row = `<tr><td>${d.name}</td><td>${d.specialty}</td><td>${d.fee || '75'}</td><td>${d.timing || ''}</td><td><button class="btn btn-secondary" onclick="editDoctor(${d.id})"><i class="fa-solid fa-pen"></i></button></td></tr>`;
+                if (d.branch === "معشي") mashy.innerHTML += row;
+                else wissam.innerHTML += row;
+            });
+            document.getElementById('kpiDocs').innerText = doctorsData.length;
+            document.getElementById('kpiAlerts').innerText = alertsData.length;
+            document.getElementById('kpiOffers').innerText = offersData.length;
+        }
+
+        db.ref('clinicData').on('value', snap => {
+            const data = snap.val() || {};
+            doctorsData = data.doctorsData || [];
+            alertsData = data.alertsData || [];
+            offersData = data.offersData || [];
+            inquiriesData = data.inquiriesData || [];
+            renderDoctors();
             renderAlerts();
+            document.getElementById('cloudStatusBadge').innerHTML = `<span class="cloud-dot" style="background:#22c55e;"></span><span>متصل بالسحابة</span>`;
+        });
+
+        async function handleSmartChatSubmit() {
+            const input = document.getElementById('aiUserInput');
+            const msgBox = document.getElementById('aiMessagesBox');
+            const text = input.value.trim();
+            if (!text) return;
+
+            msgBox.innerHTML += `<div class="ai-message user">${text}</div>`;
+            input.value = "";
+
+            if (!isCloudAI) {
+                const localReply = processLocalAIQuery(text);
+                msgBox.innerHTML += `<div class="ai-message gemini">${localReply}</div>`;
+            } else {
+                msgBox.innerHTML += `<div class="ai-message gemini">جاري التحليل أونلاين...</div>`;
+            }
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        function processLocalAIQuery(query) {
+            const clean = stemAndCleanText(query);
+            let results = [];
+            doctorsData.forEach(d => { if (stemAndCleanText(d.name).includes(clean)) results.push(`طبيب: ${d.name} - ${d.specialty}`); });
+            offersData.forEach(o => { if (stemAndCleanText(o.name).includes(clean)) results.push(`عرض: ${o.name} - ${o.price}`); });
+            alertsData.forEach(a => { if (stemAndCleanText(a.content).includes(clean)) results.push(`تنبيه: ${a.content}`); });
+
+            if (results.length > 0) return results.join('<br>');
+            return "لم أجد نتيجة مطابقة في البيانات المحلية. يمكنك إضافتها لتسجيلها في النظام أوفلاين.";
+        }
+
+        window.onload = function() {
+            renderDoctors();
+            renderAlerts();
+            setInterval(() => { document.getElementById('clockDisplay').innerText = new Date().toLocaleString('ar-EG'); }, 1000);
         };
 
         let selectedOfferTab = "عروض اسنان";
