@@ -254,9 +254,10 @@
         }
 
         /* 🎯 مسطرة التنبيهات مع المسطرة الصفراء العريضة والفاصل المناسب */
+        /* 🎯 شريط التنبيهات الثابت مع المسطرة الصفراء والوميض */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
-            border-bottom: 6px solid #f59e0b; /* مسطرة صفراء عريضة وواضحة جداً للتحكم والرؤية */
+            border-bottom: 6px solid #f59e0b; /* مسطرة صفراء عريضة وواضحة تحت التنبيهات */
             border-top: 1px solid var(--border-color);
             padding: 0.6rem 1rem;
             display: flex;
@@ -265,7 +266,7 @@
             font-size: 0.76rem;
             position: relative;
             z-index: 50;
-            margin-bottom: 0.8rem; /* مسافة فاصلة آمنة تماماً عن مربعات الملاحظات والتنبيهات */
+            margin-bottom: 0.8rem; /* مسافة فاصلة آمنة جداً للمسك والرؤية */
         }
         .ticker-yellow-ruler {
             background: #f59e0b;
@@ -297,7 +298,7 @@
         .ticker-latest-btn:hover { background: #1d4ed8; }
         
         .ticker-container {
-            overflow: hidden;
+            overflow-x: auto; /* ثابت مع إمكانية التمرير اليدوي السلس إذا كثرت العناصر */
             white-space: nowrap;
             flex: 1;
             position: relative;
@@ -307,14 +308,10 @@
             border: 1px solid var(--border-color);
             min-width: 200px;
         }
-        .ticker-track {
-            display: inline-block;
-            white-space: nowrap;
-            animation: tickerMove 120s linear infinite; /* حركة بطيئة جداً ومستمرة */
-        }
-        @keyframes tickerMove {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        .ticker-static-list {
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
         }
         .ticker-item {
             display: inline-flex;
@@ -322,8 +319,24 @@
             gap: 0.4rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-left: 3rem;
             cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .ticker-item:hover {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--primary-color);
+        }
+
+        /* أنيميشن الوميض للكرت المSelected */
+        .highlight-pulse { 
+            animation: pulseGlow 2s infinite; 
+        }
+        @keyframes pulseGlow {
+            0% { background-color: rgba(245, 158, 11, 0.6) !important; }
+            50% { background-color: rgba(245, 158, 11, 0.1) !important; }
+            100% { background-color: rgba(245, 158, 11, 0.6) !important; }
         }
         .ticker-btn {
             background: var(--bg-card);
@@ -748,13 +761,13 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-       <!-- مسطرة التنبيهات وزر أحدث إشعار فقط مع المسطرة الصفراء العريضة -->
+       <!-- مسطرة التنبيهات الثابتة مع المسطرة الصفراء العريضة وزر أحدث إشعار -->
         <div class="professional-ticker-bar">
             <div class="ticker-yellow-ruler"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <button class="ticker-latest-btn" onclick="resetAndSortTickerLatest()"><i class="fa-solid fa-bolt"></i> أحدث إشعار</button>
             
             <div class="ticker-container">
-                <div class="ticker-track" id="tickerTrackContainer"></div>
+                <div class="ticker-static-list" id="tickerTrackContainer"></div>
             </div>
         </div>
 
@@ -2080,18 +2093,29 @@
             localStorage.setItem('tickerStructuralTheme', themeClass);
         }
 
-        // زر أحدث إشعار يعيد ضبط الشريط وترتيبه من الأحدث فوراً في مكانه
+        // الانتقال لصفحة التنبيهات وتحديد التنبيه المختار مع الوميض
+        function jumpToAlertAndHighlight(alertId) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            setTimeout(() => {
+                renderAlerts("", alertId);
+                const targetCard = document.getElementById(`alert_card_${alertId}`);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
+        }
+
+        // زر أحدث إشعار يعيد الترتيب وينتقل لأحدث تنبيه مع الوميض عليه
         function resetAndSortTickerLatest() {
-            renderAlerts();
-            const track = document.getElementById('tickerTrackContainer');
-            if(track) {
-                track.style.animation = 'none';
-                track.offsetHeight; 
-                track.style.animation = null;
+            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
+            if (sortedAlerts.length > 0) {
+                jumpToAlertAndHighlight(sortedAlerts[0].id);
+            } else {
+                switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
             }
         }
 
-        function renderAlerts(search = "") {
+        function renderAlerts(search = "", highlightId = null) {
             const grid = document.getElementById('alertsGridList');
             const tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
@@ -2103,13 +2127,13 @@
             let alertItemsHtml = "";
             sortedAlerts.forEach(item => {
                 alertItemsHtml += `
-                    <div class="ticker-item" onclick="resetAndSortTickerLatest()">
+                    <div class="ticker-item" onclick="jumpToAlertAndHighlight(${item.id})">
                         <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
                         <span>${item.content}</span>
                     </div>
                 `;
             });
-            tickerTrack.innerHTML = alertItemsHtml + alertItemsHtml;
+            tickerTrack.innerHTML = alertItemsHtml;
 
             sortedAlerts.filter(a => a.content.includes(search)).forEach(item => {
                 let mediaHtml = "";
@@ -2118,8 +2142,10 @@
                     else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                 }
                 const tagsFooter = item.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${item.tags}</div>` : '';
+                const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
+
                 grid.innerHTML += `
-                    <div class="alert-card-item-compact">
+                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
                         <div style="flex:1;">
                             <p>${item.content}</p>
                             <span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span>
