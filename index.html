@@ -93,9 +93,9 @@
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.3rem; }
         .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.8rem; }
 
-        /* شريط التنبيهات مرتب ومستقل بدون أسهم وبدون تداخل */
+        /* شريط التنبيهات بكروت منفصلة مع مسطرة تمرير صفراء عريضة */
         .professional-ticker-bar { background-color: var(--bg-surface); border-bottom: 2px solid var(--primary-color); border-top: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.76rem; flex-shrink: 0; }
-        .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.35rem 0.9rem; border-radius: 6px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4); flex-shrink: 0; }
+        .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4); flex-shrink: 0; }
         
         .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; }
         .ticker-container { 
@@ -106,16 +106,29 @@
             padding: 0.4rem 0.6rem; 
             border: 1px solid var(--border-color); 
             scroll-behavior: smooth;
-            scrollbar-width: thin;
+            scrollbar-width: auto;
             scrollbar-color: #f59e0b var(--bg-surface);
         }
-        .ticker-container::-webkit-scrollbar { height: 10px; }
-        .ticker-container::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 5px; }
-        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 5px; border: 2px solid var(--bg-surface); }
+        .ticker-container::-webkit-scrollbar { height: 14px; }
+        .ticker-container::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 7px; border: 1px solid var(--border-color); }
+        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 7px; border: 3px solid var(--bg-surface); }
         
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 2rem; align-items: center; }
-        .ticker-item { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--text-main); cursor: pointer; font-size: 0.75rem; }
-        .ticker-item:hover { color: var(--primary-color); }
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 0.6rem; align-items: center; }
+        .ticker-card-item { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            background: var(--bg-surface); 
+            border: 1px solid var(--border-color); 
+            padding: 0.35rem 0.7rem; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            color: var(--text-main); 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+            transition: all 0.2s;
+        }
+        .ticker-card-item:hover { border-color: var(--primary-color); background: rgba(245, 158, 11, 0.1); color: var(--primary-color); }
 
         .content-area { flex: 1; padding: 0.6rem; overflow-y: auto; }
         .page-section { display: none; }
@@ -290,7 +303,7 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- مسطرة التنبيهات مرتبة ومستقلة بدون أسهم -->
+        <!-- شريط التنبيهات: كروت منفصلة وتحتها مسطرة تمرير أفقية صفراء عريضة -->
         <div class="professional-ticker-bar">
             <div class="ticker-yellow-ruler"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
             <div class="ticker-wrapper-outer">
@@ -602,7 +615,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك الذكي. تم ضبطي لتقديم إجابات دقيقة ومركزة حسب طلبك، مع فهم القاموس والمترادفات بذكاء.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك الذكي. تم ضبطي لتقديم إجابات دقيقة ومركزة، مع قراءة التنبيهات والأقسام والعروض بدقة تامة.</div>
         </div>
 
         <div class="ai-input-box">
@@ -1477,11 +1490,11 @@
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
             const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
-            let alertItemsHtml = "";
+            let alertCardsHtml = "";
             sortedAlerts.forEach(item => {
-                alertItemsHtml += `<div class="ticker-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
+                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
-            tickerTrack.innerHTML = alertItemsHtml;
+            tickerTrack.innerHTML = alertCardsHtml;
 
             sortedAlerts.filter(a => a.content.includes(search) || (a.tags && a.tags.includes(search))).forEach(item => {
                 let mediaHtml = "";
@@ -1938,10 +1951,10 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
                         body: JSON.stringify({
-                            "model": "liquid/lfm-2.5-embedding-350m:free",
+                            "model": "deepseek/deepseek-chat",
                             "messages": [{ 
                                 "role": "system", 
-                                "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب وعدم جلب معلومات لا علاقة لها بالبحث. استخدم قاموس المترادفات لفهم العامية.\n${siteContext}` 
+                                "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب (سواء من الأطباء أو التنبيهات أو العروض أو الاستفسارات). استخدم قاموس المترادفات لفهم العامية.\n${siteContext}` 
                             }, { "role": "user", "content": rawText }]
                         })
                     });
@@ -1953,7 +1966,7 @@
                         throw new Error("API Error");
                     }
                 } catch (err) {
-                    aiReply = "عذراً يا مصطفى، تعذر الاتصال بالسحابة أو لم يتم إدخال مفتاح OpenRouter API. يمكنك تحويل زر السويتش إلى (محلي) للعمل أوفلاين فوراً وبدون إنترنت.";
+                    aiReply = "عذراً يا مصطفى، تعذر الاتصال بالسحابة أو لم يتم إدخال مفتاح OpenRouter API، أو الموديل السحابي واجه ضغط. يمكنك استخدام المساعد المحلي (أوفلاين) وهو شغال بكفاءة فوراً.";
                 }
 
                 document.getElementById(loadingId).remove();
@@ -1996,9 +2009,18 @@
                 }
             });
 
-            const isDoctorQuery = rawTokens.some(t => t.includes('دكتور') || t.includes('د.') || doctorsData.some(d => normalize(d.name).includes(t)));
-
             let matches = [];
+
+            // البحث في التنبيهات والإشعارات أولاً لربطها بالاستفسارات
+            alertsData.forEach(a => {
+                const alertText = normalize(a.content + " " + (a.tags || ""));
+                if (expandedTokens.some(tok => alertText.includes(tok))) {
+                    matches.push({
+                        source: `📌 [المصدر: التنبيهات والإشعارات]`,
+                        text: `<strong>تنبيه:</strong> ${a.content}`
+                    });
+                }
+            });
 
             doctorsData.forEach(d => {
                 const docText = normalize(d.name + " " + d.specialty + " " + d.nationality + " " + (d.notes || ""));
@@ -2010,14 +2032,6 @@
                     });
                 }
             });
-
-            if (isDoctorQuery && matches.length > 0) {
-                let responseOutput = `<div style="margin-bottom:4px; font-size:0.7rem; color:#facc15; font-weight:700;">🔍 إجابة مركزة ومباشرة عن الطبيب المطلوب:</div>`;
-                matches.forEach(m => {
-                    responseOutput += `<div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem; border-radius:6px; margin-top:4px;"><span style="font-size:0.65rem; color:var(--primary-color); font-weight:700; display:block; margin-bottom:2px;">${m.source}</span><div style="white-space:pre-line;">${m.text}</div></div>`;
-                });
-                return responseOutput;
-            }
 
             offersData.forEach(o => {
                 const offerText = normalize(o.name + " " + o.category + " " + (o.notes || ""));
@@ -2050,15 +2064,15 @@
             });
 
             if (matches.length > 0) {
-                let responseOutput = `<div style="margin-bottom:4px; font-size:0.7rem; color:#facc15; font-weight:700;">🔍 نتائج البحث المحلي الذكي:</div>`;
-                matches.slice(0, 2).forEach(m => {
+                let responseOutput = `<div style="margin-bottom:4px; font-size:0.7rem; color:#facc15; font-weight:700;">🔍 نتائج البحث المحلي الذكي (شامل التنبيهات والأقسام):</div>`;
+                matches.slice(0, 3).forEach(m => {
                     responseOutput += `<div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem; border-radius:6px; margin-top:4px;"><span style="font-size:0.65rem; color:var(--primary-color); font-weight:700; display:block; margin-bottom:2px;">${m.source}</span><div style="white-space:pre-line;">${m.text}</div></div>`;
                 });
                 return responseOutput;
             } else {
                 return `<div style="color:#ef4444; font-weight:700; margin-bottom:4px;">⚠️ عذراً يا مصطفى، لم أجد مطابقة دقيقة لـ "${query}".</div>
                 <div style="font-size:0.72rem; color:var(--text-muted); background:var(--bg-card); padding:0.4rem; border-radius:6px; border:1px dashed var(--border-color);">
-                💡 <strong>اقتراح تعليمي:</strong> يمكنك إضافة هذه الكلمة في قاموس المترادفات أو قسم الاستفسارات ليتعلمها النظام محلياً!
+                💡 <strong>اقتراح تعليمي:</strong> يمكنك إضافة هذه الكلمة في قاموس المترادفات أو التنبيهات ليتعلمها النظام محلياً!
                 </div>`;
             }
         }
@@ -2138,7 +2152,7 @@
             setTimeout(() => { renderDeptsAndDocs("", id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightCoord(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            document.getElementById('globalSearchResultsSection'].classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators("", id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightOffer(id, cat) {
