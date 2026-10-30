@@ -93,7 +93,7 @@
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.3rem; }
         .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.8rem; }
 
-        /* شريط التنبيهات بكروت منفصلة مع مسطرة تمرير صفراء عريضة */
+        /* شريط التنبيهات مع زر إعادة الضبط */
         .professional-ticker-bar { background-color: var(--bg-surface); border-bottom: 2px solid var(--primary-color); border-top: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.76rem; flex-shrink: 0; }
         .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4); flex-shrink: 0; }
         
@@ -106,12 +106,11 @@
             padding: 0.4rem 0.6rem; 
             border: 1px solid var(--border-color); 
             scroll-behavior: smooth;
-            scrollbar-width: auto;
-            scrollbar-color: #f59e0b var(--bg-surface);
+            direction: rtl;
         }
-        .ticker-container::-webkit-scrollbar { height: 14px; }
-        .ticker-container::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 7px; border: 1px solid var(--border-color); }
-        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 7px; border: 3px solid var(--bg-surface); }
+        .ticker-container::-webkit-scrollbar { height: 10px; }
+        .ticker-container::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 5px; }
+        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 5px; }
         
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 0.6rem; align-items: center; }
         .ticker-card-item { 
@@ -204,10 +203,6 @@
         
         .card-tags-footer { margin-top: 0.3rem; padding-top: 0.2rem; border-top: 1px dashed rgba(255,255,255,0.25); font-size: 0.68rem; color: #fde047; font-weight: 600; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
-
-        .offers-multi-clipboard-box { display: none; position: fixed; bottom: 80px; right: 40px; width: 280px; background: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.5rem; flex-direction: column; gap: 0.3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 9999; cursor: move; }
-        .offers-multi-clipboard-box.active { display: flex; }
-        .clipboard-textarea { width: 100%; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.4rem; font-size: 0.73rem; resize: vertical; height: 80px; cursor: text; }
 
         .ai-floating-btn { position: fixed; bottom: 25px; left: 25px; width: 48px; height: 48px; background: #facc15; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); z-index: 10000; border: 2px solid #eab308; transition: transform 0.2s; }
         .ai-floating-btn:hover { transform: scale(1.08); }
@@ -303,9 +298,12 @@
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط التنبيهات: كروت منفصلة وتحتها مسطرة تمرير أفقية صفراء عريضة -->
+        <!-- شريط التنبيهات مع زر تحديث الإشعارات -->
         <div class="professional-ticker-bar">
-            <div class="ticker-yellow-ruler"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
+            <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
+                <div class="ticker-yellow-ruler"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
+                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; font-size:0.72rem;" onclick="resetTickerToStart()" title="إعادة ضبط شريط التنبيهات للبداية (أحدث تنبيه)"><i class="fa-solid fa-rotate-right"></i></button>
+            </div>
             <div class="ticker-wrapper-outer">
                 <div class="ticker-container" id="tickerContainerBox">
                     <div class="ticker-track" id="tickerTrackContainer"></div>
@@ -1512,6 +1510,11 @@
             updateKPIs();
         }
 
+        function resetTickerToStart() {
+            const container = document.getElementById('tickerContainerBox');
+            if (container) { container.scrollLeft = 0; }
+        }
+
         function jumpToAlertsTab(alertId) {
             switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
             if (alertId) {
@@ -1957,10 +1960,19 @@
                         },
                         body: JSON.stringify({
                             "model": "recursive/flint-v1.0:free",
-                            "messages": [{ 
-                                "role": "system", 
-                                "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب (سواء من الأطباء أو التنبيهات أو العروض أو الاستفسارات). استخدم قاموس المترادفات لفهم العامية.\n${siteContext}` 
-                            }, { "role": "user", "content": rawText }]
+                            "messages": [
+                                { 
+                                    "role": "system", 
+                                    "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب (سواء من الأطباء أو التنبيهات أو العروض أو الاستفسارات). استخدم قاموس المترادفات لفهم العامية.\n${siteContext}` 
+                                }, 
+                                { 
+                                    "role": "user", 
+                                    "content": rawText 
+                                }
+                            ],
+                            "reasoning": {
+                                "enabled": true
+                            }
                         })
                     });
 
@@ -2018,7 +2030,6 @@
 
             let matches = [];
 
-            // البحث في التنبيهات والإشعارات أولاً لربطها بالاستفسارات
             alertsData.forEach(a => {
                 const alertText = normalize(a.content + " " + (a.tags || ""));
                 if (expandedTokens.some(tok => alertText.includes(tok))) {
