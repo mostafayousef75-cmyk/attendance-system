@@ -1939,25 +1939,27 @@
                 `;
 
                 const loadingId = 'ai_load_' + Date.now();
-                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك عبر السحابة...</div>`;
-                msgBox.scrollTop = msgBox.scrollHeight;
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً وتنفيذه في قاعدة البيانات...</div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
 
-                let apiKey = localStorage.getItem('openrouter_api_key');
-                let aiReply = "";
+            let apiKey = localStorage.getItem('openrouter_api_key');
+            let aiReply = "";
 
-                try {
-                    if (!apiKey) throw new Error("No API Key");
-                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
-                        body: JSON.stringify({
-                            "model": "deepseek/deepseek-chat",
-                            "messages": [{ 
-                                "role": "system", 
-                                "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب (سواء من الأطباء أو التنبيهات أو العروض أو الاستفسارات). استخدم قاموس المترادفات لفهم العامية.\n${siteContext}` 
-                            }, { "role": "user", "content": rawText }]
-                        })
-                    });
+            try {
+                if (!apiKey) throw new Error("No API Key");
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
+                    body: JSON.stringify({
+                        "model": "recursive/flint-v1.0:free",
+                        "messages": [{ 
+                            "role": "system", 
+                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة، وفهم الأوامر البشرية (إضافة، تعديل، حذف بيانات في الموقع مثل العروض، الاستفسارات، الأطباء، التنبيهات).
+                            
+                            إذا طلب المستخدم إضافة أو تعديل أو حذف أي شيء، قم بإرجاع رد يتضمن نص الإجابة للعميل (أو تأكيد التنفيذ)، وإذا استدعى الامر تعديل البيانات، يمكنك صياغة الأوامر. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
+                        }, { "role": "user", "content": rawText }]
+                    })
+                });
 
                     const data = await response.json();
                     if (data && data.choices && data.choices[0].message.content) {
