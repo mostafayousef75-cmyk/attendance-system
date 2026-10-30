@@ -21,28 +21,6 @@
             --accent-green: #10b981;
             --danger-color: #ef4444;
         }
-
-        body.theme-amoled {
-            --bg-base: #000000;
-            --bg-surface: #121212;
-            --bg-card: #18181b;
-            --border-color: #27272a;
-        }
-
-        body.theme-darkblue {
-            --bg-base: #090d16;
-            --bg-surface: #111827;
-            --bg-card: #1f2937;
-            --border-color: #374151;
-        }
-
-        body.theme-gray {
-            --bg-base: #111827;
-            --bg-surface: #1f2937;
-            --bg-card: #374151;
-            --border-color: #4b5563;
-        }
-
         body {
             background-color: var(--bg-base);
             color: var(--text-main);
@@ -89,7 +67,7 @@
         .kpi-bar { display: flex; gap: 0.8rem; font-size: 0.72rem; font-weight: 700; }
         .kpi-card { background: var(--bg-base); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); }
 
-        /* 🎯 مسطرة التنبيهات */
+        /* 🎯 مسطرة التنبيهات مع شريط السحب الأصفر السفلي المنفصل تماماً */
         .professional-ticker-bar {
             background-color: var(--bg-surface);
             border-bottom: 2px solid var(--border-color);
@@ -145,6 +123,7 @@
             margin-bottom: 8px;
         }
 
+        /* 🟡 شريط السحب البارز باللون الأصفر البريمي للماوس */
         .ticker-container::-webkit-scrollbar { height: 10px; }
         .ticker-container::-webkit-scrollbar-track { background: #111827; border-radius: 6px; }
         .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 6px; border: 2px solid #111827; }
@@ -154,6 +133,7 @@
         .ticker-item-pill { background-color: #111827; color: #f3f4f6; border: 1px solid #374151; padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
         .ticker-item-pill:hover { border-color: #f59e0b; }
 
+        /* 🎛️ زر التبديل (Switch) بين المساعد السحابي والمحلي */
         .ai-switch-container { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-card); padding: 0.3rem 0.6rem; border-radius: 20px; border: 1px solid var(--border-color); }
         .switch-toggle { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch-toggle input { opacity: 0; width: 0; height: 0; }
@@ -162,8 +142,68 @@
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(20px); }
         
+        .whatsapp-copy-btn { background-color: #25d366; color: #fff; border: none; padding: 0.3rem 0.6rem; border-radius: 5px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.4rem; }
+        .whatsapp-copy-btn:hover { background-color: #128c7e; }
+
         .page-section { display: none; padding: 1rem; }
         .page-section.active { display: block; }
+
+        /* الشات العائم والمودالات */
+        .ai-floating-btn { position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; z-index: 999; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+        .ai-floating-chat-window { position: fixed; bottom: 80px; left: 20px; width: 360px; height: 480px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; }
+        .ai-floating-chat-window.active { display: flex; }
+        .ai-messages-box { flex: 1; padding: 0.8rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; }
+        .ai-message { padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 0.75rem; max-width: 85%; line-height: 1.4; }
+        .ai-message.user { background: #2563eb; color: #fff; align-self: flex-start; }
+        .ai-message.gemini { background: var(--bg-card); color: var(--text-main); align-self: flex-end; border: 1px solid var(--border-color); }
+        .ai-input-box { padding: 0.5rem; background: var(--bg-card); border-top: 1px solid var(--border-color); }
+        .ai-input-row { display: flex; gap: 0.4rem; }
+        .ai-input-row input { flex: 1; background: var(--bg-base); border: 1px solid var(--border-color); color: #fff; padding: 0.4rem; border-radius: 6px; font-size: 0.75rem; outline: none; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none; /* مخفية افتراضياً */
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        /* عندما يتم تفعيل الكلاس active تظهر في المنتصف تماماً */
+        .modal-overlay.active {
+            display: flex !important;
+        }
+
+        .modal {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+        .form-control { background: var(--bg-base); border: 1px solid var(--border-color); color: #fff; padding: 0.4rem; border-radius: 6px; font-size: 0.75rem; outline: none; }
+        .btn { border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .btn-green { background: #10b981; color: #fff; }
+        .btn-blue { background: #2563eb; color: #fff; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-secondary { background: #475569; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid var(--border-color); padding: 0.4rem; text-align: right; }
+        th { background: var(--bg-card); color: var(--primary-color); }
+        .highlight-pulse { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0% { background-color: rgba(245, 158, 11, 0.5); } 50% { background-color: transparent; } 100% { background-color: rgba(245, 158, 11, 0.5); } }
     </style>
 </head>
 <body class="theme-amoled">
@@ -339,12 +379,30 @@
         </section>
     </main>
 
-    <!-- المساعد الذكي السريع -->
+    <!-- المساعد الذكي السريع العائم -->
+    <div class="ai-floating-btn" onclick="toggleFloatingChat()"><i class="fa-solid fa-robot"></i></div>
+    <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
+        <div style="padding:0.5rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:700; font-size:0.8rem;">🤖 المساعد الذكي الهجين</span>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleFloatingChat()"></i>
+        </div>
+        <div class="ai-messages-box" id="aiMessagesBox">
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد متصل وجاهز بخدمتك في الأقسام الـ 6.</div>
+        </div>
+        <div class="ai-input-box">
+            <div class="ai-input-row">
+                <input type="text" id="aiUserInput" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key === 'Enter') handleSmartChatSubmit()">
+                <button class="btn btn-green" onclick="handleSmartChatSubmit()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر المساعد الذكي السريع -->
     <div class="ai-floating-btn" onclick="toggleFloatingChat()" title="المساعد الذكي الهجين">
         <i class="fa-solid fa-robot"></i>
     </div>
 
-    <!-- نافذة المساعد الذكي السريع المحدثة -->
+    <!-- نافذة المساعد الذكي السريع المحدثة (مظبوطة بحجم عملي ومرن) -->
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.3rem;">
@@ -368,7 +426,6 @@
             </div>
         </div>
     </div>
-
     <!-- مودال الأطباء -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
@@ -624,7 +681,6 @@
         </div>
     </div>
 
-    <!-- مودال تعليمات المنسقين -->
     <div class="modal-overlay" id="coordModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -659,7 +715,6 @@
         </div>
     </div>
 
-    <!-- مودال العروض والأسعار -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -784,9 +839,17 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let doctorsData = [], alertsData = [], offersData = [], inquiriesData = [], coordinatorsData = [], deptServicesData = [], deptNotesData = [], fridaySchedules = [];
+        let doctorsData = [], alertsData = [], offersData = [], inquiriesData = [], coordinatorsData = [], deptServicesData = [], deptNotesData = [];
         let isCloudAI = true;
         let localLearnedKnowledge = JSON.parse(localStorage.getItem('localLearnedKnowledge') || '[]');
+
+        const synonymDictionary = {
+            "تشقير": ["حواجب", "حواف", "تفتيح", "صبغة"],
+            "حواجب": ["تشقير", "حواف"],
+            "حاف": ["تشقير", "حواجب"],
+            "كشف": ["سعر", "تكلفة", "بكم"],
+            "ليزر": ["جنتل ماكس برو", "كلاريتي"]
+        };
 
         function stemAndCleanText(text) {
             if (!text) return "";
@@ -806,11 +869,220 @@
         function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
 
-        function switchTab(tabId, elem, save = true) {
+        function switchTab(tabId, elem) {
             document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             const sec = document.getElementById(`${tabId}-section`);
             if (sec) sec.classList.add('active');
+            if (elem) elem.classList.add('active');
+        }
+
+        function resetAndSortTickerLatest() {
+            const container = document.getElementById('tickerContainerBox');
+            if (container) container.scrollLeft = 0;
+            renderAlerts();
+        }
+
+        function renderAlerts() {
+            const container = document.getElementById('tickerTrackContainer');
+            const grid = document.getElementById('alertsGridList');
+            if (container) {
+                container.innerHTML = "";
+                alertsData.forEach(a => {
+                    container.innerHTML += `<div class="ticker-item-pill" onclick="jumpToAlertAndHighlight(${a.id})"><i class="fa-solid fa-circle-exclamation" style="color:#f59e0b;"></i> ${a.content}</div>`;
+                });
+            }
+            if (grid) {
+                grid.innerHTML = "";
+                alertsData.forEach(a => {
+                    grid.innerHTML += `<div id="alert_card_${a.id}" class="doc-card" style="background:var(--bg-card); padding:0.6rem; border-radius:6px; border:1px solid var(--border-color);"><h4>${a.content}</h4><span style="font-size:0.65rem; color:var(--text-muted);">${a.time || ''}</span></div>`;
+                });
+            }
+        }
+
+        function jumpToAlertAndHighlight(id) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            setTimeout(() => {
+                const el = document.getElementById(`alert_card_${id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function renderDoctors() {
+            const mashy = document.getElementById('mashyTableBody');
+            const wissam = document.getElementById('wissamTableBody');
+            if (!mashy || !wissam) return;
+            mashy.innerHTML = ""; wissam.innerHTML = "";
+            doctorsData.forEach(d => {
+                const row = `<tr><td>${d.name}</td><td>${d.specialty}</td><td>${d.fee || '75'}</td><td>${d.timing || ''}</td><td><button class="btn btn-secondary" onclick="editDoctor(${d.id})"><i class="fa-solid fa-pen"></i></button></td></tr>`;
+                if (d.branch === "معشي") mashy.innerHTML += row;
+                else wissam.innerHTML += row;
+            });
+            document.getElementById('kpiDocs').innerText = doctorsData.length;
+            document.getElementById('kpiAlerts').innerText = alertsData.length;
+            document.getElementById('kpiOffers').innerText = offersData.length;
+        }
+
+        db.ref('clinicData').on('value', snap => {
+            const data = snap.val() || {};
+            doctorsData = data.doctorsData || [];
+            alertsData = data.alertsData || [];
+            offersData = data.offersData || [];
+            inquiriesData = data.inquiriesData || [];
+            renderDoctors();
+            renderAlerts();
+            document.getElementById('cloudStatusBadge').innerHTML = `<span class="cloud-dot" style="background:#22c55e;"></span><span>متصل بالسحابة</span>`;
+        });
+
+        async function handleSmartChatSubmit() {
+            const input = document.getElementById('aiUserInput');
+            const msgBox = document.getElementById('aiMessagesBox');
+            const text = input.value.trim();
+            if (!text) return;
+
+            msgBox.innerHTML += `<div class="ai-message user">${text}</div>`;
+            input.value = "";
+
+            if (!isCloudAI) {
+                const localReply = processLocalAIQuery(text);
+                msgBox.innerHTML += `<div class="ai-message gemini">${localReply}</div>`;
+            } else {
+                msgBox.innerHTML += `<div class="ai-message gemini">جاري التحليل أونلاين...</div>`;
+            }
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        function processLocalAIQuery(query) {
+            const clean = stemAndCleanText(query);
+            let results = [];
+            doctorsData.forEach(d => { if (stemAndCleanText(d.name).includes(clean)) results.push(`طبيب: ${d.name} - ${d.specialty}`); });
+            offersData.forEach(o => { if (stemAndCleanText(o.name).includes(clean)) results.push(`عرض: ${o.name} - ${o.price}`); });
+            alertsData.forEach(a => { if (stemAndCleanText(a.content).includes(clean)) results.push(`تنبيه: ${a.content}`); });
+
+            if (results.length > 0) return results.join('<br>');
+            return "لم أجد نتيجة مطابقة في البيانات المحلية. يمكنك إضافتها لتسجيلها في النظام أوفلاين.";
+        }
+
+        window.onload = function() {
+            renderDoctors();
+            renderAlerts();
+            setInterval(() => { document.getElementById('clockDisplay').innerText = new Date().toLocaleString('ar-EG'); }, 1000);
+        };
+
+        let selectedOfferTab = "عروض اسنان";
+        let selectedInquiryFilter = "الكل";
+        let selectedOfferIds = [];
+        let aiChatHistory = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
+            changeTheme(savedTheme);
+
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isSidebarCollapsed) {
+                document.getElementById('appSidebar').classList.add('collapsed');
+            }
+
+            const savedShiftNote = localStorage.getItem('shift_scratchpad_current') || '';
+            document.getElementById('shiftScratchpadText').value = savedShiftNote;
+
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
+            switchTab(activeTab, targetNav, false);
+
+            db.ref('clinicData').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    doctorsData = data.doctorsData || [];
+                    fridaySchedules = data.fridaySchedules || [];
+                    alertsData = data.alertsData || [];
+                    coordinatorsData = data.coordinatorsData || [];
+                    deptServicesData = data.deptServicesData || [];
+                    if (data.deptNotesData) {
+                        deptNotesData = data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n);
+                    } else {
+                        deptNotesData = [];
+                    }
+                    offersData = data.offersData || [];
+                    inquiriesData = data.inquiriesData || [];
+                } else {
+                    doctorsData = [
+                        { id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }
+                    ];
+                    fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
+                    deptServicesData = [
+                        { id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", customColor: "", isJoint: true, tags: "جهاز، ليزر" },
+                        { id: 2, branch: "معشي", type: "dent", name: "تنظيف جير", customColor: "", isJoint: false, tags: "أسنان" },
+                        { id: 3, branch: "الوسام", type: "derm", name: "كلاريتي 2", customColor: "", isJoint: true, tags: "جهاز، ليزر" },
+                        { id: 4, branch: "الوسام", type: "dent", name: "تقويم الأسنان", customColor: "", isJoint: false, tags: "أسنان" }
+                    ];
+                    deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 ) ( 2722 )", color: "card-gold", tags: "أرقام، توجيهات" }];
+                    inquiriesData = [
+                        { id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه وممكن اذا حصل ظرف نحجز يوم قبل او يوم بعد", color: "card-darkblue", tags: "رتوش، ليزر" }
+                    ];
+                    offersData = [
+                        { id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }
+                    ];
+                    syncToCloud();
+                }
+
+                renderDoctors();
+                renderFridayScheduleTable();
+                renderAlerts();
+                renderDeptsAndDocs();
+                renderCoordinators();
+                renderOffersTabs();
+                renderOffers();
+                renderInquiriesTabs();
+                renderInquiries();
+                updateKPIs();
+            });
+            
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
+            }, 1000);
+        });
+
+        function saveShiftScratchpad() {
+            const val = document.getElementById('shiftScratchpadText').value;
+            localStorage.setItem('shift_scratchpad_current', val);
+        }
+
+        function clearShiftScratchpad() {
+            if (confirm("هل تريد مسح ملاحظات وردية الشيفت الحالية؟")) {
+                document.getElementById('shiftScratchpadText').value = "";
+                localStorage.removeItem('shift_scratchpad_current');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+
+        function toggleFloatingChat() {
+            document.getElementById('aiFloatingChatWindow').classList.toggle('active');
+        }
+
+        function syncToCloud() {
+            const payload = {
+                doctorsData, fridaySchedules, alertsData, coordinatorsData,
+                deptServicesData, deptNotesData, offersData, inquiriesData
+            };
+            db.ref('clinicData').set(payload);
+        }
+
+        function switchTab(tabId, elem, save = true) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            document.querySelectorAll('.page-section').forEach(s => {
+                if(s.id !== 'globalSearchResultsSection') s.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            
+            const targetSec = document.getElementById(`${tabId}-section`);
+            if (targetSec) targetSec.classList.add('active');
             if (elem) elem.classList.add('active');
             if (save) localStorage.setItem('activeTab', tabId);
         }
@@ -834,6 +1106,30 @@
 
         function toggleDaysChecklist(boxId) {
             document.getElementById(boxId).classList.toggle('show');
+        }
+
+        function toggleTableResizeMode() {
+            const mashyTable = document.getElementById('mashyTableElement');
+            const wissamTable = document.getElementById('wissamTableElement');
+            const btn = document.getElementById('toggleResizeBtn');
+
+            mashyTable.classList.toggle('resizable-mode');
+            wissamTable.classList.toggle('resizable-mode');
+
+            if (mashyTable.classList.contains('resizable-mode')) {
+                btn.style.background = 'var(--primary-color)';
+                btn.style.color = '#000';
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> ⚙️ وضع التعديل الحر مفعل`;
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة`;
+            }
+        }
+
+        function resetTableWidths() {
+            document.querySelectorAll('#mashyTableElement th, #wissamTableElement th').forEach(th => th.style.width = '');
+            alert("✅ تم إعادة ضبط الأعمدة للوضع الافتراضي!");
         }
 
         function exportJSON() {
@@ -976,7 +1272,18 @@
             mashyBody.innerHTML = ""; wissamBody.innerHTML = "";
             let countM = 0, countW = 0;
 
+            const todayStr = new Date().toISOString().split('T')[0];
+            const upcomingFridays = fridaySchedules.filter(f => f.date >= todayStr);
+            let mashyFridays = upcomingFridays.filter(f => f.branch === "معشي").map(f => `<span>${f.doc}</span> (${f.date})`);
+            let wissamFridays = upcomingFridays.filter(f => f.branch === "الوسام").map(f => `<span>${f.doc}</span> (${f.date})`);
+
+            document.getElementById('fridayDocMashy').innerHTML = mashyFridays.length > 0 ? mashyFridays.join(' ، ') : '<span>لم يُحدد</span>';
+            document.getElementById('fridayDocWissam').innerHTML = wissamFridays.length > 0 ? wissamFridays.join(' ، ') : '<span>لم يُحدد</span>';
+
             const currentDay = getArabicDayName();
+            document.getElementById('todayDayName').innerText = currentDay;
+
+            let todayMashyDocs = [], todayWissamDocs = [];
 
             const mashyList = doctorsData.filter(d => {
                 const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.tags && d.tags.toLowerCase().includes(search));
@@ -996,6 +1303,7 @@
 
             mashyList.forEach((doc) => {
                 const mashyDays = doc.mashyDays || doc.days || [];
+                if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;" title="مثبت">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
@@ -1006,7 +1314,7 @@
                 const formattedSpec = doc.specialty ? doc.specialty.replace('/', '/\n') : '';
 
                 mashyBody.innerHTML += `
-                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
                         <td>
                             <span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
@@ -1023,10 +1331,13 @@
                             ${tagsFooter}
                         </td>
                         <td>
-                            <div style="display:flex; gap:4px; align-items:center;">
-                                <button class="btn btn-green" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px;" onclick="copyDoctorForClient(${doc.id})" title="نسخ للعميل"><i class="fa-solid fa-copy"></i></button>
-                                <button class="btn btn-secondary" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px;" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px;" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            <div style="font-size:0.68rem; color:#fef08a;">${doc.notes || '-'}</div>
+                        </td>
+                        <td style="text-align:center;">
+                            <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                                <button class="btn btn-green" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px; justify-content:center; border-radius:4px;" onclick="copyDoctorForClient(${doc.id})" title="نسخ للعميل"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px; justify-content:center; border-radius:4px;" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px; justify-content:center; border-radius:4px;" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -1036,6 +1347,7 @@
 
             wissamList.forEach((doc) => {
                 const wissamDays = doc.wissamDays || [];
+                if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;" title="مثبت">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">إجازة</span>` : '';
@@ -1045,7 +1357,7 @@
                 const formattedSpec = doc.specialty ? doc.specialty.replace('/', '/\n') : '';
 
                 wissamBody.innerHTML += `
-                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
                         <td>
                             <span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
@@ -1062,17 +1374,65 @@
                             ${tagsFooter}
                         </td>
                         <td>
-                            <div style="display:flex; gap:4px; align-items:center;">
-                                <button class="btn btn-green" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px;" onclick="copyDoctorForClient(${doc.id})" title="نسخ للعميل"><i class="fa-solid fa-copy"></i></button>
-                                <button class="btn btn-secondary" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px;" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px;" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            <div style="font-size:0.68rem; color:#fef08a;">${doc.notes || '-'}</div>
+                        </td>
+                        <td style="text-align:center;">
+                            <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                                <button class="btn btn-green" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px; justify-content:center; border-radius:4px;" onclick="copyDoctorForClient(${doc.id})" title="نسخ للعميل"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px; justify-content:center; border-radius:4px;" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.18rem; font-size:0.75rem; width:26px; height:26px; justify-content:center; border-radius:4px;" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
                 `;
                 countW++;
             });
+
+            document.getElementById('countMashy').innerText = `${countM} أطباء`;
+            document.getElementById('countWissam').innerText = `${countW} أطباء`;
+            document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد';
+            document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد';
             updateKPIs();
+        }
+
+        let draggedBranch = null, draggedDocId = null;
+        function handleBranchDragStart(e, branch, id) { draggedBranch = branch; draggedDocId = id; }
+        function handleBranchDrop(e, branch, targetId) {
+            e.preventDefault();
+            if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
+            let currentList;
+            const search = document.getElementById('docSearchInput').value.trim().toLowerCase();
+            const selectedSpecialty = document.getElementById('specialtyFilter').value;
+
+            if (branch === 'mashy') {
+                currentList = doctorsData.filter(d => {
+                    const matchSearch = d.name.toLowerCase().includes(search);
+                    const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
+                    return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||[]).length > 0);
+                });
+            } else {
+                currentList = doctorsData.filter(d => {
+                    const matchSearch = d.name.toLowerCase().includes(search);
+                    const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
+                    return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
+                });
+            }
+
+            const oldIdx = currentList.findIndex(d => d.id === draggedDocId);
+            const targetIdx = currentList.findIndex(d => d.id === targetId);
+            if (oldIdx !== -1 && targetIdx !== -1) {
+                const moved = currentList.splice(oldIdx, 1)[0];
+                currentList.splice(targetIdx, 0, moved);
+                currentList.forEach((doc, idx) => {
+                    const mainDoc = doctorsData.find(d => d.id === doc.id);
+                    if (mainDoc) {
+                        if (branch === 'mashy') mainDoc.mashyOrder = idx;
+                        else mainDoc.wissamOrder = idx;
+                    }
+                });
+                syncToCloud();
+                renderDoctors();
+            }
         }
 
         function openDoctorModal() {
@@ -1163,9 +1523,51 @@
                 renderDoctors();
             }
         }
-    </script>
 
-    <script>
+        function toggleTickerMovement() {
+            const track = document.getElementById('tickerTrackContainer');
+            const btn = document.getElementById('tickerToggleBtn');
+            track.classList.toggle('paused');
+            if (track.classList.contains('paused')) {
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
+            }
+        }
+
+        function changeTickerSpeed(seconds) {
+            const track = document.getElementById('tickerTrackContainer');
+            track.style.animationDuration = seconds + 's';
+        }
+
+        function changeTickerStructuralTheme(themeClass) {
+            document.body.classList.remove('ticker-style-modern', 'ticker-style-minimal', 'ticker-style-classic');
+            document.body.classList.add(themeClass);
+            localStorage.setItem('tickerStructuralTheme', themeClass);
+        }
+
+        // الانتقال لصفحة التنبيهات وتحديد التنبيه المختار مع الوميض
+        function jumpToAlertAndHighlight(alertId) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            setTimeout(() => {
+                renderAlerts("", alertId);
+                const targetCard = document.getElementById(`alert_card_${alertId}`);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
+        }
+
+        // زر أحدث إشعار يعيد الترتيب وينتقل لأحدث تنبيه مع الوميض عليه
+        function resetAndSortTickerLatest() {
+            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
+            if (sortedAlerts.length > 0) {
+                jumpToAlertAndHighlight(sortedAlerts[0].id);
+            } else {
+                switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            }
+        }
+
         function renderAlerts(search = "", highlightId = null) {
             const grid = document.getElementById('alertsGridList');
             const tickerTrack = document.getElementById('tickerTrackContainer');
@@ -1194,7 +1596,7 @@
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
 
                 grid.innerHTML += `
-                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" style="display:flex; gap:0.5rem; background:var(--bg-card); padding:0.6rem; border-radius:6px; border:1px solid var(--border-color); margin-bottom:0.5rem;">
+                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
                         <div style="flex:1;">
                             <p>${item.content}</p>
                             <span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span>
@@ -1209,6 +1611,24 @@
                 `;
             });
             updateKPIs();
+        }
+
+        function jumpToAlertAndHighlight(alertId) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            setTimeout(() => {
+                renderAlerts("", alertId);
+                const targetCard = document.getElementById(`alert_card_${alertId}`);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
+        }
+
+        function resetAndSortTickerLatest() {
+            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
+            if (sortedAlerts.length > 0) {
+                jumpToAlertAndHighlight(sortedAlerts[0].id);
+            }
         }
 
         function openAlertModal() {
@@ -1311,6 +1731,155 @@
             }
         }
 
+        function renderDeptsAndDocs(search = "") {
+            const mashyDermBody = document.getElementById('mashyDermTableBody');
+            const mashyDentBody = document.getElementById('mashyDentTableBody');
+            const wissamDermBody = document.getElementById('wissamDermTableBody');
+            const wissamDentBody = document.getElementById('wissamDentTableBody');
+            if(!mashyDermBody || !mashyDentBody || !wissamDermBody || !wissamDentBody) return;
+
+            mashyDermBody.innerHTML = "";
+            mashyDentBody.innerHTML = "";
+            wissamDermBody.innerHTML = "";
+            wissamDentBody.innerHTML = "";
+
+            deptServicesData.filter(s => s.name && s.name.toLowerCase().includes(search.toLowerCase())).forEach(item => {
+                const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
+                const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
+                const tagsFooter = item.tags ? `<div class="card-tags-footer" style="margin-top:2px;">🏷️ ${item.tags}</div>` : '';
+                const rowHtml = `
+                    <tr>
+                        <td ${cellStyle}>${item.name} ${jointBadge} ${tagsFooter}</td>
+                        <td style="text-align:center;">
+                            <button class="btn btn-secondary" style="padding:0.1rem 0.2rem; font-size:0.6rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.1rem 0.2rem; font-size:0.6rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                if (item.branch === "معشي") {
+                    if (item.type === "derm") mashyDermBody.innerHTML += rowHtml;
+                    else mashyDentBody.innerHTML += rowHtml;
+                } else {
+                    if (item.type === "derm") wissamDermBody.innerHTML += rowHtml;
+                    else wissamDentBody.innerHTML += rowHtml;
+                }
+            });
+
+            const notesContainer = document.getElementById('deptNotesContainer');
+            if(!notesContainer) return;
+            notesContainer.innerHTML = "";
+            deptNotesData.forEach((noteObj, idx) => {
+                const tagsFooter = noteObj.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${noteObj.tags}</div>` : '';
+                notesContainer.innerHTML += `
+                    <div class="doc-sheet-card ${noteObj.color || 'card-gold'}">
+                        <h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}
+                            <div style="display:flex; gap:0.2rem;">
+                                <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <p>${noteObj.text}</p>
+                        ${tagsFooter}
+                    </div>
+                `;
+            });
+        }
+
+        function openDeptServiceModal() {
+            document.getElementById('deptRowId').value = "";
+            document.getElementById('deptBranchSelect').value = "معشي";
+            document.getElementById('deptCategorySelect').value = "derm";
+            document.getElementById('deptItemName').value = "";
+            document.getElementById('deptItemTags').value = "";
+            document.getElementById('deptCustomColor').value = "";
+            document.getElementById('deptIsJoint').checked = false;
+            document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز مستقل";
+            document.getElementById('deptServiceModal').classList.add('active');
+        }
+
+        function saveDeptService() {
+            const id = document.getElementById('deptRowId').value;
+            const rowObj = {
+                id: id ? parseInt(id) : Date.now(),
+                branch: document.getElementById('deptBranchSelect').value,
+                type: document.getElementById('deptCategorySelect').value,
+                name: document.getElementById('deptItemName').value.trim(),
+                tags: document.getElementById('deptItemTags').value.trim(),
+                customColor: document.getElementById('deptCustomColor').value,
+                isJoint: document.getElementById('deptIsJoint').checked
+            };
+            if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
+            if (id) {
+                const idx = deptServicesData.findIndex(s => s.id == id);
+                deptServicesData[idx] = rowObj;
+            } else deptServicesData.push(rowObj);
+            syncToCloud();
+            renderDeptsAndDocs();
+            closeModal('deptServiceModal');
+        }
+
+        function editDeptService(id) {
+            const item = deptServicesData.find(s => s.id === id);
+            if (!item) return;
+            document.getElementById('deptRowId').value = item.id;
+            document.getElementById('deptBranchSelect').value = item.branch || "معشي";
+            document.getElementById('deptCategorySelect').value = item.type || "derm";
+            document.getElementById('deptItemName').value = item.name || "";
+            document.getElementById('deptItemTags').value = item.tags || "";
+            document.getElementById('deptCustomColor').value = item.customColor || "";
+            document.getElementById('deptIsJoint').checked = !!item.isJoint;
+            document.getElementById('deptServiceModal').classList.add('active');
+        }
+
+        function deleteDeptService(id) {
+            if (confirm("حذف؟")) {
+                deptServicesData = deptServicesData.filter(s => s.id !== id);
+                syncToCloud();
+                renderDeptsAndDocs();
+            }
+        }
+
+        function openDeptNoteModal() {
+            document.getElementById('noteIndex').value = "";
+            document.getElementById('deptNoteText').value = "";
+            document.getElementById('deptNoteTags').value = "";
+            document.getElementById('deptNoteColor').value = "card-gold";
+            document.getElementById('deptNoteModal').classList.add('active');
+        }
+
+        function saveDeptNote() {
+            const idx = document.getElementById('noteIndex').value;
+            const text = document.getElementById('deptNoteText').value.trim();
+            const tags = document.getElementById('deptNoteTags').value.trim();
+            const color = document.getElementById('deptNoteColor').value;
+            if (!text) return;
+            const noteObj = { text, tags, color };
+            if (idx !== "") deptNotesData[parseInt(idx)] = noteObj;
+            else deptNotesData.push(noteObj);
+            syncToCloud();
+            renderDeptsAndDocs();
+            closeModal('deptNoteModal');
+        }
+
+        function editDeptNote(idx) {
+            const noteObj = deptNotesData[idx];
+            if (!noteObj) return;
+            document.getElementById('noteIndex').value = idx;
+            document.getElementById('deptNoteText').value = noteObj.text;
+            document.getElementById('deptNoteTags').value = noteObj.tags || "";
+            document.getElementById('deptNoteColor').value = noteObj.color || "card-gold";
+            document.getElementById('deptNoteModal').classList.add('active');
+        }
+
+        function deleteDeptNote(idx) {
+            if (confirm("حذف؟")) {
+                deptNotesData.splice(idx, 1);
+                syncToCloud();
+                renderDeptsAndDocs();
+            }
+        }
+
+        let draggedCoordIdx = null;
         function renderCoordinators(search = "") {
             const grid = document.getElementById('coordinatorsGrid');
             if(!grid) return;
@@ -1321,6 +1890,7 @@
                 grid.innerHTML += `
                     <div class="doc-sheet-card ${c.color || 'card-teal'}">
                         <h3>
+                            <span class="card-drag-handle" draggable="true" ondragstart="handleCoordDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleCoordDrop(event, ${idx})" title="اسحب لتحريك المكان"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.4rem;">${c.name}</span>
                             <div style="display:flex; gap:0.2rem;">
                                 <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1332,6 +1902,16 @@
                     </div>
                 `;
             });
+        }
+
+        function handleCoordDragStart(e, idx) { draggedCoordIdx = idx; }
+        function handleCoordDrop(e, targetIdx) {
+            e.preventDefault();
+            if (draggedCoordIdx === null || draggedCoordIdx === targetIdx) return;
+            const moved = coordinatorsData.splice(draggedCoordIdx, 1)[0];
+            coordinatorsData.splice(targetIdx, 0, moved);
+            syncToCloud();
+            renderCoordinators();
         }
 
         function openCoordinatorModal() {
@@ -1420,6 +2000,76 @@
             });
         }
 
+        function handleOfferCheckboxChange(id, checkboxEl) {
+            const offerId = parseInt(id);
+            if (checkboxEl.checked) {
+                if (!selectedOfferIds.includes(offerId)) selectedOfferIds.push(offerId);
+            } else {
+                selectedOfferIds = selectedOfferIds.filter(i => i !== offerId);
+            }
+            updateMultiOffersClipboard();
+        }
+
+        function updateMultiOffersClipboard() {
+            const box = document.getElementById('multiOffersClipboardBox');
+            const textarea = document.getElementById('multiOffersTextarea');
+            if (!box || !textarea) return;
+
+            if (selectedOfferIds.length === 0) {
+                box.classList.remove('active');
+                textarea.value = "";
+                return;
+            }
+
+            box.classList.add('active');
+            let blocks = [];
+            selectedOfferIds.forEach(id => {
+                const item = offersData.find(o => o.id === id);
+                if (item) {
+                    blocks.push(formatOfferLineForClient(item));
+                }
+            });
+            textarea.value = blocks.join('\n\n');
+        }
+
+        function copyMultiOffersText() {
+            const textarea = document.getElementById('multiOffersTextarea');
+            if (!textarea || !textarea.value) return;
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                alert(`📋 تم نسخ العروض المحددة بنجاح!`);
+            });
+        }
+
+        function clearMultiOffersSelection() {
+            selectedOfferIds = [];
+            document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false);
+            updateMultiOffersClipboard();
+        }
+
+        let isDraggingClipboard = false, clipStartX = 0, clipStartY = 0;
+        function startDragClipboard(e) {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') return;
+            isDraggingClipboard = true;
+            const box = document.getElementById('multiOffersClipboardBox');
+            clipStartX = e.clientX - box.offsetLeft;
+            clipStartY = e.clientY - box.offsetTop;
+            document.addEventListener('mousemove', onDragClipboard);
+            document.addEventListener('mouseup', stopDragClipboard);
+        }
+        function onDragClipboard(e) {
+            if (!isDraggingClipboard) return;
+            const box = document.getElementById('multiOffersClipboardBox');
+            box.style.left = (e.clientX - clipStartX) + 'px';
+            box.style.top = (e.clientY - clipStartY) + 'px';
+            box.style.right = 'auto';
+            box.style.bottom = 'auto';
+        }
+        function stopDragClipboard() {
+            isDraggingClipboard = false;
+            document.removeEventListener('mousemove', onDragClipboard);
+            document.removeEventListener('mouseup', stopDragClipboard);
+        }
+
         function renderOffers(search = "") {
             const tableEl = document.getElementById('offersTableElement');
             if(!tableEl) return;
@@ -1442,6 +2092,7 @@
 
             let bodyHtml = `<tbody>`;
             filteredOffers.forEach(item => {
+                const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
                 let devicesDisplay = "";
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
@@ -1451,7 +2102,7 @@
 
                 bodyHtml += `
                     <tr id="offer_row_${item.id}">
-                        <td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}"></td>
+                        <td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td>
                         <td>${pinnedBadge}<strong>${item.name}</strong> ${notesTags}</td>
                         <td>${devicesDisplay}</td>
                         <td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td>
@@ -1467,6 +2118,7 @@
             });
             bodyHtml += `</tbody>`;
             tableEl.innerHTML = headerHtml + bodyHtml;
+            updateMultiOffersClipboard();
         }
 
         function openOfferModal() {
@@ -1536,17 +2188,36 @@
             }
         }
 
+        function checkInquiryCustomCat(val) {
+            document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
+        }
+        function renderInquiriesTabs() {}
+        function filterInquiryCategory(cat, btn) {
+            selectedInquiryFilter = cat;
+            document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderInquiries();
+        }
+
+        let draggedInquiryIdx = null;
         function renderInquiries(search = "", highlightId = null) {
             const grid = document.getElementById('inquiryCardsGrid');
             if(!grid) return;
             grid.innerHTML = "";
 
-            inquiriesData.forEach(item => {
+            const filtered = inquiriesData.filter(i => {
+                const matchCat = (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter);
+                const matchSearch = (!search || i.question.toLowerCase().includes(search.toLowerCase()) || i.answer.toLowerCase().includes(search.toLowerCase()) || (i.tags && i.tags.toLowerCase().includes(search.toLowerCase())));
+                return matchCat && matchSearch;
+            });
+
+            filtered.forEach((item, idx) => {
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsFooter = item.tags ? `<div class="card-tags-footer">🏷️ الوسوم: ${item.tags}</div>` : '';
                 grid.innerHTML += `
                     <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${isHighlighted}" style="position:relative;">
                         <h3>
+                            <span class="card-drag-handle" draggable="true" ondragstart="handleInquiryDragStart(event, ${idx})" ondragover="event.preventDefault()" ondrop="handleInquiryDrop(event, ${idx})" title="اسحب لتحريك المكان"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.3rem;">${item.question}</span>
                             <div style="display:flex; gap:0.2rem;">
                                 <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button>
@@ -1558,6 +2229,16 @@
                     </div>
                 `;
             });
+        }
+
+        function handleInquiryDragStart(e, idx) { draggedInquiryIdx = idx; }
+        function handleInquiryDrop(e, targetIdx) {
+            e.preventDefault();
+            if (draggedInquiryIdx === null || draggedInquiryIdx === targetIdx) return;
+            const moved = inquiriesData.splice(draggedInquiryIdx, 1)[0];
+            inquiriesData.splice(targetIdx, 0, moved);
+            syncToCloud();
+            renderInquiries();
         }
 
         function openInquiryModal() {
@@ -1574,6 +2255,7 @@
         function saveInquiry() {
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
+            if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
             const obj = { 
                 id: id ? parseInt(id) : Date.now(), 
                 category: cat, 
@@ -1614,7 +2296,7 @@
 
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('openrouter_api_key') || '';
-            const newKey = prompt("أدخل مفتاح OpenRouter API:", currentKey);
+            const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
             if (newKey !== null) {
                 localStorage.setItem('openrouter_api_key', newKey.trim());
                 alert("✅ تم حفظ مفتاح OpenRouter API بنجاح!");
@@ -1638,77 +2320,167 @@
             inputEl.value = "";
             msgBox.scrollTop = msgBox.scrollHeight;
 
+            const currentShiftNote = document.getElementById('shiftScratchpadText').value;
+
             const siteContext = `
-            قاعدة بيانات الموقع الشاملة لعيادات ماجستي:
-            1. مواعيد الأطباء: ${JSON.stringify(doctorsData)}
-            2. التنبيهات: ${JSON.stringify(alertsData)}
-            3. المنسقين: ${JSON.stringify(coordinatorsData)}
-            4. العروض: ${JSON.stringify(offersData)}
-            5. الاستفسارات: ${JSON.stringify(inquiriesData)}
+            قاعدة بيانات الموقع الشاملة (جميع الأقسام الـ 6 لعيادات ماجستي):
+            1. ملاحظات الشفت: ${currentShiftNote || 'لا توجد'}
+            2. مواعيد الأطباء (القسم 1): ${JSON.stringify(doctorsData)}
+            3. التنبيهات والإشعارات (القسم 2): ${JSON.stringify(alertsData)}
+            4. الأقسام والأطباء والخدمات والأجهزة والملاحظات (القسم 3): خدمات: ${JSON.stringify(deptServicesData)} | ملاحظات الأقسام: ${JSON.stringify(deptNotesData)}
+            5. دليل المنسقين (القسم 4): ${JSON.stringify(coordinatorsData)}
+            6. العروض والأسعار (القسم 5): ${JSON.stringify(offersData)}
+            7. دليل الاستفسارات (القسم 6): ${JSON.stringify(inquiriesData)}
             `;
+
+            const loadingId = 'ai_load_' + Date.now();
+            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري التحليل الشامل لجميع الأقسام...</div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
 
             let apiKey = localStorage.getItem('openrouter_api_key');
             if (!apiKey) {
-                alert("⚠️ يرجى إدخال مفتاح OpenRouter API أولاً!");
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                alert("⚠️ يرجى إدخال مفتاح OpenRouter API أولاً من علامة المفتاح (🔑) أعلى نافذة المساعد!");
                 return;
             }
 
-            const systemPrompt = `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. أجب بدقة واختصار من البيانات التالية: ${siteContext}`;
-            
+            const systemPrompt = `أنت مساعد ذكي ومحترف لخدمة عملاء الكول سنتر الطبي. 
+            قواعدك الصارمة:
+            1. لديك ارتباط كامل وشامل بجميع أقسام الموقع الـ 6 المرفقة أدناه.
+            2. ابحث بدقة داخل (الأطباء، التنبيهات، الخدمات، الملاحظات، المنسقين، العروض، الاستفسارات) وأجب فوراً بدقة واختصار مناسب للواتساب.
+            3. إذا سأل المستخدم عن معلومة، اقرأها من البيانات المرفقة أينما كانت واعرضها بوضوح تام.
+            ${siteContext}`;
+
+            aiChatHistory.push({ role: "user", content: rawText });
+
+            const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+
             try {
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey.trim()}`
+                        'Authorization': `Bearer ${apiKey.trim()}`,
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'Clinic CallCenter Agent'
                     },
                     body: JSON.stringify({
                         "model": "recursive/flint-v1.0:free",
                         "messages": [
                             { "role": "system", "content": systemPrompt },
-                            { "role": "user", "content": rawText }
+                            ...aiChatHistory
                         ]
                     })
                 });
+
                 const data = await response.json();
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+
                 if (data && data.choices && data.choices[0].message.content) {
                     const aiReply = data.choices[0].message.content;
+                    aiChatHistory.push({ role: "assistant", content: aiReply });
+
                     const replyId = 'ai_reply_' + Date.now();
                     msgBox.innerHTML += `
                         <div class="ai-message gemini">
                             <div id="${replyId}">${aiReply.replace(/\n/g, '<br>')}</div>
                             <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                                <i class="fa-solid fa-copy"></i> 📋 نسخ للواتساب
+                                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
                             </button>
                         </div>
                     `;
+                } else {
+                    msgBox.innerHTML += `<div class="ai-message gemini">عذراً، لم أتمكن من جلب الرد من الخادم السحابي. تأكد من صحة المفتاح.</div>`;
                 }
             } catch (error) {
-                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال.</div>`;
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                msgBox.innerHTML += `<div class="ai-message gemini">حدث خطأ في الاتصال بالشبكة.</div>`;
             }
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        window.onload = function() {
-            db.ref('clinicData').on('value', snap => {
-                const data = snap.val() || {};
-                doctorsData = data.doctorsData || [];
-                fridaySchedules = data.fridaySchedules || [];
-                alertsData = data.alertsData || [];
-                coordinatorsData = data.coordinatorsData || [];
-                deptServicesData = data.deptServicesData || [];
-                deptNotesData = data.deptNotesData || [];
-                offersData = data.offersData || [];
-                inquiriesData = data.inquiriesData || [];
-                renderDoctors();
-                renderAlerts();
-                renderCoordinators();
-                renderOffersTabs();
-                renderOffers();
-                renderInquiries();
-                updateKPIs();
+        function handleTrueGlobalSearch(query) {
+            const q = query.trim().toLowerCase();
+            const resultsSection = document.getElementById('globalSearchResultsSection');
+            const resultsList = document.getElementById('globalSearchResultsList');
+
+            if (!q) {
+                resultsSection.classList.remove('active');
+                const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                document.getElementById(`${activeTab}-section`).classList.add('active');
+                return;
+            }
+
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            resultsSection.classList.add('active');
+            resultsList.innerHTML = "";
+            let foundCount = 0;
+
+            alertsData.forEach(a => {
+                if (a.content.toLowerCase().includes(q) || (a.tags && a.tags.toLowerCase().includes(q))) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(220,38,38,0.2); color:#ef4444; border-color:#dc2626;">التنبيهات والإشعارات</span><h4>${a.content}</h4><span style="font-size:0.65rem; color:var(--text-muted);">${a.time}</span></div><button class="btn btn-blue" onclick="jumpToAlertsTab()">عرض التنبيهات</button></div>`;
+                }
             });
-        };
+
+            doctorsData.forEach(d => {
+                if (d.name.toLowerCase().includes(q) || (d.specialty && d.specialty.toLowerCase().includes(q)) || (d.tags && d.tags.toLowerCase().includes(q)) || (d.notes && d.notes.toLowerCase().includes(q))) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(37,99,235,0.2); color:#93c5fd; border-color:#2563eb;">مواعيد الأطباء</span><h4>${d.name} (${d.specialty})</h4><p style="font-size:0.7rem; color:var(--text-muted);">الدوام: ${d.timing || ''} ${d.isLeave ? ' - [⚠️ في إجازة]' : ''}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightDoc(${d.id})">عرض الطبيب</button></div>`;
+                }
+            });
+
+            offersData.forEach(o => {
+                if (o.name.toLowerCase().includes(q) || (o.notes && o.notes.toLowerCase().includes(q))) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge" style="background:rgba(22,163,74,0.2); color:#86efac; border-color:#16a34a;">العروض والأسعار</span><h4>${o.name}</h4><p style="font-size:0.7rem; color:var(--text-muted);">السعر: ${o.price || 'حسب الأجهزة'} (${o.notes || ''})</p></div><button class="btn btn-blue" onclick="switchTab('offers', document.querySelectorAll('.nav-link')[4])">عرض العروض</button></div>`;
+                }
+            });
+
+            inquiriesData.forEach(i => {
+                if (i.question.toLowerCase().includes(q) || i.answer.toLowerCase().includes(q) || (i.tags && i.tags.toLowerCase().includes(q))) {
+                    foundCount++;
+                    resultsList.innerHTML += `<div class="search-result-card"><div><span class="source-badge">دليل الاستفسارات</span><h4>${i.question}</h4><p style="font-size:0.7rem; color:var(--text-muted);">${i.answer}</p></div><button class="btn btn-blue" onclick="jumpToSectionAndHighlightInquiry(${i.id})">عرض الاستفسار</button></div>`;
+                }
+            });
+
+            if (foundCount === 0) resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في أقسام الموقع.</div>`;
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
+        }
+
+        function jumpToSectionAndHighlightDoc(docId) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
+            setTimeout(() => {
+                renderDoctors(docId);
+                const rowEl = document.getElementById(`doc_row_${docId}`);
+                if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(inqId) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelector(`.nav-link[data-tab="inquiries"]`));
+            setTimeout(() => {
+                renderInquiries("", inqId);
+                const cardEl = document.getElementById(`inquiry_card_${inqId}`);
+                if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
     </script>
 </body>
 </html>
