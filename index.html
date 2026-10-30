@@ -599,7 +599,7 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (سحابي / محلي دقيق)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (recursive/flint-v1.0:free)</h4>
             </div>
             
             <div style="display:flex; align-items:center; gap:0.4rem; background:var(--bg-surface); padding:0.15rem 0.4rem; border-radius:12px; border:1px solid var(--border-color);">
@@ -615,7 +615,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك الذكي. تم ضبطي لتقديم إجابات دقيقة ومركزة، مع قراءة التنبيهات والأقسام والعروض بدقة تامة.</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك الذكي المعتمد على موديل (recursive/flint-v1.0:free). جاهز لقراءة التنبيهات والأقسام والعروض ومساعدتك فوراً!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1896,8 +1896,8 @@
 
         function setApiKeyPrompt() {
             const currentKey = localStorage.getItem('openrouter_api_key') || '';
-            const newKey = prompt("أدخل مفتاح OpenRouter API (يبدأ بـ sk-or-v1-...):", currentKey);
-            if (newKey !== null) { localStorage.setItem('openrouter_api_key', newKey.trim()); alert("✅ تم حفظ مفتاح OpenRouter API!"); }
+            const newKey = prompt("أدخل مفتاح OpenRouter API الخاص بك:", currentKey);
+            if (newKey !== null) { localStorage.setItem('openrouter_api_key', newKey.trim()); alert("✅ تم حفظ مفتاح OpenRouter API بنجاح!"); }
         }
         function copyAIAnswerToWhatsApp(textElementId) {
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
@@ -1939,36 +1939,41 @@
                 `;
 
                 const loadingId = 'ai_load_' + Date.now();
-            msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك سحابياً وتنفيذه في قاعدة البيانات...</div>`;
-            msgBox.scrollTop = msgBox.scrollHeight;
+                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك بواسطة recursive/flint-v1.0:free...</div>`;
+                msgBox.scrollTop = msgBox.scrollHeight;
 
-            let apiKey = localStorage.getItem('openrouter_api_key');
-            let aiReply = "";
+                let apiKey = localStorage.getItem('openrouter_api_key');
+                let aiReply = "";
 
-            try {
-                if (!apiKey) throw new Error("No API Key");
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey.trim()}`, 'HTTP-Referer': window.location.origin, 'X-Title': 'Clinic CallCenter Agent' },
-                    body: JSON.stringify({
-                        "model": "recursive/flint-v1.0:free",
-                        "messages": [{ 
-                            "role": "system", 
-                            "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة، وفهم الأوامر البشرية (إضافة، تعديل، حذف بيانات في الموقع مثل العروض، الاستفسارات، الأطباء، التنبيهات).
-                            
-                            إذا طلب المستخدم إضافة أو تعديل أو حذف أي شيء، قم بإرجاع رد يتضمن نص الإجابة للعميل (أو تأكيد التنفيذ)، وإذا استدعى الامر تعديل البيانات، يمكنك صياغة الأوامر. أجب باللغة العربية بوضوح واحترافية.\n${siteContext}` 
-                        }, { "role": "user", "content": rawText }]
-                    })
-                });
+                try {
+                    if (!apiKey) throw new Error("مفتاح API غير مدخل");
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Authorization': `Bearer ${apiKey.trim()}`, 
+                            'HTTP-Referer': window.location.origin, 
+                            'X-Title': 'Clinic CallCenter Agent' 
+                        },
+                        body: JSON.stringify({
+                            "model": "recursive/flint-v1.0:free",
+                            "messages": [{ 
+                                "role": "system", 
+                                "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب (سواء من الأطباء أو التنبيهات أو العروض أو الاستفسارات). استخدم قاموس المترادفات لفهم العامية.\n${siteContext}` 
+                            }, { "role": "user", "content": rawText }]
+                        })
+                    });
 
                     const data = await response.json();
                     if (data && data.choices && data.choices[0].message.content) {
                         aiReply = data.choices[0].message.content;
+                    } else if (data && data.error) {
+                        throw new Error(data.error.message || "API Error");
                     } else {
                         throw new Error("API Error");
                     }
                 } catch (err) {
-                    aiReply = "عذراً يا مصطفى، تعذر الاتصال بالسحابة أو لم يتم إدخال مفتاح OpenRouter API، أو الموديل السحابي واجه ضغط. يمكنك استخدام المساعد المحلي (أوفلاين) وهو شغال بكفاءة فوراً.";
+                    aiReply = "عذراً يا مصطفى، لم نتمكن من الاتصال بـ OpenRouter (تأكد من إدخال مفتاح API من أيقونة 🔑 في الأعلى). تم التحويل تلقائياً للمساعد المحلي (أوفلاين) لتقديم الإجابة فوراً:\n\n" + executeLocalSmartSearch(rawText);
                 }
 
                 document.getElementById(loadingId).remove();
@@ -2154,7 +2159,7 @@
             setTimeout(() => { renderDeptsAndDocs("", id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightCoord(id) {
-            document.getElementById('globalSearchResultsSection'].classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators("", id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightOffer(id, cat) {
