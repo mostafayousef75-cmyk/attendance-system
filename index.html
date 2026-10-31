@@ -225,7 +225,7 @@
             <!-- شريط البحث الشامل الفائق -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الأقسام (يتخطى الهمزات والوسوم والمرادفات)..." oninput="handleTrueGlobalSearch(this.value)">
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الأقسام..." oninput="handleTrueGlobalSearch(this.value)">
             </div>
             
             <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -295,7 +295,7 @@
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center;">
                     <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="docSearchInput" placeholder="بحث ذكي في الأطباء (يتخطى الهمزات والوسوم)..." oninput="renderDoctors()">
+                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
                     </div>
                     <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة
@@ -363,7 +363,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="alertSearchInput" placeholder="بحث ذكي في التنبيهات (يتخطى الهمزات والوسوم)..." oninput="renderAlerts()">
+                    <input type="text" id="alertSearchInput" placeholder="بحث في التنبيهات..." oninput="renderAlerts()">
                 </div>
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
@@ -379,7 +379,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="deptSearchInput" placeholder="بحث ذكي داخل الأقسام (يتخطى الهمزات والوسوم)..." oninput="renderDeptsAndDocs()">
+                    <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs()">
                 </div>
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
                     <div style="display:flex; flex-direction:column; gap:0.6rem;">
@@ -439,7 +439,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="coordSearchInput" placeholder="بحث ذكي في تعليمات ودليل المنسقين (يتخطى الهمزات)..." oninput="renderCoordinators()">
+                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين..." oninput="renderCoordinators()">
                 </div>
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
@@ -453,7 +453,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="offerSearchInput" placeholder="بحث ذكي في العروض والأسعار (يتخطى الهمزات والوسوم)..." oninput="renderOffers()">
+                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار..." oninput="renderOffers()">
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -484,7 +484,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="inquirySearchInput" placeholder="بحث ذكي في الاستفسارات (يتخطى الهمزات والوسوم)..." oninput="renderInquiries()">
+                    <input type="text" id="inquirySearchInput" placeholder="بحث في الاستفسارات..." oninput="renderInquiries()">
                 </div>
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
@@ -500,7 +500,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="synonymSearchInput" placeholder="بحث ذكي في قاموس المصطلحات (يتخطى الهمزات)..." oninput="renderSynonyms()">
+                    <input type="text" id="synonymSearchInput" placeholder="بحث في قاموس المصطلحات..." oninput="renderSynonyms()">
                 </div>
                 <div class="offers-table-box">
                     <div class="table-responsive">
@@ -1245,17 +1245,10 @@
             return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
         }
 
-        // --- دالة التنظيف الاحترافية للبحث المحلي والشامل ---
+        // --- دالة التنظيف الآمنة للبحث ---
         function cleanSearchText(str) {
             if (!str) return "";
-            return str.toLowerCase()
-                .replace(/[إأآاٱ]/g, 'ا')
-                .replace(/[ةه]/g, 'ه')
-                .replace(/[ىي]/g, 'ي')
-                .replace(/^ال/gm, '')
-                .replace(/\sال/g, ' ')
-                .replace(/[ًٍُِّْء]/g, '')
-                .trim();
+            return str.toString().toLowerCase().trim();
         }
 
         function renderDoctors(highlightId = null) {
@@ -1898,36 +1891,9 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        function getExpandedTokens(rawQuery) {
-            const cleaned = cleanSearchText(rawQuery);
-            let tokens = [cleaned];
-            if (!cleaned) return tokens;
-
-            if (synonymsData) {
-                for (let synKey in synonymsData) {
-                    let cleanKey = cleanSearchText(synKey);
-                    let item = synonymsData[synKey];
-                    let vals = [];
-                    if (item) {
-                        if (typeof item === 'object' && Array.isArray(item.values)) {
-                            vals = item.values.map(v => cleanSearchText(v));
-                        } else if (typeof item === 'string') {
-                            vals = item.split(/[,،]/).map(v => cleanSearchText(v.trim()));
-                        }
-                    }
-
-                    if (cleaned.includes(cleanKey) || cleanKey.includes(cleaned) || vals.some(v => cleaned.includes(v))) {
-                        tokens.push(cleanKey);
-                        vals.forEach(v => tokens.push(v));
-                    }
-                }
-            }
-            return Array.from(new Set(tokens));
-        }
-
-        // --- البحث الشامل (مع الترتيب من الأحدث للأقدم وربط أزرار العرض بدقة) ---
+        // --- البحث الشامل (مبسط ومضمون النتائج 100%) ---
         function handleTrueGlobalSearch(query) {
-            const rawQ = query.trim();
+            const rawQ = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
             const resultsList = document.getElementById('globalSearchResultsList');
             
@@ -1942,19 +1908,13 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            const tokens = getExpandedTokens(rawQ);
-            const isMatch = (text) => {
-                const cleanedText = cleanSearchText(text);
-                return tokens.some(t => cleanedText.includes(t));
-            };
-
             let allMatchedResults = [];
 
             // 1. الأطباء
             doctorsData.forEach(d => {
-                if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes)) {
+                if (d.name.toLowerCase().includes(rawQ) || (d.specialty && d.specialty.toLowerCase().includes(rawQ)) || (d.tags && d.tags.toLowerCase().includes(rawQ)) || (d.notes && d.notes.toLowerCase().includes(rawQ))) {
                     allMatchedResults.push({
-                        id: d.id, timeId: d.id || 0, source: "الأطباء",
+                        timeId: d.id || 0, source: "الأطباء",
                         title: `${d.name} (${d.specialty})`,
                         subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
                         action: `jumpToSectionAndHighlightDoc(${d.id})`
@@ -1964,9 +1924,9 @@
 
             // 2. العروض
             offersData.forEach(o => {
-                if (isMatch(o.name) || isMatch(o.category) || isMatch(o.device1) || isMatch(o.device2) || isMatch(o.notes) || isMatch(o.tags)) {
+                if (o.name.toLowerCase().includes(rawQ) || o.category.toLowerCase().includes(rawQ) || (o.device1 && o.device1.toLowerCase().includes(rawQ)) || (o.device2 && o.device2.toLowerCase().includes(rawQ)) || (o.notes && o.notes.toLowerCase().includes(rawQ)) || (o.tags && o.tags.toLowerCase().includes(rawQ))) {
                     allMatchedResults.push({
-                        id: o.id, timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
+                        timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
                         title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
                         subtitle: o.notes || '',
                         action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`
@@ -1976,9 +1936,9 @@
 
             // 3. الاستفسارات
             inquiriesData.forEach(i => {
-                if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags) || isMatch(i.category)) {
+                if (i.question.toLowerCase().includes(rawQ) || i.answer.toLowerCase().includes(rawQ) || (i.tags && i.tags.toLowerCase().includes(rawQ)) || i.category.toLowerCase().includes(rawQ)) {
                     allMatchedResults.push({
-                        id: i.id, timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
+                        timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
                         title: i.question, subtitle: i.answer,
                         action: `jumpToSectionAndHighlightInquiry(${i.id})`
                     });
@@ -1987,9 +1947,9 @@
 
             // 4. التنبيهات
             alertsData.forEach(a => {
-                if (isMatch(a.content) || isMatch(a.tags)) {
+                if (a.content.toLowerCase().includes(rawQ) || (a.tags && a.tags.toLowerCase().includes(rawQ))) {
                     allMatchedResults.push({
-                        id: a.id, timeId: a.id || 0, source: "التنبيهات والإشعارات",
+                        timeId: a.id || 0, source: "التنبيهات والإشعارات",
                         title: a.content, subtitle: a.time,
                         action: `jumpToAlertsTab(${a.id})`
                     });
@@ -1998,9 +1958,9 @@
 
             // 5. الخدمات والأجهزة
             deptServicesData.forEach(s => {
-                if (isMatch(s.name) || isMatch(s.tags) || isMatch(s.branch)) {
+                if (s.name.toLowerCase().includes(rawQ) || (s.tags && s.tags.toLowerCase().includes(rawQ)) || s.branch.toLowerCase().includes(rawQ)) {
                     allMatchedResults.push({
-                        id: s.id, timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
+                        timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
                         title: s.name, subtitle: `القسم: ${s.type}`,
                         action: `jumpToSectionAndHighlightService(${s.id})`
                     });
@@ -2009,9 +1969,9 @@
 
             // 6. الملاحظات الداخلية
             deptNotesData.forEach((n, idx) => {
-                if (isMatch(n.text) || isMatch(n.tags)) {
+                if (n.text.toLowerCase().includes(rawQ) || (n.tags && n.tags.toLowerCase().includes(rawQ))) {
                     allMatchedResults.push({
-                        id: idx, timeId: idx, source: "الملاحظات الداخلية",
+                        timeId: idx, source: "الملاحظات الداخلية",
                         title: n.text, subtitle: `ملحوظة #${idx + 1}`,
                         action: `jumpToSectionAndHighlightNote(${idx})`
                     });
@@ -2020,10 +1980,10 @@
 
             // 7. دليل المنسقين
             coordinatorsData.forEach(c => {
-                let rulesText = c.rules ? c.rules.join(' ') : '';
-                if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
+                let rulesText = c.rules ? c.rules.join(' ').toLowerCase() : '';
+                if (c.name.toLowerCase().includes(rawQ) || rulesText.includes(rawQ) || (c.tags && c.tags.toLowerCase().includes(rawQ))) {
                     allMatchedResults.push({
-                        id: c.id, timeId: c.id || 0, source: "دليل المنسقين",
+                        timeId: c.id || 0, source: "دليل المنسقين",
                         title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
                         action: `jumpToSectionAndHighlightCoordinator(${c.id})`
                     });
@@ -2033,17 +1993,17 @@
             // 8. القاموس
             for (let synKey in synonymsData) {
                 let item = synonymsData[synKey];
-                let valsStr = typeof item === 'object' ? (item.values || []).join(' ') : item;
-                if (isMatch(synKey) || isMatch(valsStr)) {
+                let valsStr = typeof item === 'object' ? (item.values || []).join(' ').toLowerCase() : item.toLowerCase();
+                if (synKey.toLowerCase().includes(rawQ) || valsStr.includes(rawQ)) {
                     allMatchedResults.push({
-                        id: synKey, timeId: 0, source: "قاموس المرادفات والمصطلحات",
+                        timeId: 0, source: "قاموس المرادفات والمصطلحات",
                         title: `المصطلح: ${synKey}`, subtitle: `المرادفات: ${valsStr}`,
                         action: `jumpToSectionAndHighlightSynonym('${synKey.replace(/'/g, "\\'")}')`
                     });
                 }
             }
 
-            // الترتيب: الأحدث أولاً (أكبر رقم ID زمني في الصدارة)
+            // الترتيب: الأحدث أولاً
             allMatchedResults.sort((a, b) => b.timeId - a.timeId);
 
             if (allMatchedResults.length === 0) {
@@ -2071,7 +2031,6 @@
             switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
         }
 
-        // --- دوال القفز وتفعيل الوميض بدقة لكل قسم ---
         function jumpToSectionAndHighlightDoc(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
