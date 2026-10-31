@@ -2081,7 +2081,7 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // محرك البحث المحلي الذكي والدقيق (مع فلترة الأقسام، الذكاء السياقي، وإخفاء أي قواعد عن العميل)
+        // محرك البحث المحلي الذكي والدقيق (نسخة مُطورة ومرنة 100%)
         function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
@@ -2102,118 +2102,116 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // محرك البحث المحلي الذكي والدقيق (نسخة مُطورة ومرنة 100%)
-function executeLocalSmartSearch(query) {
-    const normalize = (str) => (str || "").toLowerCase()
-        .replace(/[إأآاٱ]/g, 'ا')
-        .replace(/[ةه]/g, 'ه')
-        .replace(/[ىي]/g, 'ي')
-        .replace(/^ال/gm, '')
-        .replace(/\sال/g, ' ')
-        .replace(/[ًٍُِّْء]/g, '')
-        .replace(/[^u0600-u06FFa-zA-Z0-9]/g, ' ')
-        .trim();
+        function executeLocalSmartSearch(query) {
+            const normalize = (str) => (str || "").toLowerCase()
+                .replace(/[إأآاٱ]/g, 'ا')
+                .replace(/[ةه]/g, 'ه')
+                .replace(/[ىي]/g, 'ي')
+                .replace(/^ال/gm, '')
+                .replace(/\sال/g, ' ')
+                .replace(/[ًٍُِّْء]/g, '')
+                .trim();
 
-    const rawQueryClean = normalize(query);
-    const queryWords = rawQueryClean.split(/\s+/).filter(w => w.length > 1);
-    let matches = [];
-    let targetCategory = null;
+            const rawQueryClean = normalize(query);
+            const queryWords = rawQueryClean.split(/\s+/).filter(w => w.length > 1);
+            let matches = [];
+            let targetCategory = null;
 
-    // 1. فحص قواعد توجيه المسار (Routing) للوصول المباشر للقسم والإجابة
-    if (routingRulesData) {
-        for (let key in routingRulesData) {
-            const cleanKey = normalize(key);
-            if (rawQueryClean.includes(cleanKey) || cleanKey.includes(rawQueryClean) || queryWords.some(w => cleanKey.includes(w))) {
-                let rule = routingRulesData[key];
-                targetCategory = rule.category;
-                matches.push(rule.answer);
+            // 1. فحص قواعد توجيه المسار (Routing)
+            if (routingRulesData) {
+                for (let key in routingRulesData) {
+                    const cleanKey = normalize(key);
+                    if (rawQueryClean.includes(cleanKey) || cleanKey.includes(rawQueryClean) || queryWords.some(w => cleanKey.includes(w))) {
+                        let rule = routingRulesData[key];
+                        targetCategory = rule.category;
+                        matches.push(rule.answer);
+                    }
+                }
+            }
+
+            // 2. استخدام قاموس المرادفات
+            let expandedQueryTokens = [...queryWords];
+            if (synonymsData) {
+                for (let synKey in synonymsData) {
+                    let item = synonymsData[synKey];
+                    let vals = typeof item === 'object' ? item.values : (Array.isArray(item) ? item : [item]);
+                    let cat = typeof item === 'object' ? item.category : "عام";
+                    
+                    const cleanSynKey = normalize(synKey);
+                    const valMatch = vals.some(v => rawQueryClean.includes(normalize(v)));
+
+                    if (rawQueryClean.includes(cleanSynKey) || valMatch) {
+                        targetCategory = cat;
+                        vals.forEach(v => expandedQueryTokens.push(normalize(v)));
+                        expandedQueryTokens.push(cleanSynKey);
+                    }
+                }
+            }
+
+            // 3. البحث في العروض والأسعار
+            offersData.forEach(o => {
+                const oNameNorm = normalize(o.name);
+                const oCatNorm = normalize(o.category);
+                const oDev1 = normalize(o.device1);
+                const oDev2 = normalize(o.device2);
+
+                let matchScore = 0;
+                if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 3;
+                if (expandedQueryTokens.some(token => oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token) || oCatNorm.includes(token))) matchScore += 5;
+
+                if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
+                    let devicesText = "";
+                    if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
+                    if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
+                    matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
+                }
+            });
+
+            // 4. البحث في الأطباء
+            const currentDay = getArabicDayName();
+            const todayDateStr = new Date().toISOString().split('T')[0];
+
+            doctorsData.forEach(d => {
+                const docNameNorm = normalize(d.name);
+                const specNorm = normalize(d.specialty);
+                const tagsNorm = normalize(d.tags);
+
+                let docMatch = expandedQueryTokens.some(token => docNameNorm.includes(token) || specNorm.includes(token) || tagsNorm.includes(token)) || docNameNorm.includes(rawQueryClean);
+
+                if (docMatch) {
+                    let leaveStatus = d.isLeave ? "⚠️ الطبيب غير متواجد حالياً (في إجازة رسمية)." : "✅ الطبيب متاح وعلي رأس العمل.";
+                    const mashyDays = d.mashyDays || d.days || [], wissamDays = d.wissamDays || [];
+                    let presentTodayText = [];
+                    if (!d.isLeave) {
+                        if (mashyDays.includes(currentDay)) presentTodayText.push("فرع معشي");
+                        if (wissamDays.includes(currentDay)) presentTodayText.push("فرع الوسام");
+                    }
+                    let todayStatus = presentTodayText.length > 0 ? `متواجد اليوم (${currentDay}) في: ${presentTodayText.join(' و ')}` : `غير متواجد اليوم (${currentDay})`;
+                    let fridayDuty = fridaySchedules.filter(f => f.doc.includes(d.name.replace('د. ', '')) && f.date >= todayDateStr);
+                    let fridayText = fridayDuty.length > 0 ? `مناوب يوم الجمعة القادمة (${fridayDuty[0].date}) في فرع ${fridayDuty[0].branch}` : `ليس لديه مناوبة جمعة قريبة`;
+                    let docAlerts = alertsData.filter(a => normalize(a.content).includes(normalize(d.name)) || normalize(a.tags).includes(normalize(d.name)));
+                    let alertLines = docAlerts.map(a => `• ${a.content}`).join('\n');
+
+                    matches.push(`<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}\n• حالة الدوام: ${leaveStatus}\n• التواجد اليومي: ${todayStatus}\n• مناوبة الجمعة: ${fridayText}\n• مواعيد معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}\n• مواعيد الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}\n• الساعات: ${d.timing || ''}${alertLines ? `\n\n🚨 <strong>تنبيهات خاصة:</strong>\n${alertLines}` : ''}`);
+                }
+            });
+
+            // 5. البحث في الاستفسارات والأسئلة الشائعة
+            inquiriesData.forEach(i => {
+                const qNorm = normalize(i.question);
+                const ansNorm = normalize(i.answer);
+                if (expandedQueryTokens.some(token => qNorm.includes(token) || ansNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
+                    matches.push(`<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`);
+                }
+            });
+
+            if (matches.length > 0) {
+                let uniqueMatches = Array.from(new Set(matches));
+                return uniqueMatches.slice(0, 3).join('\n\n-------------------\n\n');
+            } else {
+                return `عذراً يا مصطفى، لم أجد إجابة مطابقة تماماً. أرجو إضافة قاعدة توجيه مسار أو مصطلح في القائمة الجانبية لهذا السؤال ليتم حفظه واستدعاؤه فوراً.`;
             }
         }
-    }
-
-    // 2. استخدام قاموس المرادفات لفهم المصطلحات وربطها بالقسم
-    let expandedQueryTokens = [...queryWords];
-    if (synonymsData) {
-        for (let synKey in synonymsData) {
-            let item = synonymsData[synKey];
-            let vals = typeof item === 'object' ? item.values : (Array.isArray(item) ? item : [item]);
-            let cat = typeof item === 'object' ? item.category : "عام";
-            
-            const cleanSynKey = normalize(synKey);
-            const valMatch = vals.some(v => rawQueryClean.includes(normalize(v)));
-
-            if (rawQueryClean.includes(cleanSynKey) || valMatch) {
-                targetCategory = cat;
-                vals.forEach(v => expandedQueryTokens.push(normalize(v)));
-                expandedQueryTokens.push(cleanSynKey);
-            }
-        }
-    }
-
-    // 3. البحث في العروض والأسعار بمرونة عالية
-    offersData.forEach(o => {
-        const oNameNorm = normalize(o.name);
-        const oCatNorm = normalize(o.category);
-        const oDev1 = normalize(o.device1);
-        const oDev2 = normalize(o.device2);
-
-        let matchScore = 0;
-        if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 3;
-        if (expandedQueryTokens.some(token => oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token) || oCatNorm.includes(token))) matchScore += 5;
-
-        if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
-            let devicesText = "";
-            if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
-            if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
-            matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
-        }
-    });
-
-    // 4. البحث في الأطباء
-    const currentDay = getArabicDayName();
-    const todayDateStr = new Date().toISOString().split('T')[0];
-
-    doctorsData.forEach(d => {
-        const docNameNorm = normalize(d.name);
-        const specNorm = normalize(d.specialty);
-        const tagsNorm = normalize(d.tags);
-
-        let docMatch = expandedQueryTokens.some(token => docNameNorm.includes(token) || specNorm.includes(token) || tagsNorm.includes(token)) || docNameNorm.includes(rawQueryClean);
-
-        if (docMatch) {
-            let leaveStatus = d.isLeave ? "⚠️ الطبيب غير متواجد حالياً (في إجازة رسمية)." : "✅ الطبيب متاح وعلي رأس العمل.";
-            const mashyDays = d.mashyDays || d.days || [], wissamDays = d.wissamDays || [];
-            let presentTodayText = [];
-            if (!d.isLeave) {
-                if (mashyDays.includes(currentDay)) presentTodayText.push("فرع معشي");
-                if (wissamDays.includes(currentDay)) presentTodayText.push("فرع الوسام");
-            }
-            let todayStatus = presentTodayText.length > 0 ? `متواجد اليوم (${currentDay}) في: ${presentTodayText.join(' و ')}` : `غير متواجد اليوم (${currentDay})`;
-            let fridayDuty = fridaySchedules.filter(f => f.doc.includes(d.name.replace('د. ', '')) && f.date >= todayDateStr);
-            let fridayText = fridayDuty.length > 0 ? `مناوب يوم الجمعة القادمة (${fridayDuty[0].date}) في فرع ${fridayDuty[0].branch}` : `ليس لديه مناوبة جمعة قريبة`;
-            let docAlerts = alertsData.filter(a => normalize(a.content).includes(normalize(d.name)) || normalize(a.tags).includes(normalize(d.name)));
-            let alertLines = docAlerts.map(a => `• ${a.content}`).join('\n');
-
-            matches.push(`<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}\n• حالة الدوام: ${leaveStatus}\n• التواجد اليومي: ${todayStatus}\n• مناوبة الجمعة: ${fridayText}\n• مواعيد معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}\n• مواعيد الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}\n• الساعات: ${d.timing || ''}${alertLines ? `\n\n🚨 <strong>تنبيهات خاصة:</strong>\n${alertLines}` : ''}`);
-        }
-    });
-
-    // 5. البحث في الاستفسارات والأسئلة الشائعة
-    inquiriesData.forEach(i => {
-        const qNorm = normalize(i.question);
-        const ansNorm = normalize(i.answer);
-        if (expandedQueryTokens.some(token => qNorm.includes(token) || ansNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
-            matches.push(`<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`);
-        }
-    });
-
-    if (matches.length > 0) {
-        let uniqueMatches = Array.from(new Set(matches));
-        return uniqueMatches.slice(0, 3).join('\n\n-------------------\n\n');
-    } else {
-        return `عذراً يا مصطفى، لم أجد إجابة مطابقة تماماً. أرجو إضافة قاعدة توجيه مسار أو مصطلح في القائمة الجانبية لهذا السؤال ليتم حفظه واستدعاؤه فوراً.`;
-    }
-}
 
         function handleTrueGlobalSearch(query) {
             const cleanText = (str) => (str || "").toLowerCase().replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ال/g, '').replace(/\s+/g, '');
