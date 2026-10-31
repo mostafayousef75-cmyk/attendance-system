@@ -254,7 +254,7 @@
                 <i class="fa-solid fa-headset"></i>
                 <span class="brand-text">لوحة الكول سنتر</span>
             </div>
-            <i class="fa-solid fa-angles-left" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
+            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
 
         <div class="json-tools">
@@ -1949,7 +1949,6 @@
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
-            // الوضع المحلي صريح ومستقل تماماً
             if (aiManualMode === 'local') {
                 const replyHtml = executeLocalSmartSearch(rawText);
                 const replyId = 'ai_local_reply_' + Date.now();
@@ -1963,7 +1962,6 @@
                 `;
                 msgBox.scrollTop = msgBox.scrollHeight;
             } else {
-                // الوضع السحابي (Gemini API)
                 const currentShiftNote = document.getElementById('shiftScratchpadText').value;
                 const siteContext = `
                 قاعدة بيانات الموقع الحالية:
@@ -2001,7 +1999,7 @@
 
                     const data = await response.json();
                     
-                    if (data && data.candidates && data.candidates[0].content.parts[0].text) {
+                    if (data && data.candidates && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
                         aiReply = data.candidates[0].content.parts[0].text;
                     } else if (data && data.error) {
                         throw new Error(data.error.message || "API Error");
@@ -2009,7 +2007,7 @@
                         throw new Error("استجابة غير صالحة من السيرفر");
                     }
                 } catch (err) {
-                    aiReply = "عذراً يا مصطفى، حدث خطأ في الاتصال بالسحابي (تأكد من صحة مفتاح API من أيقونة 🔑). برجاء التبديل للمحلي يدوياً لو أردت.";
+                    aiReply = `⚠️ عذراً يا مصطفى، تعذر الاتصال بالسحابة: (${err.message}). تأكد من صحة مفتاح API من أيقونة 🔑 في الأعلى، أو قم بالتبديل للمحلي يدوياً.`;
                 }
 
                 document.getElementById(loadingId).remove();
