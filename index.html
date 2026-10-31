@@ -1954,6 +1954,7 @@
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
+            // تطبيق زر التبديل اليدوي الصريح (سحابي أو محلي)
             if (aiManualMode === 'local') {
                 const replyHtml = executeLocalSmartSearch(rawText);
                 const replyId = 'ai_local_reply_' + Date.now();
@@ -1981,7 +1982,7 @@
                 `;
 
                 const loadingId = 'ai_load_' + Date.now();
-                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري معالجة طلبك بواسطة Gemini 1.5 Flash...</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري المعالجة عبر Interactions API (gemini-flash-latest)...</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
 
                 let apiKey = localStorage.getItem('gemini_api_key');
@@ -1990,35 +1991,36 @@
                 try {
                     if (!apiKey) throw new Error("مفتاح API غير مدخل");
                     
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`, {
+                    // استخدام واجهة Interactions API الحديثة كما ظهرت في المرجع في صورتك
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/interactions`, {
                         method: 'POST',
                         headers: { 
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'x-goog-api-key': apiKey.trim()
                         },
                         body: JSON.stringify({
-                            "contents": [
-                                {
-                                    "parts": [
-                                        { "text": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. مهمتك الأساسية: الإجابة على استفسارات الكول سنتر بدقة تامة وتركيز كامل على السؤال المطلوب (سواء من الأطباء أو التنبيهات أو العروض أو الاستفسارات). استخدم قاموس المترادفات لفهم العامية.\n\nقاعدة البيانات:\n${siteContext}\n\nسؤال المستخدم: ${rawText}` }
-                                    ]
-                                }
-                            ]
+                            "model": "gemini-flash-latest",
+                            "input": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. الإجابة يجب أن تكون دقيقة ومرتبطة ببيانات الموقع التالية.\n\nقاعدة البيانات:\n${siteContext}\n\nسؤال المستخدم: ${rawText}`
                         })
                     });
 
                     const data = await response.json();
                     
-                    if (data && data.candidates && data.candidates[0].content.parts[0].text) {
+                    if (data && data.outputs && data.outputs.length > 0) {
+                        aiReply = data.outputs[0].text || data.outputs[0].content || JSON.stringify(data.outputs[0]);
+                    } else if (data && data.candidates && data.candidates[0].content.parts[0].text) {
                         aiReply = data.candidates[0].content.parts[0].text;
                     } else if (data && data.error) {
                         throw new Error(data.error.message || "API Error");
+                    } else {
+                        aiReply = data.text || JSON.stringify(data);
                     }
 
                     if (!aiReply) {
                         throw new Error("لم يتم استقبال نص من الموديل");
                     }
                 } catch (err) {
-                    aiReply = "عذراً يا مصطفى، لم نتمكن من الاتصال بـ Google Gemini API (تأكد من إدخال مفتاح API من أيقونة 🔑 في الأعلى). تم التحويل تلقائياً للمساعد المحلي (أوفلاين) لتقديم الإجابة فوراً:\n\n" + executeLocalSmartSearch(rawText);
+                    aiReply = "عذراً يا مصطفى، لم نتمكن من الاتصال بـ Google Gemini API (تأكد من إدخال مفتاح API الصحيح من أيقونة 🔑 في الأعلى). تم التحويل تلقائياً للمساعد المحلي (أوفلاين) لتقديم الإجابة فوراً:\n\n" + executeLocalSmartSearch(rawText);
                 }
 
                 document.getElementById(loadingId).remove();
@@ -2198,7 +2200,7 @@
         }
         function jumpToSectionAndHighlightAlert(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
-            setTimeout(() => { renderAlerts(""); const el = document.getElementById(`alert_card_${id}`); if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); } }, 100);
+            setTimeout(() => { renderAlerts(""); const el = document.getElementById(`alert_card_${id}`); if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center'	); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); } }, 100);
         }
         function jumpToSectionAndHighlightService(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
@@ -2217,7 +2219,7 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active'); switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
             setTimeout(() => { renderInquiries("", id); const el = document.getElementById(`inquiry_card_${id}`); if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); } }, 100);
         }
-        function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightboxModal').classList.add('active'); }
+        function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightboxModal').classList.add('active');	}
     </script>
 </body>
 </html>
