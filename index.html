@@ -2082,43 +2082,59 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // --- ربط أحداث المساعد المحلي لضمان العمل بنسبة 100% ---
-        function initAiChatEventListeners() {
-            const inputEl = document.getElementById('aiUserInput');
-            const sendBtn = document.getElementById('aiSendBtn');
-            if (!inputEl || !sendBtn) return;
+        // استبدل دالة initAiChatEventListeners القديمة بهذه النسخة المُحدثة والنهائية:
+function initAiChatEventListeners() {
+    const inputEl = document.getElementById('aiUserInput');
+    const sendBtn = document.getElementById('aiSendBtn');
+    if (!inputEl || !sendBtn) return;
 
-            const handleSend = () => {
-                const rawText = inputEl.value.trim();
-                if (!rawText) return;
+    // إزالة أي أحداث قديمة لمنع التكرار
+    const newSendBtn = sendBtn.cloneNode(true);
+    sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
 
-                const msgBox = document.getElementById('aiMessagesBox');
-                msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
-                inputEl.value = "";
-                msgBox.scrollTop = msgBox.scrollHeight;
+    const newInputEl = inputEl.cloneNode(true);
+    inputEl.parentNode.replaceChild(newInputEl, inputEl);
 
-                const replyHtml = executeLocalSmartSearch(rawText);
-                const replyId = 'ai_local_reply_' + Date.now();
-                
-                msgBox.innerHTML += `
-                    <div class="ai-message gemini">
-                        <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
-                        <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                            <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                        </button>
-                    </div>
-                `;
-                msgBox.scrollTop = msgBox.scrollHeight;
-            };
+    const executeSend = () => {
+        const queryText = document.getElementById('aiUserInput').value.trim();
+        if (!queryText) return;
 
-            sendBtn.onclick = handleSend;
-            inputEl.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSend();
-                }
-            };
+        const msgBox = document.getElementById('aiMessagesBox');
+        
+        // 1. إضافة رسالة المستخدم
+        const userMsg = document.createElement('div');
+        userMsg.className = 'ai-message user';
+        userMsg.innerText = queryText;
+        msgBox.appendChild(userMsg);
+
+        document.getElementById('aiUserInput').value = "";
+        msgBox.scrollTop = msgBox.scrollHeight;
+
+        // 2. جلب نتيجة البحث المحلي
+        const replyHtml = executeLocalSmartSearch(queryText);
+        const replyId = 'ai_local_reply_' + Date.now();
+
+        // 3. إضافة رد المساعد المنظم
+        const geminiMsg = document.createElement('div');
+        geminiMsg.className = 'ai-message gemini';
+        geminiMsg.innerHTML = `
+            <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
+            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="navigator.clipboard.writeText(document.getElementById('${replyId}').innerText).then(() => alert('📋 تم النسخ للواتساب!'))">
+                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+            </button>
+        `;
+        msgBox.appendChild(geminiMsg);
+        msgBox.scrollTop = msgBox.scrollHeight;
+    };
+
+    document.getElementById('aiSendBtn').addEventListener('click', executeSend);
+    document.getElementById('aiUserInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            executeSend();
         }
+    });
+}
 
         // محرك البحث المحلي الذكي والدقيق
         function executeLocalSmartSearch(query) {
