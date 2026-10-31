@@ -602,7 +602,7 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 id="aiChatHeaderTitle" style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (🌐 سحابي - Gemini)</h4>
+                <h4 id="aiChatHeaderTitle" style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (🌐 سحابي - OpenRouter)</h4>
             </div>
             
             <div style="display:flex; align-items:center; gap:0.3rem;">
@@ -612,7 +612,7 @@
             </div>
 
             <div style="display:flex; gap:0.4rem; align-items:center;">
-                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح Google Gemini API"></i>
+                <i class="fa-solid fa-key" style="cursor:pointer; color:#facc15; font-size:0.85rem;" onclick="setApiKeyPrompt()" title="تغيير مفتاح OpenRouter API"></i>
                 <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
             </div>
         </div>
@@ -1073,6 +1073,14 @@
             }
         });
 
+        // دوال الترميز الآمن لمفاتيح Firebase
+        function encodeFirebaseKey(key) {
+            return encodeURIComponent(key).replace(/\./g, '%2E');
+        }
+        function decodeFirebaseKey(key) {
+            return decodeURIComponent(key.replace(/%2E/g, '.'));
+        }
+
         let doctorsData = [];
         let fridaySchedules = [];
         let alertsData = [];
@@ -1127,7 +1135,16 @@
                     deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
-                    synonymsData = data.synonymsData || defaultSynonyms;
+                    
+                    // فك ترميز القاموس من Firebase
+                    synonymsData = {};
+                    if (data.synonymsData) {
+                        for (let rawKey in data.synonymsData) {
+                            synonymsData[decodeFirebaseKey(rawKey)] = data.synonymsData[rawKey];
+                        }
+                    } else {
+                        synonymsData = defaultSynonyms;
+                    }
                 } else {
                     doctorsData = [{ id: 1, name: "د. فؤاد بهجت", nationality: "(مصري)", specialty: "طبيب عام /\nطوارئ", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "طوارئ", mashyDays: [], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الخميس"], timing: "يومياً من 2م-10م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-10-30", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1186,12 +1203,29 @@
                 btn.innerHTML = '🌐 سحابي';
                 btn.style.background = '';
                 btn.style.color = '';
-                if(titleEl) titleEl.innerText = "المساعد الذكي (🌐 سحابي - Gemini)";
+                if(titleEl) titleEl.innerText = "المساعد الذكي (🌐 سحابي - OpenRouter)";
             }
         }
 
         function syncToCloud() {
-            db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData });
+            // ترميز مفاتيح قاموس المترادفات قبل حفظها في Firebase لتجاوز مشكلة النقاط والرموز
+            let encodedSynonyms = {};
+            if (synonymsData) {
+                for (let k in synonymsData) {
+                    encodedSynonyms[encodeFirebaseKey(k)] = synonymsData[k];
+                }
+            }
+            db.ref('clinicData').set({ 
+                doctorsData, 
+                fridaySchedules, 
+                alertsData, 
+                coordinatorsData, 
+                deptServicesData, 
+                deptNotesData, 
+                offersData, 
+                inquiriesData, 
+                synonymsData: encodedSynonyms 
+            });
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -1726,7 +1760,6 @@
             for (let key in synonymsData) {
                 const vals = Array.isArray(synonymsData[key]) ? synonymsData[key].join('، ') : synonymsData[key];
                 if (!search || key.includes(search) || vals.includes(search)) {
-                    // Safe string escaping for click handlers
                     const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                     tbody.innerHTML += `
                         <tr>
@@ -1756,7 +1789,6 @@
             const valsArr = valsStr.split(/[,،\s]+/).filter(Boolean);
             if (!synonymsData) synonymsData = {};
             
-            // تنظيف الكلمة أو الحفاظ عليها كمفتاح آمن في الـ Firebase (استبدال النقاط لو لزم الأمر أو التعامل معها)
             if (originalKey && originalKey !== key && synonymsData[originalKey]) {
                 delete synonymsData[originalKey];
             }
@@ -1937,9 +1969,9 @@
         }
 
         function setApiKeyPrompt() {
-            const currentKey = localStorage.getItem('gemini_api_key') || '';
-            const newKey = prompt("أدخل مفتاح Google Gemini API الخاص بك:", currentKey);
-            if (newKey !== null) { localStorage.setItem('gemini_api_key', newKey.trim()); alert("✅ تم حفظ مفتاح Google Gemini API بنجاح!"); }
+            const currentKey = localStorage.getItem('openrouter_api_key') || '';
+            const newKey = prompt("أدخل مفتاح OpenRouter API الخاص بك:", currentKey);
+            if (newKey !== null) { localStorage.setItem('openrouter_api_key', newKey.trim()); alert("✅ تم حفظ مفتاح OpenRouter API بنجاح!"); }
         }
         function copyAIAnswerToWhatsApp(textElementId) {
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
@@ -1965,6 +1997,7 @@
                 `;
                 msgBox.scrollTop = msgBox.scrollHeight;
             } else {
+                // وضع السحابي فقط بدون تحويل تلقائي للـ Local
                 const currentShiftNote = document.getElementById('shiftScratchpadText').value;
                 const siteContext = `
                 قاعدة بيانات الموقع الحالية:
@@ -1979,37 +2012,50 @@
                 `;
 
                 const loadingId = 'ai_load_' + Date.now();
-                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري المعالجة عبر المساعد السحابي والمحلي الذكي...</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري الاستجابة عبر المساعد السحابي (OpenRouter)...</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
 
-                let apiKey = localStorage.getItem('gemini_api_key');
+                let apiKey = localStorage.getItem('openrouter_api_key');
                 let aiReply = "";
 
                 try {
-                    if (!apiKey) throw new Error("مفتاح API غير مدخل");
-                    
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                    if (!apiKey) throw new Error("مفتاح OpenRouter API غير مدخل. الرجاء النقر على أيقونة المفتاح 🔑 لإدخاله.");
+
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${apiKey.trim()}`
+                        },
                         body: JSON.stringify({
-                            "contents": [{
-                                "parts": [{
-                                    "text": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. الإجابة يجب أن تكون دقيقة ومرتبطة ببيانات الموقع التالية.\n\nقاعدة البيانات:\n${siteContext}\n\nسؤال المستخدم: ${rawText}`
-                                }]
-                            }]
+                            "model": "recursive/flint-v1.0:free",
+                            "messages": [
+                                {
+                                    "role": "system",
+                                    "content": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. استخرج الإجابات بدقة من البيانات التالية فقط:\n${siteContext}`
+                                },
+                                {
+                                    "role": "user",
+                                    "content": rawText
+                                }
+                            ],
+                            "reasoning": {
+                                "enabled": true
+                            }
                         })
                     });
 
                     const data = await response.json();
                     
-                    if (data && data.candidates && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
-                        aiReply = data.candidates[0].content.parts[0].text;
+                    if (data && data.choices && data.choices[0] && data.choices[0].message) {
+                        aiReply = data.choices[0].message.content;
+                    } else if (data.error && data.error.message) {
+                        throw new Error(data.error.message);
                     } else {
-                        throw new Error("استجابة غير صالحة من السيرفر");
+                        throw new Error("حدث خطأ في الاتصال بالخدمة السحابية.");
                     }
                 } catch (err) {
-                    // نظام التحويل التلقائي الذكي للمحلي لو السحابي واجه أي مشكلة CORS أو مفتاح غير صالح
-                    aiReply = executeLocalSmartSearch(rawText) + `<br><span style="font-size:0.6rem; color:#facc15;">(ملاحظة: تم جلب هذه الإجابة من محرك البحث المحلي الذكي تلقائياً لتعذر اتصال السحابة حالياً).</span>`;
+                    aiReply = `<span style="color:#ef4444; font-weight:700;">عذراً يا مصطفى، حدث خطأ في الاتصال بالسحابي: (${err.message}).<br>تأكد من صحة المفتاح 🔑 أو قم بالتحويل للوضع المحلي يدوياً.</span>`;
                 }
 
                 document.getElementById(loadingId).remove();
