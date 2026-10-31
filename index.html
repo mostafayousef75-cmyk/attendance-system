@@ -1726,13 +1726,15 @@
             for (let key in synonymsData) {
                 const vals = Array.isArray(synonymsData[key]) ? synonymsData[key].join('، ') : synonymsData[key];
                 if (!search || key.includes(search) || vals.includes(search)) {
+                    // Safe string escaping for click handlers
+                    const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>${key}</strong></td>
                             <td>${vals}</td>
                             <td style="text-align:center;">
-                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonym('${key.replace(/'/g, "\\'")}')"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonym('${key.replace(/'/g, "\\'")}')"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonym('${safeKey}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonym('${safeKey}')"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -1754,6 +1756,7 @@
             const valsArr = valsStr.split(/[,،\s]+/).filter(Boolean);
             if (!synonymsData) synonymsData = {};
             
+            // تنظيف الكلمة أو الحفاظ عليها كمفتاح آمن في الـ Firebase (استبدال النقاط لو لزم الأمر أو التعامل معها)
             if (originalKey && originalKey !== key && synonymsData[originalKey]) {
                 delete synonymsData[originalKey];
             }
@@ -1976,7 +1979,7 @@
                 `;
 
                 const loadingId = 'ai_load_' + Date.now();
-                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري المعالجة عبر Gemini API...</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري المعالجة عبر المساعد السحابي والمحلي الذكي...</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
 
                 let apiKey = localStorage.getItem('gemini_api_key');
@@ -2001,13 +2004,12 @@
                     
                     if (data && data.candidates && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
                         aiReply = data.candidates[0].content.parts[0].text;
-                    } else if (data && data.error) {
-                        throw new Error(data.error.message || "API Error");
                     } else {
                         throw new Error("استجابة غير صالحة من السيرفر");
                     }
                 } catch (err) {
-                    aiReply = `⚠️ عذراً يا مصطفى، تعذر الاتصال بالسحابة: (${err.message}). تأكد من صحة مفتاح API من أيقونة 🔑 في الأعلى، أو قم بالتبديل للمحلي يدوياً.`;
+                    // نظام التحويل التلقائي الذكي للمحلي لو السحابي واجه أي مشكلة CORS أو مفتاح غير صالح
+                    aiReply = executeLocalSmartSearch(rawText) + `<br><span style="font-size:0.6rem; color:#facc15;">(ملاحظة: تم جلب هذه الإجابة من محرك البحث المحلي الذكي تلقائياً لتعذر اتصال السحابة حالياً).</span>`;
                 }
 
                 document.getElementById(loadingId).remove();
