@@ -65,9 +65,9 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
-        html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row-reverse; user-select: text !important; }
+        html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; user-select: text !important; }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
+        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
         .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
@@ -237,7 +237,7 @@
 
         @media (max-width: 768px) {
             html, body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); }
             .main-wrapper { height: auto; overflow: visible; }
             .split-grid { grid-template-columns: 1fr; }
             .alerts-2col-grid { grid-template-columns: 1fr; }
@@ -254,7 +254,7 @@
                 <i class="fa-solid fa-headset"></i>
                 <span class="brand-text">لوحة الكول سنتر</span>
             </div>
-            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
+            <i class="fa-solid fa-angles-left" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
 
         <div class="json-tools">
@@ -602,7 +602,7 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (Gemini 1.5 Flash)</h4>
+                <h4 id="aiChatHeaderTitle" style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (🌐 سحابي - Gemini)</h4>
             </div>
             
             <div style="display:flex; align-items:center; gap:0.3rem;">
@@ -1045,11 +1045,11 @@
             <input type="hidden" id="synOriginalKey">
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الكلمة الأصلية (المفتاح الأساسي)</label>
-                <input type="text" id="synKey" class="form-control" placeholder="مثال: تشقير">
+                <input type="text" id="synKey" class="form-control" placeholder="مثال: د. محمود البنا">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>المرادفات والمعاني (مفصولة بفاصلة أو مسافة)</label>
-                <input type="text" id="synValues" class="form-control" placeholder="حواجب، حواف، رتوش، صبغة">
+                <input type="text" id="synValues" class="form-control" placeholder="الدكتور محمود">
             </div>
             <button class="btn btn-green" onclick="saveSynonym()">حفظ المرادفات</button>
         </div>
@@ -1086,7 +1086,7 @@
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
-        let aiManualMode = 'cloud';
+        let aiManualMode = 'cloud'; // الافتراضي سحابي صريح
 
         const defaultSynonyms = {
             "تشقير": ["حواجب", "حواف", "رتوش", "صبغة"],
@@ -1174,16 +1174,19 @@
 
         function toggleAIModeManual() {
             const btn = document.getElementById('aiModeManualBtn');
+            const titleEl = document.getElementById('aiChatHeaderTitle');
             if (aiManualMode === 'cloud') {
                 aiManualMode = 'local';
                 btn.innerHTML = '💻 المحلي (أوفلاين)';
                 btn.style.background = 'var(--accent-blue)';
                 btn.style.color = '#fff';
+                if(titleEl) titleEl.innerText = "المساعد الذكي (💻 المحلي - أوفلاين)";
             } else {
                 aiManualMode = 'cloud';
-                btn.innerHTML = '🌐 سحابي (Gemini)';
+                btn.innerHTML = '🌐 سحابي';
                 btn.style.background = '';
                 btn.style.color = '';
+                if(titleEl) titleEl.innerText = "المساعد الذكي (🌐 سحابي - Gemini)";
             }
         }
 
@@ -1751,7 +1754,7 @@
             const valsArr = valsStr.split(/[,،\s]+/).filter(Boolean);
             if (!synonymsData) synonymsData = {};
             
-            if (originalKey && originalKey !== key) {
+            if (originalKey && originalKey !== key && synonymsData[originalKey]) {
                 delete synonymsData[originalKey];
             }
             synonymsData[key] = valsArr;
@@ -1946,6 +1949,7 @@
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
+            // الوضع المحلي صريح ومستقل تماماً
             if (aiManualMode === 'local') {
                 const replyHtml = executeLocalSmartSearch(rawText);
                 const replyId = 'ai_local_reply_' + Date.now();
@@ -1959,6 +1963,7 @@
                 `;
                 msgBox.scrollTop = msgBox.scrollHeight;
             } else {
+                // الوضع السحابي (Gemini API)
                 const currentShiftNote = document.getElementById('shiftScratchpadText').value;
                 const siteContext = `
                 قاعدة بيانات الموقع الحالية:
@@ -1973,7 +1978,7 @@
                 `;
 
                 const loadingId = 'ai_load_' + Date.now();
-                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري المعالجة عبر Interactions API (gemini-flash-latest)...</div>`;
+                msgBox.innerHTML += `<div class="ai-message gemini" id="${loadingId}"><i class="fa-solid fa-brain fa-spin" style="color:#facc15;"></i> جاري المعالجة عبر Gemini API...</div>`;
                 msgBox.scrollTop = msgBox.scrollHeight;
 
                 let apiKey = localStorage.getItem('gemini_api_key');
@@ -1982,35 +1987,29 @@
                 try {
                     if (!apiKey) throw new Error("مفتاح API غير مدخل");
                     
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/interactions`, {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`, {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'x-goog-api-key': apiKey.trim()
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            "model": "gemini-flash-latest",
-                            "input": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. الإجابة يجب أن تكون دقيقة ومرتبطة ببيانات الموقع التالية.\n\nقاعدة البيانات:\n${siteContext}\n\nسؤال المستخدم: ${rawText}`
+                            "contents": [{
+                                "parts": [{
+                                    "text": `أنت مساعد ذكي ومحترف لعيادات ماجستي الطبية. الإجابة يجب أن تكون دقيقة ومرتبطة ببيانات الموقع التالية.\n\nقاعدة البيانات:\n${siteContext}\n\nسؤال المستخدم: ${rawText}`
+                                }]
+                            }]
                         })
                     });
 
                     const data = await response.json();
                     
-                    if (data && data.outputs && data.outputs.length > 0) {
-                        aiReply = data.outputs[0].text || data.outputs[0].content || JSON.stringify(data.outputs[0]);
-                    } else if (data && data.candidates && data.candidates[0].content.parts[0].text) {
+                    if (data && data.candidates && data.candidates[0].content.parts[0].text) {
                         aiReply = data.candidates[0].content.parts[0].text;
                     } else if (data && data.error) {
                         throw new Error(data.error.message || "API Error");
                     } else {
-                        aiReply = data.text || JSON.stringify(data);
-                    }
-
-                    if (!aiReply) {
-                        throw new Error("لم يتم استقبال نص من الموديل");
+                        throw new Error("استجابة غير صالحة من السيرفر");
                     }
                 } catch (err) {
-                    aiReply = "عذراً يا مصطفى، لم نتمكن من الاتصال بـ Google Gemini API (تأكد من إدخال مفتاح API الصحيح من أيقونة 🔑 في الأعلى). تم التحويل تلقائياً للمساعد المحلي (أوفلاين) لتقديم الإجابة فوراً:\n\n" + executeLocalSmartSearch(rawText);
+                    aiReply = "عذراً يا مصطفى، حدث خطأ في الاتصال بالسحابي (تأكد من صحة مفتاح API من أيقونة 🔑). برجاء التبديل للمحلي يدوياً لو أردت.";
                 }
 
                 document.getElementById(loadingId).remove();
@@ -2042,13 +2041,19 @@
             let expandedTokens = [...rawTokens];
             rawTokens.forEach(token => {
                 for (let key in synonymsData) {
-                    if (normalize(key) === token || token.includes(normalize(key)) || normalize(key).includes(token)) {
+                    if (normalize(key).includes(token) || token.includes(normalize(key))) {
                         const vals = synonymsData[key];
                         const arr = Array.isArray(vals) ? vals : vals.split(/[,،\s]+/);
                         arr.forEach(syn => {
                             const normSyn = normalize(syn);
-                            if (!expandedTokens.includes(normSyn)) {
-                                expandedTokens.push(normSyn);
+                            if (!expandedTokens.includes(normSyn)) expandedTokens.push(normSyn);
+                        });
+                    }
+                    if (Array.isArray(synonymsData[key])) {
+                        synonymsData[key].forEach(syn => {
+                            if (normalize(syn).includes(token) || token.includes(normalize(syn))) {
+                                const normKey = normalize(key);
+                                if (!expandedTokens.includes(normKey)) expandedTokens.push(normKey);
                             }
                         });
                     }
