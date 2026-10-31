@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - البحث الشامل الفائق</title>
+    <title>لوحة الكول سنتر والمنسقين - البحث الشامل المحترف</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -265,7 +265,7 @@
 
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام حرفياً</h2>
+                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام (الأحدث أولاً)</h2>
                     <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
                 </div>
                 <div id="globalSearchResultsList"></div>
@@ -295,7 +295,7 @@
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center;">
                     <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
+                        <input type="text" id="docSearchInput" placeholder="بحث ذكي في الأطباء (يتخطى الهمزات والوسوم)..." oninput="renderDoctors()">
                     </div>
                     <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة
@@ -363,7 +363,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في التنبيهات..." oninput="renderAlerts(this.value)">
+                    <input type="text" id="alertSearchInput" placeholder="بحث ذكي في التنبيهات (يتخطى الهمزات والوسوم)..." oninput="renderAlerts()">
                 </div>
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
@@ -379,7 +379,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs(this.value)">
+                    <input type="text" id="deptSearchInput" placeholder="بحث ذكي داخل الأقسام (يتخطى الهمزات والوسوم)..." oninput="renderDeptsAndDocs()">
                 </div>
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
                     <div style="display:flex; flex-direction:column; gap:0.6rem;">
@@ -439,7 +439,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في تعليمات ودليل المنسقين..." oninput="renderCoordinators(this.value)">
+                    <input type="text" id="coordSearchInput" placeholder="بحث ذكي في تعليمات ودليل المنسقين (يتخطى الهمزات)..." oninput="renderCoordinators()">
                 </div>
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
@@ -453,7 +453,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في العروض والأسعار..." oninput="renderOffers(this.value)">
+                    <input type="text" id="offerSearchInput" placeholder="بحث ذكي في العروض والأسعار (يتخطى الهمزات والوسوم)..." oninput="renderOffers()">
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -484,7 +484,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في الاستفسارات..." oninput="renderInquiries(this.value)">
+                    <input type="text" id="inquirySearchInput" placeholder="بحث ذكي في الاستفسارات (يتخطى الهمزات والوسوم)..." oninput="renderInquiries()">
                 </div>
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
@@ -500,7 +500,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في قاموس المصطلحات..." oninput="renderSynonyms(this.value)">
+                    <input type="text" id="synonymSearchInput" placeholder="بحث ذكي في قاموس المصطلحات (يتخطى الهمزات)..." oninput="renderSynonyms()">
                 </div>
                 <div class="offers-table-box">
                     <div class="table-responsive">
@@ -1244,8 +1244,22 @@
             if (!tagsStr || !tagsStr.trim()) return '';
             return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
         }
+
+        // --- دالة التنظيف الاحترافية للبحث المحلي والشامل ---
+        function cleanSearchText(str) {
+            if (!str) return "";
+            return str.toLowerCase()
+                .replace(/[إأآاٱ]/g, 'ا')
+                .replace(/[ةه]/g, 'ه')
+                .replace(/[ىي]/g, 'ي')
+                .replace(/^ال/gm, '')
+                .replace(/\sال/g, ' ')
+                .replace(/[ًٍُِّْء]/g, '')
+                .trim();
+        }
+
         function renderDoctors(highlightId = null) {
-            const searchInput = document.getElementById('docSearchInput'), search = searchInput ? searchInput.value.trim().toLowerCase() : "";
+            const searchInput = document.getElementById('docSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
             const specDropdown = document.getElementById('specialtyFilter'), currentSpecVal = specDropdown.value;
             const uniqueSpecialties = [...new Set(doctorsData.map(d => d.specialty).filter(Boolean))];
@@ -1268,14 +1282,14 @@
 
             let todayMashyDocs = [], todayWissamDocs = [];
             const mashyList = doctorsData.filter(d => {
-                const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.tags && d.tags.toLowerCase().includes(search));
+                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
             });
             mashyList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a.mashyOrder ?? 0) - (b.mashyOrder ?? 0)));
 
             const wissamList = doctorsData.filter(d => {
-                const matchSearch = d.name.toLowerCase().includes(search) || d.specialty.toLowerCase().includes(search) || (d.tags && d.tags.toLowerCase().includes(search));
+                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
             });
@@ -1426,7 +1440,8 @@
             if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); renderDoctors(); }
         }
 
-        function renderAlerts(search = "") {
+        function renderAlerts(highlightId = null) {
+            const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
@@ -1437,14 +1452,15 @@
             });
             tickerTrack.innerHTML = alertCardsHtml;
 
-            sortedAlerts.filter(a => a.content.includes(search) || (a.tags && a.tags.includes(search))).forEach(item => {
+            sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
                     else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                 }
+                const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 grid.innerHTML += `
-                    <div id="alert_card_${item.id}" class="alert-card-item-compact">
+                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
                         <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span>${getTagsTooltipHtml(item.tags)}</div>
                         ${mediaHtml}
                         <div style="display:flex; flex-direction:column; gap:0.2rem;"><button class="btn btn-blue" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editAlert(${item.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button></div>
@@ -1530,12 +1546,13 @@
             if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); renderAlerts(); }
         }
 
-        function renderDeptsAndDocs(search = "", highlightServiceId = null) {
+        function renderDeptsAndDocs(highlightServiceId = null) {
+            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
             if(bodies.some(b => !b)) return;
             bodies.forEach(b => b.innerHTML = "");
 
-            deptServicesData.filter(s => s.name && (s.name.toLowerCase().includes(search.toLowerCase()) || (s.tags && s.tags.toLowerCase().includes(search.toLowerCase())))).forEach(item => {
+            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
@@ -1550,7 +1567,9 @@
             const notesContainer = document.getElementById('deptNotesContainer');
             if(!notesContainer) return; notesContainer.innerHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
-                notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
+                if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
+                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
+                }
             });
         }
         function openDeptServiceModal() {
@@ -1610,9 +1629,14 @@
         }
 
         let draggedCoordIdx = null;
-        function renderCoordinators(search = "", highlightId = null) {
+        function renderCoordinators(highlightId = null) {
+            const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
-            coordinatorsData.filter(c => c.name.includes(search) || (c.tags && c.tags.includes(search))).forEach((c, idx) => {
+            
+            coordinatorsData.filter(c => {
+                let rulesText = c.rules ? c.rules.join(' ') : '';
+                return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
+            }).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
             });
@@ -1642,7 +1666,8 @@
         function checkSynCustomCat(val) {
             document.getElementById('synCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
         }
-        function renderSynonyms(search = "") {
+        function renderSynonyms() {
+            const searchInput = document.getElementById('synonymSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const tbody = document.getElementById('synonymsTableBody');
             if(!tbody) return; tbody.innerHTML = "";
             if (!synonymsData) synonymsData = {};
@@ -1650,7 +1675,7 @@
                 let item = synonymsData[key];
                 let cat = typeof item === 'object' ? item.category : "عام";
                 let vals = typeof item === 'object' ? (item.values || []).join('، ') : item;
-                if (!search || key.includes(search) || vals.includes(search) || cat.includes(search)) {
+                if (!search || cleanSearchText(key).includes(search) || cleanSearchText(vals).includes(search) || cleanSearchText(cat).includes(search)) {
                     const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                     tbody.innerHTML += `
                         <tr>
@@ -1777,9 +1802,10 @@
             function stopDragWin() { isDragging = false; document.removeEventListener('mousemove', onDragWin); document.removeEventListener('mouseup', stopDragWin); }
         }
 
-        function renderOffers(search = "", highlightOfferId = null) {
+        function renderOffers(highlightOfferId = null) {
+            const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const tableEl = document.getElementById('offersTableElement'); if(!tableEl) return;
-            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (o.name.includes(search) || (o.price && o.price.includes(search)) || (o.notes && o.notes.includes(search))));
+            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
             filteredOffers.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
             let bodyHtml = `<thead><tr><th style="width: 35px; text-align:center;"><i class="fa-solid fa-check-square"></i></th><th style="width: 30%;">الخدمة / العرض</th><th style="width: 25%;">الأجهزة والأسعار</th><th style="width: 15%;">السعر العام</th><th style="width: 15%; text-align:center;">إدارة النسخ</th><th style="width: 10%; text-align:center;">تعديل</th></tr></thead><tbody>`;
@@ -1839,9 +1865,10 @@
         }
 
         let draggedInquiryIdx = null;
-        function renderInquiries(search = "", highlightId = null) {
+        function renderInquiries(highlightId = null) {
+            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
-            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || i.question.toLowerCase().includes(search.toLowerCase()) || i.answer.toLowerCase().includes(search.toLowerCase()) || (i.tags && i.tags.toLowerCase().includes(search.toLowerCase())))).forEach((item, idx) => {
+            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item, idx) => {
                 grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
@@ -1871,25 +1898,11 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        // --- محرك البحث الشامل الفائق (يتخطى الهمزات، الحروف، الوسوم، والمرادفات في كافة الأقسام حرفياً) ---
-        function cleanSearchText(str) {
-            if (!str) return "";
-            return str.toLowerCase()
-                .replace(/[إأآاٱ]/g, 'ا')
-                .replace(/[ةه]/g, 'ه')
-                .replace(/[ىي]/g, 'ي')
-                .replace(/^ال/gm, '')
-                .replace(/\sال/g, ' ')
-                .replace(/[ًٍُِّْء]/g, '')
-                .trim();
-        }
-
         function getExpandedTokens(rawQuery) {
             const cleaned = cleanSearchText(rawQuery);
             let tokens = [cleaned];
             if (!cleaned) return tokens;
 
-            // إدخال المرادفات من القاموس
             if (synonymsData) {
                 for (let synKey in synonymsData) {
                     let cleanKey = cleanSearchText(synKey);
@@ -1912,6 +1925,7 @@
             return Array.from(new Set(tokens));
         }
 
+        // --- البحث الشامل (مع الترتيب من الأحدث للأقدم وربط أزرار العرض بدقة) ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -1929,142 +1943,125 @@
             resultsList.innerHTML = "";
 
             const tokens = getExpandedTokens(rawQ);
-            let foundCount = 0;
-
             const isMatch = (text) => {
                 const cleanedText = cleanSearchText(text);
                 return tokens.some(t => cleanedText.includes(t));
             };
 
-            // 1. البحث في الأطباء
+            let allMatchedResults = [];
+
+            // 1. الأطباء
             doctorsData.forEach(d => {
                 if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">الأطباء</span>
-                                <h4>${d.name} (${d.specialty})</h4>
-                                <p style="font-size:0.7rem; color:var(--text-muted);">الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}</p>
-                            </div>
-                            <button class="btn btn-blue" onclick="jumpToSectionAndHighlightDoc(${d.id})">عرض</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: d.id, timeId: d.id || 0, source: "الأطباء",
+                        title: `${d.name} (${d.specialty})`,
+                        subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
+                        action: `jumpToSectionAndHighlightDoc(${d.id})`
+                    });
                 }
             });
 
-            // 2. البحث في العروض والأسعار
+            // 2. العروض
             offersData.forEach(o => {
                 if (isMatch(o.name) || isMatch(o.category) || isMatch(o.device1) || isMatch(o.device2) || isMatch(o.notes) || isMatch(o.tags)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">العروض والأسعار (${o.category})</span>
-                                <h4>${o.name} - السعر: ${o.price || o.price1 || '-'}</h4>
-                            </div>
-                            <button class="btn btn-blue" onclick="jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')">عرض</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: o.id, timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
+                        title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
+                        subtitle: o.notes || '',
+                        action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`
+                    });
                 }
             });
 
-            // 3. البحث في الاستفسارات والأسئلة الشائعة
+            // 3. الاستفسارات
             inquiriesData.forEach(i => {
                 if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags) || isMatch(i.category)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">دليل الاستفسارات (${i.category})</span>
-                                <h4>${i.question}</h4>
-                                <p style="font-size:0.7rem; color:var(--text-muted);">${i.answer}</p>
-                            </div>
-                            <button class="btn btn-blue" onclick="jumpToSectionAndHighlightInquiry(${i.id})">عرض</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: i.id, timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
+                        title: i.question, subtitle: i.answer,
+                        action: `jumpToSectionAndHighlightInquiry(${i.id})`
+                    });
                 }
             });
 
-            // 4. البحث في التنبيهات والإشعارات
+            // 4. التنبيهات
             alertsData.forEach(a => {
                 if (isMatch(a.content) || isMatch(a.tags)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">التنبيهات والإشعارات</span>
-                                <h4>${a.content}</h4>
-                                <p style="font-size:0.6rem; color:var(--text-muted);">${a.time}</p>
-                            </div>
-                            <button class="btn btn-blue" onclick="jumpToAlertsTab(${a.id})">عرض</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: a.id, timeId: a.id || 0, source: "التنبيهات والإشعارات",
+                        title: a.content, subtitle: a.time,
+                        action: `jumpToAlertsTab(${a.id})`
+                    });
                 }
             });
 
-            // 5. البحث في خدمات وأجهزة الأقسام
+            // 5. الخدمات والأجهزة
             deptServicesData.forEach(s => {
                 if (isMatch(s.name) || isMatch(s.tags) || isMatch(s.branch)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">أقسام وفروع العيادات (${s.branch})</span>
-                                <h4>${s.name}</h4>
-                            </div>
-                            <button class="btn btn-blue" onclick="switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])">عرض الأقسام</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: s.id, timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
+                        title: s.name, subtitle: `القسم: ${s.type}`,
+                        action: `jumpToSectionAndHighlightService(${s.id})`
+                    });
                 }
             });
 
-            // 6. البحث في ملاحظات الشيفت والملحوظات الداخلية
+            // 6. الملاحظات الداخلية
             deptNotesData.forEach((n, idx) => {
                 if (isMatch(n.text) || isMatch(n.tags)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">الملاحظات الداخلية</span>
-                                <h4>${n.text}</h4>
-                            </div>
-                            <button class="btn btn-blue" onclick="switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])">عرض</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: idx, timeId: idx, source: "الملاحظات الداخلية",
+                        title: n.text, subtitle: `ملحوظة #${idx + 1}`,
+                        action: `jumpToSectionAndHighlightNote(${idx})`
+                    });
                 }
             });
 
-            // 7. البحث في دليل المنسقين
+            // 7. دليل المنسقين
             coordinatorsData.forEach(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
                 if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">دليل المنسقين</span>
-                                <h4>${c.name}</h4>
-                            </div>
-                            <button class="btn btn-blue" onclick="switchTab('coordinators', document.querySelectorAll('.nav-link')[3])">عرض</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: c.id, timeId: c.id || 0, source: "دليل المنسقين",
+                        title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
+                        action: `jumpToSectionAndHighlightCoordinator(${c.id})`
+                    });
                 }
             });
 
-            // 8. البحث في قاموس المرادفات نفسه
+            // 8. القاموس
             for (let synKey in synonymsData) {
                 let item = synonymsData[synKey];
                 let valsStr = typeof item === 'object' ? (item.values || []).join(' ') : item;
                 if (isMatch(synKey) || isMatch(valsStr)) {
-                    foundCount++;
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div>
-                                <span class="source-badge">قاموس المرادفات والمصطلحات</span>
-                                <h4>المصطلح: ${synKey} (المرادفات: ${valsStr})</h4>
-                            </div>
-                            <button class="btn btn-blue" onclick="switchTab('synonyms', document.querySelectorAll('.nav-link')[6])">عرض القاموس</button>
-                        </div>`;
+                    allMatchedResults.push({
+                        id: synKey, timeId: 0, source: "قاموس المرادفات والمصطلحات",
+                        title: `المصطلح: ${synKey}`, subtitle: `المرادفات: ${valsStr}`,
+                        action: `jumpToSectionAndHighlightSynonym('${synKey.replace(/'/g, "\\'")}')`
+                    });
                 }
             }
 
-            if (foundCount === 0) {
+            // الترتيب: الأحدث أولاً (أكبر رقم ID زمني في الصدارة)
+            allMatchedResults.sort((a, b) => b.timeId - a.timeId);
+
+            if (allMatchedResults.length === 0) {
                 resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في أي قسم من الأقسام.</div>`;
+                return;
             }
+
+            allMatchedResults.forEach(res => {
+                resultsList.innerHTML += `
+                    <div class="search-result-card">
+                        <div>
+                            <span class="source-badge">${res.source}</span>
+                            <h4>${res.title}</h4>
+                            <p style="font-size:0.7rem; color:var(--text-muted);">${res.subtitle}</p>
+                        </div>
+                        <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                    </div>`;
+            });
         }
 
         function clearGlobalSearch() {
@@ -2074,6 +2071,7 @@
             switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
         }
 
+        // --- دوال القفز وتفعيل الوميض بدقة لكل قسم ---
         function jumpToSectionAndHighlightDoc(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
@@ -2083,12 +2081,32 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('offers', document.querySelectorAll('.nav-link')[4]);
             selectedOfferTab = cat; renderOffersTabs();
-            setTimeout(() => { renderOffers("", id); document.getElementById(`offer_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            setTimeout(() => { renderOffers(id); document.getElementById(`offer_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightInquiry(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
-            setTimeout(() => { renderInquiries("", id); document.getElementById(`inquiry_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            setTimeout(() => { renderInquiries(id); document.getElementById(`inquiry_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+        function jumpToSectionAndHighlightNote(idx) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(); }, 100);
+        }
+        function jumpToSectionAndHighlightSynonym(key) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('synonyms', document.querySelectorAll('.nav-link')[6]);
+            setTimeout(() => { renderSynonyms(); }, 100);
         }
     </script>
 </body>
