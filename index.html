@@ -611,10 +611,11 @@
                 <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (Gemini 1.5 Flash)</h4>
             </div>
             
-            <div style="display:flex; align-items:center; gap:0.4rem; background:var(--bg-surface); padding:0.15rem 0.4rem; border-radius:12px; border:1px solid var(--border-color);">
-                <span style="font-size:0.65rem; color:var(--text-muted);">محلي</span>
-                <input type="checkbox" id="aiModeSwitch" style="cursor:pointer; accent-color:var(--primary-color);" checked title="التفعيل لـ سحابي، إلغاء التفعيل لـ محلي أوفلاين">
-                <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;">سحابي</span>
+            <!-- زر التبديل اليدوي الصريح (سحابي / محلي) -->
+            <div style="display:flex; align-items:center; gap:0.3rem;">
+                <button id="aiModeManualBtn" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem; font-weight:700;" onclick="toggleAIModeManual()">
+                    🌐 سحابي
+                </button>
             </div>
 
             <div style="display:flex; gap:0.4rem; align-items:center;">
@@ -624,7 +625,7 @@
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك الذكي المعتمد على موديل Gemini 1.5 Flash السريع. جاهز لقراءة البيانات ومساعدتك فوراً!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! أنا مساعدك الذكي. جاهز لقراءة البيانات ومساعدتك فوراً!</div>
         </div>
 
         <div class="ai-input-box">
@@ -1092,6 +1093,7 @@
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
+        let aiManualMode = 'cloud'; // 'cloud' أو 'local'
 
         const defaultSynonyms = {
             "تشقير": ["حواجب", "حواف", "رتوش", "صبغة"],
@@ -1176,6 +1178,21 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
+
+        function toggleAIModeManual() {
+            const btn = document.getElementById('aiModeManualBtn');
+            if (aiManualMode === 'cloud') {
+                aiManualMode = 'local';
+                btn.innerHTML = '💻 المحلي (أوفلاين)';
+                btn.style.background = 'var(--accent-blue)';
+                btn.style.color = '#fff';
+            } else {
+                aiManualMode = 'cloud';
+                btn.innerHTML = '🌐 سحابي (Gemini)';
+                btn.style.background = '';
+                btn.style.color = '';
+            }
+        }
 
         function syncToCloud() {
             db.ref('clinicData').set({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData });
@@ -1710,6 +1727,7 @@
         function renderSynonyms(search = "") {
             const tbody = document.getElementById('synonymsTableBody');
             if(!tbody) return; tbody.innerHTML = "";
+            if (!synonymsData) synonymsData = {};
             for (let key in synonymsData) {
                 const vals = Array.isArray(synonymsData[key]) ? synonymsData[key].join('، ') : synonymsData[key];
                 if (!search || key.includes(search) || vals.includes(search)) {
@@ -1718,8 +1736,8 @@
                             <td><strong>${key}</strong></td>
                             <td>${vals}</td>
                             <td style="text-align:center;">
-                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonym('${key}')"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonym('${key}')"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonym('${key.replace(/'/g, "\\'")}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonym('${key.replace(/'/g, "\\'")}')"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -1739,6 +1757,8 @@
             if (!key || !valsStr) return alert("املأ الكلمة الأصلية والمرادفات!");
             
             const valsArr = valsStr.split(/[,،\s]+/).filter(Boolean);
+            if (!synonymsData) synonymsData = {};
+            
             if (originalKey && originalKey !== key) {
                 delete synonymsData[originalKey];
             }
@@ -1808,7 +1828,6 @@
         }
         function clearMultiOffersSelection() { selectedOfferIds = []; document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); updateFloatingOffersWindow(); }
         
-        // تفعيل سحب وإفلات نافذة السلة العائمة في أي مكان بالصفحة
         function initDraggableFloatingOffers() {
             const win = document.getElementById('floatingOffersWin'), header = document.getElementById('floatingOffersHeader');
             let isDragging = false, startX = 0, startY = 0;
@@ -1935,9 +1954,7 @@
             msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
             inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
 
-            const isCloudMode = document.getElementById('aiModeSwitch').checked;
-
-            if (!isCloudMode) {
+            if (aiManualMode === 'local') {
                 const replyHtml = executeLocalSmartSearch(rawText);
                 const replyId = 'ai_local_reply_' + Date.now();
                 msgBox.innerHTML += `
@@ -2019,7 +2036,6 @@
         }
 
         function executeLocalSmartSearch(query) {
-            // تنظيف النص بالكامل من الـ (ال التعريف، التاء المربوطة، الهاء، الهمزات، الحركات) لتفادي التعجيز تماماً
             const normalize = (str) => (str || "").toLowerCase()
                 .replace(/[إأآاٱ]/g, 'ا')
                 .replace(/[ةه]/g, 'ه')
