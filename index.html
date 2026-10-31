@@ -1051,7 +1051,14 @@
                         for (let rawKey in data.synonymsData) {
                             let k = decodeFirebaseKey(rawKey);
                             let val = data.synonymsData[rawKey];
-                            synonymsData[k] = typeof val === 'object' ? val : { category: "عام", values: Array.isArray(val) ? val : [val] };
+                            if (typeof val === 'object' && val !== null) {
+                                synonymsData[k] = { 
+                                    category: val.category || "عام", 
+                                    values: Array.isArray(val.values) ? val.values : (typeof val.values === 'string' ? val.values.split(/[,،]/).map(v => v.trim()).filter(Boolean) : [String(val)]) 
+                                };
+                            } else {
+                                synonymsData[k] = { category: "عام", values: [String(val)] };
+                            }
                         }
                     } else { synonymsData = defaultSynonyms; }
                 } else {
@@ -1072,7 +1079,6 @@
                 renderCoordinators();
                 renderOffersTabs();
                 renderOffers();
-                renderInquiriesTabs();
                 renderInquiries();
                 renderSynonyms();
                 updateKPIs();
@@ -1665,8 +1671,9 @@
             if (!synonymsData) synonymsData = {};
             for (let key in synonymsData) {
                 let item = synonymsData[key];
-                let cat = typeof item === 'object' ? item.category : "عام";
-                let vals = typeof item === 'object' ? (item.values || []).join('، ') : item;
+                let cat = (typeof item === 'object' && item !== null) ? (item.category || "عام") : "عام";
+                let valsArr = (typeof item === 'object' && item !== null) ? (Array.isArray(item.values) ? item.values : [String(item)]) : [String(item)];
+                let vals = valsArr.join('، ');
                 if (!search || cleanSearchText(key).includes(search) || cleanSearchText(vals).includes(search) || cleanSearchText(cat).includes(search)) {
                     const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                     tbody.innerHTML += `
@@ -1711,8 +1718,9 @@
             document.getElementById('synOriginalKey').value = key;
             document.getElementById('synKey').value = key;
             let item = synonymsData[key];
-            let cat = typeof item === 'object' ? item.category : "عام";
-            let vals = typeof item === 'object' ? (item.values || []).join('، ') : item;
+            let cat = (typeof item === 'object' && item !== null) ? (item.category || "عام") : "عام";
+            let valsArr = (typeof item === 'object' && item !== null) ? (Array.isArray(item.values) ? item.values : [String(item)]) : [String(item)];
+            let vals = valsArr.join('، ');
             
             let catSelect = document.getElementById('synCategorySelect');
             let foundOption = Array.from(catSelect.options).some(o => o.value === cat);
@@ -1911,13 +1919,19 @@
             let searchTokens = [rawQ];
             for (let synKey in synonymsData) {
                 let synObj = synonymsData[synKey];
-                let synValues = (typeof synObj === 'object' && synObj.values) ? synObj.values.map(v => v.toLowerCase()) : [];
+                let synValues = [];
+                if (synObj && typeof synObj === 'object') {
+                    if (Array.isArray(synObj.values)) {
+                        synValues = synObj.values.map(v => String(v).toLowerCase());
+                    } else if (typeof synObj.values === 'string') {
+                        synValues = synObj.values.split(/[,،]/).map(v => v.trim().toLowerCase());
+                    }
+                }
                 if (synKey.toLowerCase().includes(rawQ) || rawQ.includes(synKey.toLowerCase()) || synValues.some(v => v.includes(rawQ) || rawQ.includes(v))) {
                     searchTokens.push(synKey.toLowerCase());
                     synValues.forEach(v => searchTokens.push(v));
                 }
             }
-            // تقسيم الكلمة إلى كلمات مفردة أيضاً لتشمل البحث الجزئي
             rawQ.split(/\s+/).forEach(word => {
                 if (word.length > 1 && !searchTokens.includes(word)) searchTokens.push(word);
             });
@@ -1925,7 +1939,7 @@
             let allMatchedResults = [];
             const isMatch = (text) => {
                 if (!text) return false;
-                let t = text.toLowerCase();
+                let t = text.toString().toLowerCase();
                 return searchTokens.some(token => t.includes(token));
             };
 
@@ -2012,8 +2026,10 @@
             // 8. القاموس
             for (let synKey in synonymsData) {
                 let item = synonymsData[synKey];
-                let valsStr = typeof item === 'object' ? (item.values || []).join(' ') : item;
-                if (isMatch(synKey) || isMatch(valsStr) || (typeof item === 'object' && isMatch(item.category))) {
+                let valsArr = (typeof item === 'object' && item !== null) ? (item.values || []) : [String(item)];
+                let valsStr = valsArr.join(' ');
+                let catStr = (typeof item === 'object' && item !== null) ? (item.category || "") : "";
+                if (isMatch(synKey) || isMatch(valsStr) || isMatch(catStr)) {
                     allMatchedResults.push({
                         timeId: 0, source: "قاموس المرادفات والمصطلحات",
                         title: `المصطلح: ${synKey}`, subtitle: `المرادفات: ${valsStr}`,
@@ -2022,14 +2038,11 @@
                 }
             }
 
-            // إزالة النتائج المكررة بناءً على العنوان والمصدر
             let uniqueMap = new Map();
             allMatchedResults.forEach(item => {
                 uniqueMap.set(item.source + "_" + item.title, item);
             });
             let finalResults = Array.from(uniqueMap.values());
-
-            // الترتيب: الأحدث أولاً
             finalResults.sort((a, b) => b.timeId - a.timeId);
 
             if (finalResults.length === 0) {
@@ -2078,11 +2091,12 @@
             switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators(id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
-        function jumpToSectionAndHighlightService(id) {
+        function jumpToSectionAndFormatService(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
+        function jumpToSectionAndHighlightService(id) { jumpToSectionAndFormatService(id); }
         function jumpToSectionAndHighlightNote(idx) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
