@@ -591,25 +591,25 @@
     </div>
 
     <div class="ai-floating-chat-window" id="aiFloatingChatWindow">
-        <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-                <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد المحلي الذكي (أوفلاين)</h4>
-            </div>
-            <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
+    <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:0.4rem;">
+            <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
+            <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد المحلي الذكي (أوفلاين)</h4>
         </div>
+        <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
+    </div>
 
-        <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد المحلي جاهز الآن بالإجابات المباشرة والمنسقة بدقة. اسألني أي شئ!</div>
-        </div>
+    <div class="ai-messages-box" id="aiMessagesBox">
+        <div class="ai-message gemini">أهلاً يا مصطفى! المساعد المحلي جاهز الآن بالإجابات المباشرة والمنسقة بدقة. اسألني أي شئ!</div>
+    </div>
 
-        <div class="ai-input-box">
-            <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، خدمة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
-                <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
+    <div class="ai-input-box">
+        <div class="ai-input-row">
+            <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، خدمة..." onkeydown="if(event.key === 'Enter') { sendSmartAIMessage(); event.preventDefault(); }">
+            <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
+</div>
 
     <!-- مودال الأطباء -->
     <div class="modal-overlay" id="doctorModal">
@@ -2083,24 +2083,33 @@
 
         // محرك البحث المحلي الذكي والدقيق (نسخة مُطورة ومرنة 100%)
         function sendSmartAIMessage() {
-            const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
-            const rawText = inputEl.value.trim(); if (!rawText) return;
+    const inputEl = document.getElementById('aiUserInput');
+    const msgBox = document.getElementById('aiMessagesBox');
+    if (!inputEl || !msgBox) return;
+    
+    const rawText = inputEl.value.trim();
+    if (!rawText) return;
 
-            msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
-            inputEl.value = ""; msgBox.scrollTop = msgBox.scrollHeight;
+    // إضافة رسالة المستخدم
+    msgBox.innerHTML += `<div class="ai-message user">${rawText}</div>`;
+    inputEl.value = "";
+    msgBox.scrollTop = msgBox.scrollHeight;
 
-            const replyHtml = executeLocalSmartSearch(rawText);
-            const replyId = 'ai_local_reply_' + Date.now();
-            msgBox.innerHTML += `
-                <div class="ai-message gemini">
-                    <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
-                    <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
-                        <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-                    </button>
-                </div>
-            `;
-            msgBox.scrollTop = msgBox.scrollHeight;
-        }
+    // جلب الإجابة من محرك البحث المحلي
+    const replyHtml = executeLocalSmartSearch(rawText);
+    const replyId = 'ai_local_reply_' + Date.now();
+    
+    // إضافة رد المساعد
+    msgBox.innerHTML += `
+        <div class="ai-message gemini">
+            <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
+            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="navigator.clipboard.writeText(document.getElementById('${replyId}').innerText).then(() => alert('📋 تم النسخ للواتساب!'))">
+                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+            </button>
+        </div>
+    `;
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
 
         function executeLocalSmartSearch(query) {
             const normalize = (str) => (str || "").toLowerCase()
