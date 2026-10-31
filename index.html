@@ -2072,7 +2072,7 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // --- الدالة المباشرة والآمنة 100% لتشغيل المساعد والرد الفوري ---
+        // --- الدالة المباشرة والآمنة لتشغيل المساعد والرد الفوري مع أولوية التنبيهات ---
         function triggerSmartAiSend() {
             const inputEl = document.getElementById('aiUserInput');
             if (!inputEl) return;
@@ -2082,7 +2082,7 @@
 
             const msgBox = document.getElementById('aiMessagesBox');
             
-            // 1. إضافة رسالة المستخدم صندوق الدردشة
+            // 1. إضافة رسالة المستخدم لصندوق الدردشة
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'ai-message user';
             userMsgDiv.innerText = rawText;
@@ -2108,7 +2108,7 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // محرك البحث المحلي الذكي والمحمي تماماً ضد أي أخطاء
+        // محرك البحث المحلي الذكي والمحدث ليشمل التنبيهات كأولوية قصوى ومحمي تماماً
         function executeLocalSmartSearch(query) {
             const normalize = (str) => (str || "").toLowerCase()
                 .replace(/[إأآاٱ]/g, 'ا')
@@ -2123,6 +2123,22 @@
             const queryWords = rawQueryClean.split(/\s+/).filter(w => w.length > 1);
             let matches = [];
             let targetCategory = null;
+
+            // 0. الأولوية القصوى: البحث في التنبيهات والإشعارات (مثل: مفيش جلدية، إجازات، توجيهات عاجلة)
+            if (Array.isArray(alertsData)) {
+                alertsData.forEach(a => {
+                    const alertTextNorm = normalize(a.content);
+                    const alertTagsNorm = normalize(a.tags);
+                    
+                    let isAlertMatch = queryWords.some(w => alertTextNorm.includes(w) || alertTagsNorm.includes(w)) || 
+                                       (rawQueryClean.includes("جلدية") && alertTextNorm.includes("جلدية")) ||
+                                       (rawQueryClean.includes("اليوم") && (alertTextNorm.includes("اليوم") || alertTextNorm.includes("حالية") || alertTextNorm.includes("شفاله")));
+
+                    if (isAlertMatch) {
+                        matches.push(`🚨 <strong>تنبيه هام من الإدارة:</strong>\n${a.content}\n<span style="font-size:0.65rem; color:#9ca3af;">(وقت النشر: ${a.time})</span>`);
+                    }
+                });
+            }
 
             // 1. فحص قواعد توجيه المسار (Routing)
             if (routingRulesData) {
@@ -2170,28 +2186,7 @@
                 }
             }
 
-            // 3. البحث في العروض والأسعار
-            if (Array.isArray(offersData)) {
-                offersData.forEach(o => {
-                    const oNameNorm = normalize(o.name);
-                    const oCatNorm = normalize(o.category);
-                    const oDev1 = normalize(o.device1);
-                    const oDev2 = normalize(o.device2);
-
-                    let matchScore = 0;
-                    if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 3;
-                    if (expandedQueryTokens.some(token => oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token) || oCatNorm.includes(token))) matchScore += 5;
-
-                    if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
-                        let devicesText = "";
-                        if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
-                        if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
-                        matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
-                    }
-                });
-            }
-
-            // 4. البحث في الأطباء
+            // 3. البحث في الأطباء
             const currentDay = getArabicDayName();
             const todayDateStr = new Date().toISOString().split('T')[0];
 
@@ -2222,9 +2217,30 @@
                 });
             }
 
+            // 4. البحث في العروض والأسعار (فقط إذا لم يتم إيجاد تطابق مع التنبيهات)
+            if (Array.isArray(offersData) && matches.length === 0) {
+                offersData.forEach(o => {
+                    const oNameNorm = normalize(o.name);
+                    const oCatNorm = normalize(o.category);
+                    const oDev1 = normalize(o.device1);
+                    const oDev2 = normalize(o.device2);
+
+                    let matchScore = 0;
+                    if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 3;
+                    if (expandedQueryTokens.some(token => oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token) || oCatNorm.includes(token))) matchScore += 5;
+
+                    if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
+                        let devicesText = "";
+                        if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
+                        if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
+                        matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
+                    }
+                });
+            }
+
             // 5. البحث في الاستفسارات والأسئلة الشائعة
             if (Array.isArray(inquiriesData)) {
-                inquiriesData.forEach(i => {
+                inquiriesData.filter(i => matches.length === 0).forEach(i => {
                     const qNorm = normalize(i.question);
                     const ansNorm = normalize(i.answer);
                     if (expandedQueryTokens.some(token => qNorm.includes(token) || ansNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
