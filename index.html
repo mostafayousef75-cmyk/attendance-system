@@ -31,15 +31,10 @@
             --radius-lg: 10px;
         }
 
-        body.theme-darkblue {
-            --bg-base: #060913; --bg-surface: #0c1222; --bg-card: #111a30; --bg-sidebar: #080d1a; --text-main: #ffffff; --text-muted: #94a3b8; --border-color: #1e293b; --primary-color: #3b82f6;
-        }
-        body.theme-gray {
-            --bg-base: #121214; --bg-surface: #1a1a1e; --bg-card: #242429; --bg-sidebar: #161619; --text-main: #f4f4f5; --text-muted: #a1a1aa; --border-color: #27272a; --primary-color: #8b5cf6;
-        }
-        body.theme-light {
-            --bg-base: #f1f5f9; --bg-surface: #ffffff; --bg-card: #f8fafc; --bg-sidebar: #0f172a; --text-main: #0f172a; --text-muted: #475569; --border-color: #cbd5e1; --primary-color: #2563eb;
-        }
+        body.theme-amoled { --bg-base: #000000; --bg-surface: #09090b; --bg-card: #18181b; --bg-sidebar: #050507; }
+        body.theme-darkblue { --bg-base: #060913; --bg-surface: #0c1222; --bg-card: #111a30; --bg-sidebar: #080d1a; --text-main: #ffffff; --text-muted: #94a3b8; --border-color: #1e293b; --primary-color: #3b82f6; }
+        body.theme-gray { --bg-base: #121214; --bg-surface: #1a1a1e; --bg-card: #242429; --bg-sidebar: #161619; --text-main: #f4f4f5; --text-muted: #a1a1aa; --border-color: #27272a; --primary-color: #8b5cf6; }
+        body.theme-light { --bg-base: #f1f5f9; --bg-surface: #ffffff; --bg-card: #f8fafc; --bg-sidebar: #0f172a; --text-main: #0f172a; --text-muted: #475569; --border-color: #cbd5e1; --primary-color: #2563eb; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; user-select: text !important; }
@@ -158,13 +153,9 @@
         .card-tags-footer { margin-top: 0.3rem; padding-top: 0.2rem; border-top: 1px dashed rgba(255,255,255,0.25); font-size: 0.68rem; color: #fde047; font-weight: 600; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
 
-        .floating-offers-window {
-            position: fixed; bottom: 30px; right: 30px; width: 320px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 9999; display: none; flex-direction: column; overflow: hidden;
-        }
+        .floating-offers-window { position: fixed; bottom: 30px; right: 30px; width: 320px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
         .floating-offers-window.active { display: flex; }
-        .floating-offers-header {
-            background: var(--bg-card); padding: 0.4rem 0.7rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.78rem;
-        }
+        .floating-offers-header { background: var(--bg-card); padding: 0.4rem 0.7rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.78rem; }
         .floating-offers-body { padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
         .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; font-size: 0.74rem; resize: vertical; height: 120px; outline: none; }
 
@@ -605,7 +596,6 @@
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <!-- تم ربط الحقل وزر الإرسال بـ onclick و onkeydown مباشرة لضمان العمل بنسبة 100% -->
                 <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، خدمة..." onkeydown="if(event.key === 'Enter') { triggerSmartAiSend(); event.preventDefault(); }">
                 <button class="btn btn-green" id="aiSendBtn" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="triggerSmartAiSend()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
@@ -2082,7 +2072,7 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // --- الدالة المباشرة والنهائية لتشغيل المساعد والرد الفوري ---
+        // --- الدالة المباشرة والآمنة 100% لتشغيل المساعد والرد الفوري ---
         function triggerSmartAiSend() {
             const inputEl = document.getElementById('aiUserInput');
             if (!inputEl) return;
@@ -2118,7 +2108,7 @@
             msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // محرك البحث المحلي الذكي والدقيق
+        // محرك البحث المحلي الذكي والمحمي تماماً ضد أي أخطاء
         function executeLocalSmartSearch(query) {
             const normalize = (str) => (str || "").toLowerCase()
                 .replace(/[إأآاٱ]/g, 'ا')
@@ -2140,87 +2130,108 @@
                     const cleanKey = normalize(key);
                     if (rawQueryClean.includes(cleanKey) || cleanKey.includes(rawQueryClean) || queryWords.some(w => cleanKey.includes(w))) {
                         let rule = routingRulesData[key];
-                        targetCategory = rule.category;
-                        matches.push(rule.answer);
+                        if (rule && rule.answer) {
+                            targetCategory = rule.category;
+                            matches.push(rule.answer);
+                        }
                     }
                 }
             }
 
-            // 2. استخدام قاموس المرادفات
+            // 2. استخدام قاموس المرادفات (مع حماية تامة ضد أنواع البيانات المختلفة)
             let expandedQueryTokens = [...queryWords];
             if (synonymsData) {
                 for (let synKey in synonymsData) {
                     let item = synonymsData[synKey];
-                    let vals = typeof item === 'object' ? item.values : (Array.isArray(item) ? item : [item]);
-                    let cat = typeof item === 'object' ? item.category : "عام";
+                    let vals = [];
+                    let cat = "عام";
+
+                    if (item) {
+                        if (typeof item === 'object') {
+                            cat = item.category || "عام";
+                            if (Array.isArray(item.values)) {
+                                vals = item.values;
+                            } else if (typeof item.values === 'string') {
+                                vals = item.values.split(/[,،]/).map(v => v.trim());
+                            }
+                        } else if (typeof item === 'string') {
+                            vals = item.split(/[,،]/).map(v => v.trim());
+                        }
+                    }
                     
                     const cleanSynKey = normalize(synKey);
-                    const valMatch = vals.some(v => rawQueryClean.includes(normalize(v)));
+                    const valMatch = vals.some(v => typeof v === 'string' && rawQueryClean.includes(normalize(v)));
 
                     if (rawQueryClean.includes(cleanSynKey) || valMatch) {
                         targetCategory = cat;
-                        vals.forEach(v => expandedQueryTokens.push(normalize(v)));
+                        vals.forEach(v => { if (typeof v === 'string') expandedQueryTokens.push(normalize(v)); });
                         expandedQueryTokens.push(cleanSynKey);
                     }
                 }
             }
 
             // 3. البحث في العروض والأسعار
-            offersData.forEach(o => {
-                const oNameNorm = normalize(o.name);
-                const oCatNorm = normalize(o.category);
-                const oDev1 = normalize(o.device1);
-                const oDev2 = normalize(o.device2);
+            if (Array.isArray(offersData)) {
+                offersData.forEach(o => {
+                    const oNameNorm = normalize(o.name);
+                    const oCatNorm = normalize(o.category);
+                    const oDev1 = normalize(o.device1);
+                    const oDev2 = normalize(o.device2);
 
-                let matchScore = 0;
-                if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 3;
-                if (expandedQueryTokens.some(token => oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token) || oCatNorm.includes(token))) matchScore += 5;
+                    let matchScore = 0;
+                    if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 3;
+                    if (expandedQueryTokens.some(token => oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token) || oCatNorm.includes(token))) matchScore += 5;
 
-                if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
-                    let devicesText = "";
-                    if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
-                    if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
-                    matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
-                }
-            });
+                    if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
+                        let devicesText = "";
+                        if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
+                        if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
+                        matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
+                    }
+                });
+            }
 
             // 4. البحث في الأطباء
             const currentDay = getArabicDayName();
             const todayDateStr = new Date().toISOString().split('T')[0];
 
-            doctorsData.forEach(d => {
-                const docNameNorm = normalize(d.name);
-                const specNorm = normalize(d.specialty);
-                const tagsNorm = normalize(d.tags);
+            if (Array.isArray(doctorsData)) {
+                doctorsData.forEach(d => {
+                    const docNameNorm = normalize(d.name);
+                    const specNorm = normalize(d.specialty);
+                    const tagsNorm = normalize(d.tags);
 
-                let docMatch = expandedQueryTokens.some(token => docNameNorm.includes(token) || specNorm.includes(token) || tagsNorm.includes(token)) || docNameNorm.includes(rawQueryClean);
+                    let docMatch = expandedQueryTokens.some(token => docNameNorm.includes(token) || specNorm.includes(token) || tagsNorm.includes(token)) || docNameNorm.includes(rawQueryClean);
 
-                if (docMatch) {
-                    let leaveStatus = d.isLeave ? "⚠️ الطبيب غير متواجد حالياً (في إجازة رسمية)." : "✅ الطبيب متاح وعلي رأس العمل.";
-                    const mashyDays = d.mashyDays || d.days || [], wissamDays = d.wissamDays || [];
-                    let presentTodayText = [];
-                    if (!d.isLeave) {
-                        if (mashyDays.includes(currentDay)) presentTodayText.push("فرع معشي");
-                        if (wissamDays.includes(currentDay)) presentTodayText.push("فرع الوسام");
+                    if (docMatch) {
+                        let leaveStatus = d.isLeave ? "⚠️ الطبيب غير متواجد حالياً (في إجازة رسمية)." : "✅ الطبيب متاح وعلي رأس العمل.";
+                        const mashyDays = d.mashyDays || d.days || [], wissamDays = d.wissamDays || [];
+                        let presentTodayText = [];
+                        if (!d.isLeave) {
+                            if (mashyDays.includes(currentDay)) presentTodayText.push("فرع معشي");
+                            if (wissamDays.includes(currentDay)) presentTodayText.push("فرع الوسام");
+                        }
+                        let todayStatus = presentTodayText.length > 0 ? `متواجد اليوم (${currentDay}) في: ${presentTodayText.join(' و ')}` : `غير متواجد اليوم (${currentDay})`;
+                        let fridayDuty = Array.isArray(fridaySchedules) ? fridaySchedules.filter(f => f.doc.includes(d.name.replace('د. ', '')) && f.date >= todayDateStr) : [];
+                        let fridayText = fridayDuty.length > 0 ? `مناوب يوم الجمعة القادمة (${fridayDuty[0].date}) في فرع ${fridayDuty[0].branch}` : `ليس لديه مناوبة جمعة قريبة`;
+                        let docAlerts = Array.isArray(alertsData) ? alertsData.filter(a => normalize(a.content).includes(normalize(d.name)) || normalize(a.tags).includes(normalize(d.name))) : [];
+                        let alertLines = docAlerts.map(a => `• ${a.content}`).join('\n');
+
+                        matches.push(`<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}\n• حالة الدوام: ${leaveStatus}\n• التواجد اليومي: ${todayStatus}\n• مناوبة الجمعة: ${fridayText}\n• مواعيد معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}\n• مواعيد الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}\n• الساعات: ${d.timing || ''}${alertLines ? `\n\n🚨 <strong>تنبيهات خاصة:</strong>\n${alertLines}` : ''}`);
                     }
-                    let todayStatus = presentTodayText.length > 0 ? `متواجد اليوم (${currentDay}) في: ${presentTodayText.join(' و ')}` : `غير متواجد اليوم (${currentDay})`;
-                    let fridayDuty = fridaySchedules.filter(f => f.doc.includes(d.name.replace('د. ', '')) && f.date >= todayDateStr);
-                    let fridayText = fridayDuty.length > 0 ? `مناوب يوم الجمعة القادمة (${fridayDuty[0].date}) في فرع ${fridayDuty[0].branch}` : `ليس لديه مناوبة جمعة قريبة`;
-                    let docAlerts = alertsData.filter(a => normalize(a.content).includes(normalize(d.name)) || normalize(a.tags).includes(normalize(d.name)));
-                    let alertLines = docAlerts.map(a => `• ${a.content}`).join('\n');
-
-                    matches.push(`<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}\n• حالة الدوام: ${leaveStatus}\n• التواجد اليومي: ${todayStatus}\n• مناوبة الجمعة: ${fridayText}\n• مواعيد معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}\n• مواعيد الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}\n• الساعات: ${d.timing || ''}${alertLines ? `\n\n🚨 <strong>تنبيهات خاصة:</strong>\n${alertLines}` : ''}`);
-                }
-            });
+                });
+            }
 
             // 5. البحث في الاستفسارات والأسئلة الشائعة
-            inquiriesData.forEach(i => {
-                const qNorm = normalize(i.question);
-                const ansNorm = normalize(i.answer);
-                if (expandedQueryTokens.some(token => qNorm.includes(token) || ansNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
-                    matches.push(`<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`);
-                }
-            });
+            if (Array.isArray(inquiriesData)) {
+                inquiriesData.forEach(i => {
+                    const qNorm = normalize(i.question);
+                    const ansNorm = normalize(i.answer);
+                    if (expandedQueryTokens.some(token => qNorm.includes(token) || ansNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
+                        matches.push(`<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`);
+                    }
+                });
+            }
 
             if (matches.length > 0) {
                 let uniqueMatches = Array.from(new Set(matches));
