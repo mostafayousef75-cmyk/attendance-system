@@ -605,8 +605,9 @@
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، خدمة...">
-                <button class="btn btn-green" id="aiSendBtn" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;"><i class="fa-solid fa-paper-plane"></i></button>
+                <!-- تم ربط الحقل وزر الإرسال بـ onclick و onkeydown مباشرة لضمان العمل بنسبة 100% -->
+                <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، خدمة..." onkeydown="if(event.key === 'Enter') { triggerSmartAiSend(); event.preventDefault(); }">
+                <button class="btn btn-green" id="aiSendBtn" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="triggerSmartAiSend()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
@@ -1149,7 +1150,6 @@
 
             loadTableWidths();
             initDraggableFloatingOffers();
-            initAiChatEventListeners();
 
             db.ref('clinicData').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -2082,59 +2082,41 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // استبدل دالة initAiChatEventListeners القديمة بهذه النسخة المُحدثة والنهائية:
-function initAiChatEventListeners() {
-    const inputEl = document.getElementById('aiUserInput');
-    const sendBtn = document.getElementById('aiSendBtn');
-    if (!inputEl || !sendBtn) return;
+        // --- الدالة المباشرة والنهائية لتشغيل المساعد والرد الفوري ---
+        function triggerSmartAiSend() {
+            const inputEl = document.getElementById('aiUserInput');
+            if (!inputEl) return;
+            
+            const rawText = inputEl.value.trim();
+            if (!rawText) return;
 
-    // إزالة أي أحداث قديمة لمنع التكرار
-    const newSendBtn = sendBtn.cloneNode(true);
-    sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+            const msgBox = document.getElementById('aiMessagesBox');
+            
+            // 1. إضافة رسالة المستخدم صندوق الدردشة
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'ai-message user';
+            userMsgDiv.innerText = rawText;
+            msgBox.appendChild(userMsgDiv);
 
-    const newInputEl = inputEl.cloneNode(true);
-    inputEl.parentNode.replaceChild(newInputEl, inputEl);
+            inputEl.value = "";
+            msgBox.scrollTop = msgBox.scrollHeight;
 
-    const executeSend = () => {
-        const queryText = document.getElementById('aiUserInput').value.trim();
-        if (!queryText) return;
+            // 2. جلب نتيجة البحث المحلي الذكي
+            const replyHtml = executeLocalSmartSearch(rawText);
+            const replyId = 'ai_local_reply_' + Date.now();
 
-        const msgBox = document.getElementById('aiMessagesBox');
-        
-        // 1. إضافة رسالة المستخدم
-        const userMsg = document.createElement('div');
-        userMsg.className = 'ai-message user';
-        userMsg.innerText = queryText;
-        msgBox.appendChild(userMsg);
-
-        document.getElementById('aiUserInput').value = "";
-        msgBox.scrollTop = msgBox.scrollHeight;
-
-        // 2. جلب نتيجة البحث المحلي
-        const replyHtml = executeLocalSmartSearch(queryText);
-        const replyId = 'ai_local_reply_' + Date.now();
-
-        // 3. إضافة رد المساعد المنظم
-        const geminiMsg = document.createElement('div');
-        geminiMsg.className = 'ai-message gemini';
-        geminiMsg.innerHTML = `
-            <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
-            <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="navigator.clipboard.writeText(document.getElementById('${replyId}').innerText).then(() => alert('📋 تم النسخ للواتساب!'))">
-                <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
-            </button>
-        `;
-        msgBox.appendChild(geminiMsg);
-        msgBox.scrollTop = msgBox.scrollHeight;
-    };
-
-    document.getElementById('aiSendBtn').addEventListener('click', executeSend);
-    document.getElementById('aiUserInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            executeSend();
+            // 3. إضافة رد المساعد مع زر النسخ للواتساب
+            const geminiMsgDiv = document.createElement('div');
+            geminiMsgDiv.className = 'ai-message gemini';
+            geminiMsgDiv.innerHTML = `
+                <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
+                <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
+                    <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
+                </button>
+            `;
+            msgBox.appendChild(geminiMsgDiv);
+            msgBox.scrollTop = msgBox.scrollHeight;
         }
-    });
-}
 
         // محرك البحث المحلي الذكي والدقيق
         function executeLocalSmartSearch(query) {
