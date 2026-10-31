@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - البحث الشامل المحترف</title>
+    <title>لوحة الكول سنتر والمنسقين - البحث الشامل المتقدم جداً</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -222,10 +222,10 @@
 
     <main class="main-wrapper">
         <header class="top-header">
-            <!-- شريط البحث الشامل الفائق -->
+            <!-- شريط البحث الشامل المتقدم جداً -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الأقسام..." oninput="handleTrueGlobalSearch(this.value)">
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع (أطباء، عروض، مرادفات...)" oninput="handleTrueGlobalSearch(this.value)">
             </div>
             
             <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -1245,7 +1245,6 @@
             return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
         }
 
-        // --- دالة التنظيف الآمنة للبحث ---
         function cleanSearchText(str) {
             if (!str) return "";
             return str.toString().toLowerCase().trim();
@@ -1891,7 +1890,7 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        // --- البحث الشامل (مبسط ومضمون النتائج 100%) ---
+        // --- البحث الشامل المتقدم جداً (يدعم المرادفات وتجزئة الكلمات 100%) ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim().toLowerCase();
             const resultsSection = document.getElementById('globalSearchResultsSection');
@@ -1908,11 +1907,31 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
+            // توسيع الكلمات عبر قاموس المرادفات الذكي
+            let searchTokens = [rawQ];
+            for (let synKey in synonymsData) {
+                let synObj = synonymsData[synKey];
+                let synValues = (typeof synObj === 'object' && synObj.values) ? synObj.values.map(v => v.toLowerCase()) : [];
+                if (synKey.toLowerCase().includes(rawQ) || rawQ.includes(synKey.toLowerCase()) || synValues.some(v => v.includes(rawQ) || rawQ.includes(v))) {
+                    searchTokens.push(synKey.toLowerCase());
+                    synValues.forEach(v => searchTokens.push(v));
+                }
+            }
+            // تقسيم الكلمة إلى كلمات مفردة أيضاً لتشمل البحث الجزئي
+            rawQ.split(/\s+/).forEach(word => {
+                if (word.length > 1 && !searchTokens.includes(word)) searchTokens.push(word);
+            });
+
             let allMatchedResults = [];
+            const isMatch = (text) => {
+                if (!text) return false;
+                let t = text.toLowerCase();
+                return searchTokens.some(token => t.includes(token));
+            };
 
             // 1. الأطباء
             doctorsData.forEach(d => {
-                if (d.name.toLowerCase().includes(rawQ) || (d.specialty && d.specialty.toLowerCase().includes(rawQ)) || (d.tags && d.tags.toLowerCase().includes(rawQ)) || (d.notes && d.notes.toLowerCase().includes(rawQ))) {
+                if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes) || isMatch(d.nationality)) {
                     allMatchedResults.push({
                         timeId: d.id || 0, source: "الأطباء",
                         title: `${d.name} (${d.specialty})`,
@@ -1924,7 +1943,7 @@
 
             // 2. العروض
             offersData.forEach(o => {
-                if (o.name.toLowerCase().includes(rawQ) || o.category.toLowerCase().includes(rawQ) || (o.device1 && o.device1.toLowerCase().includes(rawQ)) || (o.device2 && o.device2.toLowerCase().includes(rawQ)) || (o.notes && o.notes.toLowerCase().includes(rawQ)) || (o.tags && o.tags.toLowerCase().includes(rawQ))) {
+                if (isMatch(o.name) || isMatch(o.category) || isMatch(o.device1) || isMatch(o.device2) || isMatch(o.notes) || isMatch(o.tags) || isMatch(o.price)) {
                     allMatchedResults.push({
                         timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
                         title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
@@ -1936,7 +1955,7 @@
 
             // 3. الاستفسارات
             inquiriesData.forEach(i => {
-                if (i.question.toLowerCase().includes(rawQ) || i.answer.toLowerCase().includes(rawQ) || (i.tags && i.tags.toLowerCase().includes(rawQ)) || i.category.toLowerCase().includes(rawQ)) {
+                if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags) || isMatch(i.category)) {
                     allMatchedResults.push({
                         timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
                         title: i.question, subtitle: i.answer,
@@ -1947,7 +1966,7 @@
 
             // 4. التنبيهات
             alertsData.forEach(a => {
-                if (a.content.toLowerCase().includes(rawQ) || (a.tags && a.tags.toLowerCase().includes(rawQ))) {
+                if (isMatch(a.content) || isMatch(a.tags)) {
                     allMatchedResults.push({
                         timeId: a.id || 0, source: "التنبيهات والإشعارات",
                         title: a.content, subtitle: a.time,
@@ -1958,7 +1977,7 @@
 
             // 5. الخدمات والأجهزة
             deptServicesData.forEach(s => {
-                if (s.name.toLowerCase().includes(rawQ) || (s.tags && s.tags.toLowerCase().includes(rawQ)) || s.branch.toLowerCase().includes(rawQ)) {
+                if (isMatch(s.name) || isMatch(s.tags) || isMatch(s.branch) || isMatch(s.type)) {
                     allMatchedResults.push({
                         timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
                         title: s.name, subtitle: `القسم: ${s.type}`,
@@ -1969,7 +1988,7 @@
 
             // 6. الملاحظات الداخلية
             deptNotesData.forEach((n, idx) => {
-                if (n.text.toLowerCase().includes(rawQ) || (n.tags && n.tags.toLowerCase().includes(rawQ))) {
+                if (isMatch(n.text) || isMatch(n.tags)) {
                     allMatchedResults.push({
                         timeId: idx, source: "الملاحظات الداخلية",
                         title: n.text, subtitle: `ملحوظة #${idx + 1}`,
@@ -1980,8 +1999,8 @@
 
             // 7. دليل المنسقين
             coordinatorsData.forEach(c => {
-                let rulesText = c.rules ? c.rules.join(' ').toLowerCase() : '';
-                if (c.name.toLowerCase().includes(rawQ) || rulesText.includes(rawQ) || (c.tags && c.tags.toLowerCase().includes(rawQ))) {
+                let rulesText = c.rules ? c.rules.join(' ') : '';
+                if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
                     allMatchedResults.push({
                         timeId: c.id || 0, source: "دليل المنسقين",
                         title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
@@ -1993,8 +2012,8 @@
             // 8. القاموس
             for (let synKey in synonymsData) {
                 let item = synonymsData[synKey];
-                let valsStr = typeof item === 'object' ? (item.values || []).join(' ').toLowerCase() : item.toLowerCase();
-                if (synKey.toLowerCase().includes(rawQ) || valsStr.includes(rawQ)) {
+                let valsStr = typeof item === 'object' ? (item.values || []).join(' ') : item;
+                if (isMatch(synKey) || isMatch(valsStr) || (typeof item === 'object' && isMatch(item.category))) {
                     allMatchedResults.push({
                         timeId: 0, source: "قاموس المرادفات والمصطلحات",
                         title: `المصطلح: ${synKey}`, subtitle: `المرادفات: ${valsStr}`,
@@ -2003,15 +2022,22 @@
                 }
             }
 
-            // الترتيب: الأحدث أولاً
-            allMatchedResults.sort((a, b) => b.timeId - a.timeId);
+            // إزالة النتائج المكررة بناءً على العنوان والمصدر
+            let uniqueMap = new Map();
+            allMatchedResults.forEach(item => {
+                uniqueMap.set(item.source + "_" + item.title, item);
+            });
+            let finalResults = Array.from(uniqueMap.values());
 
-            if (allMatchedResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في أي قسم من الأقسام.</div>`;
+            // الترتيب: الأحدث أولاً
+            finalResults.sort((a, b) => b.timeId - a.timeId);
+
+            if (finalResults.length === 0) {
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في أي قسم من الأقسام. جرب البحث بكلمة أقصر أو أضفها في قاموس المرادفات.</div>`;
                 return;
             }
 
-            allMatchedResults.forEach(res => {
+            finalResults.forEach(res => {
                 resultsList.innerHTML += `
                     <div class="search-result-card">
                         <div>
