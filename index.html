@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - المساعد السحابي والمحلي الذكي</title>
+    <title>لوحة الكول سنتر والمنسقين - المساعد الذكي المُطوّر</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -602,12 +602,12 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 id="aiChatHeaderTitle" style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (🌐 سحابي - OpenRouter)</h4>
+                <h4 id="aiChatHeaderTitle" style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد الذكي (💻 المحلي - أوفلاين)</h4>
             </div>
             
             <div style="display:flex; align-items:center; gap:0.3rem;">
-                <button id="aiModeManualBtn" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem; font-weight:700;" onclick="toggleAIModeManual()">
-                    🌐 سحابي
+                <button id="aiModeManualBtn" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem; font-weight:700; background:var(--accent-blue); color:#fff;" onclick="toggleAIModeManual()">
+                    💻 المحلي (أوفلاين)
                 </button>
             </div>
 
@@ -1073,7 +1073,6 @@
             }
         });
 
-        // دوال الترميز الآمن لمفاتيح Firebase
         function encodeFirebaseKey(key) {
             return encodeURIComponent(key).replace(/\./g, '%2E');
         }
@@ -1094,7 +1093,7 @@
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
-        let aiManualMode = 'cloud'; // الافتراضي سحابي صريح
+        let aiManualMode = 'local'; // جعل المحلي هو الافتراضي الفوري لتجنب أي مشاكل شبكة
 
         const defaultSynonyms = {
             "تشقير": ["حواجب", "حواف", "رتوش", "صبغة"],
@@ -1136,7 +1135,6 @@
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                     
-                    // فك ترميز القاموس من Firebase
                     synonymsData = {};
                     if (data.synonymsData) {
                         for (let rawKey in data.synonymsData) {
@@ -1208,7 +1206,6 @@
         }
 
         function syncToCloud() {
-            // ترميز مفاتيح قاموس المترادفات قبل حفظها في Firebase لتجاوز مشكلة النقاط والرموز
             let encodedSynonyms = {};
             if (synonymsData) {
                 for (let k in synonymsData) {
@@ -1997,7 +1994,6 @@
                 `;
                 msgBox.scrollTop = msgBox.scrollHeight;
             } else {
-                // وضع السحابي فقط بدون تحويل تلقائي للـ Local
                 const currentShiftNote = document.getElementById('shiftScratchpadText').value;
                 const siteContext = `
                 قاعدة بيانات الموقع الحالية:
@@ -2072,6 +2068,7 @@
             }
         }
 
+        // محرك البحث المحلي الذكي والمضبوط تماماً (يقوم بمطابقة اسم الطبيب أو الكلمة بذكاء)
         function executeLocalSmartSearch(query) {
             const normalize = (str) => (str || "").toLowerCase()
                 .replace(/[إأآاٱ]/g, 'ا')
@@ -2082,66 +2079,37 @@
                 .replace(/[ًٍُِّْء]/g, '')
                 .trim();
 
-            const rawTokens = query.split(/\s+/).map(t => normalize(t)).filter(Boolean);
-            
-            let expandedTokens = [...rawTokens];
-            rawTokens.forEach(token => {
-                for (let key in synonymsData) {
-                    if (normalize(key).includes(token) || token.includes(normalize(key))) {
-                        const vals = synonymsData[key];
-                        const arr = Array.isArray(vals) ? vals : vals.split(/[,،\s]+/);
-                        arr.forEach(syn => {
-                            const normSyn = normalize(syn);
-                            if (!expandedTokens.includes(normSyn)) expandedTokens.push(normSyn);
-                        });
-                    }
-                    if (Array.isArray(synonymsData[key])) {
-                        synonymsData[key].forEach(syn => {
-                            if (normalize(syn).includes(token) || token.includes(normalize(syn))) {
-                                const normKey = normalize(key);
-                                if (!expandedTokens.includes(normKey)) expandedTokens.push(normKey);
-                            }
-                        });
-                    }
-                }
-            });
-
+            const rawQueryClean = normalize(query);
             let matches = [];
 
-            alertsData.forEach(a => {
-                const alertText = normalize(a.content + " " + (a.tags || ""));
-                if (expandedTokens.some(tok => alertText.includes(tok))) {
-                    matches.push({
-                        source: `📌 [المصدر: التنبيهات والإشعارات]`,
-                        text: `<strong>تنبيه:</strong> ${a.content}`
-                    });
-                }
-            });
-
+            // 1. البحث الدقيق في الأطباء (لو السؤال فيه اسم طبيب أو جزء منه)
             doctorsData.forEach(d => {
-                const docText = normalize(d.name + " " + d.specialty + " " + d.nationality + " " + (d.notes || ""));
-                if (expandedTokens.some(tok => docText.includes(tok))) {
+                const docNameNorm = normalize(d.name);
+                const specNorm = normalize(d.specialty);
+                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && (docNameNorm.includes(token) || specNorm.includes(token))) || docNameNorm.includes(rawQueryClean)) {
                     let leaveInfo = d.isLeave ? " ⚠️ (غير متواجد حالياً - في إجازة)" : " (متواجد حسب الجدول)";
                     matches.push({
                         source: `📌 [المصدر: جدول الأطباء]`,
-                        text: `<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}${leaveInfo}\n• فرع معشي: ${(d.mashyDays||[]).join('، ') || 'طوال الأسبوع'}\n• فرع الوسام: ${(d.wissamDays||[]).join('، ') || 'طوال الأسبوع'}`
+                        text: `<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}${leaveInfo}\n• فرع معشي: ${(d.mashyDays||[]).join('، ') || 'طوال الأسبوع'}\n• فرع الوسام: ${(d.wissamDays||[]).join('، ') || 'طوال الأسبوع'}\n• المواعيد: ${d.timing || ''}`
                     });
                 }
             });
 
-            offersData.forEach(o => {
-                const offerText = normalize(o.name + " " + o.category + " " + (o.notes || ""));
-                if (expandedTokens.some(tok => offerText.includes(tok))) {
+            // 2. البحث الدقيق في التنبيهات (لو فيه إجازات أو تنبيهات تخص الدكتور)
+            alertsData.forEach(a => {
+                const alertTextNorm = normalize(a.content);
+                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && alertTextNorm.includes(token))) {
                     matches.push({
-                        source: `📌 [المصدر: العروض والأسعار]`,
-                        text: `<strong>العرض:</strong> ${o.name} - السعر: ${o.price || 'حسب الأجهزة'}`
+                        source: `📌 [المصدر: التنبيهات والإشعارات]`,
+                        text: `<strong>تنبيه هام:</strong> ${a.content}`
                     });
                 }
             });
 
+            // 3. البحث في الاستفسارات والعروض
             inquiriesData.forEach(i => {
-                const inqText = normalize(i.question + " " + i.answer + " " + i.category);
-                if (expandedTokens.some(tok => inqText.includes(tok))) {
+                const qNorm = normalize(i.question);
+                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && qNorm.includes(token))) {
                     matches.push({
                         source: `📌 [المصدر: دليل الاستفسارات]`,
                         text: `<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`
@@ -2149,24 +2117,28 @@
                 }
             });
 
-            coordinatorsData.forEach(c => {
-                const coordText = normalize(c.name + " " + c.rules.join(' '));
-                if (expandedTokens.some(tok => coordText.includes(tok))) {
+            offersData.forEach(o => {
+                const oNorm = normalize(o.name);
+                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && oNorm.includes(token))) {
                     matches.push({
-                        source: `📌 [المصدر: دليل المنسقين]`,
-                        text: `<strong>إرشادات (${c.name}):</strong>\n` + c.rules.map(r => `• ${r}`).join('\n')
+                        source: `📌 [المصدر: العروض والأسعار]`,
+                        text: `<strong>العرض:</strong> ${o.name} - السعر: ${o.price || 'حسب الأجهزة'}`
                     });
                 }
             });
 
             if (matches.length > 0) {
-                let responseOutput = `<div style="margin-bottom:4px; font-size:0.7rem; color:#facc15; font-weight:700;">🔍 نتائج البحث المحلي الذكي:</div>`;
-                matches.slice(0, 3).forEach(m => {
+                // إزالة التكرار إن وجد
+                let uniqueMatches = Array.from(new Set(matches.map(m => m.text)))
+                    .map(text => { return matches.find(m => m.text === text); });
+
+                let responseOutput = `<div style="margin-bottom:4px; font-size:0.7rem; color:#facc15; font-weight:700;">🔍 نتائج البحث المحلي الذكي الدقيق:</div>`;
+                uniqueMatches.slice(0, 3).forEach(m => {
                     responseOutput += `<div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem; border-radius:6px; margin-top:4px;"><span style="font-size:0.65rem; color:var(--primary-color); font-weight:700; display:block; margin-bottom:2px;">${m.source}</span><div style="white-space:pre-line;">${m.text}</div></div>`;
                 });
                 return responseOutput;
             } else {
-                return `<div style="color:#ef4444; font-weight:700; margin-bottom:4px;">⚠️ عذراً يا مصطفى، لم أجد مطابقة لـ "${query}".</div>`;
+                return `<div style="color:#ef4444; font-weight:700; margin-bottom:4px;">⚠️ عذراً يا مصطفى، لم أجد نتائج مطابقة لـ "${query}" في البيانات المسجلة. تأكد من كتابة اسم الدكتور أو الخدمة بدقة.</div>`;
             }
         }
 
