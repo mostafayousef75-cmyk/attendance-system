@@ -168,10 +168,10 @@
         .floating-offers-body { padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
         .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; font-size: 0.74rem; resize: vertical; height: 120px; outline: none; }
 
-        .ai-floating-btn { position: fixed; bottom: 25px; left: 25px; width: 48px; height: 48px; background: #facc15; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); z-index: 10000; border: 2px solid #eab308; transition: transform 0.2s; }
+        .ai-floating-btn { position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: #facc15; color: #1e1b4b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); z-index: 10000; border: 2px solid #eab308; transition: transform 0.2s; }
         .ai-floating-btn:hover { transform: scale(1.08); }
 
-        .ai-floating-chat-window { position: fixed; bottom: 82px; left: 25px; width: 420px; height: 560px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: none; flex-direction: column; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
+        .ai-floating-chat-window { position: fixed; bottom: 75px; left: 20px; width: 380px; height: 450px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: none; flex-direction: column; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; }
         .ai-floating-chat-window.active { display: flex; }
         .ai-messages-box { flex: 1; padding: 0.6rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; }
         .ai-message { max-width: 95%; padding: 0.5rem 0.7rem; border-radius: 8px; font-size: 0.76rem; line-height: 1.4; }
@@ -227,7 +227,8 @@
             <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
-            <li><a class="nav-link" data-tab="synonyms" onclick="switchTab('synonyms', this)"><i class="fa-solid fa-book-bookmark"></i> <span>قاموس المرادفات وقواعد التوجيه</span></a></li>
+            <li><a class="nav-link" data-tab="synonyms" onclick="switchTab('synonyms', this)"><i class="fa-solid fa-book-bookmark"></i> <span>قاموس المرادفات والمصطلحات</span></a></li>
+            <li><a class="nav-link" data-tab="routing" onclick="switchTab('routing', this)"><i class="fa-solid fa-route"></i> <span>قواعد توجيه المسار</span></a></li>
         </ul>
         
         <div class="theme-box">
@@ -509,30 +510,61 @@
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
 
-            <!-- 7. قاموس المرادفات وقواعد التوجيه -->
+            <!-- 7. قاموس المرادفات والمصطلحات -->
             <section id="synonyms-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h2>قاموس المرادفات وقواعد توجيه المسار (لتصحيح أخطاء المساعد)</h2>
-                    <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة مرادف / توجيه مسار</button>
+                    <h2>قاموس المرادفات والمصطلحات (مع تحديد القسم)</h2>
+                    <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة مصطلح / مرادف</button>
                 </div>
                 <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.5rem; border-radius:6px; margin-bottom:0.5rem; font-size:0.74rem; color:var(--primary-color);">
-                    💡 <strong>كيف تربط السؤال بمسار أو رد محدد؟</strong> أضف "السؤال أو الكلمة" في خانة الكلمة الأصلية، واكتب في خانة المرادفات النص أو التوجيه الدقيق الذي تريد أن يظهر للعميل تماماً عند سؤاله.
+                    💡 هنا تربط المصطلح بمعانيه (مثل: تشقير = حواجب، حاف) مع تحديد القسم المناسب في الموقع.
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" placeholder="بحث في القاموس وقواعد التوجيه..." oninput="renderSynonyms(this.value)">
+                    <input type="text" placeholder="بحث في قاموس المصطلحات..." oninput="renderSynonyms(this.value)">
                 </div>
                 <div class="offers-table-box">
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width: 30%;">السؤال أو الكلمة الأصلية</th>
-                                    <th style="width: 50%;">الرد الموجه أو المرادفات</th>
-                                    <th style="width: 20%; text-align:center;">إدارة</th>
+                                    <th style="width: 25%;">الكلمة الأصلية</th>
+                                    <th style="width: 25%;">القسم بالموقع</th>
+                                    <th style="width: 35%;">المرادفات والمعاني</th>
+                                    <th style="width: 15%; text-align:center;">إدارة</th>
                                 </tr>
                             </thead>
                             <tbody id="synonymsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. قواعد توجيه المسار -->
+            <section id="routing-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <h2>قواعد توجيه المسار وربط الأسئلة بالأقسام</h2>
+                    <button class="btn btn-green" onclick="openRoutingModal()"><i class="fa-solid fa-plus"></i> إضافة قاعدة توجيه مسار</button>
+                </div>
+                <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.5rem; border-radius:6px; margin-bottom:0.5rem; font-size:0.74rem; color:var(--primary-color);">
+                    💡 هنا تحدد السؤال أو النمط (مثل: بكم سعر جلسات الليزر) مع اختيار القسم المستهدف والإجابة الموجهة بدقة.
+                </div>
+                <div class="page-local-search">
+                    <i class="fa-solid fa-filter"></i>
+                    <input type="text" placeholder="بحث في قواعد التوجيه..." oninput="renderRouting(this.value)">
+                </div>
+                <div class="offers-table-box">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;">السؤال أو النمط</th>
+                                    <th style="width: 20%;">القسم المستهدف</th>
+                                    <th style="width: 35%;">الإجابة الموجهة</th>
+                                    <th style="width: 15%; text-align:center;">إدارة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="routingTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -562,18 +594,18 @@
         <div style="padding:0.5rem 0.7rem; background:var(--bg-card); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-brain" style="color:#facc15; font-size:1rem;"></i>
-                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد المحلي الذكي (أوفلاين بالكامل)</h4>
+                <h4 style="font-size:0.78rem; color:var(--text-main); font-weight:700;">المساعد المحلي الذكي (أوفلاين)</h4>
             </div>
             <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.9rem;" onclick="toggleFloatingChat()"></i>
         </div>
 
         <div class="ai-messages-box" id="aiMessagesBox">
-            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد المحلي جاهز الآن للبحث الدقيق وربط الأطباء، الإجازات، مناوبات الجمعة، والأسعار بدقة تامة. اسألني أي شئ!</div>
+            <div class="ai-message gemini">أهلاً يا مصطفى! المساعد المحلي جاهز الآن بالإجابات المباشرة والمنسقة بدقة. اسألني أي شئ!</div>
         </div>
 
         <div class="ai-input-box">
             <div class="ai-input-row">
-                <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، إجازة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
+                <input type="text" id="aiUserInput" placeholder="اسأل عن دكتور، سعر عرض، خدمة..." onkeypress="if(event.key === 'Enter') sendSmartAIMessage()">
                 <button class="btn btn-green" style="padding:0.25rem 0.5rem; font-size:0.7rem; background:#facc15; color:#000;" onclick="sendSmartAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -740,7 +772,7 @@
                 <textarea id="alertContent" class="form-control" rows="3"></textarea>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الوسوم (Tags - ضروري لربط التنبيه بالدكتور أو القسم)</label>
+                <label>الوسوم (Tags)</label>
                 <input type="text" id="alertTags" class="form-control" placeholder="أبان، إجازة، عاجل">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
@@ -892,7 +924,7 @@
                 <input type="text" id="offCustomCategory" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>اسم الخدمة / العرض (مهم للبحث عن السعر)</label>
+                <label>اسم الخدمة / العرض</label>
                 <input type="text" id="offName" class="form-control" placeholder="3 جلسات جسم كامل">
             </div>
             
@@ -985,23 +1017,73 @@
         </div>
     </div>
 
-    <!-- مودال قاموس المرادفات وقواعد التوجيه -->
+    <!-- مودال قاموس المرادفات والمصطلحات -->
     <div class="modal-overlay" id="synonymModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="synonymModalTitle">إضافة / تعديل قاعدة توجيه المسار أو مرادف</h3>
+                <h3 id="synonymModalTitle">إضافة / تعديل مصطلح ومرادفات</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('synonymModal')"></i>
             </div>
             <input type="hidden" id="synOriginalKey">
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>السؤال أو الكلمة الأصلية (التي يسألها المستخدم)</label>
-                <input type="text" id="synKey" class="form-control" placeholder="مثال: بكم تنظيف الاسنان">
+                <label>الكلمة أو المصطلح الأصلي</label>
+                <input type="text" id="synKey" class="form-control" placeholder="مثال: تشقير">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الرد الموجه أو المرادفات الدقيقة (أو مسار الإجابة)</label>
-                <textarea id="synValues" class="form-control" rows="3" placeholder="مثال: تنظيف الأسنان بـ 150 ريال شامل الكشفية (راجع قسم العروض والأسعار)"></textarea>
+                <label>القسم في الموقع</label>
+                <select id="synCategorySelect" class="form-control" onchange="checkSynCustomCat(this.value)">
+                    <option value="عروض اسنان">عروض اسنان</option>
+                    <option value="عروض ليزر نساء">عروض ليزر نساء</option>
+                    <option value="عروض ليزر رجال">عروض ليزر رجال</option>
+                    <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
+                    <option value="جدول الأطباء">جدول الأطباء</option>
+                    <option value="أخرى">أخرى (اكتب اسم القسم)</option>
+                </select>
             </div>
-            <button class="btn btn-green" onclick="saveSynonym()">حفظ القاعدة</button>
+            <div id="synCustomCatBox" style="display:none; flex-direction:column; gap:0.3rem;">
+                <label>اسم القسم المخصص</label>
+                <input type="text" id="synCustomCategoryText" class="form-control" placeholder="اسم القسم...">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>المرادفات والمعاني (مفصولة بفاصلة)</label>
+                <textarea id="synValues" class="form-control" rows="3" placeholder="مثال: حواجب، حاف، صبغة"></textarea>
+            </div>
+            <button class="btn btn-green" onclick="saveSynonym()">حفظ المصطلح</button>
+        </div>
+    </div>
+
+    <!-- مودال قواعد توجيه المسار -->
+    <div class="modal-overlay" id="routingModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="routingModalTitle">إضافة / تعديل قاعدة توجيه المسار</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('routingModal')"></i>
+            </div>
+            <input type="hidden" id="routingOriginalKey">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>السؤال أو النمط الافتتاحي</label>
+                <input type="text" id="routingKey" class="form-control" placeholder="مثال: بكم سعر جلسات الليزر">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>القسم المستهدف في الموقع</label>
+                <select id="routingCategorySelect" class="form-control" onchange="checkRoutingCustomCat(this.value)">
+                    <option value="عروض ليزر نساء">عروض ليزر نساء</option>
+                    <option value="عروض ليزر رجال">عروض ليزر رجال</option>
+                    <option value="عروض اسنان">عروض اسنان</option>
+                    <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
+                    <option value="جدول الأطباء">جدول الأطباء</option>
+                    <option value="أخرى">أخرى (اكتب اسم القسم)</option>
+                </select>
+            </div>
+            <div id="routingCustomCatBox" style="display:none; flex-direction:column; gap:0.3rem;">
+                <label>اسم القسم المخصص</label>
+                <input type="text" id="routingCustomCategoryText" class="form-control" placeholder="اسم القسم...">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                <label>الإجابة الموجهة والدقيقة</label>
+                <textarea id="routingAnswer" class="form-control" rows="3" placeholder="مثال: سعر جلسات الليزر يبدأ من 188 ريال مع الرتوش (راجع قسم العروض والاسعار)"></textarea>
+            </div>
+            <button class="btn btn-green" onclick="saveRouting()">حفظ القاعدة</button>
         </div>
     </div>
 
@@ -1035,18 +1117,20 @@
         let offersData = [];
         let inquiriesData = [];
         let synonymsData = {};
+        let routingRulesData = {};
 
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
         const defaultSynonyms = {
-            "تشقير": ["حواجب", "حواف", "رتوش", "صبغة"],
-            "رتوش": ["جلسة", "تكملة", "استكمال"],
-            "بكم": ["سعر", "تكلفة", "كم", "كشفية"],
-            "سعر": ["تكلفة", "بكم", "قيمة", "كشف"],
-            "كشف": ["كشفية", "طبيب", "استشارة"],
-            "إجازة": ["غائب", "مسافر", "غير متواجد", "عطلة"]
+            "تشقير": { category: "عروض ليزر نساء", values: ["حواجب", "حاف", "صبغة"] },
+            "رتوش": { category: "عروض ليزر نساء", values: ["جلسة", "تكملة", "استكمال"] },
+            "بكم": { category: "العروض والأسعار", values: ["سعر", "تكلفة", "كم", "كشفية"] }
+        };
+
+        const defaultRouting = {
+            "بكم سعر جلسات الليزر": { category: "عروض ليزر نساء", answer: "سعر جلسات الليزر يبدأ من 188 ريال مع الرتوش (راجع قسم العروض والاسعار)" }
         };
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1081,11 +1165,19 @@
                     synonymsData = {};
                     if (data.synonymsData) {
                         for (let rawKey in data.synonymsData) {
-                            synonymsData[decodeFirebaseKey(rawKey)] = data.synonymsData[rawKey];
+                            let k = decodeFirebaseKey(rawKey);
+                            let val = data.synonymsData[rawKey];
+                            synonymsData[k] = typeof val === 'object' ? val : { category: "عام", values: Array.isArray(val) ? val : [val] };
                         }
-                    } else {
-                        synonymsData = defaultSynonyms;
-                    }
+                    } else { synonymsData = defaultSynonyms; }
+
+                    routingRulesData = {};
+                    if (data.routingRulesData) {
+                        for (let rawKey in data.routingRulesData) {
+                            let k = decodeFirebaseKey(rawKey);
+                            routingRulesData[k] = data.routingRulesData[rawKey];
+                        }
+                    } else { routingRulesData = defaultRouting; }
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1094,6 +1186,7 @@
                     inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
                     offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
                     synonymsData = defaultSynonyms;
+                    routingRulesData = defaultRouting;
                     syncToCloud();
                 }
 
@@ -1107,6 +1200,7 @@
                 renderInquiriesTabs();
                 renderInquiries();
                 renderSynonyms();
+                renderRouting();
                 updateKPIs();
             });
             
@@ -1131,12 +1225,10 @@
         function toggleFloatingChat() { document.getElementById('aiFloatingChatWindow').classList.toggle('active'); }
 
         function syncToCloud() {
-            let encodedSynonyms = {};
-            if (synonymsData) {
-                for (let k in synonymsData) {
-                    encodedSynonyms[encodeFirebaseKey(k)] = synonymsData[k];
-                }
-            }
+            let encodedSyn = {}, encodedRoute = {};
+            for (let k in synonymsData) { encodedSyn[encodeFirebaseKey(k)] = synonymsData[k]; }
+            for (let k in routingRulesData) { encodedRoute[encodeFirebaseKey(k)] = routingRulesData[k]; }
+
             db.ref('clinicData').set({ 
                 doctorsData, 
                 fridaySchedules, 
@@ -1146,7 +1238,8 @@
                 deptNotesData, 
                 offersData, 
                 inquiriesData, 
-                synonymsData: encodedSynonyms 
+                synonymsData: encodedSyn,
+                routingRulesData: encodedRoute
             });
         }
 
@@ -1206,7 +1299,7 @@
         }
 
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData, routingRulesData }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1226,6 +1319,7 @@
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
                         if (data.synonymsData) synonymsData = data.synonymsData;
+                        if (data.routingRulesData) routingRulesData = data.routingRulesData;
                         syncToCloud(); alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
@@ -1436,8 +1530,7 @@
                     id: Date.now(),
                     content: `⚠️ تنبيه إجازة: الدكتور ${docNameVal} غير متواجد حالياً في العيادة.`,
                     tags: `${docNameVal} إجازة أطباء`,
-                    media: "",
-                    mediaType: "",
+                    media: "", mediaType: "",
                     time: new Date().toLocaleString('en-US')
                 });
             }
@@ -1675,17 +1768,24 @@
             if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
         }
 
+        // --- قاموس المرادفات والمصطلحات ---
+        function checkSynCustomCat(val) {
+            document.getElementById('synCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
+        }
         function renderSynonyms(search = "") {
             const tbody = document.getElementById('synonymsTableBody');
             if(!tbody) return; tbody.innerHTML = "";
             if (!synonymsData) synonymsData = {};
             for (let key in synonymsData) {
-                const vals = Array.isArray(synonymsData[key]) ? synonymsData[key].join('، ') : synonymsData[key];
-                if (!search || key.includes(search) || vals.includes(search)) {
+                let item = synonymsData[key];
+                let cat = typeof item === 'object' ? item.category : "عام";
+                let vals = typeof item === 'object' ? (item.values || []).join('، ') : item;
+                if (!search || key.includes(search) || vals.includes(search) || cat.includes(search)) {
                     const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>${key}</strong></td>
+                            <td><span style="color:var(--primary-color);">${cat}</span></td>
                             <td>${vals}</td>
                             <td style="text-align:center;">
                                 <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonym('${safeKey}')"><i class="fa-solid fa-pen"></i></button>
@@ -1699,35 +1799,124 @@
         function openSynonymModal() {
             document.getElementById('synOriginalKey').value = ""; 
             document.getElementById('synKey').value = ""; 
+            document.getElementById('synCategorySelect').value = "عروض ليزر نساء";
+            document.getElementById('synCustomCategoryText').value = "";
+            document.getElementById('synCustomCatBox').style.display = "none";
             document.getElementById('synValues').value = "";
             document.getElementById('synonymModal').classList.add('active');
         }
         function saveSynonym() {
             const originalKey = document.getElementById('synOriginalKey').value.trim();
             const key = document.getElementById('synKey').value.trim();
+            let cat = document.getElementById('synCategorySelect').value;
+            if (cat === "أخرى") cat = document.getElementById('synCustomCategoryText').value.trim() || "عام";
             const valsStr = document.getElementById('synValues').value.trim();
-            if (!key || !valsStr) return alert("املأ السؤال والرد الموجه!");
+            if (!key || !valsStr) return alert("املأ الكلمة والمعاني!");
             
             if (!synonymsData) synonymsData = {};
-            if (originalKey && originalKey !== key && synonymsData[originalKey]) {
-                delete synonymsData[originalKey];
-            }
-            synonymsData[key] = valsStr;
-            syncToCloud(); 
-            renderSynonyms(); 
-            closeModal('synonymModal');
+            if (originalKey && originalKey !== key && synonymsData[originalKey]) { delete synonymsData[originalKey]; }
+            
+            let valsArr = valsStr.split(/[,،]/).map(v => v.trim()).filter(Boolean);
+            synonymsData[key] = { category: cat, values: valsArr };
+            syncToCloud(); renderSynonyms(); closeModal('synonymModal');
         }
         function editSynonym(key) {
             document.getElementById('synOriginalKey').value = key;
             document.getElementById('synKey').value = key;
-            document.getElementById('synValues').value = Array.isArray(synonymsData[key]) ? synonymsData[key].join(', ') : synonymsData[key];
+            let item = synonymsData[key];
+            let cat = typeof item === 'object' ? item.category : "عام";
+            let vals = typeof item === 'object' ? (item.values || []).join('، ') : item;
+            
+            let catSelect = document.getElementById('synCategorySelect');
+            let foundOption = Array.from(catSelect.options).some(o => o.value === cat);
+            if (foundOption) {
+                catSelect.value = cat;
+                document.getElementById('synCustomCatBox').style.display = "none";
+            } else {
+                catSelect.value = "أخرى";
+                document.getElementById('synCustomCatBox').style.display = "flex";
+                document.getElementById('synCustomCategoryText').value = cat;
+            }
+            document.getElementById('synValues').value = vals;
             document.getElementById('synonymModal').classList.add('active');
         }
         function deleteSynonym(key) {
-            if (confirm(`حذف القاعدة "${key}"؟`)) {
-                delete synonymsData[key];
-                syncToCloud(); renderSynonyms();
+            if (confirm(`حذف المصطلح "${key}"؟`)) { delete synonymsData[key]; syncToCloud(); renderSynonyms(); }
+        }
+
+        // --- قواعد توجيه المسار ---
+        function checkRoutingCustomCat(val) {
+            document.getElementById('routingCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
+        }
+        function renderRouting(search = "") {
+            const tbody = document.getElementById('routingTableBody');
+            if(!tbody) return; tbody.innerHTML = "";
+            if (!routingRulesData) routingRulesData = {};
+            for (let key in routingRulesData) {
+                let item = routingRulesData[key];
+                let cat = item.category || "عام";
+                let ans = item.answer || "";
+                if (!search || key.includes(search) || ans.includes(search) || cat.includes(search)) {
+                    const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${key}</strong></td>
+                            <td><span style="color:var(--primary-color);">${cat}</span></td>
+                            <td>${ans}</td>
+                            <td style="text-align:center;">
+                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editRouting('${safeKey}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteRouting('${safeKey}')"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }
             }
+        }
+        function openRoutingModal() {
+            document.getElementById('routingOriginalKey').value = "";
+            document.getElementById('routingKey').value = "";
+            document.getElementById('routingCategorySelect').value = "عروض ليزر نساء";
+            document.getElementById('routingCustomCategoryText').value = "";
+            document.getElementById('routingCustomCatBox').style.display = "none";
+            document.getElementById('routingAnswer').value = "";
+            document.getElementById('routingModal').classList.add('active');
+        }
+        function saveRouting() {
+            const originalKey = document.getElementById('routingOriginalKey').value.trim();
+            const key = document.getElementById('routingKey').value.trim();
+            let cat = document.getElementById('routingCategorySelect').value;
+            if (cat === "أخرى") cat = document.getElementById('routingCustomCategoryText').value.trim() || "عام";
+            const answer = document.getElementById('routingAnswer').value.trim();
+            if (!key || !answer) return alert("املأ السؤال والإجابة!");
+
+            if (!routingRulesData) routingRulesData = {};
+            if (originalKey && originalKey !== key && routingRulesData[originalKey]) { delete routingRulesData[originalKey]; }
+
+            routingRulesData[key] = { category: cat, answer: answer };
+            syncToCloud(); renderRouting(); closeModal('routingModal');
+        }
+        function editRouting(key) {
+            document.getElementById('routingOriginalKey').value = key;
+            document.getElementById('routingKey').value = key;
+            let item = routingRulesData[key];
+            let cat = item.category || "عام";
+            let ans = item.answer || "";
+
+            let catSelect = document.getElementById('routingCategorySelect');
+            let foundOption = Array.from(catSelect.options).some(o => o.value === cat);
+            if (foundOption) {
+                catSelect.value = cat;
+                document.getElementById('routingCustomCatBox').style.display = "none";
+            } else {
+                catSelect.value = "أخرى";
+                document.getElementById('routingCustomCatBox').style.display = "flex";
+                document.getElementById('routingCustomCategoryText').value = cat;
+            }
+            document.getElementById('routingAnswer').value = ans;
+            document.getElementById('routingModal').classList.add('active');
+        }
+        function deleteRouting(key) {
+            if (confirm(`حذف قاعدة التوجيه "${key}"؟`)) { delete routingRulesData[key]; syncToCloud(); renderRouting(); }
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -1892,7 +2081,7 @@
             navigator.clipboard.writeText(document.getElementById(textElementId).innerText).then(() => alert("📋 تم النسخ للواتساب!"));
         }
 
-        // محرك البحث المحلي الذكي والدقيق 100% (مع ربط الأطباء، الإجازات، مناوبات الجمعة، الأسعار، والمسارات)
+        // محرك البحث المحلي الذكي والدقيق (مع فلترة الأقسام، الذكاء السياقي، وإخفاء أي قواعد عن العميل)
         function sendSmartAIMessage() {
             const inputEl = document.getElementById('aiUserInput'), msgBox = document.getElementById('aiMessagesBox');
             const rawText = inputEl.value.trim(); if (!rawText) return;
@@ -1904,7 +2093,7 @@
             const replyId = 'ai_local_reply_' + Date.now();
             msgBox.innerHTML += `
                 <div class="ai-message gemini">
-                    <div id="${replyId}">${replyHtml}</div>
+                    <div id="${replyId}" style="white-space:pre-line;">${replyHtml}</div>
                     <button class="btn btn-green" style="margin-top:0.4rem; padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copyAIAnswerToWhatsApp('${replyId}')">
                         <i class="fa-solid fa-copy"></i> 📋 نسخ للعميل على الواتساب
                     </button>
@@ -1925,38 +2114,56 @@
 
             const rawQueryClean = normalize(query);
             let matches = [];
+            let targetCategory = null;
 
-            // 0. فحص "قاموس المرادفات وقواعد التوجيه" أولاً للتوجيه المباشر
-            if (synonymsData) {
-                for (let key in synonymsData) {
+            // 1. فحص قواعد توجيه المسار (Routing) للوصول المباشر للقسم والإجابة
+            if (routingRulesData) {
+                for (let key in routingRulesData) {
                     const cleanKey = normalize(key);
                     if (rawQueryClean === cleanKey || rawQueryClean.includes(cleanKey)) {
-                        matches.push({
-                            source: `📌 [توجيه مسار ومصطلحات معتمدة]`,
-                            text: `${synonymsData[key]}`
-                        });
+                        let rule = routingRulesData[key];
+                        targetCategory = rule.category;
+                        matches.push(rule.answer);
                     }
                 }
             }
 
-            // 1. البحث الدقيق في العروض والأسعار (لو السؤال عن سعر أو خدمة)
+            // 2. استخدام قاموس المرادفات لفهم المصطلحات وربطها بالقسم
+            let expandedQueryTokens = rawQueryClean.split(/\s+/);
+            if (synonymsData) {
+                for (let synKey in synonymsData) {
+                    let item = synonymsData[synKey];
+                    let vals = typeof item === 'object' ? item.values : (Array.isArray(item) ? item : [item]);
+                    let cat = typeof item === 'object' ? item.category : "عام";
+                    
+                    if (rawQueryClean.includes(normalize(synKey)) || vals.some(v => rawQueryClean.includes(normalize(v)))) {
+                        targetCategory = cat;
+                        vals.forEach(v => expandedQueryTokens.push(normalize(v)));
+                        expandedQueryTokens.push(normalize(synKey));
+                    }
+                }
+            }
+
+            // 3. البحث في العروض والأسعار (مع فلترة القسم المستهدف إن وجد أو الذكاء السياقي)
             offersData.forEach(o => {
                 const oNameNorm = normalize(o.name);
                 const oCatNorm = normalize(o.category);
                 const oDev1 = normalize(o.device1);
                 const oDev2 = normalize(o.device2);
-                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && (oNameNorm.includes(token) || oCatNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token))) || oNameNorm.includes(rawQueryClean)) {
+
+                let matchScore = 0;
+                if (targetCategory && normalize(o.category).includes(normalize(targetCategory))) matchScore += 2;
+                if (expandedQueryTokens.some(token => token.length > 1 && (oNameNorm.includes(token) || oDev1.includes(token) || oDev2.includes(token)))) matchScore += 3;
+
+                if (matchScore > 0 || oNameNorm.includes(rawQueryClean)) {
                     let devicesText = "";
                     if (o.device1) devicesText += `• ${o.device1}: ${o.price1 || ''}\n`;
                     if (o.device2) devicesText += `• ${o.device2}: ${o.price2 || ''}\n`;
-                    matches.push({
-                        source: `📌 [المصدر: العروض والأسعار - ${o.category}]`,
-                        text: `<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`
-                    });
+                    matches.push(`<strong>الخدمة/العرض:</strong> ${o.name}\n${devicesText}${o.price ? `<strong>السعر العام:</strong> ${o.price}\n` : ''}${o.notes ? `(${o.notes})` : ''}`);
                 }
             });
 
-            // 2. البحث الدقيق في الأطباء (مع حالة التواجد، الإجازة، ومناوبات الجمعة)
+            // 4. البحث في الأطباء
             const currentDay = getArabicDayName();
             const todayDateStr = new Date().toISOString().split('T')[0];
 
@@ -1965,67 +2172,37 @@
                 const specNorm = normalize(d.specialty);
                 const tagsNorm = normalize(d.tags);
 
-                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && (docNameNorm.includes(token) || specNorm.includes(token) || tagsNorm.includes(token))) || docNameNorm.includes(rawQueryClean)) {
-                    
-                    // حالات التواجد والإجازة ومناوبات الجمعة
+                if (expandedQueryTokens.some(token => token.length > 1 && (docNameNorm.includes(token) || specNorm.includes(token) || tagsNorm.includes(token))) || docNameNorm.includes(rawQueryClean)) {
                     let leaveStatus = d.isLeave ? "⚠️ الطبيب غير متواجد حالياً (في إجازة رسمية)." : "✅ الطبيب متاح وعلي رأس العمل.";
-                    
-                    const mashyDays = d.mashyDays || d.days || [];
-                    const wissamDays = d.wissamDays || [];
+                    const mashyDays = d.mashyDays || d.days || [], wissamDays = d.wissamDays || [];
                     let presentTodayText = [];
                     if (!d.isLeave) {
                         if (mashyDays.includes(currentDay)) presentTodayText.push("فرع معشي");
                         if (wissamDays.includes(currentDay)) presentTodayText.push("فرع الوسام");
                     }
                     let todayStatus = presentTodayText.length > 0 ? `متواجد اليوم (${currentDay}) في: ${presentTodayText.join(' و ')}` : `غير متواجد اليوم (${currentDay})`;
-
-                    // فحص مناوبة الجمعة القادمة
                     let fridayDuty = fridaySchedules.filter(f => f.doc.includes(d.name.replace('د. ', '')) && f.date >= todayDateStr);
                     let fridayText = fridayDuty.length > 0 ? `مناوب يوم الجمعة القادمة (${fridayDuty[0].date}) في فرع ${fridayDuty[0].branch}` : `ليس لديه مناوبة جمعة قريبة`;
-
-                    // فحص التنبيهات الخاصة بهذا الطبيب فقط (بناءً على اسمه في التنبيهات)
                     let docAlerts = alertsData.filter(a => normalize(a.content).includes(normalize(d.name)) || normalize(a.tags).includes(normalize(d.name)));
                     let alertLines = docAlerts.map(a => `• ${a.content}`).join('\n');
 
-                    matches.push({
-                        source: `📌 [المصدر: جدول الأطباء والإشعارات]`,
-                        text: `<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}\n• حالة الدوام: ${leaveStatus}\n• التواجد اليومي: ${todayStatus}\n• مناوبة الجمعة: ${fridayText}\n• مواعيد معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}\n• مواعيد الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}\n• الساعات: ${d.timing || ''}${alertLines ? `\n\n🚨 <strong>تنبيهات وإشعارات خاصة بالطبيب:</strong>\n${alertLines}` : ''}`
-                    });
+                    matches.push(`<strong>الطبيب:</strong> ${d.name} ${d.nationality || ''}\n• التخصص: ${d.specialty}\n• الكشفية: ${d.fee || '75 ريال'}\n• حالة الدوام: ${leaveStatus}\n• التواجد اليومي: ${todayStatus}\n• مناوبة الجمعة: ${fridayText}\n• مواعيد معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}\n• مواعيد الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}\n• الساعات: ${d.timing || ''}${alertLines ? `\n\n🚨 <strong>تنبيهات خاصة:</strong>\n${alertLines}` : ''}`);
                 }
             });
 
-            // 3. البحث في الاستفسارات ودليل المنسقين
+            // 5. البحث في الاستفسارات والمنسقين
             inquiriesData.forEach(i => {
                 const qNorm = normalize(i.question);
-                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && qNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
-                    matches.push({
-                        source: `📌 [المصدر: دليل الاستفسارات - ${i.category}]`,
-                        text: `<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`
-                    });
-                }
-            });
-
-            coordinatorsData.forEach(c => {
-                const cNameNorm = normalize(c.name);
-                if (rawQueryClean.split(/\s+/).some(token => token.length > 1 && cNameNorm.includes(token))) {
-                    matches.push({
-                        source: `📌 [المصدر: دليل المنسقين وقوانين التسليم]`,
-                        text: `<strong>تعليمات ${c.name}:</strong>\n` + c.rules.map(r => `• ${r}`).join('\n')
-                    });
+                if (expandedQueryTokens.some(token => token.length > 1 && qNorm.includes(token)) || qNorm.includes(rawQueryClean)) {
+                    matches.push(`<strong>سؤال:</strong> ${i.question}\n<strong>الإجابة:</strong> ${i.answer}`);
                 }
             });
 
             if (matches.length > 0) {
-                let uniqueMatches = Array.from(new Set(matches.map(m => m.text)))
-                    .map(text => { return matches.find(m => m.text === text); });
-
-                let responseOutput = `<div style="margin-bottom:4px; font-size:0.7rem; color:#facc15; font-weight:700;">🔍 نتائج المساعد المحلي الذكي الدقيق:</div>`;
-                uniqueMatches.slice(0, 3).forEach(m => {
-                    responseOutput += `<div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem; border-radius:6px; margin-top:4px;"><span style="font-size:0.65rem; color:var(--primary-color); font-weight:700; display:block; margin-bottom:2px;">${m.source}</span><div style="white-space:pre-line;">${m.text}</div></div>`;
-                });
-                return responseOutput;
+                let uniqueMatches = Array.from(new Set(matches));
+                return uniqueMatches.slice(0, 3).join('\n\n-------------------\n\n');
             } else {
-                return `<div style="color:#ef4444; font-weight:700; margin-bottom:4px;">⚠️ عذراً يا مصطفى، لم أجد مطابقة دقيقة لـ "${query}". تأكد من كتابة اسم الطبيب أو الخدمة أو أضف قاعدة توجيه مسار جديدة من قسم "قاموس المرادفات وقواعد التوجيه".</div>`;
+                return `عذراً يا مصطفى، لم أجد إجابة دقيقة لهذا السؤال. أرجو إضافة قاعدة توجيه مسار أو مصطلح جديد من القائمة الجانبية لكي أفهمها فوراً.`;
             }
         }
 
