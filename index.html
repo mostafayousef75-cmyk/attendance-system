@@ -264,7 +264,7 @@
 
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام (بالترتيب الذكي المخصص)</h2>
+                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام (الدقيقة والمطابقة)</h2>
                     <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
                 </div>
                 <div id="globalSearchResultsList"></div>
@@ -443,7 +443,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
-            <!-- 5. العروض والأسعار (تمت إضافة تبويب "كل العروض والأسعار") -->
+            <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -488,7 +488,7 @@
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
 
-            <!-- 7. قاموس المرادفات والمصطلحات المتقدم والأقسام -->
+            <!-- 7. قاموس المرادفات والمصطلحات المتقدم -->
             <section id="synonyms-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
                     <h2>قاموس المرادفات والمصطلحات والحروف والجمل الذكي</h2>
@@ -959,7 +959,7 @@
         </div>
     </div>
 
-    <!-- مودال إضافة/تعديل عنصر في قاموس المرادفات (حسب التبويب النشط) -->
+    <!-- مودال إضافة/تعديل عنصر في قاموس المرادفات -->
     <div class="modal-overlay" id="synonymModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -987,7 +987,7 @@
         </div>
     </div>
 
-    <!-- مودال إدارة أقسام القاموس (إضافة وحذف وتعديل الأقسام) -->
+    <!-- مودال إدارة أقسام القاموس -->
     <div class="modal-overlay" id="categoryManageModal">
         <div class="modal" style="max-width: 450px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1039,8 +1039,7 @@
         
         let synonymsData = {
             words: {
-                "هيليوس": { category: "عروض ليزر نساء", values: ["الهيليوس", "جهاز هيليوس", "ليزر هيليوس"] },
-                "تشقير": { category: "عروض ليزر نساء", values: ["حواجب", "حاف", "صبغة"] }
+                "سامى": { category: "جدول الأطباء", values: ["الدكتور سامى", "د سامى", "دكتور سامى"] }
             },
             letters: {
                 "ه": { category: "الحروف", values: ["ة", "هـ"] }
@@ -1053,7 +1052,7 @@
         let synonymCategories = ["عروض اسنان", "عروض ليزر نساء", "عروض ليزر رجال", "عروض الجلديه والتجميل", "جدول الأطباء", "الجمل والاستفسارات", "الحروف", "عام"];
 
         let activeSynonymTab = "words";
-        let selectedOfferTab = "⭐ كل العروض والأسعار"; // التبويب الافتراضي الشامل لكل الأسعار
+        let selectedOfferTab = "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
@@ -1744,7 +1743,7 @@
             if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
         }
 
-        // --- قاموس المرادفات والمصطلحات والحروف والجمل الذكي والمستقل تماماً ---
+        // --- قاموس المرادفات والمصطلحات والحروف والجمل الذكي والمستقل ---
         function switchSynonymTab(tabType, btnEl) {
             activeSynonymTab = tabType;
             document.querySelectorAll('#synonymTypeTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1930,7 +1929,6 @@
             const container = document.getElementById('offersTabsContainer'); if(!container) return; container.innerHTML = "";
             const cats = [...new Set(offersData.map(o => o.category))];
             
-            // إضافة تبويب رئيسي يجمع كل العروض والأسعار معاً دفعة واحدة
             let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار</button>`;
             cats.forEach(cat => { 
                 tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; 
@@ -2028,7 +2026,6 @@
             document.getElementById('offPrice').value = ""; document.getElementById('offNotes').value = "";
             document.getElementById('offIsPinned').checked = false; 
             
-            // لو التبويب الحالي ليس التبويب الشامل، اجعل القسم الافتراضي هو التبويب النشط الحالي
             if (selectedOfferTab && selectedOfferTab !== '⭐ كل العروض والأسعار') {
                 document.getElementById('offCategory').value = selectedOfferTab;
             } else {
@@ -2066,7 +2063,6 @@
             document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offIsPinned').checked = !!item.isPinned;
             
-            // حل المشكلة: تثبيت القسم الأصلي للعرض عند التعديل وعدم تغييره لأسنان
             const categorySelect = document.getElementById('offCategory');
             const customCatBox = document.getElementById('customCategoryBox');
             let catExists = Array.from(categorySelect.options).some(opt => opt.value === item.category);
@@ -2128,7 +2124,7 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        // --- البحث الشامل الذكي المتقدم (مع دعم الجمل المضافة بدقة وترتيب النتائج المطلوب) ---
+        // --- البحث الشامل الذكي المتقدم الدقيق والمطابق تماماً ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const normQ = normalizeArabicText(rawQ);
@@ -2146,29 +2142,30 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            // تجميع كلمات البحث موسعة من القاموس (كلمات + حروف + جمل)
-            let searchTokens = [normQ];
+            let searchWords = normQ.split(/\s+/).filter(Boolean);
             
-            ['words', 'letters', 'sentences'].forEach(subType => {
+            // إضافة المرادفات والجمل من القاموس لو الكلمة مطابقة أو مرتبطة
+            let activeTokens = [normQ, ...searchWords];
+            ['words', 'sentences'].forEach(subType => {
                 let dataset = synonymsData[subType] || {};
                 for (let k in dataset) {
                     let item = dataset[k];
                     let normKey = normalizeArabicText(k);
                     let vals = Array.isArray(item.values) ? item.values.map(v => normalizeArabicText(v)) : [];
                     
-                    if (normKey.includes(normQ) || normQ.includes(normKey) || vals.some(v => v.includes(normQ) || normQ.includes(v))) {
-                        searchTokens.push(normKey);
-                        vals.forEach(v => searchTokens.push(v));
-                        searchTokens.push(k);
-                        item.values.forEach(v => searchTokens.push(v));
+                    if (normKey === normQ || vals.some(v => v === normQ || normQ.includes(v) || v.includes(normQ))) {
+                        activeTokens.push(normKey);
+                        vals.forEach(v => activeTokens.push(v));
+                        activeTokens.push(k);
+                        item.values.forEach(v => activeTokens.push(v));
                     }
                 }
             });
 
-            // تطبيع الحروف التلقائي (مثل ه = ة) من قسم الحروف بالقاموس
+            // معالجة الحروف (ه = ة)
             let letterMap = synonymsData.letters || {};
             let expandedTokens = [];
-            searchTokens.forEach(token => {
+            activeTokens.forEach(token => {
                 let t = token;
                 for (let lKey in letterMap) {
                     let lItem = letterMap[lKey];
@@ -2183,27 +2180,28 @@
                 }
                 expandedTokens.push(t);
             });
-            searchTokens = [...new Set([...searchTokens, ...expandedTokens])];
-
-            rawQ.split(/\s+/).forEach(word => {
-                let nw = normalizeArabicText(word);
-                if (nw.length > 0 && !searchTokens.includes(nw)) searchTokens.push(nw);
-            });
+            activeTokens = [...new Set([...activeTokens, ...expandedTokens])];
 
             let allMatchedResults = [];
-            const isMatch = (text) => {
+            
+            // دالة مطابقة دقيقة تمنع ظهور نتائج عشوائية مالهاش علاقة
+            const isStrictMatch = (text) => {
                 if (!text) return false;
                 let t = normalizeArabicText(text);
-                return searchTokens.some(token => t.includes(token));
+                return activeTokens.some(token => {
+                    if (token.length <= 2) {
+                        return t === token || t.split(/\s+/).includes(token);
+                    }
+                    return t.includes(token);
+                });
             };
 
-            // تحديد نوع الاستعلام لتطبيق الترتيب الذكي الثابت المطلوب
-            let isQueryForDoctor = searchTokens.some(token => doctorsData.some(d => normalizeArabicText(d.name).includes(token) || normalizeArabicText(d.specialty).includes(token)));
-            let isQueryForOffers = searchTokens.some(token => offersData.some(o => normalizeArabicText(o.name).includes(token) || normalizeArabicText(o.category).includes(token) || normalizeArabicText(o.price).includes(token)) || token.includes('سعر') || token.includes('ريال') || token.includes('عرض') || token.includes('شعر'));
+            let isQueryForDoctor = activeTokens.some(token => doctorsData.some(d => normalizeArabicText(d.name).includes(token) || normalizeArabicText(d.specialty).includes(token)));
+            let isQueryForOffers = activeTokens.some(token => offersData.some(o => normalizeArabicText(o.name).includes(token) || normalizeArabicText(o.category).includes(token)) || token.includes('سعر') || token.includes('ريال') || token.includes('عرض'));
 
             // 1. الأطباء
             doctorsData.forEach(d => {
-                if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes) || isMatch(d.nationality)) {
+                if (isStrictMatch(d.name) || isStrictMatch(d.specialty) || isStrictMatch(d.tags) || isStrictMatch(d.notes) || isStrictMatch(d.nationality)) {
                     allMatchedResults.push({
                         timeId: d.id || 0, source: "الأطباء",
                         title: `${d.name} (${d.specialty})`,
@@ -2215,36 +2213,38 @@
                 }
             });
 
-            // 2. العروض
-            offersData.forEach(o => {
-                if (isMatch(o.name) || isMatch(o.category) || isMatch(o.device1) || isMatch(o.device2) || isMatch(o.notes) || isMatch(o.tags) || isMatch(o.price)) {
-                    allMatchedResults.push({
-                        timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
-                        title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
-                        subtitle: o.notes || '',
-                        action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
-                        categoryType: 'offer',
-                        priority: isQueryForOffers ? 1 : 2
-                    });
-                }
-            });
+            // 2. العروض (فقط لو البحث يخصها أو يطابق اسمها بدقة)
+            if (!isQueryForDoctor || normQ.includes('عرض') || normQ.includes('سعر') || normQ.includes('جلسه') || normQ.includes('جسم')) {
+                offersData.forEach(o => {
+                    if (isStrictMatch(o.name) || isStrictMatch(o.category) || isStrictMatch(o.device1) || isStrictMatch(o.device2) || isStrictMatch(o.notes) || isStrictMatch(o.tags)) {
+                        allMatchedResults.push({
+                            timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
+                            title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
+                            subtitle: o.notes || '',
+                            action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
+                            categoryType: 'offer',
+                            priority: isQueryForOffers ? 1 : 2
+                        });
+                    }
+                });
+            }
 
             // 3. التنبيهات
             alertsData.forEach(a => {
-                if (isMatch(a.content) || isMatch(a.tags)) {
+                if (isStrictMatch(a.content) || isStrictMatch(a.tags)) {
                     allMatchedResults.push({
                         timeId: a.id || 0, source: "التنبيهات والإشعارات",
                         title: a.content, subtitle: a.time,
                         action: `jumpToAlertsTab(${a.id})`,
                         categoryType: 'alert',
-                        priority: isQueryForDoctor ? 2 : 1 // التنبيهات تأتي أولاً في البحث العام أو بعد الأطباء لو بحث عن طبيب
+                        priority: 1
                     });
                 }
             });
 
             // 4. الاستفسارات
             inquiriesData.forEach(i => {
-                if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags) || isMatch(i.category)) {
+                if (isStrictMatch(i.question) || isStrictMatch(i.answer) || isStrictMatch(i.tags) || isStrictMatch(i.category)) {
                     allMatchedResults.push({
                         timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
                         title: i.question, subtitle: i.answer,
@@ -2257,7 +2257,7 @@
 
             // 5. الخدمات والأجهزة
             deptServicesData.forEach(s => {
-                if (isMatch(s.name) || isMatch(s.tags) || isMatch(s.branch) || isMatch(s.type)) {
+                if (isStrictMatch(s.name) || isStrictMatch(s.tags) || isStrictMatch(s.branch)) {
                     allMatchedResults.push({
                         timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
                         title: s.name, subtitle: `القسم: ${s.type}`,
@@ -2270,7 +2270,7 @@
 
             // 6. الملاحظات الداخلية
             deptNotesData.forEach((n, idx) => {
-                if (isMatch(n.text) || isMatch(n.tags)) {
+                if (isStrictMatch(n.text) || isStrictMatch(n.tags)) {
                     allMatchedResults.push({
                         timeId: idx, source: "الملاحظات الداخلية",
                         title: n.text, subtitle: `ملحوظة #${idx + 1}`,
@@ -2284,7 +2284,7 @@
             // 7. دليل المنسقين
             coordinatorsData.forEach(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
-                if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
+                if (isStrictMatch(c.name) || isStrictMatch(rulesText) || isStrictMatch(c.tags)) {
                     allMatchedResults.push({
                         timeId: c.id || 0, source: "دليل المنسقين",
                         title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
@@ -2295,21 +2295,19 @@
                 }
             });
 
-            // إزالة التكرار وتطبيق الترتيب الذكي المطلوب
             let uniqueMap = new Map();
             allMatchedResults.forEach(item => {
                 uniqueMap.set(item.source + "_" + item.title, item);
             });
             let finalResults = Array.from(uniqueMap.values());
 
-            // ترتيب النتائج حسب الأولوية المطلوبة ثم الأحدث
             finalResults.sort((a, b) => {
                 if (a.priority !== b.priority) return a.priority - b.priority;
                 return b.timeId - a.timeId;
             });
 
             if (finalResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في أي قسم من الأقسام. جرب البحث بجملة أخرى أو أضفها في قاموس المرادفات والجمل.</div>`;
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}". تأكد من إضافة الكلمة في القاموس أو كتابة الاسم الصحيح.</div>`;
                 return;
             }
 
