@@ -3,7 +3,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لوحة الكول سنتر والمنسقين - البحث الشامل المتعدد</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,7 +67,7 @@
         .cloud-indicator { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(22, 163, 74, 0.2); border: 1px solid var(--accent-green); color: #4ade80; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
         .cloud-dot { width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
 
-        .kpi-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .kpi-bar { display: flex; gap: 0.4rem; }
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.3rem; }
         .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.8rem; }
 
@@ -175,30 +175,32 @@
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.2rem; font-size: 0.75rem; cursor: pointer; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
 
+        /* تكييف شاشات الهواتف مع المحافظة على التنسيق كاملاً */
         @media (max-width: 768px) {
-            html, body { flex-direction: column; height: auto; overflow-x: hidden; overflow-y: auto; }
-            .sidebar { width: 100% !important; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); padding: 0.5rem; }
-            .sidebar.collapsed { width: 100% !important; padding: 0.5rem; }
+            html, body { flex-direction: column; height: 100vh; overflow: hidden; }
+            .sidebar { width: 100% !important; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); padding: 0.4rem 0.6rem; flex-shrink: 0; }
+            .sidebar.collapsed { width: 100% !important; padding: 0.4rem 0.6rem; }
             .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: flex !important; }
             .sidebar.collapsed .theme-box label { display: block !important; }
-            .sidebar.collapsed .nav-link { justify-content: flex-start; padding: 0.45rem 0.7rem; }
-            .nav-links { flex-direction: row; flex-wrap: wrap; overflow-x: auto; max-height: 120px; gap: 0.3rem; }
-            .nav-link { font-size: 0.72rem; padding: 0.3rem 0.5rem; }
+            .sidebar.collapsed .nav-link { justify-content: flex-start; padding: 0.4rem 0.6rem; }
+            .nav-links { flex-direction: row; overflow-x: auto; white-space: nowrap; max-height: unset; gap: 0.3rem; padding-bottom: 0.2rem; -webkit-overflow-scrolling: touch; }
+            .nav-link { font-size: 0.74rem; padding: 0.35rem 0.6rem; flex-shrink: 0; }
             .brand-title .fa-angles-right { display: none; }
-            .main-wrapper { height: auto; overflow: visible; }
+            .theme-box, .json-tools { display: none !important; }
+            .main-wrapper { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+            .top-header { padding: 0.4rem 0.6rem; gap: 0.3rem; flex-shrink: 0; }
+            .search-container { max-width: 100%; width: 100%; }
+            .search-container input { font-size: 0.8rem; padding: 0.35rem 2rem 0.35rem 0.6rem; }
+            .kpi-bar { font-size: 0.68rem; gap: 0.2rem; }
+            .kpi-card { padding: 0.15rem 0.35rem; font-size: 0.68rem; }
+            .professional-ticker-bar { padding: 0.3rem 0.6rem; gap: 0.4rem; }
+            .ticker-yellow-ruler { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
             .split-grid { grid-template-columns: 1fr; }
             .alerts-2col-grid { grid-template-columns: 1fr; }
-            .top-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-            .search-container { max-width: 100%; width: 100%; }
-            .kpi-bar { justify-content: space-between; width: 100%; }
-            .kpi-card { flex: 1; justify-content: center; }
-            .professional-ticker-bar { flex-direction: column; align-items: stretch; gap: 0.4rem; }
-            .ticker-wrapper-outer { width: 100%; }
             .floating-offers-window { width: calc(100vw - 20px); right: 10px; bottom: 10px; }
             .depts-grid-responsive { grid-template-columns: 1fr !important; }
-            table { min-width: 480px; }
-            .search-result-card { flex-direction: column; align-items: flex-start; }
-            .search-result-card > div:last-child { width: 100%; justify-content: flex-end; margin-top: 0.4rem; }
+            table { min-width: 580px; }
+            .content-area { padding: 0.4rem; overflow-y: auto; flex: 1; }
         }
     </style>
 </head>
@@ -327,13 +329,13 @@
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center; flex-wrap:wrap;">
                     <div class="page-local-search" style="flex:1; min-width:180px; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
+                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="debouncedRenderDoctors()">
                     </div>
                     <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ وضع تعديل الأعمدة
                     </button>
                     <button class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.5rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
-                    <div style="width: 180px; min-width: 140px;">
+                    <div style="width: 180px; min-width:140px;">
                         <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
                             <option value="">جميع التخصصات</option>
                         </select>
@@ -395,7 +397,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="alertSearchInput" placeholder="بحث في التنبيهات..." oninput="renderAlerts()">
+                    <input type="text" id="alertSearchInput" placeholder="بحث في التنبيهات..." oninput="debouncedRenderAlerts()">
                 </div>
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
@@ -411,7 +413,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs()">
+                    <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام..." oninput="debouncedRenderDeptsAndDocs()">
                 </div>
                 <div class="depts-grid-responsive" style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
                     <div style="display:flex; flex-direction:column; gap:0.6rem;">
@@ -471,7 +473,7 @@
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين..." oninput="renderCoordinators()">
+                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين..." oninput="debouncedRenderCoordinators()">
                 </div>
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
@@ -485,7 +487,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار (يشمل البحث العام لكل الأقسام)..." oninput="renderOffers()">
+                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار (يشمل البحث العام لكل الأقسام)..." oninput="debouncedRenderOffers()">
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -516,7 +518,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="inquirySearchInput" placeholder="بحث في الاستفسارات..." oninput="renderInquiries()">
+                    <input type="text" id="inquirySearchInput" placeholder="بحث في الاستفسارات..." oninput="debouncedRenderInquiries()">
                 </div>
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
@@ -537,7 +539,7 @@
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center; flex-wrap:wrap;">
                     <div style="flex:1; min-width:200px;" class="page-local-search" style="margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="synonymSearchInput" placeholder="بحث داخل القاموس..." oninput="renderSynonyms()">
+                        <input type="text" id="synonymSearchInput" placeholder="بحث داخل القاموس..." oninput="debouncedRenderSynonyms()">
                     </div>
                     <div style="width: 220px; min-width:160px;" id="synCategoryFilterWrapper">
                         <select id="synonymCategoryFilter" class="form-control" onchange="renderSynonyms()">
@@ -1089,6 +1091,23 @@
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
+        // تحسين الأداء: Debounce للبحث وسرعة الموقع
+        function debounce(func, wait = 250) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        const debouncedRenderDoctors = debounce(() => renderDoctors());
+        const debouncedRenderAlerts = debounce(() => renderAlerts());
+        const debouncedRenderDeptsAndDocs = debounce(() => renderDeptsAndDocs());
+        const debouncedRenderCoordinators = debounce(() => renderCoordinators());
+        const debouncedRenderOffers = debounce(() => renderOffers());
+        const debouncedRenderInquiries = debounce(() => renderInquiries());
+        const debouncedRenderSynonyms = debounce(() => renderSynonyms());
+
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
@@ -1387,7 +1406,8 @@
 
             const mashyBody = document.getElementById('mashyTableBody'), wissamBody = document.getElementById('wissamTableBody');
             if(!mashyBody || !wissamBody) return;
-            mashyBody.innerHTML = ""; wissamBody.innerHTML = "";
+            
+            let mashyHTML = "", wissamHTML = "";
             let countM = 0, countW = 0;
 
             const todayStr = new Date().toISOString().split('T')[0];
@@ -1424,14 +1444,14 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
-                mashyBody.innerHTML += `
+                mashyHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})">
                         <td><span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.7rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.65rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
                         <td><div style="font-size:0.68rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:4px; align-items:center;"><button class="btn btn-green" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:4px; align-items:center;"><button class="btn btn-green" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.1rem; width:26px; height:26px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countM++;
             });
@@ -1445,7 +1465,7 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
-                wissamBody.innerHTML += `
+                wissamHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})">
                         <td><span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
@@ -1457,6 +1477,8 @@
                 countW++;
             });
 
+            mashyBody.innerHTML = mashyHTML;
+            wissamBody.innerHTML = wissamHTML;
             document.getElementById('countMashy').innerText = `${countM} أطباء`;
             document.getElementById('countWissam').innerText = `${countW} أطباء`;
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد';
@@ -1564,7 +1586,7 @@
             const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
-            grid.innerHTML = ""; tickerTrack.innerHTML = "";
+            
             const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
             let alertCardsHtml = "";
             sortedAlerts.forEach(item => {
@@ -1572,6 +1594,7 @@
             });
             tickerTrack.innerHTML = alertCardsHtml;
 
+            let gridHTML = "";
             sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
@@ -1579,13 +1602,14 @@
                     else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                 }
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
-                grid.innerHTML += `
+                gridHTML += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
                         <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span>${getTagsTooltipHtml(item.tags)}</div>
                         ${mediaHtml}
                         <div style="display:flex; flex-direction:column; gap:0.2rem;"><button class="btn btn-blue" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editAlert(${item.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button></div>
                     </div>`;
             });
+            grid.innerHTML = gridHTML;
             updateKPIs();
         }
 
@@ -1670,7 +1694,8 @@
             const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
             if(bodies.some(b => !b)) return;
-            bodies.forEach(b => b.innerHTML = "");
+            
+            let htmlBuffers = ["", "", "", ""];
 
             deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
@@ -1678,19 +1703,23 @@
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
                 const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge} ${getTagsTooltipHtml(item.tags)}</td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.1rem 0.2rem; font-size:0.6rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.2rem; font-size:0.6rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                 if (item.branch === "معشي") {
-                    if (item.type === "derm") bodies[0].innerHTML += rowHtml; else bodies[1].innerHTML += rowHtml;
+                    if (item.type === "derm") htmlBuffers[0] += rowHtml; else htmlBuffers[1] += rowHtml;
                 } else {
-                    if (item.type === "derm") bodies[2].innerHTML += rowHtml; else bodies[3].innerHTML += rowHtml;
+                    if (item.type === "derm") htmlBuffers[2] += rowHtml; else htmlBuffers[3] += rowHtml;
                 }
             });
 
+            bodies.forEach((b, idx) => b.innerHTML = htmlBuffers[idx]);
+
             const notesContainer = document.getElementById('deptNotesContainer');
-            if(!notesContainer) return; notesContainer.innerHTML = "";
+            if(!notesContainer) return; 
+            let notesHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
-                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
+                    notesHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
                 }
             });
+            notesContainer.innerHTML = notesHTML;
         }
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = ""; document.getElementById('deptBranchSelect').value = "معشي";
@@ -1751,15 +1780,17 @@
         let draggedCoordIdx = null;
         function renderCoordinators(highlightId = null) {
             const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
+            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; 
             
+            let gridHTML = "";
             coordinatorsData.filter(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
                 return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
             }).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
+                gridHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
             });
+            grid.innerHTML = gridHTML;
         }
         function openCoordinatorModal() {
             document.getElementById('coordId').value = ""; document.getElementById('coordName').value = "";
@@ -1812,7 +1843,7 @@
             const searchInput = document.getElementById('synonymSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const catFilter = document.getElementById('synonymCategoryFilter').value;
             const tbody = document.getElementById('synonymsTableBody');
-            if(!tbody) return; tbody.innerHTML = "";
+            if(!tbody) return;
 
             if (!synonymsData) synonymsData = { words: {}, letters: {}, sentences: {} };
             let currentDataset = synonymsData[activeSynonymTab] || {};
@@ -1827,6 +1858,7 @@
                 filterSelect.innerHTML = `<option value="">📁 تصفية حسب القسم (الكل)</option>` + synonymCategories.map(c => `<option value="${c}" ${c === currentFilterVal ? 'selected' : ''}>${c}</option>`).join('');
             }
 
+            let tbodyHTML = "";
             for (let key in currentDataset) {
                 let item = currentDataset[key];
                 let cat = (typeof item === 'object' && item !== null) ? (item.category || "عام") : "عام";
@@ -1838,9 +1870,9 @@
 
                 if (matchCat && matchSearch) {
                     const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                    let categoryDisplay = (activeSynonymTab === 'words') ? `<span style="color:var(--primary-color);">${cat}</span>` : `<span style="color:#38bdf8;">${activeSynonymTab === 'letters' ? 'معالجة الحروف' : 'الجمل والاستفسارات'}</span>`;
+                    let categoryDisplay = (activeSynonymTab === 'words') ? `<span style="color:var(--primary-color);">${cat}</span>` : `<span style="color:#38bdf8;">${activeSynonymTab === 'letters' ? 'معالجة الحروف' : 'الجمل واستفسارات'}</span>`;
                     
-                    tbody.innerHTML += `
+                    tbodyHTML += `
                         <tr>
                             <td><strong>${key}</strong></td>
                             <td>${categoryDisplay}</td>
@@ -1853,6 +1885,7 @@
                     `;
                 }
             }
+            tbody.innerHTML = tbodyHTML;
         }
 
         function openSynonymModal() {
@@ -1931,9 +1964,10 @@
 
         function renderCategoryManageTable() {
             const tbody = document.getElementById('categoryManageTableBody');
-            if(!tbody) return; tbody.innerHTML = "";
+            if(!tbody) return; 
+            let tbodyHTML = "";
             synonymCategories.forEach((cat, idx) => {
-                tbody.innerHTML += `
+                tbodyHTML += `
                     <tr>
                         <td><strong>${cat}</strong></td>
                         <td style="text-align:center;">
@@ -1942,6 +1976,7 @@
                     </tr>
                 `;
             });
+            tbody.innerHTML = tbodyHTML;
         }
 
         function addNewSynonymCategory() {
@@ -1965,7 +2000,7 @@
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
         
         function renderOffersTabs() {
-            const container = document.getElementById('offersTabsContainer'); if(!container) return; container.innerHTML = "";
+            const container = document.getElementById('offersTabsContainer'); if(!container) return;
             const cats = [...new Set(offersData.map(o => o.category))];
             
             let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار</button>`;
@@ -2144,10 +2179,13 @@
         let draggedInquiryIdx = null;
         function renderInquiries(highlightId = null) {
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
+            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; 
+            
+            let gridHTML = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-green" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+                gridHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-green" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
+            grid.innerHTML = gridHTML;
         }
         function openInquiryModal() {
             document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
@@ -2180,9 +2218,11 @@
             triggerGlobalSearchFromInput();
         }
 
+        const debouncedGlobalSearch = debounce((query) => handleTrueGlobalSearch(query), 200);
+
         function triggerGlobalSearchFromInput() {
             const query = document.getElementById('globalSearchInput').value;
-            handleTrueGlobalSearch(query);
+            debouncedGlobalSearch(query);
         }
 
         // --- البحث الشامل المتطور جداً مع دعم تحديد أقسام متعددة والترتيب المطلوب ---
@@ -2370,8 +2410,9 @@
                 return;
             }
 
+            let resultsHTML = "";
             finalResults.forEach(res => {
-                resultsList.innerHTML += `
+                resultsHTML += `
                     <div class="search-result-card">
                         <div>
                             <span class="source-badge">${res.source}</span>
@@ -2384,6 +2425,7 @@
                         </div>
                     </div>`;
             });
+            resultsList.innerHTML = resultsHTML;
         }
 
         function clearGlobalSearch() {
