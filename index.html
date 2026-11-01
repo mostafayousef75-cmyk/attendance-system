@@ -264,7 +264,7 @@
 
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام (الأحدث أولاً)</h2>
+                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام (بالترتيب الذكي المخصص)</h2>
                     <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
                 </div>
                 <div id="globalSearchResultsList"></div>
@@ -443,7 +443,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid"></div>
             </section>
 
-            <!-- 5. العروض والأسعار -->
+            <!-- 5. العروض والأسعار (تمت إضافة تبويب "كل العروض والأسعار") -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -452,7 +452,7 @@
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار..." oninput="renderOffers()">
+                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار (يشمل البحث العام لكل الأقسام)..." oninput="renderOffers()">
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -495,14 +495,12 @@
                     <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة للقاموس</button>
                 </div>
 
-                <!-- تبويبات قاموس المرادفات الثلاثة (المرادفات - الحروف - الجمل) -->
                 <div class="offers-tabs" id="synonymTypeTabs">
                     <button class="offer-tab-btn active" onclick="switchSynonymTab('words', this)"><i class="fa-solid fa-book"></i> المصطلحات والمرادفات</button>
                     <button class="offer-tab-btn" onclick="switchSynonymTab('letters', this)"><i class="fa-solid fa-font"></i> الحروف (ه = ة)</button>
                     <button class="offer-tab-btn" onclick="switchSynonymTab('sentences', this)"><i class="fa-solid fa-comment-dots"></i> الجمل والاستفسارات</button>
                 </div>
 
-                <!-- شريط البحث والفلترة حسب قسم المرادفات -->
                 <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center; flex-wrap:wrap;">
                     <div style="flex:1; min-width:200px;" class="page-local-search" style="margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
@@ -1039,7 +1037,6 @@
         let offersData = [];
         let inquiriesData = [];
         
-        // هيكل القاموس المطور
         let synonymsData = {
             words: {
                 "هيليوس": { category: "عروض ليزر نساء", values: ["الهيليوس", "جهاز هيليوس", "ليزر هيليوس"] },
@@ -1053,11 +1050,10 @@
             }
         };
 
-        // أقسام قاموس المرادفات القابلة للتخصيص والحذف والإضافة
         let synonymCategories = ["عروض اسنان", "عروض ليزر نساء", "عروض ليزر رجال", "عروض الجلديه والتجميل", "جدول الأطباء", "الجمل والاستفسارات", "الحروف", "عام"];
 
-        let activeSynonymTab = "words"; // تبويب القاموس النشط حالياً (words, letters, sentences)
-        let selectedOfferTab = "عروض اسنان";
+        let activeSynonymTab = "words";
+        let selectedOfferTab = "⭐ كل العروض والأسعار"; // التبويب الافتراضي الشامل لكل الأسعار
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
@@ -1105,7 +1101,6 @@
                     
                     if (data.synonymCategories) synonymCategories = data.synonymCategories;
 
-                    // معالجة بنية القاموس الجديد والمستقل
                     if (data.synonymsData) {
                         if (data.synonymsData.words || data.synonymsData.letters || data.synonymsData.sentences) {
                             synonymsData = {
@@ -1114,7 +1109,6 @@
                                 sentences: parseSubSynSection(data.synonymsData.sentences)
                             };
                         } else {
-                            // التوافق مع البيانات القديمة وتحويلها تلقائياً للتبويبات
                             synonymsData = { words: {}, letters: {}, sentences: {} };
                             for (let rawKey in data.synonymsData) {
                                 let k = decodeFirebaseKey(rawKey);
@@ -1192,11 +1186,7 @@
         }
 
         function syncToCloud() {
-            let encodedSynData = {
-                words: {},
-                letters: {},
-                sentences: {}
-            };
+            let encodedSynData = { words: {}, letters: {}, sentences: {} };
             ['words', 'letters', 'sentences'].forEach(subType => {
                 for (let k in synonymsData[subType]) {
                     encodedSynData[subType][encodeFirebaseKey(k)] = synonymsData[subType][k];
@@ -1789,7 +1779,6 @@
             if (!synonymsData) synonymsData = { words: {}, letters: {}, sentences: {} };
             let currentDataset = synonymsData[activeSynonymTab] || {};
 
-            // تحديث قائمة الأقسام في السليكت
             const catSelect = document.getElementById('synCategorySelect');
             if (catSelect) {
                 catSelect.innerHTML = synonymCategories.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -1897,7 +1886,6 @@
             }
         }
 
-        // إدارة أقسام القاموس (إضافة وحذف)
         function openCategoryManageModal() {
             renderCategoryManageTable();
             document.getElementById('categoryManageModal').classList.add('active');
@@ -1937,19 +1925,27 @@
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        
         function renderOffersTabs() {
             const container = document.getElementById('offersTabsContainer'); if(!container) return; container.innerHTML = "";
             const cats = [...new Set(offersData.map(o => o.category))];
-            if (cats.length > 0 && !cats.includes(selectedOfferTab)) selectedOfferTab = cats[0];
-            cats.forEach(cat => { container.innerHTML += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; });
+            
+            // إضافة تبويب رئيسي يجمع كل العروض والأسعار معاً دفعة واحدة
+            let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار</button>`;
+            cats.forEach(cat => { 
+                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; 
+            });
+            container.innerHTML = tabsHtml;
             updateKPIs();
         }
+
         function filterOfferCategory(cat, btn) {
             selectedOfferTab = cat;
             document.querySelectorAll('#offersTabsContainer .offer-tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderOffers();
         }
+
         function formatOfferLineForClient(item) {
             let lines = [`${item.name}`], hasDeviceLines = false;
             if (item.device1 && item.device1.trim() !== "") { lines.push(`جهاز ${item.device1}${item.price1 ? ` بـ ${item.price1}` : ""}`); hasDeviceLines = true; }
@@ -2002,10 +1998,16 @@
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const tableEl = document.getElementById('offersTableElement'); if(!tableEl) return;
-            const filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
+            
+            let filteredOffers = [];
+            if (selectedOfferTab === '⭐ كل العروض والأسعار') {
+                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search) || cleanSearchText(o.category).includes(search));
+            } else {
+                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
+            }
             filteredOffers.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
-            let bodyHtml = `<thead><tr><th style="width: 35px; text-align:center;"><i class="fa-solid fa-check-square"></i></th><th style="width: 30%;">الخدمة / العرض</th><th style="width: 25%;">الأجهزة والأسعار</th><th style="width: 15%;">السعر العام</th><th style="width: 15%; text-align:center;">إدارة النسخ</th><th style="width: 10%; text-align:center;">تعديل</th></tr></thead><tbody>`;
+            let bodyHtml = `<thead><tr><th style="width: 35px; text-align:center;"><i class="fa-solid fa-check-square"></i></th><th style="width: 25%;">الخدمة / العرض</th><th style="width: 20%;">القسم</th><th style="width: 25%;">الأجهزة والأسعار</th><th style="width: 15%;">السعر العام</th><th style="width: 10%; text-align:center;">إدارة</th></tr></thead><tbody>`;
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
@@ -2013,19 +2015,29 @@
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
                 if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
                 if (!devicesDisplay) devicesDisplay = "-";
-                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><button class="btn btn-green" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="copySingleOffer(${item.id})"><i class="fa-solid fa-copy"></i> نسخ</button></td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
             tableEl.innerHTML = bodyHtml + `</tbody>`;
             updateFloatingOffersWindow();
         }
+
         function openOfferModal() {
             document.getElementById('offerId').value = ""; document.getElementById('offName').value = "";
             document.getElementById('offDevice1').value = ""; document.getElementById('offPrice1').value = "";
             document.getElementById('offDevice2').value = ""; document.getElementById('offPrice2').value = "";
             document.getElementById('offPrice').value = ""; document.getElementById('offNotes').value = "";
-            document.getElementById('offIsPinned').checked = false; document.getElementById('offCategory').value = "عروض اسنان";
-            document.getElementById('customCategoryBox').style.display = "none"; document.getElementById('offerModal').classList.add('active');
+            document.getElementById('offIsPinned').checked = false; 
+            
+            // لو التبويب الحالي ليس التبويب الشامل، اجعل القسم الافتراضي هو التبويب النشط الحالي
+            if (selectedOfferTab && selectedOfferTab !== '⭐ كل العروض والأسعار') {
+                document.getElementById('offCategory').value = selectedOfferTab;
+            } else {
+                document.getElementById('offCategory').value = "عروض اسنان";
+            }
+            document.getElementById('customCategoryBox').style.display = "none"; 
+            document.getElementById('offerModal').classList.add('active');
         }
+
         function saveOffer() {
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
@@ -2039,16 +2051,37 @@
             };
             if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
             if (id) offersData[offersData.findIndex(o => o.id == id)] = obj; else offersData.push(obj);
-            syncToCloud(); selectedOfferTab = cat; renderOffersTabs(); renderOffers(); closeModal('offerModal');
+            syncToCloud(); renderOffersTabs(); renderOffers(); closeModal('offerModal');
         }
+
         function editOffer(id) {
             const item = offersData.find(o => o.id === id); if (!item) return;
-            document.getElementById('offerId').value = item.id; document.getElementById('offName').value = item.name;
-            document.getElementById('offDevice1').value = item.device1 || ""; document.getElementById('offPrice1').value = item.price1 || "";
-            document.getElementById('offDevice2').value = item.device2 || ""; document.getElementById('offPrice2').value = item.price2 || "";
-            document.getElementById('offPrice').value = item.price || ""; document.getElementById('offNotes').value = item.notes || "";
-            document.getElementById('offIsPinned').checked = !!item.isPinned; document.getElementById('offerModal').classList.add('active');
+            document.getElementById('offerId').value = item.id; 
+            document.getElementById('offName').value = item.name;
+            document.getElementById('offDevice1').value = item.device1 || ""; 
+            document.getElementById('offPrice1').value = item.price1 || "";
+            document.getElementById('offDevice2').value = item.device2 || ""; 
+            document.getElementById('offPrice2').value = item.price2 || "";
+            document.getElementById('offPrice').value = item.price || ""; 
+            document.getElementById('offNotes').value = item.notes || "";
+            document.getElementById('offIsPinned').checked = !!item.isPinned;
+            
+            // حل المشكلة: تثبيت القسم الأصلي للعرض عند التعديل وعدم تغييره لأسنان
+            const categorySelect = document.getElementById('offCategory');
+            const customCatBox = document.getElementById('customCategoryBox');
+            let catExists = Array.from(categorySelect.options).some(opt => opt.value === item.category);
+            if (catExists) {
+                categorySelect.value = item.category;
+                customCatBox.style.display = "none";
+            } else {
+                categorySelect.value = "أخرى";
+                document.getElementById('offCustomCategory').value = item.category;
+                customCatBox.style.display = "flex";
+            }
+
+            document.getElementById('offerModal').classList.add('active');
         }
+
         function deleteOffer(id) {
             if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); renderOffersTabs(); renderOffers(); }
         }
@@ -2095,7 +2128,7 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        // --- البحث الشامل الذكي المتقدم (مع استخدام القاموس بشقيه: الكلمات، الحروف، والجمل) ---
+        // --- البحث الشامل الذكي المتقدم (مع دعم الجمل المضافة بدقة وترتيب النتائج المطلوب) ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const normQ = normalizeArabicText(rawQ);
@@ -2126,6 +2159,8 @@
                     if (normKey.includes(normQ) || normQ.includes(normKey) || vals.some(v => v.includes(normQ) || normQ.includes(v))) {
                         searchTokens.push(normKey);
                         vals.forEach(v => searchTokens.push(v));
+                        searchTokens.push(k);
+                        item.values.forEach(v => searchTokens.push(v));
                     }
                 }
             });
@@ -2162,6 +2197,10 @@
                 return searchTokens.some(token => t.includes(token));
             };
 
+            // تحديد نوع الاستعلام لتطبيق الترتيب الذكي الثابت المطلوب
+            let isQueryForDoctor = searchTokens.some(token => doctorsData.some(d => normalizeArabicText(d.name).includes(token) || normalizeArabicText(d.specialty).includes(token)));
+            let isQueryForOffers = searchTokens.some(token => offersData.some(o => normalizeArabicText(o.name).includes(token) || normalizeArabicText(o.category).includes(token) || normalizeArabicText(o.price).includes(token)) || token.includes('سعر') || token.includes('ريال') || token.includes('عرض') || token.includes('شعر'));
+
             // 1. الأطباء
             doctorsData.forEach(d => {
                 if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes) || isMatch(d.nationality)) {
@@ -2169,7 +2208,9 @@
                         timeId: d.id || 0, source: "الأطباء",
                         title: `${d.name} (${d.specialty})`,
                         subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
-                        action: `jumpToSectionAndHighlightDoc(${d.id})`
+                        action: `jumpToSectionAndHighlightDoc(${d.id})`,
+                        categoryType: 'doctor',
+                        priority: isQueryForDoctor ? 1 : 3
                     });
                 }
             });
@@ -2181,29 +2222,35 @@
                         timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
                         title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
                         subtitle: o.notes || '',
-                        action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`
+                        action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
+                        categoryType: 'offer',
+                        priority: isQueryForOffers ? 1 : 2
                     });
                 }
             });
 
-            // 3. الاستفسارات
-            inquiriesData.forEach(i => {
-                if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags) || isMatch(i.category)) {
-                    allMatchedResults.push({
-                        timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
-                        title: i.question, subtitle: i.answer,
-                        action: `jumpToSectionAndHighlightInquiry(${i.id})`
-                    });
-                }
-            });
-
-            // 4. التنبيهات
+            // 3. التنبيهات
             alertsData.forEach(a => {
                 if (isMatch(a.content) || isMatch(a.tags)) {
                     allMatchedResults.push({
                         timeId: a.id || 0, source: "التنبيهات والإشعارات",
                         title: a.content, subtitle: a.time,
-                        action: `jumpToAlertsTab(${a.id})`
+                        action: `jumpToAlertsTab(${a.id})`,
+                        categoryType: 'alert',
+                        priority: isQueryForDoctor ? 2 : 1 // التنبيهات تأتي أولاً في البحث العام أو بعد الأطباء لو بحث عن طبيب
+                    });
+                }
+            });
+
+            // 4. الاستفسارات
+            inquiriesData.forEach(i => {
+                if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags) || isMatch(i.category)) {
+                    allMatchedResults.push({
+                        timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
+                        title: i.question, subtitle: i.answer,
+                        action: `jumpToSectionAndHighlightInquiry(${i.id})`,
+                        categoryType: 'inquiry',
+                        priority: 4
                     });
                 }
             });
@@ -2214,7 +2261,9 @@
                     allMatchedResults.push({
                         timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
                         title: s.name, subtitle: `القسم: ${s.type}`,
-                        action: `jumpToSectionAndHighlightService(${s.id})`
+                        action: `jumpToSectionAndHighlightService(${s.id})`,
+                        categoryType: 'service',
+                        priority: 4
                     });
                 }
             });
@@ -2225,7 +2274,9 @@
                     allMatchedResults.push({
                         timeId: idx, source: "الملاحظات الداخلية",
                         title: n.text, subtitle: `ملحوظة #${idx + 1}`,
-                        action: `jumpToSectionAndHighlightNote(${idx})`
+                        action: `jumpToSectionAndHighlightNote(${idx})`,
+                        categoryType: 'note',
+                        priority: 4
                     });
                 }
             });
@@ -2237,35 +2288,25 @@
                     allMatchedResults.push({
                         timeId: c.id || 0, source: "دليل المنسقين",
                         title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
-                        action: `jumpToSectionAndHighlightCoordinator(${c.id})`
+                        action: `jumpToSectionAndHighlightCoordinator(${c.id})`,
+                        categoryType: 'coordinator',
+                        priority: 4
                     });
                 }
             });
 
-            // 8. القاموس والمرادفات
-            ['words', 'letters', 'sentences'].forEach(subType => {
-                let dataset = synonymsData[subType] || {};
-                for (let k in dataset) {
-                    let item = dataset[k];
-                    let valsArr = Array.isArray(item.values) ? item.values : [];
-                    let valsStr = valsArr.join(' ');
-                    let catStr = item.category || "";
-                    if (isMatch(k) || isMatch(valsStr) || isMatch(catStr)) {
-                        allMatchedResults.push({
-                            timeId: 0, source: `قاموس المرادفات (${subType === 'words' ? 'مصطلحات' : subType === 'letters' ? 'حروف' : 'جمل'})`,
-                            title: `العنصر: ${k}`, subtitle: `المعاني والبدائل: ${valsStr}`,
-                            action: `jumpToSectionAndHighlightSynonym('${k.replace(/'/g, "\\'")}', '${subType}')`
-                        });
-                    }
-                }
-            });
-
+            // إزالة التكرار وتطبيق الترتيب الذكي المطلوب
             let uniqueMap = new Map();
             allMatchedResults.forEach(item => {
                 uniqueMap.set(item.source + "_" + item.title, item);
             });
             let finalResults = Array.from(uniqueMap.values());
-            finalResults.sort((a, b) => b.timeId - a.timeId);
+
+            // ترتيب النتائج حسب الأولوية المطلوبة ثم الأحدث
+            finalResults.sort((a, b) => {
+                if (a.priority !== b.priority) return a.priority - b.priority;
+                return b.timeId - a.timeId;
+            });
 
             if (finalResults.length === 0) {
                 resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في أي قسم من الأقسام. جرب البحث بجملة أخرى أو أضفها في قاموس المرادفات والجمل.</div>`;
