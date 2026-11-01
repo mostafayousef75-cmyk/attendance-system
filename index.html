@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - البحث الشامل الذكي المتقدم</title>
+    <title>لوحة الكول سنتر والمنسقين - القاموس الذكي المتقدم</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -222,7 +222,6 @@
 
     <main class="main-wrapper">
         <header class="top-header">
-            <!-- شريط البحث الشامل الذكي المتقدم -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع (أطباء، عروض، مرادفات، جمل...)" oninput="handleTrueGlobalSearch(this.value)">
@@ -489,27 +488,29 @@
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
 
-            <!-- 7. قاموس المرادفات والمصطلحات -->
+            <!-- 7. قاموس المرادفات والمصطلحات المتقدم والأقسام -->
             <section id="synonyms-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
                     <h2>قاموس المرادفات والمصطلحات والحروف والجمل الذكي</h2>
-                    <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة مصطلح / حرف / جملة</button>
-                </div>
-                <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.5rem; border-radius:6px; margin-bottom:0.5rem; font-size:0.74rem; color:var(--primary-color);">
-                    💡 هنا يمكنك ربط الكلمات، الحروف (مثل: ه = ة)، أو الجمل الكاملة (مثل: كم سعر، كم تكلفة = سعر) وربطها بالقسم لتوجيه البحث الشامل فوراً.
+                    <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة للقاموس</button>
                 </div>
 
-                <!-- فلتر الأقسام في قاموس المرادفات -->
-                <div style="display:flex; gap:0.4rem; margin-bottom:0.5rem; align-items:center; flex-wrap:wrap;">
+                <!-- تبويبات قاموس المرادفات الثلاثة (المرادفات - الحروف - الجمل) -->
+                <div class="offers-tabs" id="synonymTypeTabs">
+                    <button class="offer-tab-btn active" onclick="switchSynonymTab('words', this)"><i class="fa-solid fa-book"></i> المصطلحات والمرادفات</button>
+                    <button class="offer-tab-btn" onclick="switchSynonymTab('letters', this)"><i class="fa-solid fa-font"></i> الحروف (ه = ة)</button>
+                    <button class="offer-tab-btn" onclick="switchSynonymTab('sentences', this)"><i class="fa-solid fa-comment-dots"></i> الجمل والاستفسارات</button>
+                </div>
+
+                <!-- شريط البحث والفلترة حسب قسم المرادفات -->
+                <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center; flex-wrap:wrap;">
                     <div style="flex:1; min-width:200px;" class="page-local-search" style="margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="synonymSearchInput" placeholder="بحث في قاموس المصطلحات..." oninput="renderSynonyms()">
+                        <input type="text" id="synonymSearchInput" placeholder="بحث داخل القاموس..." oninput="renderSynonyms()">
                     </div>
-                    <div style="width: 220px;">
+                    <div style="width: 220px;" id="synCategoryFilterWrapper">
                         <select id="synonymCategoryFilter" class="form-control" onchange="renderSynonyms()">
                             <option value="">📁 تصفية حسب القسم (الكل)</option>
-                            <option value="الحروف">الحروف (معالجة التباين)</option>
-                            <option value="الجمل">الجمل والاستفسارات</option>
                             <option value="عروض اسنان">عروض اسنان</option>
                             <option value="عروض ليزر نساء">عروض ليزر نساء</option>
                             <option value="عروض ليزر رجال">عروض ليزر رجال</option>
@@ -518,6 +519,7 @@
                             <option value="عام">عام</option>
                         </select>
                     </div>
+                    <button class="btn btn-blue" style="font-size:0.7rem; padding:0.35rem 0.6rem;" onclick="openCategoryManageModal()"><i class="fa-solid fa-folder-plus"></i> إدارة أقسام القاموس</button>
                 </div>
 
                 <div class="offers-table-box">
@@ -525,9 +527,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width: 25%;">الكلمة / الحرف / الجملة الأصلية</th>
-                                    <th style="width: 25%;">القسم بالموقع</th>
-                                    <th style="width: 35%;">المرادفات والمعاني المرتبطة</th>
+                                    <th style="width: 25%;" id="synTableCol1">الكلمة الأصلية</th>
+                                    <th style="width: 25%;">القسم / النوع</th>
+                                    <th style="width: 35%;" id="synTableCol2">المرادفات والمعاني المرتبطة</th>
                                     <th style="width: 15%; text-align:center;">إدارة</th>
                                 </tr>
                             </thead>
@@ -959,41 +961,51 @@
         </div>
     </div>
 
-    <!-- مودال قاموس المرادفات والمصطلحات الذكي -->
+    <!-- مودال إضافة/تعديل عنصر في قاموس المرادفات (حسب التبويب النشط) -->
     <div class="modal-overlay" id="synonymModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="synonymModalTitle">إضافة / تعديل مصطلح، حرف أو جملة بالقاموس</h3>
+                <h3 id="synModalTitle">إضافة عنصر للقاموس</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('synonymModal')"></i>
             </div>
             <input type="hidden" id="synOriginalKey">
+            
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>الكلمة الأصلية أو الجملة أو الحرف (مثل: سعر، هـ، تشقير)</label>
-                <input type="text" id="synKey" class="form-control" placeholder="مثال: سعر أو كم سعر">
+                <label id="synKeyLabel">الكلمة الأصلية أو المصطلح</label>
+                <input type="text" id="synKeyInput" class="form-control" placeholder="مثال: سعر">
             </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.3rem;" id="synCategoryRow">
+                <label>القسم المخصص</label>
+                <select id="synCategorySelect" class="form-control"></select>
+            </div>
+
             <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>القسم في الموقع</label>
-                <select id="synCategorySelect" class="form-control" onchange="checkSynCustomCat(this.value)">
-                    <option value="الحروف">الحروف (مثل ه = ة)</option>
-                    <option value="الجمل">الجمل والاستفسارات (مثل كم سعر = سعر)</option>
-                    <option value="عروض اسنان">عروض اسنان</option>
-                    <option value="عروض ليزر نساء">عروض ليزر نساء</option>
-                    <option value="عروض ليزر رجال">عروض ليزر رجال</option>
-                    <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
-                    <option value="جدول الأطباء">جدول الأطباء</option>
-                    <option value="عام">عام</option>
-                    <option value="أخرى">أخرى (اكتب اسم القسم)</option>
-                </select>
+                <label id="synValuesLabel">المرادفات والمعاني (مفصولة بفاصلة)</label>
+                <textarea id="synValuesInput" class="form-control" rows="3" placeholder="مثال: كم سعر، تكلفة، سعر الجلسة"></textarea>
             </div>
-            <div id="synCustomCatBox" style="display:none; flex-direction:column; gap:0.3rem;">
-                <label>اسم القسم المخصص</label>
-                <input type="text" id="synCustomCategoryText" class="form-control" placeholder="اسم القسم...">
+
+            <button class="btn btn-green" onclick="saveSynonymItem()">حفظ العنصر</button>
+        </div>
+    </div>
+
+    <!-- مودال إدارة أقسام القاموس (إضافة وحذف وتعديل الأقسام) -->
+    <div class="modal-overlay" id="categoryManageModal">
+        <div class="modal" style="max-width: 450px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>إدارة وتخصيص أقسام القاموس</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('categoryManageModal')"></i>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                <label>المرادفات والجمل والمعاني البديلة (مفصولة بفاصلة)</label>
-                <textarea id="synValues" class="form-control" rows="3" placeholder="مثال: كم سعر، كم تكلفة، سعر الجلسة"></textarea>
+            <div style="display:flex; gap:0.3rem; margin-top:0.3rem;">
+                <input type="text" id="newCategoryNameInput" class="form-control" placeholder="اسم القسم الجديد...">
+                <button class="btn btn-green" onclick="addNewSynonymCategory()"><i class="fa-solid fa-plus"></i> إضافة قسم</button>
             </div>
-            <button class="btn btn-green" onclick="saveSynonym()">حفظ في القاموس</button>
+            <div style="max-height: 250px; overflow-y:auto; margin-top:0.5rem;">
+                <table style="width:100%;">
+                    <thead><tr><th>اسم القسم</th><th style="width:70px; text-align:center;">إجراء</th></tr></thead>
+                    <tbody id="categoryManageTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -1026,13 +1038,29 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        let synonymsData = {};
+        
+        // هيكل القاموس المطور
+        let synonymsData = {
+            words: {
+                "هيليوس": { category: "عروض ليزر نساء", values: ["الهيليوس", "جهاز هيليوس", "ليزر هيليوس"] },
+                "تشقير": { category: "عروض ليزر نساء", values: ["حواجب", "حاف", "صبغة"] }
+            },
+            letters: {
+                "ه": { category: "الحروف", values: ["ة", "هـ"] }
+            },
+            sentences: {
+                "سعر": { category: "الجمل والاستفسارات", values: ["كم سعر", "كم تكلفة", "تكلفة", "السعر", "بكم"] }
+            }
+        };
 
+        // أقسام قاموس المرادفات القابلة للتخصيص والحذف والإضافة
+        let synonymCategories = ["عروض اسنان", "عروض ليزر نساء", "عروض ليزر رجال", "عروض الجلديه والتجميل", "جدول الأطباء", "الجمل والاستفسارات", "الحروف", "عام"];
+
+        let activeSynonymTab = "words"; // تبويب القاموس النشط حالياً (words, letters, sentences)
         let selectedOfferTab = "عروض اسنان";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
-        // دالة تطبيع الحروف المتقدمة (تعالج ه=ة، الهمزات، والمدود)
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
@@ -1042,17 +1070,9 @@
                 .replace(/ى/g, 'ي')
                 .replace(/ؤ/g, 'ء')
                 .replace(/ئ/g, 'ء')
-                .replace(/[\u064b-\u0652]/g, '') // إزالة التشكيل
+                .replace(/[\u064b-\u0652]/g, '')
                 .trim();
         }
-
-        const defaultSynonyms = {
-            "سعر": { category: "الجمل", values: ["كم سعر", "كم تكلفة", "تكلفة", "السعر", "بكم"] },
-            "ه": { category: "الحروف", values: ["ة", "هـ"] },
-            "هيليوس": { category: "عروض ليزر نساء", values: ["الهيليوس", "جهاز هيليوس", "ليزر هيليوس"] },
-            "تشقير": { category: "عروض ليزر نساء", values: ["حواجب", "حاف", "صبغة"] },
-            "رتوش": { category: "عروض ليزر نساء", values: ["جلسة", "تكملة", "استكمال"] }
-        };
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-amoled';
@@ -1083,21 +1103,35 @@
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                     
-                    synonymsData = {};
+                    if (data.synonymCategories) synonymCategories = data.synonymCategories;
+
+                    // معالجة بنية القاموس الجديد والمستقل
                     if (data.synonymsData) {
-                        for (let rawKey in data.synonymsData) {
-                            let k = decodeFirebaseKey(rawKey);
-                            let val = data.synonymsData[rawKey];
-                            if (typeof val === 'object' && val !== null) {
-                                synonymsData[k] = { 
-                                    category: val.category || "عام", 
-                                    values: Array.isArray(val.values) ? val.values : (typeof val.values === 'string' ? val.values.split(/[,،]/).map(v => v.trim()).filter(Boolean) : [String(val)]) 
-                                };
-                            } else {
-                                synonymsData[k] = { category: "عام", values: [String(val)] };
+                        if (data.synonymsData.words || data.synonymsData.letters || data.synonymsData.sentences) {
+                            synonymsData = {
+                                words: parseSubSynSection(data.synonymsData.words),
+                                letters: parseSubSynSection(data.synonymsData.letters),
+                                sentences: parseSubSynSection(data.synonymsData.sentences)
+                            };
+                        } else {
+                            // التوافق مع البيانات القديمة وتحويلها تلقائياً للتبويبات
+                            synonymsData = { words: {}, letters: {}, sentences: {} };
+                            for (let rawKey in data.synonymsData) {
+                                let k = decodeFirebaseKey(rawKey);
+                                let val = data.synonymsData[rawKey];
+                                let cat = (typeof val === 'object' && val !== null) ? (val.category || "عام") : "عام";
+                                let vals = (typeof val === 'object' && val !== null) ? (Array.isArray(val.values) ? val.values : [String(val)]) : [String(val)];
+                                
+                                if (cat === "الحروف") {
+                                    synonymsData.letters[k] = { category: cat, values: vals };
+                                } else if (cat === "الجمل" || cat === "الجمل والاستفسارات") {
+                                    synonymsData.sentences[k] = { category: cat, values: vals };
+                                } else {
+                                    synonymsData.words[k] = { category: cat, values: vals };
+                                }
                             }
                         }
-                    } else { synonymsData = defaultSynonyms; }
+                    }
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1105,7 +1139,6 @@
                     deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", color: "card-gold", tags: "أرقام" }];
                     inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
                     offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
-                    synonymsData = defaultSynonyms;
                     syncToCloud();
                 }
 
@@ -1127,6 +1160,24 @@
             }, 1000);
         });
 
+        function parseSubSynSection(subObj) {
+            let res = {};
+            if (!subObj) return res;
+            for (let rawK in subObj) {
+                let k = decodeFirebaseKey(rawK);
+                let val = subObj[rawK];
+                if (typeof val === 'object' && val !== null) {
+                    res[k] = {
+                        category: val.category || "عام",
+                        values: Array.isArray(val.values) ? val.values : [String(val)]
+                    };
+                } else {
+                    res[k] = { category: "عام", values: [String(val)] };
+                }
+            }
+            return res;
+        }
+
         function saveShiftScratchpad() { localStorage.setItem('shift_scratchpad_current', document.getElementById('shiftScratchpadText').value); }
         function clearShiftScratchpad() {
             if (confirm("مسح ملاحظات وردية الشيفت؟")) {
@@ -1141,8 +1192,16 @@
         }
 
         function syncToCloud() {
-            let encodedSyn = {};
-            for (let k in synonymsData) { encodedSyn[encodeFirebaseKey(k)] = synonymsData[k]; }
+            let encodedSynData = {
+                words: {},
+                letters: {},
+                sentences: {}
+            };
+            ['words', 'letters', 'sentences'].forEach(subType => {
+                for (let k in synonymsData[subType]) {
+                    encodedSynData[subType][encodeFirebaseKey(k)] = synonymsData[subType][k];
+                }
+            });
 
             db.ref('clinicData').set({ 
                 doctorsData, 
@@ -1153,7 +1212,8 @@
                 deptNotesData, 
                 offersData, 
                 inquiriesData, 
-                synonymsData: encodedSyn
+                synonymsData: encodedSynData,
+                synonymCategories
             });
         }
 
@@ -1213,7 +1273,7 @@
         }
 
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData, synonymCategories }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1233,6 +1293,7 @@
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
                         if (data.synonymsData) synonymsData = data.synonymsData;
+                        if (data.synonymCategories) synonymCategories = data.synonymCategories;
                         syncToCloud(); alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
@@ -1287,11 +1348,7 @@
             if (!tagsStr || !tagsStr.trim()) return '';
             return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
         }
-
-        function cleanSearchText(str) {
-            if (!str) return "";
-            return normalizeArabicText(str);
-        }
+        function cleanSearchText(str) { return normalizeArabicText(str); }
 
         function renderDoctors(highlightId = null) {
             const searchInput = document.getElementById('docSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
@@ -1697,89 +1754,186 @@
             if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
         }
 
-        // --- قاموس المرادفات والمصطلحات والحروف والجمل الذكي ---
-        function checkSynCustomCat(val) {
-            document.getElementById('synCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none";
+        // --- قاموس المرادفات والمصطلحات والحروف والجمل الذكي والمستقل تماماً ---
+        function switchSynonymTab(tabType, btnEl) {
+            activeSynonymTab = tabType;
+            document.querySelectorAll('#synonymTypeTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+
+            const filterWrapper = document.getElementById('synCategoryFilterWrapper');
+            const col1 = document.getElementById('synTableCol1');
+            const col2 = document.getElementById('synTableCol2');
+
+            if (tabType === 'words') {
+                filterWrapper.style.display = 'block';
+                col1.innerText = "الكلمة الأصلية";
+                col2.innerText = "المرادفات والمعاني المرتبطة";
+            } else if (tabType === 'letters') {
+                filterWrapper.style.display = 'none';
+                col1.innerText = "الحرف الأساسي";
+                col2.innerText = "الحروف البديلة (ه = ة)";
+            } else if (tabType === 'sentences') {
+                filterWrapper.style.display = 'none';
+                col1.innerText = "الجملة الأصلية (المستهدفة)";
+                col2.innerText = "الجمل والأسئلة المرادفة لها";
+            }
+            renderSynonyms();
         }
+
         function renderSynonyms() {
             const searchInput = document.getElementById('synonymSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const catFilter = document.getElementById('synonymCategoryFilter').value;
             const tbody = document.getElementById('synonymsTableBody');
             if(!tbody) return; tbody.innerHTML = "";
-            if (!synonymsData) synonymsData = {};
 
-            for (let key in synonymsData) {
-                let item = synonymsData[key];
+            if (!synonymsData) synonymsData = { words: {}, letters: {}, sentences: {} };
+            let currentDataset = synonymsData[activeSynonymTab] || {};
+
+            // تحديث قائمة الأقسام في السليكت
+            const catSelect = document.getElementById('synCategorySelect');
+            if (catSelect) {
+                catSelect.innerHTML = synonymCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+            const filterSelect = document.getElementById('synonymCategoryFilter');
+            if (filterSelect) {
+                const currentFilterVal = filterSelect.value;
+                filterSelect.innerHTML = `<option value="">📁 تصفية حسب القسم (الكل)</option>` + synonymCategories.map(c => `<option value="${c}" ${c === currentFilterVal ? 'selected' : ''}>${c}</option>`).join('');
+            }
+
+            for (let key in currentDataset) {
+                let item = currentDataset[key];
                 let cat = (typeof item === 'object' && item !== null) ? (item.category || "عام") : "عام";
                 let valsArr = (typeof item === 'object' && item !== null) ? (Array.isArray(item.values) ? item.values : [String(item)]) : [String(item)];
                 let vals = valsArr.join('، ');
 
-                const matchCat = !catFilter || cat === catFilter;
+                const matchCat = (activeSynonymTab !== 'words') || !catFilter || cat === catFilter;
                 const matchSearch = !search || cleanSearchText(key).includes(search) || cleanSearchText(vals).includes(search) || cleanSearchText(cat).includes(search);
 
                 if (matchCat && matchSearch) {
                     const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                    let categoryDisplay = (activeSynonymTab === 'words') ? `<span style="color:var(--primary-color);">${cat}</span>` : `<span style="color:#38bdf8;">${activeSynonymTab === 'letters' ? 'معالجة الحروف' : 'الجمل والاستفسارات'}</span>`;
+                    
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>${key}</strong></td>
-                            <td><span style="color:var(--primary-color);">${cat}</span></td>
+                            <td>${categoryDisplay}</td>
                             <td>${vals}</td>
                             <td style="text-align:center;">
-                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonym('${safeKey}')"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonym('${safeKey}')"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editSynonymItem('${safeKey}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonymItem('${safeKey}')"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
                 }
             }
         }
+
         function openSynonymModal() {
             document.getElementById('synOriginalKey').value = ""; 
-            document.getElementById('synKey').value = ""; 
-            document.getElementById('synCategorySelect').value = "عروض ليزر نساء";
-            document.getElementById('synCustomCategoryText').value = "";
-            document.getElementById('synCustomCatBox').style.display = "none";
-            document.getElementById('synValues').value = "";
+            document.getElementById('synKeyInput').value = ""; 
+            document.getElementById('synValuesInput').value = "";
+            
+            const catRow = document.getElementById('synCategoryRow');
+            const keyLabel = document.getElementById('synKeyLabel');
+            const valLabel = document.getElementById('synValuesLabel');
+
+            if (activeSynonymTab === 'words') {
+                catRow.style.display = 'flex';
+                keyLabel.innerText = "الكلمة الأصلية أو المصطلح";
+                valLabel.innerText = "المرادفات والمعاني (مفصولة بفاصلة)";
+            } else if (activeSynonymTab === 'letters') {
+                catRow.style.display = 'none';
+                keyLabel.innerText = "الحرف الأساسي (مثال: هـ)";
+                valLabel.innerText = "الحروف البديلة والمماثلة (مثال: ة، ه)";
+            } else if (activeSynonymTab === 'sentences') {
+                catRow.style.display = 'none';
+                keyLabel.innerText = "الجملة أو الكلمة الأصلية المستهدفة (مثال: سعر)";
+                valLabel.innerText = "الجمل الاستفسارية المرادفة (مثال: كم سعر، كم تكلفة، بكم)";
+            }
+
             document.getElementById('synonymModal').classList.add('active');
         }
-        function saveSynonym() {
+
+        function saveSynonymItem() {
             const originalKey = document.getElementById('synOriginalKey').value.trim();
-            const key = document.getElementById('synKey').value.trim();
-            let cat = document.getElementById('synCategorySelect').value;
-            if (cat === "أخرى") cat = document.getElementById('synCustomCategoryText').value.trim() || "عام";
-            const valsStr = document.getElementById('synValues').value.trim();
-            if (!key || !valsStr) return alert("املأ الكلمة والمعاني!");
-            
-            if (!synonymsData) synonymsData = {};
-            if (originalKey && originalKey !== key && synonymsData[originalKey]) { delete synonymsData[originalKey]; }
-            
+            const key = document.getElementById('synKeyInput').value.trim();
+            const valsStr = document.getElementById('synValuesInput').value.trim();
+            let cat = document.getElementById('synCategorySelect').value || "عام";
+
+            if (!key || !valsStr) return alert("املأ الحقول المطلوبة!");
+
+            if (!synonymsData[activeSynonymTab]) synonymsData[activeSynonymTab] = {};
+            if (originalKey && originalKey !== key && synonymsData[activeSynonymTab][originalKey]) {
+                delete synonymsData[activeSynonymTab][originalKey];
+            }
+
             let valsArr = valsStr.split(/[,،]/).map(v => v.trim()).filter(Boolean);
-            synonymsData[key] = { category: cat, values: valsArr };
+            if (activeSynonymTab !== 'words') {
+                cat = (activeSynonymTab === 'letters') ? "الحروف" : "الجمل والاستفسارات";
+            }
+
+            synonymsData[activeSynonymTab][key] = { category: cat, values: valsArr };
             syncToCloud(); renderSynonyms(); closeModal('synonymModal');
         }
-        function editSynonym(key) {
+
+        function editSynonymItem(key) {
+            openSynonymModal();
             document.getElementById('synOriginalKey').value = key;
-            document.getElementById('synKey').value = key;
-            let item = synonymsData[key];
-            let cat = (typeof item === 'object' && item !== null) ? (item.category || "عام") : "عام";
-            let valsArr = (typeof item === 'object' && item !== null) ? (Array.isArray(item.values) ? item.values : [String(item)]) : [String(item)];
-            let vals = valsArr.join('، ');
-            
-            let catSelect = document.getElementById('synCategorySelect');
-            let foundOption = Array.from(catSelect.options).some(o => o.value === cat);
-            if (foundOption) {
-                catSelect.value = cat;
-                document.getElementById('synCustomCatBox').style.display = "none";
-            } else {
-                catSelect.value = "أخرى";
-                document.getElementById('synCustomCatBox').style.display = "flex";
-                document.getElementById('synCustomCategoryText').value = cat;
+            document.getElementById('synKeyInput').value = key;
+            let item = synonymsData[activeSynonymTab][key];
+            if (item) {
+                let valsArr = Array.isArray(item.values) ? item.values : [String(item)];
+                document.getElementById('synValuesInput').value = valsArr.join('، ');
+                if (activeSynonymTab === 'words') {
+                    document.getElementById('synCategorySelect').value = item.category || "عام";
+                }
             }
-            document.getElementById('synValues').value = vals;
-            document.getElementById('synonymModal').classList.add('active');
         }
-        function deleteSynonym(key) {
-            if (confirm(`حذف المصطلح "${key}"؟`)) { delete synonymsData[key]; syncToCloud(); renderSynonyms(); }
+
+        function deleteSynonymItem(key) {
+            if (confirm(`حذف "${key}" من القاموس؟`)) {
+                delete synonymsData[activeSynonymTab][key];
+                syncToCloud(); renderSynonyms();
+            }
+        }
+
+        // إدارة أقسام القاموس (إضافة وحذف)
+        function openCategoryManageModal() {
+            renderCategoryManageTable();
+            document.getElementById('categoryManageModal').classList.add('active');
+        }
+
+        function renderCategoryManageTable() {
+            const tbody = document.getElementById('categoryManageTableBody');
+            if(!tbody) return; tbody.innerHTML = "";
+            synonymCategories.forEach((cat, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${cat}</strong></td>
+                        <td style="text-align:center;">
+                            ${idx > 4 ? `<button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteSynonymCategory('${cat}')"><i class="fa-solid fa-trash"></i></button>` : '<span style="font-size:0.6rem; color:var(--text-muted);">افتراضي</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function addNewSynonymCategory() {
+            const input = document.getElementById('newCategoryNameInput');
+            const catName = input.value.trim();
+            if (!catName) return alert("أدخل اسم القسم الجديد!");
+            if (synonymCategories.includes(catName)) return alert("هذا القسم موجود بالفعل!");
+            synonymCategories.push(catName);
+            input.value = "";
+            syncToCloud(); renderCategoryManageTable(); renderSynonyms();
+            alert(`✅ تمت إضافة القسم "${catName}" بنجاح!`);
+        }
+
+        function deleteSynonymCategory(catName) {
+            if (confirm(`حذف القسم "${catName}"؟`)) {
+                synonymCategories = synonymCategories.filter(c => c !== catName);
+                syncToCloud(); renderCategoryManageTable(); renderSynonyms();
+            }
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -1941,7 +2095,7 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        // --- البحث الشامل الذكي المتقدم (يدعم الجمل، الحروف، وتطبيع النصوص) ---
+        // --- البحث الشامل الذكي المتقدم (مع استخدام القاموس بشقيه: الكلمات، الحروف، والجمل) ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const normQ = normalizeArabicText(rawQ);
@@ -1959,28 +2113,43 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            // توسيع الكلمات والجمل والحروف عبر قاموس المرادفات الذكي
+            // تجميع كلمات البحث موسعة من القاموس (كلمات + حروف + جمل)
             let searchTokens = [normQ];
-            for (let synKey in synonymsData) {
-                let synObj = synonymsData[synKey];
-                let normKey = normalizeArabicText(synKey);
-                let synValues = [];
-                if (synObj && typeof synObj === 'object') {
-                    if (Array.isArray(synObj.values)) {
-                        synValues = synObj.values.map(v => normalizeArabicText(v));
-                    } else if (typeof synObj.values === 'string') {
-                        synValues = synObj.values.split(/[,،]/).map(v => normalizeArabicText(v));
+            
+            ['words', 'letters', 'sentences'].forEach(subType => {
+                let dataset = synonymsData[subType] || {};
+                for (let k in dataset) {
+                    let item = dataset[k];
+                    let normKey = normalizeArabicText(k);
+                    let vals = Array.isArray(item.values) ? item.values.map(v => normalizeArabicText(v)) : [];
+                    
+                    if (normKey.includes(normQ) || normQ.includes(normKey) || vals.some(v => v.includes(normQ) || normQ.includes(v))) {
+                        searchTokens.push(normKey);
+                        vals.forEach(v => searchTokens.push(v));
                     }
                 }
-                
-                // لو المدخل يطابق المفتاح أو أي من مرادفاته، نضيف الكل للبحث
-                if (normKey.includes(normQ) || normQ.includes(normKey) || synValues.some(v => v.includes(normQ) || normQ.includes(v))) {
-                    searchTokens.push(normKey);
-                    synValues.forEach(v => searchTokens.push(v));
+            });
+
+            // تطبيع الحروف التلقائي (مثل ه = ة) من قسم الحروف بالقاموس
+            let letterMap = synonymsData.letters || {};
+            let expandedTokens = [];
+            searchTokens.forEach(token => {
+                let t = token;
+                for (let lKey in letterMap) {
+                    let lItem = letterMap[lKey];
+                    let replacements = Array.isArray(lItem.values) ? lItem.values.map(v => normalizeArabicText(v)) : [];
+                    replacements.push(normalizeArabicText(lKey));
+                    
+                    replacements.forEach(fromChar => {
+                        replacements.forEach(toChar => {
+                            t = t.replace(new RegExp(fromChar, 'g'), toChar);
+                        });
+                    });
                 }
-            }
-            
-            // تقسيم الكلمات المفردة أيضا
+                expandedTokens.push(t);
+            });
+            searchTokens = [...new Set([...searchTokens, ...expandedTokens])];
+
             rawQ.split(/\s+/).forEach(word => {
                 let nw = normalizeArabicText(word);
                 if (nw.length > 0 && !searchTokens.includes(nw)) searchTokens.push(nw);
@@ -2074,19 +2243,22 @@
             });
 
             // 8. القاموس والمرادفات
-            for (let synKey in synonymsData) {
-                let item = synonymsData[synKey];
-                let valsArr = (typeof item === 'object' && item !== null) ? (item.values || []) : [String(item)];
-                let valsStr = valsArr.join(' ');
-                let catStr = (typeof item === 'object' && item !== null) ? (item.category || "") : "";
-                if (isMatch(synKey) || isMatch(valsStr) || isMatch(catStr)) {
-                    allMatchedResults.push({
-                        timeId: 0, source: "قاموس المرادفات والمصطلحات",
-                        title: `المصطلح: ${synKey}`, subtitle: `المرادفات: ${valsStr}`,
-                        action: `jumpToSectionAndHighlightSynonym('${synKey.replace(/'/g, "\\'")}')`
-                    });
+            ['words', 'letters', 'sentences'].forEach(subType => {
+                let dataset = synonymsData[subType] || {};
+                for (let k in dataset) {
+                    let item = dataset[k];
+                    let valsArr = Array.isArray(item.values) ? item.values : [];
+                    let valsStr = valsArr.join(' ');
+                    let catStr = item.category || "";
+                    if (isMatch(k) || isMatch(valsStr) || isMatch(catStr)) {
+                        allMatchedResults.push({
+                            timeId: 0, source: `قاموس المرادفات (${subType === 'words' ? 'مصطلحات' : subType === 'letters' ? 'حروف' : 'جمل'})`,
+                            title: `العنصر: ${k}`, subtitle: `المعاني والبدائل: ${valsStr}`,
+                            action: `jumpToSectionAndHighlightSynonym('${k.replace(/'/g, "\\'")}', '${subType}')`
+                        });
+                    }
                 }
-            }
+            });
 
             let uniqueMap = new Map();
             allMatchedResults.forEach(item => {
@@ -2152,9 +2324,11 @@
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(); }, 100);
         }
-        function jumpToSectionAndHighlightSynonym(key) {
+        function jumpToSectionAndHighlightSynonym(key, subType) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('synonyms', document.querySelectorAll('.nav-link')[6]);
+            const btnEl = document.querySelectorAll('#synonymTypeTabs .offer-tab-btn')[subType === 'words' ? 0 : subType === 'letters' ? 1 : 2];
+            switchSynonymTab(subType, btnEl);
             setTimeout(() => { renderSynonyms(); }, 100);
         }
     </script>
