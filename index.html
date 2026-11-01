@@ -69,8 +69,11 @@
         .search-filter-chk { display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
         .search-filter-chk input { accent-color: var(--primary-color); width: 13px; height: 13px; cursor: pointer; }
 
-        .cloud-indicator { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(22, 163, 74, 0.15); border: 1px solid var(--accent-green); color: #4ade80; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; }
+        /* مؤشر السحابة المحدث */
+        .cloud-indicator { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(22, 163, 74, 0.15); border: 1px solid var(--accent-green); color: #4ade80; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; transition: all 0.3s ease; }
+        .cloud-indicator.offline { background: rgba(220, 38, 38, 0.15); border-color: var(--danger-color); color: #f87171; }
+        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; transition: all 0.3s ease; }
+        .cloud-indicator.offline .cloud-dot { background-color: #dc2626; box-shadow: 0 0 8px #dc2626; }
 
         .kpi-bar { display: flex; gap: 0.3rem; }
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.15rem 0.45rem; border-radius: 6px; font-size: 0.7rem; display: flex; align-items: center; gap: 0.25rem; }
@@ -246,9 +249,10 @@
                 <input type="text" id="globalSearchInput" placeholder="بحث شامل وفوري بكامل الموقع..." oninput="onGlobalSearchInputDebounced()">
             </div>
             
+            <!-- مؤشر السحابة المحدث بالكامل -->
             <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال بالسحابة">
                 <span class="cloud-dot"></span>
-                <span>متصل بالسحابة أونلاين</span>
+                <span id="cloudStatusText">جاري الاتصال...</span>
             </div>
 
             <div class="kpi-bar">
@@ -940,12 +944,16 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
+        // تحديث حالة السحابة باللون والنص المطلوب
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
+            const statusText = document.getElementById('cloudStatusText');
             if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 8px #22c55e;"></span><span>متصل بالسحابة أونلاين</span>`;
+                badge.classList.remove('offline');
+                statusText.innerText = "متصل بالسحاب";
             } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #f59e0b;"></span><span>أوفلاين (يعمل محلياً)</span>`;
+                badge.classList.add('offline');
+                statusText.innerText = "أوفلاين (غير متصل)";
             }
         });
 
@@ -962,14 +970,12 @@
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
 
-        // تحسين دالة تحويل النصوص لسرعة خرافية
         const arabicMap = { 'إ':'ا', 'أ':'ا', 'آ':'ا', 'ة':'ه', 'ى':'ي', 'ؤ':'ء', 'ئ':'ء' };
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString().toLowerCase().replace(/[إأآةىؤئ]/g, m => arabicMap[m] || m).replace(/[\u064b-\u0652]/g, '').trim();
         }
 
-        // Debounce Utility للبحث بدون تهنيج
         function debounce(func, wait) {
             let timeout;
             return function(...args) {
@@ -1003,7 +1009,6 @@
             loadTableWidths();
             initDraggableFloatingOffers();
 
-            // الاستماع الذكي الخفيف للبيانات
             db.ref('clinicData').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1782,7 +1787,6 @@
             onGlobalSearchInputDebounced();
         }
 
-        // محرك البحث الفائق والمباشر
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const normQ = normalizeArabicText(rawQ);
