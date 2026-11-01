@@ -180,9 +180,9 @@
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: var(--radius-md); box-shadow: 0 0 25px rgba(0,0,0,0.8); }
 
-        /* Modern Mobile Specific Styles */
+        /* Modern Mobile Specific Styles & Hardware Acceleration */
         @media (max-width: 768px) {
-            html, body { flex-direction: column; height: 100%; overflow-y: auto; }
+            html, body { flex-direction: column; height: 100%; overflow-y: auto; -webkit-transform: translateZ(0); transform: translateZ(0); }
             .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); padding: 0.75rem; }
             .sidebar.collapsed { width: 100%; padding: 0.75rem; }
             .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span { display: inline-block !important; }
@@ -205,7 +205,7 @@
             .table-responsive { overflow-x: visible; }
             table, tbody, tr, td, th { display: block; width: 100%; }
             thead { display: none; }
-            tr { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 0.75rem; padding: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+            tr { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 0.75rem; padding: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
             td { text-align: right; padding: 0.35rem 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; }
             td:last-child { border-bottom: none; justify-content: flex-end; }
             
@@ -1182,15 +1182,9 @@
                     syncToCloud();
                 }
 
-                renderDoctors();
-                renderFridayScheduleTable();
-                renderAlerts();
-                renderDeptsAndDocs();
-                renderCoordinators();
-                renderOffersTabs();
-                renderOffers();
-                renderInquiries();
-                renderSynonyms();
+                // تحديث القسم الحالي فقط عند جلب البيانات منعاً لأي ثقل
+                const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                refreshActiveTabContent(activeTab);
                 updateKPIs();
             });
             
@@ -1253,15 +1247,41 @@
             });
         }
 
+        // دالة التحميل السريع المخصصة لتفريغ الذاكرة وعدم تهنيج الهاتف
         function switchTab(tabId, elem, save = true) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
+            document.querySelectorAll('.page-section').forEach(s => {
+                if(s.id !== 'globalSearchResultsSection') {
+                    s.classList.remove('active');
+                    s.style.display = 'none';
+                }
+            });
+            
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            
             const targetSec = document.getElementById(`${tabId}-section`);
-            if (targetSec) targetSec.classList.add('active');
+            if (targetSec) {
+                targetSec.style.display = 'block';
+                targetSec.classList.add('active');
+            }
+            
             if (elem) elem.classList.add('active');
             if (save) localStorage.setItem('activeTab', tabId);
+
+            setTimeout(() => {
+                refreshActiveTabContent(tabId);
+            }, 30);
         }
+
+        function refreshActiveTabContent(tabId) {
+            if (tabId === 'schedule') renderDoctors();
+            else if (tabId === 'alerts') renderAlerts();
+            else if (tabId === 'depts-docs') renderDeptsAndDocs();
+            else if (tabId === 'coordinators') renderCoordinators();
+            else if (tabId === 'offers') { renderOffersTabs(); renderOffers(); }
+            else if (tabId === 'inquiries') renderInquiries();
+            else if (tabId === 'synonyms') renderSynonyms();
+        }
+
         function changeTheme(themeName) {
             document.body.className = themeName;
             localStorage.setItem('appTheme', themeName);
