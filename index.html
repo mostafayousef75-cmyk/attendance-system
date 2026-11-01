@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة الكول سنتر والمنسقين الذكية</title>
+    <title>لوحة الكول سنتر والمنسقين السريعة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Firebase SDK (v8 Compat) -->
@@ -16,134 +16,130 @@
     <style>
         :root {
             --font-family: 'Tajawal', sans-serif;
-            --bg-base: #090a0f;
-            --bg-surface: #12141c;
-            --bg-card: #1a1d28;
-            --bg-sidebar: #0d0e14;
-            --text-main: #f3f4f6;
+            --bg-base: #030305;
+            --bg-surface: #0a0a0e;
+            --bg-card: #13131a;
+            --bg-sidebar: #060609;
+            --text-main: #ffffff;
             --text-muted: #9ca3af;
-            --border-color: #2a2e3d;
+            --border-color: #27272a;
             --primary-color: #f59e0b;
             --primary-glow: rgba(245, 158, 11, 0.15);
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --danger-color: #ef4444;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
+            --accent-blue: #2563eb;
+            --accent-green: #16a34a;
+            --danger-color: #dc2626;
+            --radius-md: 8px;
+            --radius-lg: 12px;
         }
 
-        body.theme-amoled { --bg-base: #000000; --bg-surface: #0a0a0c; --bg-card: #141417; --bg-sidebar: #050506; --border-color: #222226; }
-        body.theme-darkblue { --bg-base: #070c18; --bg-surface: #0f172a; --bg-card: #1e293b; --bg-sidebar: #0a1120; --border-color: #334155; --primary-color: #60a5fa; }
-        body.theme-gray { --bg-base: #121212; --bg-surface: #1e1e1e; --bg-card: #282828; --bg-sidebar: #181818; --border-color: #383838; --primary-color: #a78bfa; }
-        body.theme-light { --bg-base: #f3f4f6; --bg-surface: #ffffff; --bg-card: #f9fafb; --bg-sidebar: #1f2937; --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb; --primary-color: #2563eb; }
+        body.theme-amoled { --bg-base: #000000; --bg-surface: #09090b; --bg-card: #18181b; --bg-sidebar: #050507; }
+        body.theme-darkblue { --bg-base: #060913; --bg-surface: #0c1222; --bg-card: #111a30; --bg-sidebar: #080d1a; --text-main: #ffffff; --text-muted: #94a3b8; --border-color: #1e293b; --primary-color: #3b82f6; }
+        body.theme-gray { --bg-base: #121214; --bg-surface: #1a1a1e; --bg-card: #242429; --bg-sidebar: #161619; --text-main: #f4f4f5; --text-muted: #a1a1aa; --border-color: #27272a; --primary-color: #8b5cf6; }
+        body.theme-light { --bg-base: #f1f5f9; --bg-surface: #ffffff; --bg-card: #f8fafc; --bg-sidebar: #0f172a; --text-main: #0f172a; --text-muted: #475569; --border-color: #cbd5e1; --primary-color: #2563eb; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); -webkit-tap-highlight-color: transparent; }
-        html, body { width: 100%; height: 100%; min-height: 100vh; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; user-select: text !important; overflow-x: hidden; }
+        html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; user-select: text !important; }
 
-        /* Sidebar Styling */
-        .sidebar { width: 260px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar.collapsed { width: 75px; padding: 1rem 0.5rem; }
+        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
+        .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
         .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
-        .sidebar.collapsed .nav-link { justify-content: center; padding: 0.75rem; }
+        .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
 
-        .brand-title { font-size: 1.15rem; font-weight: 800; color: var(--primary-color); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
-        .json-tools { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; flex: 1; overflow-y: auto; }
-        .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 600; font-size: 0.88rem; transition: all 0.2s; }
-        .nav-link:hover, .nav-link.active { background-color: var(--primary-glow); color: var(--primary-color); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; }
+        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; overflow-y: auto; }
+        .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
+        .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
+        .theme-box { padding-top: 0.5rem; border-top: 1px solid var(--border-color); }
+        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; margin-top: 0.2rem; font-size: 0.75rem; }
+
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; flex-shrink: 0; }
         
-        .theme-box { padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-        .theme-select { width: 100%; padding: 0.5rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; margin-top: 0.3rem; font-size: 0.8rem; font-weight: 600; }
+        .search-container { position: relative; flex: 1; max-width: 420px; }
+        .search-container input { width: 100%; padding: 0.45rem 2.2rem 0.45rem 0.8rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.85rem; font-weight: 700; box-shadow: 0 0 10px var(--primary-glow); }
+        .search-container i { position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 0.9rem; }
 
-        /* Main Body Layout */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; overflow-x: hidden; }
-        .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; flex-shrink: 0; position: sticky; top: 0; z-index: 90; backdrop-filter: blur(8px); }
-        
-        .search-container { position: relative; flex: 1; max-width: 480px; }
-        .search-container input { width: 100%; padding: 0.6rem 2.5rem 0.6rem 1rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.9rem; font-weight: 700; box-shadow: 0 0 15px var(--primary-glow); }
-        .search-container i { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 1rem; }
+        .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.3rem 0.6rem; border-radius: 6px; display: flex; align-items: center; gap: 0.8rem; font-size: 0.73rem; flex-wrap: wrap; }
+        .search-filter-chk { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
+        .search-filter-chk input { accent-color: var(--primary-color); width: 13px; height: 13px; cursor: pointer; }
 
-        .search-filters-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1.25rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.8rem; flex-wrap: wrap; }
-        .search-filter-chk { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
-        .search-filter-chk input { accent-color: var(--primary-color); width: 15px; height: 15px; cursor: pointer; }
+        .cloud-indicator { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(22, 163, 74, 0.2); border: 1px solid var(--accent-green); color: #4ade80; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .cloud-dot { width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
 
-        .cloud-indicator { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-green); color: #34d399; padding: 0.3rem 0.8rem; border-radius: 30px; font-size: 0.8rem; font-weight: 700; }
-        .cloud-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+        .kpi-bar { display: flex; gap: 0.4rem; }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.3rem; }
+        .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.8rem; }
 
-        .kpi-bar { display: flex; gap: 0.5rem; }
-        .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 600; }
-        .kpi-num { color: var(--primary-color); font-weight: 800; font-size: 0.9rem; }
-
-        .professional-ticker-bar { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1.25rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.8rem; flex-shrink: 0; }
-        .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.35rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+        .professional-ticker-bar { background-color: var(--bg-surface); border-bottom: 2px solid var(--primary-color); border-top: 1px solid var(--border-color); padding: 0.4rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.76rem; flex-shrink: 0; }
+        .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
         
         .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; border: 1px solid var(--border-color); scroll-behavior: smooth; direction: rtl; }
-        .ticker-container::-webkit-scrollbar { height: 4px; }
-        .ticker-container::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border-radius: 6px; padding: 0.3rem 0.5rem; border: 1px solid var(--border-color); scroll-behavior: smooth; direction: rtl; }
+        .ticker-container::-webkit-scrollbar { height: 6px; }
+        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 4px; }
         
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 0.6rem; align-items: center; }
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); font-weight: 600; color: var(--text-main); cursor: pointer; font-size: 0.78rem; transition: all 0.2s; }
-        .ticker-card-item:hover { border-color: var(--primary-color); background: var(--primary-glow); color: var(--primary-color); }
+        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 600; color: var(--text-main); cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
+        .ticker-card-item:hover { border-color: var(--primary-color); background: rgba(245, 158, 11, 0.1); color: var(--primary-color); }
 
-        .content-area { flex: 1; padding: 1rem; overflow-y: auto; }
+        .content-area { flex: 1; padding: 0.6rem; overflow-y: auto; }
         .page-section { display: none; }
         .page-section.active { display: block; }
 
-        .search-result-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 0.6rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .source-badge { background: var(--primary-glow); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.72rem; font-weight: 800; display: inline-block; margin-bottom: 0.3rem; }
+        .search-result-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.7rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .source-badge { background: rgba(245, 158, 11, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
 
-        .page-local-search { margin-bottom: 0.75rem; position: relative; }
-        .page-local-search input { width: 100%; padding: 0.5rem 2.3rem 0.5rem 0.8rem; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-main); outline: none; font-size: 0.85rem; font-weight: 600; }
-        .page-local-search i { position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .page-local-search { margin-bottom: 0.4rem; position: relative; }
+        .page-local-search input { width: 100%; padding: 0.3rem 2rem 0.3rem 0.6rem; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.78rem; }
+        .page-local-search i { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        .btn { background-color: var(--primary-color); color: #000; font-weight: 700; border: none; padding: 0.45rem 0.85rem; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; transition: all 0.2s; }
+        .btn { background-color: var(--primary-color); color: #000; font-weight: 700; border: none; padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.76rem; transition: all 0.2s; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-green { background-color: var(--accent-green); color: #fff; }
         .btn-blue { background-color: var(--accent-blue); color: #fff; }
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        .shift-scratchpad-box { background: var(--bg-surface); border: 1px solid var(--primary-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.4rem; box-shadow: 0 4px 20px var(--primary-glow); }
-        .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem; font-size: 0.82rem; resize: vertical; height: 60px; outline: none; }
+        .shift-scratchpad-box { background: var(--bg-surface); border: 1px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.5rem 0.8rem; margin-bottom: 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
+        .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; font-size: 0.75rem; resize: vertical; height: 50px; outline: none; }
 
-        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; align-items: start; }
-        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; width: 100%; }
-        .branch-title { font-size: 0.95rem; font-weight: 800; padding-bottom: 0.4rem; margin-bottom: 0.6rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
+        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; align-items: start; }
+        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.5rem; display: flex; flex-direction: column; width: 100%; }
+        .branch-title { font-size: 0.88rem; font-weight: 700; padding-bottom: 0.3rem; margin-bottom: 0.4rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
 
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; table-layout: fixed; }
-        th, td { padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.4; vertical-align: middle; }
-        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 700; font-size: 0.8rem; }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; table-layout: fixed; }
+        th, td { padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.35; vertical-align: middle; }
+        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 700; font-size: 0.75rem; }
 
-        .doc-name-box { font-weight: 800; font-size: 0.88rem; color: #ffffff; display: block; word-break: break-word; }
-        .doc-nat-badge { font-weight: 600; font-size: 0.74rem; color: #38bdf8; display: block; margin-top: 2px; }
+        .doc-name-box { font-weight: 800; font-size: 0.82rem; color: #ffffff; display: block; word-break: break-word; }
+        .doc-nat-badge { font-weight: 600; font-size: 0.7rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: #f3f4f6; }
 
         .tags-tooltip-wrapper { position: relative; display: inline-flex; align-items: center; margin-top: 3px; cursor: pointer; }
-        .tags-icon-badge { font-size: 0.7rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.1rem 0.4rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.25rem; }
-        .tags-tooltip-popup { visibility: hidden; background-color: var(--bg-card); color: var(--primary-color); text-align: right; padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--primary-color); position: absolute; z-index: 100; bottom: 125%; right: 0; white-space: nowrap; font-size: 0.72rem; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s; }
+        .tags-icon-badge { font-size: 0.65rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.05rem 0.3rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.2rem; }
+        .tags-tooltip-popup { visibility: hidden; background-color: var(--bg-card); color: var(--primary-color); text-align: right; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--primary-color); position: absolute; z-index: 100; bottom: 125%; right: 0; white-space: nowrap; font-size: 0.68rem; font-weight: 700; opacity: 0; transition: opacity 0.2s; }
         .tags-tooltip-wrapper:hover .tags-tooltip-popup { visibility: visible; opacity: 1; }
 
-        table.resizable-mode th, table.resizable-mode td { resize: both !important; overflow: auto !important; border-left: 1px dashed var(--primary-color); min-width: 40px !important; min-height: 24px !important; }
+        table.resizable-mode th, table.resizable-mode td { resize: both !important; overflow: auto !important; border-left: 1px dashed var(--primary-color); min-width: 30px !important; min-height: 20px !important; }
 
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
         @keyframes pulseGlow {
-            0% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1.01); }
-            50% { background-color: rgba(245, 158, 11, 0.1); transform: scale(1); }
-            100% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1.01); }
+            0% { background-color: rgba(245, 158, 11, 0.7); }
+            50% { background-color: rgba(245, 158, 11, 0.1); }
+            100% { background-color: rgba(245, 158, 11, 0.7); }
         }
 
-        .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
-        .alert-card-item-compact { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.82rem; }
-        .alert-thumb-side { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
-        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+        .alert-card-item-compact { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem 0.6rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-size: 0.76rem; }
+        .alert-thumb-side { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
+        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem; }
 
-        .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; align-items: start; }
-        .doc-sheet-card { border-radius: var(--radius-md); padding: 0.75rem 0.85rem; color: #fff; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; line-height: 1.4; box-shadow: 0 4px 15px rgba(0,0,0,0.25); position: relative; }
-        .doc-sheet-card h3 { font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.3rem; margin-bottom: 0.2rem; display: flex; align-items: center; justify-content: space-between; }
-        .card-drag-handle { cursor: grab; padding: 0.1rem 0.25rem; color: #facc15; font-size: 0.8rem; }
+        .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: start; }
+        .doc-sheet-card { border-radius: 8px; padding: 0.5rem 0.6rem; color: #fff; display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; line-height: 1.3; box-shadow: 0 3px 10px rgba(0,0,0,0.2); position: relative; }
+        .doc-sheet-card h3 { font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.2rem; margin-bottom: 0.1rem; display: flex; align-items: center; justify-content: space-between; }
+        .card-drag-handle { cursor: grab; padding: 0.1rem 0.25rem; color: #facc15; font-size: 0.75rem; }
 
         .card-teal { background-color: #0d47a1; }
         .card-maroon { background-color: #4a148c; }
@@ -152,64 +148,51 @@
         .card-gold { background-color: #e65100; }
         .card-green { background-color: #1b5e20; }
 
-        .offers-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.35rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.4rem 0.85rem; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; transition: all 0.2s; }
+        .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; overflow-x: auto; }
+        .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.3rem 0.7rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.76rem; }
         .offer-tab-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
 
-        .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 0.75rem; }
-        .price-badge { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.3); padding: 0.25rem 0.65rem; border-radius: 6px; font-weight: 800; font-size: 0.88rem; display: inline-block; }
-        .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.62rem; padding: 0.1rem 0.35rem; border-radius: 4px; }
-        
-        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.68rem; display: inline-block; margin-top: 3px; }
+        .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.6rem; }
+        .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.88rem; display: inline-block; }
+        .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.55rem; padding: 0.02rem 0.2rem; border-radius: 3px; }
+        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
 
-        .floating-offers-window { position: fixed; bottom: 30px; right: 30px; width: 320px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        .floating-offers-window { position: fixed; bottom: 30px; right: 30px; width: 320px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
         .floating-offers-window.active { display: flex; }
-        .floating-offers-header { background: var(--bg-card); padding: 0.5rem 0.85rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 800; font-size: 0.85rem; }
-        .floating-offers-body { padding: 0.65rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem; font-size: 0.78rem; resize: vertical; height: 130px; outline: none; }
+        .floating-offers-header { background: var(--bg-card); padding: 0.4rem 0.7rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.78rem; }
+        .floating-offers-body { padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; font-size: 0.74rem; resize: vertical; height: 110px; outline: none; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100000; padding: 1rem; backdrop-filter: blur(4px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100000; padding: 0.8rem; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex; }
-        .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.6rem; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .form-control { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-main); outline: none; font-size: 0.82rem; font-weight: 600; }
-        .form-control:focus { border-color: var(--primary-color); }
+        .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; padding: 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto; }
+        .form-control { width: 100%; padding: 0.35rem 0.5rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.78rem; }
 
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; }
-        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.4rem; display: none; }
+        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; }
+        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; margin-top: 0.3rem; display: none; }
         .days-checklist.show { display: grid; }
-        .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
-        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: var(--radius-md); box-shadow: 0 0 25px rgba(0,0,0,0.8); }
+        .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.2rem; font-size: 0.75rem; cursor: pointer; }
+        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
 
-        /* Modern Mobile Specific Styles & Hardware Acceleration */
+        /* Mobile Super Fast Adaptation */
         @media (max-width: 768px) {
-            html, body { flex-direction: column; height: 100%; overflow-y: auto; -webkit-transform: translateZ(0); transform: translateZ(0); }
-            .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); padding: 0.75rem; }
-            .sidebar.collapsed { width: 100%; padding: 0.75rem; }
-            .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span { display: inline-block !important; }
-            .sidebar.collapsed .nav-link { justify-content: flex-start; padding: 0.65rem 0.85rem; }
+            html, body { flex-direction: column; height: 100%; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); padding: 0.6rem; }
             .nav-links { flex-direction: row; flex-wrap: wrap; gap: 0.3rem; }
-            .nav-link { font-size: 0.78rem; padding: 0.4rem 0.65rem; }
-            .json-tools { margin-bottom: 0.4rem; }
-
+            .nav-link { font-size: 0.78rem; padding: 0.4rem 0.6rem; }
             .main-wrapper { height: auto; overflow: visible; }
-            .top-header { flex-direction: column; align-items: stretch; gap: 0.6rem; padding: 0.75rem; }
+            .top-header { flex-direction: column; align-items: stretch; gap: 0.5rem; padding: 0.6rem; }
             .search-container { max-width: 100%; width: 100%; }
-            .kpi-bar { justify-content: space-between; }
-            .kpi-card { font-size: 0.72rem; padding: 0.3rem 0.5rem; }
-
             .split-grid { grid-template-columns: 1fr; }
             .alerts-2col-grid { grid-template-columns: 1fr; }
-            .coordinators-grid { grid-template-columns: 1fr; }
 
-            /* Mobile Card View Transformation for Tables */
+            /* Card View Transformation for Tables on Mobile */
             .table-responsive { overflow-x: visible; }
             table, tbody, tr, td, th { display: block; width: 100%; }
             thead { display: none; }
-            tr { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 0.75rem; padding: 0.75rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-            td { text-align: right; padding: 0.35rem 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; }
+            tr { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 0.75rem; padding: 0.75rem; }
+            td { text-align: right; padding: 0.35rem 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
             td:last-child { border-bottom: none; justify-content: flex-end; }
-            
-            .floating-offers-window { width: 90%; right: 5%; bottom: 20px; }
         }
     </style>
 </head>
@@ -217,31 +200,30 @@
 
     <aside class="sidebar" id="appSidebar">
         <div class="brand-title">
-            <div style="display:flex; align-items:center; gap:0.5rem;">
+            <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-headset"></i>
                 <span class="brand-text">لوحة الكول سنتر</span>
             </div>
-            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.9rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
+            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.85rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
 
         <div class="json-tools">
-            <button class="btn btn-secondary" style="flex:1; font-size:0.75rem; padding:0.35rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير</button>
-            <button class="btn btn-secondary" style="flex:1; font-size:0.75rem; padding:0.35rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد</button>
+            <button class="btn btn-secondary" style="flex:1; font-size:0.65rem; padding:0.25rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير</button>
+            <button class="btn btn-secondary" style="flex:1; font-size:0.65rem; padding:0.25rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد</button>
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
         <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
+            <li><a class="nav-link active" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
             <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأجهزة</span></a></li>
             <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
-            <li><a class="nav-link" data-tab="synonyms" onclick="switchTab('synonyms', this)"><i class="fa-solid fa-book-bookmark"></i> <span>قاموس المرادفات والمصطلحات</span></a></li>
         </ul>
         
         <div class="theme-box">
-            <label style="font-size: 0.78rem; color: var(--text-muted); font-weight:700;"><i class="fa-solid fa-palette"></i> السيم واللون</label>
+            <label style="font-size: 0.72rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
             <select class="theme-select" onchange="changeTheme(this.value)">
                 <option value="theme-amoled">OLED أسود (Amoled)</option>
                 <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
@@ -255,7 +237,7 @@
         <header class="top-header">
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع (اختر الأقسام أدناه)..." oninput="triggerGlobalSearchFromInput()">
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الموقع..." oninput="triggerGlobalSearchFromInput()">
             </div>
             
             <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -269,26 +251,26 @@
                 <div class="kpi-card"><i class="fa-solid fa-tags" style="color:var(--accent-green);"></i> العروض: <span id="kpiOffers" class="kpi-num">0</span></div>
             </div>
 
-            <div id="clockDisplay" style="font-weight: 700; font-size: 0.8rem; color:var(--text-muted);"></div>
+            <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
 
-        <!-- شريط فلاتر الأقسام المتعددة للبحث الشامل -->
+        <!-- فلاتر الأقسام للبحث الشامل السريع -->
         <div class="search-filters-bar">
-            <span style="font-weight:800; color:var(--primary-color);"><i class="fa-solid fa-filter"></i> تصفية الأقسام:</span>
+            <span style="font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-filter"></i> تصفية البحث:</span>
             <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="doctors" checked onchange="triggerGlobalSearchFromInput()"> الأطباء</label>
             <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="offers" checked onchange="triggerGlobalSearchFromInput()"> العروض والأسعار</label>
             <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="alerts" checked onchange="triggerGlobalSearchFromInput()"> التنبيهات</label>
             <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="inquiries" checked onchange="triggerGlobalSearchFromInput()"> الاستفسارات</label>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="services" checked onchange="triggerGlobalSearchFromInput()"> الأقسام والخدمات</label>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="services" checked onchange="triggerGlobalSearchFromInput()"> الأجهزة والخدمات</label>
             <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="coordinators" checked onchange="triggerGlobalSearchFromInput()"> المنسقين</label>
-            <button class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.7rem; margin-right:auto;" onclick="toggleAllSearchCats(true)">تحديد الكل</button>
-            <button class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
+            <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem; margin-right:auto;" onclick="toggleAllSearchCats(true)">الكل</button>
+            <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="toggleAllSearchCats(false)">إلغاء</button>
         </div>
 
         <div class="professional-ticker-bar">
-            <div style="display:flex; align-items:center; gap:0.4rem; flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
                 <div class="ticker-yellow-ruler"><i class="fa-solid fa-bullhorn"></i> التنبيهات:</div>
-                <button class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;" onclick="resetTickerToStart()" title="إعادة ضبط شريط التنبيهات للبداية"><i class="fa-solid fa-rotate-right"></i></button>
+                <button class="btn btn-secondary" style="padding:0.25rem 0.4rem; font-size:0.7rem;" onclick="resetTickerToStart()" title="إعادة التمرير"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
             <div class="ticker-wrapper-outer">
                 <div class="ticker-container" id="tickerContainerBox">
@@ -299,52 +281,53 @@
 
         <div class="content-area">
             <div class="shift-scratchpad-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.82rem; font-weight:800; color:var(--primary-color);">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--primary-color);">
                     <span><i class="fa-solid fa-clipboard-list"></i> سجل ملاحظات وطوارئ وردية الشيفت (مؤقت):</span>
-                    <button class="btn btn-danger" style="padding:0.15rem 0.4rem; font-size:0.65rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الشيفت</button>
+                    <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.6rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الشيفت</button>
                 </div>
                 <textarea id="shiftScratchpadText" class="scratchpad-textarea" placeholder="اكتب هنا أي تنبيه طارئ أو ملاحظة سريعة أثناء الوردية..." oninput="saveShiftScratchpad()"></textarea>
             </div>
 
+            <!-- نتائج البحث الشامل -->
             <section id="globalSearchResultsSection" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل المتعدد</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل الفوري</h2>
                     <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
                 </div>
                 <div id="globalSearchResultsList"></div>
             </section>
 
             <!-- 1. مواعيد الأطباء -->
-            <section id="schedule-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; gap:0.5rem;">
-                    <h2 style="font-size:1.1rem; font-weight:800;">جدول دوام الأطباء المقسم حسب الفروع</h2>
-                    <div style="display:flex; gap:0.4rem;">
+            <section id="schedule-section" class="page-section active">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                    <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
+                    <div style="display:flex; gap:0.3rem;">
                         <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> مناوبات الجمعة</button>
                         <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
                     </div>
                 </div>
 
-                <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.6rem 0.85rem; border-radius:var(--radius-md); margin-bottom:0.75rem; display:flex; flex-direction:column; gap:0.4rem; font-size:0.8rem;">
-                    <div style="display:flex; gap:1.2rem; border-bottom:1px solid var(--border-color); padding-bottom:0.4rem; flex-wrap:wrap;">
+                <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; margin-bottom:0.4rem; display:flex; flex-direction:column; gap:0.2rem; font-size:0.72rem;">
+                    <div style="display:flex; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem; flex-wrap:wrap;">
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="font-weight:700;">-</span></span>
                         <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="font-weight:700;">-</span></span>
                     </div>
-                    <div style="display:flex; gap:1.2rem; color:var(--primary-color); flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:var(--text-main); font-weight:600;">-</span></span>
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:var(--text-main); font-weight:600;">-</span></span>
+                    <div style="display:flex; gap:1rem; color:var(--primary-color); flex-wrap:wrap;">
+                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:var(--text-main);">-</span></span>
+                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:var(--text-main);">-</span></span>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; align-items:center; flex-wrap:wrap;">
-                    <div class="page-local-search" style="flex:1; min-width:200px; margin-bottom:0;">
+                <div style="display:flex; gap:0.4rem; margin-bottom:0.4rem; align-items:center;">
+                    <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
                         <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
                     </div>
-                    <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.78rem; padding:0.45rem 0.75rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
+                    <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.6rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة
                     </button>
-                    <button class="btn btn-secondary" style="font-size:0.78rem; padding:0.45rem 0.65rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
-                    <div style="width: 180px;">
+                    <button class="btn btn-secondary" style="font-size:0.7rem; padding:0.35rem 0.5rem;" onclick="resetTableWidths()" title="إعادة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
+                    <div style="width: 160px;">
                         <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
                             <option value="">جميع التخصصات</option>
                         </select>
@@ -355,7 +338,7 @@
                     <div class="branch-box">
                         <div class="branch-title">
                             <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
-                            <span style="font-size:0.75rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
                         </div>
                         <div class="table-responsive">
                             <table id="mashyTableElement">
@@ -364,7 +347,7 @@
                                         <th id="th_mashy_0" style="width: 20%;">الطبيب والجنسية</th>
                                         <th id="th_mashy_1" style="width: 15%;">التخصص</th>
                                         <th id="th_mashy_2" style="width: 10%;">الكشف</th>
-                                        <th id="th_mashy_3" style="width: 25%;">فرع معشي والمواعيد</th>
+                                        <th id="th_mashy_3" style="width: 25%;">معشي والمواعيد</th>
                                         <th id="th_mashy_4" style="width: 20%;">الملاحظات</th>
                                         <th id="th_mashy_5" style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
@@ -377,7 +360,7 @@
                     <div class="branch-box">
                         <div class="branch-title">
                             <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
-                            <span style="font-size:0.75rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
                         </div>
                         <div class="table-responsive">
                             <table id="wissamTableElement">
@@ -386,7 +369,7 @@
                                         <th id="th_wissam_0" style="width: 20%;">الطبيب والجنسية</th>
                                         <th id="th_wissam_1" style="width: 15%;">التخصص</th>
                                         <th id="th_wissam_2" style="width: 10%;">الكشف</th>
-                                        <th id="th_wissam_3" style="width: 25%;">فرع الوسام والمواعيد</th>
+                                        <th id="th_wissam_3" style="width: 25%;">الوسام والمواعيد</th>
                                         <th id="th_wissam_4" style="width: 20%;">الملاحظات</th>
                                         <th id="th_wissam_5" style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
@@ -400,7 +383,7 @@
 
             <!-- 2. التنبيهات والإشعارات -->
             <section id="alerts-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
                     <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / PDF</button>
                 </div>
@@ -411,37 +394,37 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء -->
+            <!-- 3. الأقسام والخدمات -->
             <section id="depts-docs-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
-                    <div style="display:flex; gap:0.4rem;">
+                    <div style="display:flex; gap:0.3rem;">
                         <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام..." oninput="renderDeptsAndDocs()">
+                    <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والأجهزة..." oninput="renderDeptsAndDocs()">
                 </div>
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.85rem;" class="split-grid">
-                    <div style="display:flex; flex-direction:column; gap:0.85rem;">
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.6rem;">
+                    <div style="display:flex; flex-direction:column; gap:0.6rem;">
                         <div class="branch-box">
                             <div class="branch-title">
                                 <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span>
                             </div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;" class="split-grid">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.4rem; font-weight:700; color:#38bdf8; font-size:0.8rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color);">فرع معشي - الجلدية</div>
-                                    <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.4rem; font-size:0.75rem;">الخدمة / الجهاز</th><th style="width:60px; text-align:center; padding:0.4rem; font-size:0.75rem;">إدارة</th></tr></thead>
+                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع معشي - الجلدية</div>
+                                    <table>
+                                        <thead><tr><th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th><th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th></tr></thead>
                                         <tbody id="mashyDermTableBody"></tbody>
                                     </table>
                                 </div>
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.4rem; font-weight:700; color:#38bdf8; font-size:0.8rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color);">فرع معشي - الأسنان</div>
-                                    <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.4rem; font-size:0.75rem;">الخدمة / الجهاز</th><th style="width:60px; text-align:center; padding:0.4rem; font-size:0.75rem;">إدارة</th></tr></thead>
+                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع معشي - الأسنان</div>
+                                    <table>
+                                        <thead><tr><th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th><th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th></tr></thead>
                                         <tbody id="mashyDentTableBody"></tbody>
                                     </table>
                                 </div>
@@ -452,31 +435,31 @@
                             <div class="branch-title">
                                 <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span>
                             </div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;" class="split-grid">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.4rem; font-weight:700; color:#38bdf8; font-size:0.8rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color);">فرع الوسام - الجلدية</div>
-                                    <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.4rem; font-size:0.75rem;">الخدمة / الجهاز</th><th style="width:60px; text-align:center; padding:0.4rem; font-size:0.75rem;">إدارة</th></tr></thead>
+                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع الوسام - الجلدية</div>
+                                    <table>
+                                        <thead><tr><th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th><th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th></tr></thead>
                                         <tbody id="wissamDermTableBody"></tbody>
                                     </table>
                                 </div>
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.4rem; font-weight:700; color:#38bdf8; font-size:0.8rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color);">فرع الوسام - الأسنان</div>
-                                    <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.4rem; font-size:0.75rem;">الخدمة / الجهاز</th><th style="width:60px; text-align:center; padding:0.4rem; font-size:0.75rem;">إدارة</th></tr></thead>
+                                    <div style="background:var(--bg-card); padding:0.3rem; font-weight:700; color:#38bdf8; font-size:0.72rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع الوسام - الأسنان</div>
+                                    <table>
+                                        <thead><tr><th style="padding:0.3rem; font-size:0.68rem;">الخدمة / الجهاز</th><th style="width:50px; text-align:center; padding:0.3rem; font-size:0.68rem;">إدارة</th></tr></thead>
                                         <tbody id="wissamDentTableBody"></tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
+                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
                 </div>
             </section>
 
             <!-- 4. دليل المنسقين -->
             <section id="coordinators-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
                     <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
                 </div>
@@ -489,14 +472,14 @@
 
             <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
                     <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
                 </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار (يشمل البحث العام لكل الأقسام)..." oninput="renderOffers()">
+                    <input type="text" id="offerSearchInput" placeholder="بحث في العروض والأسعار..." oninput="renderOffers()">
                 </div>
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
@@ -510,7 +493,7 @@
 
             <!-- 6. دليل الاستفسارات -->
             <section id="inquiries-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
                     <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
                 </div>
@@ -531,65 +514,16 @@
                 </div>
                 <div class="coordinators-grid" id="inquiryCardsGrid"></div>
             </section>
-
-            <!-- 7. قاموس المرادفات والمصطلحات المتقدم -->
-            <section id="synonyms-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <h2>قاموس المرادفات والمصطلحات والحروف والجمل الذكي</h2>
-                    <button class="btn btn-green" onclick="openSynonymModal()"><i class="fa-solid fa-plus"></i> إضافة للقاموس</button>
-                </div>
-
-                <div class="offers-tabs" id="synonymTypeTabs">
-                    <button class="offer-tab-btn active" onclick="switchSynonymTab('words', this)"><i class="fa-solid fa-book"></i> المصطلحات والمرادفات</button>
-                    <button class="offer-tab-btn" onclick="switchSynonymTab('letters', this)"><i class="fa-solid fa-font"></i> الحروف (ه = ة)</button>
-                    <button class="offer-tab-btn" onclick="switchSynonymTab('sentences', this)"><i class="fa-solid fa-comment-dots"></i> الجمل والاستفسارات</button>
-                </div>
-
-                <div style="display:flex; gap:0.5rem; margin-bottom:0.6rem; align-items:center; flex-wrap:wrap;">
-                    <div style="flex:1; min-width:200px;" class="page-local-search" style="margin-bottom:0;">
-                        <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="synonymSearchInput" placeholder="بحث داخل القاموس..." oninput="renderSynonyms()">
-                    </div>
-                    <div style="width: 220px;" id="synCategoryFilterWrapper">
-                        <select id="synonymCategoryFilter" class="form-control" onchange="renderSynonyms()">
-                            <option value="">📁 تصفية حسب القسم (الكل)</option>
-                            <option value="عروض اسنان">عروض اسنان</option>
-                            <option value="عروض ليزر نساء">عروض ليزر نساء</option>
-                            <option value="عروض ليزر رجال">عروض ليزر رجال</option>
-                            <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
-                            <option value="جدول الأطباء">جدول الأطباء</option>
-                            <option value="عام">عام</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-blue" style="font-size:0.78rem; padding:0.45rem 0.75rem;" onclick="openCategoryManageModal()"><i class="fa-solid fa-folder-plus"></i> إدارة أقسام القاموس</button>
-                </div>
-
-                <div class="offers-table-box">
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 25%;" id="synTableCol1">الكلمة الأصلية</th>
-                                    <th style="width: 25%;">القسم / النوع</th>
-                                    <th style="width: 35%;" id="synTableCol2">المرادفات والمعاني المرتبطة</th>
-                                    <th style="width: 15%; text-align:center;">إدارة</th>
-                                </tr>
-                            </thead>
-                            <tbody id="synonymsTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
         </div>
     </main>
 
+    <!-- سلة العروض العائمة -->
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
             <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
-            <div style="display:flex; gap:0.4rem;">
-                <button class="btn btn-green" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i></button>
-                <button class="btn btn-danger" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-xmark"></i></button>
+            <div style="display:flex; gap:0.3rem;">
+                <button class="btn btn-green" style="padding:0.1rem 0.35rem; font-size:0.62rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i></button>
+                <button class="btn btn-danger" style="padding:0.1rem 0.35rem; font-size:0.62rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
         <div class="floating-offers-body">
@@ -605,34 +539,34 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('doctorModal')"></i>
             </div>
             <input type="hidden" id="docId">
-            <div style="display:flex; gap:0.5rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>اسم الطبيب</label>
                     <input type="text" id="docName" class="form-control" placeholder="د. أحمد">
                 </div>
-                <div style="width:130px; display:flex; flex-direction:column; gap:0.25rem;">
+                <div style="width:120px; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>الجنسية</label>
                     <input type="text" id="docNationality" class="form-control" placeholder="(مصري)">
                 </div>
             </div>
-            <div style="display:flex; gap:0.5rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; gap:0.4rem;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>التخصص</label>
                     <input type="text" id="docSpecialty" class="form-control" placeholder="طبيب عام / طوارئ">
                 </div>
-                <div style="width:110px; display:flex; flex-direction:column; gap:0.25rem;">
+                <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>الكشفية</label>
                     <input type="text" id="docFee" class="form-control" placeholder="75 ريال">
                 </div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>الفرع الرئيسي</label>
                 <select id="docBranch" class="form-control">
                     <option value="معشي">فرع معشي</option>
                     <option value="الوسام">فرع الوسام</option>
                 </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون الصف:</label>
                 <select id="docCustomColor" class="form-control">
                     <option value="">اللون الافتراضي (بدون تمييز)</option>
@@ -642,23 +576,23 @@
                     <option value="background-color: #1e1b4b;">أزرق داكن</option>
                 </select>
             </div>
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-                <input type="checkbox" id="docIsJoint" style="width:16px; height:16px;">
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="checkbox" id="docIsJoint" style="width:15px; height:15px;">
                 <label for="docIsJoint" style="font-weight:700; color:var(--primary-color);">طبيب مشترك بالفرعين (⭐)</label>
             </div>
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-                <input type="checkbox" id="docIsPinned" style="width:16px; height:16px;">
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="checkbox" id="docIsPinned" style="width:15px; height:15px;">
                 <label for="docIsPinned" style="font-weight:700; color:var(--primary-color);">📌 تثبيت في أعلى القائمة</label>
             </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(239,68,68,0.15); padding:0.4rem 0.6rem; border-radius:6px; border:1px solid var(--danger-color);">
-                <input type="checkbox" id="docIsLeave" style="width:16px; height:16px;">
+            <div style="display:flex; align-items:center; gap:0.4rem; background:rgba(220,38,38,0.1); padding:0.3rem 0.5rem; border-radius:6px; border:1px solid var(--danger-color);">
+                <input type="checkbox" id="docIsLeave" style="width:15px; height:15px;">
                 <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / غير متواجد</label>
             </div>
 
             <div class="days-section-box">
                 <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('mashyDaysBox')">
                     <label style="font-weight:700; color:var(--primary-color); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> أيام دوام معشي</label>
-                    <i class="fa-solid fa-chevron-down" style="color:var(--primary-color); font-size:0.8rem;"></i>
+                    <i class="fa-solid fa-chevron-down" style="color:var(--primary-color); font-size:0.75rem;"></i>
                 </div>
                 <div class="days-checklist" id="mashyDaysBox">
                     <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="السبت"> السبت</label>
@@ -674,7 +608,7 @@
             <div class="days-section-box">
                 <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('wissamDaysBox')">
                     <label style="font-weight:700; color:var(--accent-green); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> أيام دوام الوسام</label>
-                    <i class="fa-solid fa-chevron-down" style="color:var(--accent-green); font-size:0.8rem;"></i>
+                    <i class="fa-solid fa-chevron-down" style="color:var(--accent-green); font-size:0.75rem;"></i>
                 </div>
                 <div class="days-checklist" id="wissamDaysBox">
                     <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="السبت"> السبت</label>
@@ -687,15 +621,15 @@
                 </div>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>ساعات الدوام</label>
                 <input type="text" id="docTiming" class="form-control" placeholder="يومياً من 2م - 10م">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>الملاحظات</label>
                 <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات داخلية..."></textarea>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>الوسوم / كلمات مفتاحية (Tags)</label>
                 <input type="text" id="docTags" class="form-control" placeholder="أسنان، طوارئ">
             </div>
@@ -711,25 +645,25 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('fridayModal')"></i>
             </div>
             <input type="hidden" id="fridayEditId">
-            <div style="display:flex; gap:0.5rem; align-items:flex-end; background:var(--bg-card); padding:0.6rem; border-radius:var(--radius-sm); flex-wrap:wrap;">
-                <div style="flex:1; min-width:120px; display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; gap:0.4rem; align-items:flex-end; background:var(--bg-card); padding:0.5rem; border-radius:6px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:120px; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>التاريخ</label>
                     <input type="date" id="fridayDate" class="form-control">
                 </div>
-                <div style="width:110px; display:flex; flex-direction:column; gap:0.25rem;">
+                <div style="width:100px; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>الفرع</label>
                     <select id="fridayBranch" class="form-control">
                         <option value="معشي">معشي</option>
                         <option value="الوسام">الوسام</option>
                     </select>
                 </div>
-                <div style="flex:1.2; min-width:130px; display:flex; flex-direction:column; gap:0.25rem;">
+                <div style="flex:1.2; min-width:130px; display:flex; flex-direction:column; gap:0.2rem;">
                     <label>الطبيب المناوب</label>
                     <input type="text" id="fridayDocName" class="form-control" placeholder="د. أبان">
                 </div>
                 <button class="btn btn-green" onclick="saveFridayDutySchedule()"><i class="fa-solid fa-save"></i> حفظ</button>
             </div>
-            <div style="max-height: 220px; overflow-y:auto; margin-top:0.5rem;">
+            <div style="max-height: 220px; overflow-y:auto; margin-top:0.4rem;">
                 <table style="width:100%;">
                     <thead>
                         <tr>
@@ -753,22 +687,22 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
             <input type="hidden" id="alertId">
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>نص التنبيه</label>
                 <textarea id="alertContent" class="form-control" rows="3"></textarea>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الوسوم (Tags)</label>
                 <input type="text" id="alertTags" class="form-control" placeholder="أبان، إجازة، عاجل">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>إرفاق صورة أو PDF</label>
                 <input type="file" id="alertFileInput" class="form-control" accept="image/*,application/pdf" onchange="previewAndCompressMedia(this)">
                 <input type="hidden" id="alertMediaBase64">
                 <input type="hidden" id="alertMediaType">
-                <div id="mediaPreviewContainer" style="display:none; position:relative; margin-top:0.4rem;">
+                <div id="mediaPreviewContainer" style="display:none; position:relative; margin-top:0.3rem;">
                     <div id="mediaPreviewBox"></div>
-                    <button class="btn btn-danger" style="padding:0.2rem 0.4rem; position:absolute; top:4px; right:4px;" onclick="removeAlertMedia()"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn btn-danger" style="padding:0.15rem 0.3rem; position:absolute; top:4px; right:4px;" onclick="removeAlertMedia()"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             <button class="btn btn-green" onclick="saveAlert()">نشر التنبيه</button>
@@ -783,42 +717,42 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptServiceModal')"></i>
             </div>
             <input type="hidden" id="deptRowId">
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>الفرع</label>
                 <select id="deptBranchSelect" class="form-control">
                     <option value="معشي">فرع معشي</option>
                     <option value="الوسام">فرع الوسام</option>
                 </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>القسم</label>
                 <select id="deptCategorySelect" class="form-control">
                     <option value="derm">الجلدية (عمود الجلدية)</option>
                     <option value="dent">الأسنان (عمود الأسنان)</option>
                 </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>اسم الخدمة أو الجهاز</label>
                 <input type="text" id="deptItemName" class="form-control" placeholder="مثال: جنتل ماكس برو">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>الوسوم (Tags)</label>
                 <input type="text" id="deptItemTags" class="form-control" placeholder="جهاز، ليزر">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem; margin-top:0.2rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون التمييز:</label>
                 <select id="deptCustomColor" class="form-control">
                     <option value="">بدون تمييز (افتراضي)</option>
                     <option value="background-color: rgba(245, 158, 11, 0.25); color: #fef08a;">برتقالي مميز</option>
-                    <option value="background-color: rgba(59, 130, 246, 0.25); color: #93c5fd;">أزرق مميز</option>
-                    <option value="background-color: rgba(16, 185, 129, 0.25); color: #86efac;">أخضر مميز</option>
+                    <option value="background-color: rgba(37, 99, 235, 0.25); color: #93c5fd;">أزرق مميز</option>
+                    <option value="background-color: rgba(22, 163, 74, 0.25); color: #86efac;">أخضر مميز</option>
                 </select>
             </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.4rem;">
-                <input type="checkbox" id="deptIsJoint" style="width:16px; height:16px;">
+            <div style="display:flex; align-items:center; gap:0.4rem; margin-top:0.3rem;">
+                <input type="checkbox" id="deptIsJoint" style="width:15px; height:15px;">
                 <label for="deptIsJoint" style="font-weight:700; color:var(--primary-color);">خدمة/جهاز مشترك (⭐)</label>
             </div>
-            <button class="btn btn-green" style="margin-top:0.5rem;" onclick="saveDeptService()">حفظ الخدمة</button>
+            <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveDeptService()">حفظ الخدمة</button>
         </div>
     </div>
 
@@ -830,15 +764,15 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('deptNoteModal')"></i>
             </div>
             <input type="hidden" id="noteIndex">
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>نص الملحوظة</label>
                 <textarea id="deptNoteText" class="form-control" rows="3"></textarea>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الوسوم (Tags)</label>
                 <input type="text" id="deptNoteTags" class="form-control" placeholder="أرقام، توجيهات">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>لون الكارت</label>
                 <select id="deptNoteColor" class="form-control">
                     <option value="card-gold">برتقالي ذهبي</option>
@@ -860,15 +794,15 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('coordModal')"></i>
             </div>
             <input type="hidden" id="coordId">
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>اسم الطبيب / القسم</label>
                 <input type="text" id="coordName" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الوسوم (Tags)</label>
                 <input type="text" id="coordTags" class="form-control" placeholder="حجز، موعد">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>لون الكارت</label>
                 <select id="coordColor" class="form-control">
                     <option value="card-teal">أزرق ملكي</option>
@@ -879,7 +813,7 @@
                     <option value="card-green">أخضر زيتي</option>
                 </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>التفاصيل والشروط</label>
                 <textarea id="coordRules" class="form-control" rows="4"></textarea>
             </div>
@@ -895,7 +829,7 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('offerModal')"></i>
             </div>
             <input type="hidden" id="offerId">
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>قسم العرض</label>
                 <select id="offCategory" class="form-control" onchange="checkCustomCategory(this.value)">
                     <option value="عروض اسنان">عروض اسنان</option>
@@ -905,48 +839,48 @@
                     <option value="أخرى">أخرى</option>
                 </select>
             </div>
-            <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.35rem;">
+            <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.3rem;">
                 <label>اسم القسم الجديد</label>
                 <input type="text" id="offCustomCategory" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>اسم الخدمة / العرض</label>
                 <input type="text" id="offName" class="form-control" placeholder="3 جلسات جسم كامل">
             </div>
             
-            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; background:var(--bg-card); padding:0.5rem; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
-                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.4rem; background:var(--bg-card); padding:0.4rem; border-radius:6px; border:1px solid var(--border-color);">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
                     <label>اسم الجهاز الأول</label>
                     <input type="text" id="offDevice1" class="form-control" placeholder="جنتل ماكس برو">
                 </div>
-                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
                     <label>سعر الجهاز 1</label>
                     <input type="text" id="offPrice1" class="form-control" placeholder="444 ريال">
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; background:var(--bg-card); padding:0.5rem; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
-                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.4rem; background:var(--bg-card); padding:0.4rem; border-radius:6px; border:1px solid var(--border-color);">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
                     <label>اسم الجهاز الثاني</label>
                     <input type="text" id="offDevice2" class="form-control" placeholder="كلاريتي 2">
                 </div>
-                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <div style="display:flex; flex-direction:column; gap:0.2rem;">
                     <label>سعر الجهاز 2</label>
                     <input type="text" id="offPrice2" class="form-control" placeholder="477 ريال">
                 </div>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>السعر العام / النهائي</label>
                 <input type="text" id="offPrice" class="form-control" placeholder="مثال: 33 ريال">
             </div>
             
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>ملحوظات / شروط أو وسم (Tags)</label>
                 <input type="text" id="offNotes" class="form-control" placeholder="تشمل الكشفية">
             </div>
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.3rem;">
-                <input type="checkbox" id="offIsPinned" style="width:16px; height:16px;">
+            <div style="display:flex; align-items:center; gap:0.4rem; margin-top:0.2rem;">
+                <input type="checkbox" id="offIsPinned" style="width:15px; height:15px;">
                 <label for="offIsPinned" style="font-weight:700; color:var(--primary-color);">📌 تثبيت العرض في أعلى القائمة</label>
             </div>
             <button class="btn btn-green" onclick="saveOffer()">حفظ العرض</button>
@@ -961,7 +895,7 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('inquiryModal')"></i>
             </div>
             <input type="hidden" id="inquiryId">
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>القسم</label>
                 <select id="inqCategory" class="form-control" onchange="checkInquiryCustomCat(this.value)">
                     <option value="الليزر">الليزر</option>
@@ -972,11 +906,11 @@
                     <option value="أخرى">أخرى</option>
                 </select>
             </div>
-            <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.35rem;">
+            <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.3rem;">
                 <label>اسم القسم الجديد</label>
                 <input type="text" id="inqCustomCategoryText" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>لون الكارت</label>
                 <select id="inqColor" class="form-control">
                     <option value="card-darkblue">أزرق داكن (افتراضي)</option>
@@ -987,67 +921,19 @@
                     <option value="card-green">أخضر زيتي</option>
                 </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>السؤال</label>
                 <input type="text" id="inqQuestion" class="form-control">
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الإجابة</label>
                 <textarea id="inqAnswer" class="form-control" rows="3"></textarea>
             </div>
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+            <div style="display:flex; flex-direction:column; gap:0.3rem;">
                 <label>الوسوم (Tags)</label>
                 <input type="text" id="inqTags" class="form-control" placeholder="رتوش، جلسة">
             </div>
             <button class="btn btn-green" onclick="saveInquiry()">حفظ</button>
-        </div>
-    </div>
-
-    <!-- مودال إضافة/تعديل عنصر في قاموس المرادفات -->
-    <div class="modal-overlay" id="synonymModal">
-        <div class="modal">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="synModalTitle">إضافة عنصر للقاموس</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('synonymModal')"></i>
-            </div>
-            <input type="hidden" id="synOriginalKey">
-            
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
-                <label id="synKeyLabel">الكلمة الأصلية أو المصطلح</label>
-                <input type="text" id="synKeyInput" class="form-control" placeholder="مثال: سعر">
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:0.35rem;" id="synCategoryRow">
-                <label>القسم المخصص</label>
-                <select id="synCategorySelect" class="form-control"></select>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
-                <label id="synValuesLabel">المرادفات والمعاني (مفصولة بفاصلة)</label>
-                <textarea id="synValuesInput" class="form-control" rows="3" placeholder="مثال: كم سعر، تكلفة، سعر الجلسة"></textarea>
-            </div>
-
-            <button class="btn btn-green" onclick="saveSynonymItem()">حفظ العنصر</button>
-        </div>
-    </div>
-
-    <!-- مودال إدارة أقسام القاموس -->
-    <div class="modal-overlay" id="categoryManageModal">
-        <div class="modal" style="max-width: 450px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>إدارة وتخصيص أقسام القاموس</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('categoryManageModal')"></i>
-            </div>
-            <div style="display:flex; gap:0.4rem; margin-top:0.4rem;">
-                <input type="text" id="newCategoryNameInput" class="form-control" placeholder="اسم القسم الجديد...">
-                <button class="btn btn-green" onclick="addNewSynonymCategory()"><i class="fa-solid fa-plus"></i> إضافة قسم</button>
-            </div>
-            <div style="max-height: 250px; overflow-y:auto; margin-top:0.6rem;">
-                <table style="width:100%;">
-                    <thead><tr><th>اسم القسم</th><th style="width:80px; text-align:center;">إجراء</th></tr></thead>
-                    <tbody id="categoryManageTableBody"></tbody>
-                </table>
-            </div>
         </div>
     </div>
 
@@ -1063,14 +949,11 @@
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#10b981; box-shadow:0 0 8px #10b981;"></span><span>متصل بالسحابه اونلاين</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابه اونلاين</span>`;
             } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#ef4444; box-shadow:0 0 8px #ef4444;"></span><span>غير متصل بالنت (يعمل محلياً)</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 10px #f59e0b;"></span><span>غير متصل بالنت (يعمل محلياً)</span>`;
             }
         });
-
-        function encodeFirebaseKey(key) { return encodeURIComponent(key).replace(/\./g, '%2E'); }
-        function decodeFirebaseKey(key) { return decodeURIComponent(key.replace(/%2E/g, '.')); }
 
         let doctorsData = [];
         let fridaySchedules = [];
@@ -1080,28 +963,10 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        
-        let synonymsData = {
-            words: {
-                "سامى": { category: "جدول الأطباء", values: ["الدكتور سامى", "د سامى", "دكتور سامى"] }
-            },
-            letters: {
-                "ه": { category: "الحروف", values: ["ة", "هـ"] }
-            },
-            sentences: {
-                "سعر": { category: "الجمل والاستفسارات", values: ["كم سعر", "كم تكلفة", "تكلفة", "السعر", "بكم"] }
-            }
-        };
 
-        let synonymCategories = ["عروض اسنان", "عروض ليزر نساء", "عروض ليزر رجال", "عروض الجلديه والتجميل", "جدول الأطباء", "الجمل والاستفسارات", "الحروف", "عام"];
-
-        let activeSynonymTab = "words";
         let selectedOfferTab = "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = "الكل";
         let selectedOfferIds = [];
-
-        let currentSearchLimit = 10;
-        let lastMatchedResults = [];
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1144,34 +1009,6 @@
                     deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
-                    
-                    if (data.synonymCategories) synonymCategories = data.synonymCategories;
-
-                    if (data.synonymsData) {
-                        if (data.synonymsData.words || data.synonymsData.letters || data.synonymsData.sentences) {
-                            synonymsData = {
-                                words: parseSubSynSection(data.synonymsData.words),
-                                letters: parseSubSynSection(data.synonymsData.letters),
-                                sentences: parseSubSynSection(data.synonymsData.sentences)
-                            };
-                        } else {
-                            synonymsData = { words: {}, letters: {}, sentences: {} };
-                            for (let rawKey in data.synonymsData) {
-                                let k = decodeFirebaseKey(rawKey);
-                                let val = data.synonymsData[rawKey];
-                                let cat = (typeof val === 'object' && val !== null) ? (val.category || "عام") : "عام";
-                                let vals = (typeof val === 'object' && val !== null) ? (Array.isArray(val.values) ? val.values : [String(val)]) : [String(val)];
-                                
-                                if (cat === "الحروف") {
-                                    synonymsData.letters[k] = { category: cat, values: vals };
-                                } else if (cat === "الجمل" || cat === "الجمل والاستفسارات") {
-                                    synonymsData.sentences[k] = { category: cat, values: vals };
-                                } else {
-                                    synonymsData.words[k] = { category: cat, values: vals };
-                                }
-                            }
-                        }
-                    }
                 } else {
                     doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
                     fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
@@ -1182,9 +1019,14 @@
                     syncToCloud();
                 }
 
-                // تحديث القسم الحالي فقط عند جلب البيانات منعاً لأي ثقل
-                const activeTab = localStorage.getItem('activeTab') || 'schedule';
-                refreshActiveTabContent(activeTab);
+                renderDoctors();
+                renderFridayScheduleTable();
+                renderAlerts();
+                renderDeptsAndDocs();
+                renderCoordinators();
+                renderOffersTabs();
+                renderOffers();
+                renderInquiries();
                 updateKPIs();
             });
             
@@ -1193,24 +1035,6 @@
                 document.getElementById('clockDisplay').innerText = now.toLocaleString('ar-EG');
             }, 1000);
         });
-
-        function parseSubSynSection(subObj) {
-            let res = {};
-            if (!subObj) return res;
-            for (let rawK in subObj) {
-                let k = decodeFirebaseKey(rawK);
-                let val = subObj[rawK];
-                if (typeof val === 'object' && val !== null) {
-                    res[k] = {
-                        category: val.category || "عام",
-                        values: Array.isArray(val.values) ? val.values : [String(val)]
-                    };
-                } else {
-                    res[k] = { category: "عام", values: [String(val)] };
-                }
-            }
-            return res;
-        }
 
         function saveShiftScratchpad() { localStorage.setItem('shift_scratchpad_current', document.getElementById('shiftScratchpadText').value); }
         function clearShiftScratchpad() {
@@ -1226,13 +1050,6 @@
         }
 
         function syncToCloud() {
-            let encodedSynData = { words: {}, letters: {}, sentences: {} };
-            ['words', 'letters', 'sentences'].forEach(subType => {
-                for (let k in synonymsData[subType]) {
-                    encodedSynData[subType][encodeFirebaseKey(k)] = synonymsData[subType][k];
-                }
-            });
-
             db.ref('clinicData').set({ 
                 doctorsData, 
                 fridaySchedules, 
@@ -1241,47 +1058,19 @@
                 deptServicesData, 
                 deptNotesData, 
                 offersData, 
-                inquiriesData, 
-                synonymsData: encodedSynData,
-                synonymCategories
+                inquiriesData
             });
         }
 
-        // دالة التحميل السريع المخصصة لتفريغ الذاكرة وعدم تهنيج الهاتف
         function switchTab(tabId, elem, save = true) {
-            document.querySelectorAll('.page-section').forEach(s => {
-                if(s.id !== 'globalSearchResultsSection') {
-                    s.classList.remove('active');
-                    s.style.display = 'none';
-                }
-            });
-            
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            
             const targetSec = document.getElementById(`${tabId}-section`);
-            if (targetSec) {
-                targetSec.style.display = 'block';
-                targetSec.classList.add('active');
-            }
-            
+            if (targetSec) targetSec.classList.add('active');
             if (elem) elem.classList.add('active');
             if (save) localStorage.setItem('activeTab', tabId);
-
-            setTimeout(() => {
-                refreshActiveTabContent(tabId);
-            }, 30);
         }
-
-        function refreshActiveTabContent(tabId) {
-            if (tabId === 'schedule') renderDoctors();
-            else if (tabId === 'alerts') renderAlerts();
-            else if (tabId === 'depts-docs') renderDeptsAndDocs();
-            else if (tabId === 'coordinators') renderCoordinators();
-            else if (tabId === 'offers') { renderOffersTabs(); renderOffers(); }
-            else if (tabId === 'inquiries') renderInquiries();
-            else if (tabId === 'synonyms') renderSynonyms();
-        }
-
         function changeTheme(themeName) {
             document.body.className = themeName;
             localStorage.setItem('appTheme', themeName);
@@ -1300,7 +1089,7 @@
             const m = document.getElementById('mashyTableElement'), w = document.getElementById('wissamTableElement'), btn = document.getElementById('toggleResizeBtn');
             m.classList.toggle('resizable-mode'); w.classList.toggle('resizable-mode');
             if (m.classList.contains('resizable-mode')) {
-                btn.style.background = 'var(--primary-color)'; btn.style.color = '#000'; btn.innerHTML = `<i class="fa-solid fa-check"></i> ⚙️ حفظ وتثبيت الأعمدة`;
+                btn.style.background = 'var(--primary-color)'; btn.style.color = '#000'; btn.innerHTML = `<i class="fa-solid fa-check"></i> ⚙️ حفظ الأعمدة`;
             } else {
                 btn.style.background = ''; btn.style.color = ''; btn.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة`;
                 saveTableWidths();
@@ -1329,7 +1118,7 @@
         }
 
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, synonymsData, synonymCategories }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1348,14 +1137,13 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
-                        if (data.synonymsData) synonymsData = data.synonymsData;
-                        if (data.synonymCategories) synonymCategories = data.synonymCategories;
                         syncToCloud(); alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
                 reader.readAsText(input.files[0]);
             }
         }
+
         function openFridayScheduleModal() {
             document.getElementById('fridayEditId').value = ""; document.getElementById('fridayDate').value = ""; document.getElementById('fridayDocName').value = "";
             document.getElementById('fridayModal').classList.add('active'); renderFridayScheduleTable();
@@ -1384,7 +1172,7 @@
             const tbody = document.getElementById('fridayScheduleTableBody');
             if(!tbody) return; tbody.innerHTML = "";
             fridaySchedules.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => {
-                tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.branch}</td><td><strong>${item.doc}</strong></td><td><button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onclick="editFridaySchedule(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onclick="deleteFridaySchedule(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.branch}</td><td><strong>${item.doc}</strong></td><td><button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="editFridaySchedule(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="deleteFridaySchedule(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
@@ -1454,8 +1242,8 @@
                 if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
-                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.68rem;">⚠️ غائب</span>` : '';
-                const customBgStyle = doc.isLeave ? "background-color: rgba(239, 68, 68, 0.2) !important;" : (doc.customColor || "");
+                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">⚠️ غائب (إجازة)</span>` : '';
+                const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 mashyBody.innerHTML += `
@@ -1463,9 +1251,9 @@
                         <td><span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.75rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.7rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
-                        <td><div style="font-size:0.72rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; gap:4px; justify-content:center;"><button class="btn btn-green" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td><div style="font-size:0.7rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.65rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
+                        <td><div style="font-size:0.68rem; color:#fef08a;">${doc.notes || '-'}</div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:4px; align-items:center;"><button class="btn btn-green" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countM++;
             });
@@ -1475,8 +1263,8 @@
                 if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
-                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.68rem;">⚠️ غائب</span>` : '';
-                const customBgStyle = doc.isLeave ? "background-color: rgba(239, 68, 68, 0.2) !important;" : (doc.customColor || "");
+                const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.62rem;">⚠️ غائب (إجازة)</span>` : '';
+                const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 wissamBody.innerHTML += `
@@ -1484,9 +1272,9 @@
                         <td><span class="doc-name-box">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.75rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.7rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
-                        <td><div style="font-size:0.72rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; gap:4px; justify-content:center;"><button class="btn btn-green" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td><div style="font-size:0.7rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.65rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
+                        <td><div style="font-size:0.68rem; color:#fef08a;">${doc.notes || '-'}</div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:4px; align-items:center;"><button class="btn btn-green" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.18rem; width:26px; height:26px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countW++;
             });
@@ -1615,9 +1403,9 @@
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 grid.innerHTML += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
-                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.68rem; color:var(--text-muted);">${item.time}</span>${getTagsTooltipHtml(item.tags)}</div>
+                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.6rem; color:var(--text-muted);">${item.time}</span>${getTagsTooltipHtml(item.tags)}</div>
                         ${mediaHtml}
-                        <div style="display:flex; flex-direction:column; gap:0.25rem;"><button class="btn btn-blue" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="editAlert(${item.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.2rem 0.4rem; font-size:0.7rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button></div>
+                        <div style="display:flex; flex-direction:column; gap:0.2rem;"><button class="btn btn-blue" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editAlert(${item.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteAlert(${item.id})"><i class="fa-solid fa-trash"></i></button></div>
                     </div>`;
             });
             updateKPIs();
@@ -1663,7 +1451,7 @@
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                             const compressed = canvas.toDataURL('image/jpeg', 0.7);
                             document.getElementById('alertMediaBase64').value = compressed; document.getElementById('alertMediaType').value = "image";
-                            document.getElementById('mediaPreviewBox').innerHTML = `<img src="${compressed}" style="height:45px; border-radius:6px; object-fit:cover;">`;
+                            document.getElementById('mediaPreviewBox').innerHTML = `<img src="${compressed}" style="height:40px; border-radius:4px; object-fit:cover;">`;
                             document.getElementById('mediaPreviewContainer').style.display = 'block';
                         };
                     };
@@ -1691,7 +1479,7 @@
             document.getElementById('alertMediaType').value = item.mediaType || "";
             if (item.media) {
                 if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
-                else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:45px; border-radius:6px; object-fit:cover;">`;
+                else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:40px; border-radius:4px; object-fit:cover;">`;
                 document.getElementById('mediaPreviewContainer').style.display = 'block';
             } else document.getElementById('mediaPreviewContainer').style.display = 'none';
             document.getElementById('alertModal').classList.add('active');
@@ -1710,7 +1498,7 @@
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
-                const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge} ${getTagsTooltipHtml(item.tags)}</td><td style="text-align:center;"><div style="display:flex; gap:3px; justify-content:center;"><button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
+                const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge} ${getTagsTooltipHtml(item.tags)}</td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.1rem 0.2rem; font-size:0.6rem;" onclick="editDeptService(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.2rem; font-size:0.6rem;" onclick="deleteDeptService(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                 if (item.branch === "معشي") {
                     if (item.type === "derm") bodies[0].innerHTML += rowHtml; else bodies[1].innerHTML += rowHtml;
                 } else {
@@ -1722,7 +1510,7 @@
             if(!notesContainer) return; notesContainer.innerHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
-                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.3rem;"><button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
+                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
                 }
             });
         }
@@ -1792,7 +1580,7 @@
                 return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
             }).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${c.name}</span><div style="display:flex; gap:0.3rem;"><button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
+                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
             });
         }
         function openCoordinatorModal() {
@@ -1814,188 +1602,6 @@
         }
         function deleteCoordinator(id) {
             if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
-        }
-
-        // --- قاموس المرادفات والمصطلحات ---
-        function switchSynonymTab(tabType, btnEl) {
-            activeSynonymTab = tabType;
-            document.querySelectorAll('#synonymTypeTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl) btnEl.classList.add('active');
-
-            const filterWrapper = document.getElementById('synCategoryFilterWrapper');
-            const col1 = document.getElementById('synTableCol1');
-            const col2 = document.getElementById('synTableCol2');
-
-            if (tabType === 'words') {
-                filterWrapper.style.display = 'block';
-                col1.innerText = "الكلمة الأصلية";
-                col2.innerText = "المرادفات والمعاني المرتبطة";
-            } else if (tabType === 'letters') {
-                filterWrapper.style.display = 'none';
-                col1.innerText = "الحرف الأساسي";
-                col2.innerText = "الحروف البديلة (ه = ة)";
-            } else if (tabType === 'sentences') {
-                filterWrapper.style.display = 'none';
-                col1.innerText = "الجملة الأصلية (المستهدفة)";
-                col2.innerText = "الجمل والأسئلة المرادفة لها";
-            }
-            renderSynonyms();
-        }
-
-        function renderSynonyms() {
-            const searchInput = document.getElementById('synonymSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const catFilter = document.getElementById('synonymCategoryFilter').value;
-            const tbody = document.getElementById('synonymsTableBody');
-            if(!tbody) return; tbody.innerHTML = "";
-
-            if (!synonymsData) synonymsData = { words: {}, letters: {}, sentences: {} };
-            let currentDataset = synonymsData[activeSynonymTab] || {};
-
-            const catSelect = document.getElementById('synCategorySelect');
-            if (catSelect) {
-                catSelect.innerHTML = synonymCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-            }
-            const filterSelect = document.getElementById('synonymCategoryFilter');
-            if (filterSelect) {
-                const currentFilterVal = filterSelect.value;
-                filterSelect.innerHTML = `<option value="">📁 تصفية حسب القسم (الكل)</option>` + synonymCategories.map(c => `<option value="${c}" ${c === currentFilterVal ? 'selected' : ''}>${c}</option>`).join('');
-            }
-
-            for (let key in currentDataset) {
-                let item = currentDataset[key];
-                let cat = (typeof item === 'object' && item !== null) ? (item.category || "عام") : "عام";
-                let valsArr = (typeof item === 'object' && item !== null) ? (Array.isArray(item.values) ? item.values : [String(item)]) : [String(item)];
-                let vals = valsArr.join('، ');
-
-                const matchCat = (activeSynonymTab !== 'words') || !catFilter || cat === catFilter;
-                const matchSearch = !search || cleanSearchText(key).includes(search) || cleanSearchText(vals).includes(search) || cleanSearchText(cat).includes(search);
-
-                if (matchCat && matchSearch) {
-                    const safeKey = key.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                    let categoryDisplay = (activeSynonymTab === 'words') ? `<span style="color:var(--primary-color);">${cat}</span>` : `<span style="color:#38bdf8;">${activeSynonymTab === 'letters' ? 'معالجة الحروف' : 'الجمل والاستفسارات'}</span>`;
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${key}</strong></td>
-                            <td>${categoryDisplay}</td>
-                            <td>${vals}</td>
-                            <td style="text-align:center;">
-                                <div style="display:flex; gap:3px; justify-content:center;">
-                                    <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="editSynonymItem('${safeKey}')"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteSynonymItem('${safeKey}')"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }
-            }
-        }
-
-        function openSynonymModal() {
-            document.getElementById('synOriginalKey').value = ""; 
-            document.getElementById('synKeyInput').value = ""; 
-            document.getElementById('synValuesInput').value = "";
-            
-            const catRow = document.getElementById('synCategoryRow');
-            const keyLabel = document.getElementById('synKeyLabel');
-            const valLabel = document.getElementById('synValuesLabel');
-
-            if (activeSynonymTab === 'words') {
-                catRow.style.display = 'flex';
-                keyLabel.innerText = "الكلمة الأصلية أو المصطلح";
-                valLabel.innerText = "المرادفات والمعاني (مفصولة بفاصلة)";
-            } else if (activeSynonymTab === 'letters') {
-                catRow.style.display = 'none';
-                keyLabel.innerText = "الحرف الأساسي (مثال: هـ)";
-                valLabel.innerText = "الحروف البديلة والمماثلة (مثال: ة، ه)";
-            } else if (activeSynonymTab === 'sentences') {
-                catRow.style.display = 'none';
-                keyLabel.innerText = "الجملة أو الكلمة الأصلية المستهدفة (مثال: سعر)";
-                valLabel.innerText = "الجمل الاستفسارية المرادفة (مثال: كم سعر، كم تكلفة، بكم)";
-            }
-
-            document.getElementById('synonymModal').classList.add('active');
-        }
-
-        function saveSynonymItem() {
-            const originalKey = document.getElementById('synOriginalKey').value.trim();
-            const key = document.getElementById('synKeyInput').value.trim();
-            const valsStr = document.getElementById('synValuesInput').value.trim();
-            let cat = document.getElementById('synCategorySelect').value || "عام";
-
-            if (!key || !valsStr) return alert("املأ الحقول المطلوبة!");
-
-            if (!synonymsData[activeSynonymTab]) synonymsData[activeSynonymTab] = {};
-            if (originalKey && originalKey !== key && synonymsData[activeSynonymTab][originalKey]) {
-                delete synonymsData[activeSynonymTab][originalKey];
-            }
-
-            let valsArr = valsStr.split(/[,،]/).map(v => v.trim()).filter(Boolean);
-            if (activeSynonymTab !== 'words') {
-                cat = (activeSynonymTab === 'letters') ? "الحروف" : "الجمل والاستفسارات";
-            }
-
-            synonymsData[activeSynonymTab][key] = { category: cat, values: valsArr };
-            syncToCloud(); renderSynonyms(); closeModal('synonymModal');
-        }
-
-        function editSynonymItem(key) {
-            openSynonymModal();
-            document.getElementById('synOriginalKey').value = key;
-            document.getElementById('synKeyInput').value = key;
-            let item = synonymsData[activeSynonymTab][key];
-            if (item) {
-                let valsArr = Array.isArray(item.values) ? item.values : [String(item)];
-                document.getElementById('synValuesInput').value = valsArr.join('، ');
-                if (activeSynonymTab === 'words') {
-                    document.getElementById('synCategorySelect').value = item.category || "عام";
-                }
-            }
-        }
-
-        function deleteSynonymItem(key) {
-            if (confirm(`حذف "${key}" من القاموس؟`)) {
-                delete synonymsData[activeSynonymTab][key];
-                syncToCloud(); renderSynonyms();
-            }
-        }
-
-        function openCategoryManageModal() {
-            renderCategoryManageTable();
-            document.getElementById('categoryManageModal').classList.add('active');
-        }
-
-        function renderCategoryManageTable() {
-            const tbody = document.getElementById('categoryManageTableBody');
-            if(!tbody) return; tbody.innerHTML = "";
-            synonymCategories.forEach((cat, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${cat}</strong></td>
-                        <td style="text-align:center;">
-                            ${idx > 4 ? `<button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteSynonymCategory('${cat}')"><i class="fa-solid fa-trash"></i></button>` : '<span style="font-size:0.7rem; color:var(--text-muted);">افتراضي</span>'}
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function addNewSynonymCategory() {
-            const input = document.getElementById('newCategoryNameInput');
-            const catName = input.value.trim();
-            if (!catName) return alert("أدخل اسم القسم الجديد!");
-            if (synonymCategories.includes(catName)) return alert("هذا القسم موجود بالفعل!");
-            synonymCategories.push(catName);
-            input.value = "";
-            syncToCloud(); renderCategoryManageTable(); renderSynonyms();
-            alert(`✅ تمت إضافة القسم "${catName}" بنجاح!`);
-        }
-
-        function deleteSynonymCategory(catName) {
-            if (confirm(`حذف القسم "${catName}"؟`)) {
-                synonymCategories = synonymCategories.filter(c => c !== catName);
-                syncToCloud(); renderCategoryManageTable(); renderSynonyms();
-            }
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -2088,7 +1694,7 @@
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
                 if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
                 if (!devicesDisplay) devicesDisplay = "-";
-                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><div style="display:flex; gap:3px; justify-content:center;"><button class="btn btn-green" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button> <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
+                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><button class="btn btn-green" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button> <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
             tableEl.innerHTML = bodyHtml + `</tbody>`;
             updateFloatingOffersWindow();
@@ -2170,7 +1776,7 @@
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.4rem;">${item.question}</span><div style="display:flex; gap:0.3rem;"><button class="btn btn-green" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.68rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.8rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.68rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-green" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
         function openInquiryModal() {
@@ -2209,7 +1815,7 @@
             handleTrueGlobalSearch(query);
         }
 
-        // --- البحث الشامل المتطور بنظام تقسيم الدفعات لتخفيف الموبايل والسرعة الخيالية ---
+        // --- البحث الشامل المباشر و السريع ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const normQ = normalizeArabicText(rawQ);
@@ -2219,7 +1825,7 @@
             if (!normQ) {
                 resultsSection.classList.remove('active');
                 const activeTab = localStorage.getItem('activeTab') || 'schedule';
-                document.getElementById(`${activeTab}-section`)?.classList.add('active');
+                document.getElementById(`${activeTab}-section`).classList.add('active');
                 return;
             }
 
@@ -2228,60 +1834,13 @@
             resultsList.innerHTML = "";
 
             const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
-
-            let searchWords = normQ.split(/\s+/).filter(Boolean);
-            let activeTokens = [normQ, ...searchWords];
-            
-            ['words', 'sentences'].forEach(subType => {
-                let dataset = synonymsData[subType] || {};
-                for (let k in dataset) {
-                    let item = dataset[k];
-                    let normKey = normalizeArabicText(k);
-                    let vals = Array.isArray(item.values) ? item.values.map(v => normalizeArabicText(v)) : [];
-                    
-                    if (normKey === normQ || vals.some(v => v === normQ || normQ.includes(v) || v.includes(normQ))) {
-                        activeTokens.push(normKey);
-                        vals.forEach(v => activeTokens.push(v));
-                        activeTokens.push(k);
-                        item.values.forEach(v => activeTokens.push(v));
-                    }
-                }
-            });
-
-            let letterMap = synonymsData.letters || {};
-            let expandedTokens = [];
-            activeTokens.forEach(token => {
-                let t = token;
-                for (let lKey in letterMap) {
-                    let lItem = letterMap[lKey];
-                    let replacements = Array.isArray(lItem.values) ? lItem.values.map(v => normalizeArabicText(v)) : [];
-                    replacements.push(normalizeArabicText(lKey));
-                    
-                    replacements.forEach(fromChar => {
-                        replacements.forEach(toChar => {
-                            t = t.replace(new RegExp(fromChar, 'g'), toChar);
-                        });
-                    });
-                }
-                expandedTokens.push(t);
-            });
-            activeTokens = [...new Set([...activeTokens, ...expandedTokens])];
-
             let allMatchedResults = [];
-            
+
             const isStrictMatch = (text) => {
                 if (!text) return false;
                 let t = normalizeArabicText(text);
-                return activeTokens.some(token => {
-                    if (token.length <= 2) {
-                        return t === token || t.split(/\s+/).includes(token);
-                    }
-                    return t.includes(token);
-                });
+                return t.includes(normQ);
             };
-
-            let isQueryForDoctor = activeTokens.some(token => doctorsData.some(d => normalizeArabicText(d.name).includes(token) || normalizeArabicText(d.specialty).includes(token)));
-            let isQueryForOffers = activeTokens.some(token => offersData.some(o => normalizeArabicText(o.name).includes(token) || normalizeArabicText(o.category).includes(token)) || token.includes('سعر') || token.includes('ريال') || token.includes('عرض'));
 
             // 1. الأطباء
             if (enabledCats.includes('doctors')) {
@@ -2292,8 +1851,7 @@
                             title: `${d.name} (${d.specialty})`,
                             subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
                             action: `jumpToSectionAndHighlightDoc(${d.id})`,
-                            copyAction: `copyDoctorForClient(${d.id})`,
-                            priority: isQueryForDoctor ? 1 : 3
+                            copyAction: `copyDoctorForClient(${d.id})`
                         });
                     }
                 });
@@ -2308,14 +1866,13 @@
                             title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
                             subtitle: o.notes || '',
                             action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
-                            copyAction: `copySingleOffer(${o.id})`,
-                            priority: isQueryForOffers ? 1 : 2
+                            copyAction: `copySingleOffer(${o.id})`
                         });
                     }
                 });
             }
 
-            // 3. التنبيهات والإشعارات
+            // 3. التنبيهات الإشعارات
             if (enabledCats.includes('alerts')) {
                 alertsData.forEach(a => {
                     if (isStrictMatch(a.content) || isStrictMatch(a.tags)) {
@@ -2323,8 +1880,7 @@
                             timeId: a.id || 0, source: "التنبيهات والإشعارات",
                             title: a.content, subtitle: a.time,
                             action: `jumpToAlertsTab(${a.id})`,
-                            copyAction: `copyTextToClipboard('${a.content}', 'تم نسخ التنبيه:')`,
-                            priority: 1
+                            copyAction: `copyTextToClipboard('${a.content}', 'تم نسخ التنبيه:')`
                         });
                     }
                 });
@@ -2338,8 +1894,7 @@
                             timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
                             title: i.question, subtitle: i.answer,
                             action: `jumpToSectionAndHighlightInquiry(${i.id})`,
-                            copyAction: `copyTextToClipboard('سؤال: ${i.question}\\nإجابة: ${i.answer}', 'تم نسخ الاستفسار:')`,
-                            priority: 4
+                            copyAction: `copyTextToClipboard('سؤال: ${i.question}\\nإجابة: ${i.answer}', 'تم نسخ الاستفسار:')`
                         });
                     }
                 });
@@ -2353,8 +1908,7 @@
                             timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
                             title: s.name, subtitle: `القسم: ${s.type}`,
                             action: `jumpToSectionAndHighlightService(${s.id})`,
-                            copyAction: `copyTextToClipboard('${s.name}', 'تم نسخ الخدمة:')`,
-                            priority: 4
+                            copyAction: `copyTextToClipboard('${s.name}', 'تم نسخ الخدمة:')`
                         });
                     }
                 });
@@ -2369,77 +1923,31 @@
                             timeId: c.id || 0, source: "دليل المنسقين",
                             title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
                             action: `jumpToSectionAndHighlightCoordinator(${c.id})`,
-                            copyAction: `copyTextToClipboard('${c.name}\\n' + '${c.rules ? c.rules.join("\\n") : ""}', 'تم نسخ تعليمات المنسقين:')`,
-                            priority: 4
+                            copyAction: `copyTextToClipboard('${c.name}\\n' + '${c.rules ? c.rules.join("\\n") : ""}', 'تم نسخ تعليمات المنسقين:')`
                         });
                     }
                 });
             }
 
-            let uniqueMap = new Map();
-            allMatchedResults.forEach(item => {
-                uniqueMap.set(item.source + "_" + item.title, item);
-            });
-            
-            lastMatchedResults = Array.from(uniqueMap.values());
-            lastMatchedResults.sort((a, b) => {
-                if (a.priority !== b.priority) return a.priority - b.priority;
-                return b.timeId - a.timeId;
-            });
-
-            currentSearchLimit = 10;
-            renderSearchBatch();
-        }
-
-        function renderSearchBatch() {
-            const resultsList = document.getElementById('globalSearchResultsList');
-            if (!resultsList) return;
-
-            if (currentSearchLimit === 10) {
-                resultsList.innerHTML = "";
-            } else {
-                const oldBtn = document.getElementById('loadMoreSearchBtn');
-                if (oldBtn) oldBtn.remove();
-            }
-
-            let batch = lastMatchedResults.slice(0, currentSearchLimit);
-
-            if (batch.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة في الأقسام المحددة.</div>`;
+            if (allMatchedResults.length === 0) {
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة.</div>`;
                 return;
             }
 
-            let batchHtml = "";
-            batch.forEach(res => {
-                batchHtml += `
+            allMatchedResults.forEach(res => {
+                resultsList.innerHTML += `
                     <div class="search-result-card">
                         <div>
                             <span class="source-badge">${res.source}</span>
                             <h4>${res.title}</h4>
-                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${res.subtitle}</p>
+                            <p style="font-size:0.7rem; color:var(--text-muted);">${res.subtitle}</p>
                         </div>
-                        <div style="display:flex; gap:0.4rem;">
+                        <div style="display:flex; gap:0.3rem;">
                             <button class="btn btn-green" onclick="${res.copyAction}" title="نسخ سريع للعميل"><i class="fa-solid fa-copy"></i></button>
                             <button class="btn btn-blue" onclick="${res.action}">عرض</button>
                         </div>
                     </div>`;
             });
-
-            resultsList.innerHTML += batchHtml;
-
-            if (lastMatchedResults.length > currentSearchLimit) {
-                resultsList.innerHTML += `
-                    <div id="loadMoreSearchBtn" style="text-align:center; margin: 1rem 0;">
-                        <button class="btn btn-secondary" style="width:100%; padding: 0.6rem; font-weight:700;" onclick="loadMoreSearchResults()">
-                            🔽 عرض المزيد من النتائج (${lastMatchedResults.length - currentSearchLimit} متبقية)
-                        </button>
-                    </div>`;
-            }
-        }
-
-        function loadMoreSearchResults() {
-            currentSearchLimit += 10;
-            renderSearchBatch();
         }
 
         function clearGlobalSearch() {
@@ -2476,11 +1984,6 @@
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightService(id) { jumpToSectionAndFormatService(id); }
-        function jumpToSectionAndHighlightNote(idx) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
-            setTimeout(() => { renderDeptsAndDocs(); }, 100);
-        }
     </script>
 </body>
 </html>
