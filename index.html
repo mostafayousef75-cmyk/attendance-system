@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - القاموس الذكي المتقدم</title>
+    <title>لوحة الكول سنتر والمنسقين - البحث الشامل المتعدد</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -55,9 +55,13 @@
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; flex-shrink: 0; }
         
-        .search-container { position: relative; flex: 1; max-width: 450px; }
+        .search-container { position: relative; flex: 1; max-width: 420px; }
         .search-container input { width: 100%; padding: 0.45rem 2.2rem 0.45rem 0.8rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.85rem; font-weight: 700; }
         .search-container i { position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 0.9rem; }
+
+        .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.3rem 0.6rem; border-radius: 6px; display: flex; align-items: center; gap: 0.8rem; font-size: 0.73rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .search-filter-chk { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
+        .search-filter-chk input { accent-color: var(--primary-color); width: 13px; height: 13px; cursor: pointer; }
 
         .cloud-indicator { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(22, 163, 74, 0.2); border: 1px solid var(--accent-green); color: #4ade80; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
         .cloud-dot { width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; }
@@ -151,7 +155,6 @@
         .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.88rem; display: inline-block; }
         .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.55rem; padding: 0.02rem 0.2rem; border-radius: 3px; }
         
-        .card-tags-footer { margin-top: 0.3rem; padding-top: 0.2rem; border-top: 1px dashed rgba(255,255,255,0.25); font-size: 0.68rem; color: #fde047; font-weight: 600; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; display: inline-block; margin-top: 2px; }
 
         .floating-offers-window { position: fixed; bottom: 30px; right: 30px; width: 320px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
@@ -224,7 +227,7 @@
         <header class="top-header">
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع (أطباء، عروض، مرادفات، جمل...)" oninput="handleTrueGlobalSearch(this.value)">
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع (اختر الأقسام أدناه)..." oninput="triggerGlobalSearchFromInput()">
             </div>
             
             <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -240,6 +243,19 @@
 
             <div id="clockDisplay" style="font-weight: 600; font-size: 0.76rem;"></div>
         </header>
+
+        <!-- شريط فلاتر الأقسام المتعددة للبحث الشامل -->
+        <div class="search-filters-bar">
+            <span style="font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-filter"></i> تصفية البحث في الأقسام:</span>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="doctors" checked onchange="triggerGlobalSearchFromInput()"> الأطباء</label>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="offers" checked onchange="triggerGlobalSearchFromInput()"> العروض والأسعار</label>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="alerts" checked onchange="triggerGlobalSearchFromInput()"> التنبيهات</label>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="inquiries" checked onchange="triggerGlobalSearchFromInput()"> الاستفسارات</label>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="services" checked onchange="triggerGlobalSearchFromInput()"> الأقسام والخدمات</label>
+            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="coordinators" checked onchange="triggerGlobalSearchFromInput()"> المنسقين</label>
+            <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem; margin-right:auto;" onclick="toggleAllSearchCats(true)">تحديد الكل</button>
+            <button class="btn btn-secondary" style="padding:0.1rem 0.3rem; font-size:0.65rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
+        </div>
 
         <div class="professional-ticker-bar">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
@@ -264,7 +280,7 @@
 
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل في كافة الأقسام (الدقيقة والمطابقة)</h2>
+                    <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل المتعدد</h2>
                     <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
                 </div>
                 <div id="globalSearchResultsList"></div>
@@ -1321,6 +1337,11 @@
             });
         }
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
+        
+        function copyTextToClipboard(text, msg = "تم النسخ بنجاح!") {
+            navigator.clipboard.writeText(text).then(() => alert(`📋 ${msg}\n\n${text}`));
+        }
+
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
@@ -1331,8 +1352,9 @@
             let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\nالساعات والدوام: ${doc.timing || ''}`;
             if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
             if (scheduleLines.length > 0) clientText += `\nأيام الدوام:\n` + scheduleLines.join('\n');
-            navigator.clipboard.writeText(clientText).then(() => alert(`📋 تم نسخ بيانات الدكتور للعميل:\n\n${clientText}`));
+            copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
+
         function getTagsTooltipHtml(tagsStr) {
             if (!tagsStr || !tagsStr.trim()) return '';
             return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
@@ -1743,7 +1765,7 @@
             if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
         }
 
-        // --- قاموس المرادفات والمصطلحات والحروف والجمل الذكي والمستقل ---
+        // --- قاموس المرادفات والمصطلحات ---
         function switchSynonymTab(tabType, btnEl) {
             activeSynonymTab = tabType;
             document.querySelectorAll('#synonymTypeTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1953,9 +1975,9 @@
         }
         function copySingleOffer(id) {
             const item = offersData.find(o => o.id === id); if (!item) return;
-            const textToCopy = formatOfferLineForClient(item);
-            navigator.clipboard.writeText(textToCopy).then(() => alert(`📋 تم نسخ العرض:\n\n${textToCopy}`));
+            copyTextToClipboard(formatOfferLineForClient(item), "تم نسخ العرض:");
         }
+
         function handleOfferCheckboxChange(id, checkboxEl) {
             const offerId = parseInt(id);
             if (checkboxEl.checked) { if (!selectedOfferIds.includes(offerId)) selectedOfferIds.push(offerId); }
@@ -1974,7 +1996,7 @@
         function copyMultiOffersText() {
             const textarea = document.getElementById('floatingOffersTextarea');
             if (!textarea || !textarea.value) return;
-            navigator.clipboard.writeText(textarea.value).then(() => alert(`📋 تم نسخ العروض المحددة!`));
+            copyTextToClipboard(textarea.value, "تم نسخ العروض المحددة!");
         }
         function clearMultiOffersSelection() { selectedOfferIds = []; document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); updateFloatingOffersWindow(); }
         
@@ -2013,7 +2035,7 @@
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
                 if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
                 if (!devicesDisplay) devicesDisplay = "-";
-                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><button class="btn btn-green" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button> <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
             tableEl.innerHTML = bodyHtml + `</tbody>`;
             updateFloatingOffersWindow();
@@ -2095,7 +2117,7 @@
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-green" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.65rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.73rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.6rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
         function openInquiryModal() {
@@ -2124,7 +2146,17 @@
             if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
         }
 
-        // --- البحث الشامل الذكي المتقدم الدقيق والمطابق تماماً ---
+        function toggleAllSearchCats(status) {
+            document.querySelectorAll('.search-cat-chk').forEach(c => c.checked = status);
+            triggerGlobalSearchFromInput();
+        }
+
+        function triggerGlobalSearchFromInput() {
+            const query = document.getElementById('globalSearchInput').value;
+            handleTrueGlobalSearch(query);
+        }
+
+        // --- البحث الشامل المتطور جداً مع دعم تحديد أقسام متعددة والترتيب المطلوب ---
         function handleTrueGlobalSearch(query) {
             const rawQ = query.trim();
             const normQ = normalizeArabicText(rawQ);
@@ -2142,10 +2174,12 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
+            // جلب الأقسام المُعلم عليها فقط من فلاتر الأقسام المتعددة
+            const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+
             let searchWords = normQ.split(/\s+/).filter(Boolean);
-            
-            // إضافة المرادفات والجمل من القاموس لو الكلمة مطابقة أو مرتبطة
             let activeTokens = [normQ, ...searchWords];
+            
             ['words', 'sentences'].forEach(subType => {
                 let dataset = synonymsData[subType] || {};
                 for (let k in dataset) {
@@ -2162,7 +2196,6 @@
                 }
             });
 
-            // معالجة الحروف (ه = ة)
             let letterMap = synonymsData.letters || {};
             let expandedTokens = [];
             activeTokens.forEach(token => {
@@ -2184,7 +2217,6 @@
 
             let allMatchedResults = [];
             
-            // دالة مطابقة دقيقة تمنع ظهور نتائج عشوائية مالهاش علاقة
             const isStrictMatch = (text) => {
                 if (!text) return false;
                 let t = normalizeArabicText(text);
@@ -2200,21 +2232,23 @@
             let isQueryForOffers = activeTokens.some(token => offersData.some(o => normalizeArabicText(o.name).includes(token) || normalizeArabicText(o.category).includes(token)) || token.includes('سعر') || token.includes('ريال') || token.includes('عرض'));
 
             // 1. الأطباء
-            doctorsData.forEach(d => {
-                if (isStrictMatch(d.name) || isStrictMatch(d.specialty) || isStrictMatch(d.tags) || isStrictMatch(d.notes) || isStrictMatch(d.nationality)) {
-                    allMatchedResults.push({
-                        timeId: d.id || 0, source: "الأطباء",
-                        title: `${d.name} (${d.specialty})`,
-                        subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
-                        action: `jumpToSectionAndHighlightDoc(${d.id})`,
-                        categoryType: 'doctor',
-                        priority: isQueryForDoctor ? 1 : 3
-                    });
-                }
-            });
+            if (enabledCats.includes('doctors')) {
+                doctorsData.forEach(d => {
+                    if (isStrictMatch(d.name) || isStrictMatch(d.specialty) || isStrictMatch(d.tags) || isStrictMatch(d.notes) || isStrictMatch(d.nationality)) {
+                        allMatchedResults.push({
+                            timeId: d.id || 0, source: "الأطباء",
+                            title: `${d.name} (${d.specialty})`,
+                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
+                            action: `jumpToSectionAndHighlightDoc(${d.id})`,
+                            copyAction: `copyDoctorForClient(${d.id})`,
+                            priority: isQueryForDoctor ? 1 : 3
+                        });
+                    }
+                });
+            }
 
-            // 2. العروض (فقط لو البحث يخصها أو يطابق اسمها بدقة)
-            if (!isQueryForDoctor || normQ.includes('عرض') || normQ.includes('سعر') || normQ.includes('جلسه') || normQ.includes('جسم')) {
+            // 2. العروض والأسعار
+            if (enabledCats.includes('offers')) {
                 offersData.forEach(o => {
                     if (isStrictMatch(o.name) || isStrictMatch(o.category) || isStrictMatch(o.device1) || isStrictMatch(o.device2) || isStrictMatch(o.notes) || isStrictMatch(o.tags)) {
                         allMatchedResults.push({
@@ -2222,78 +2256,73 @@
                             title: `${o.name} - السعر: ${o.price || o.price1 || '-'}`,
                             subtitle: o.notes || '',
                             action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
-                            categoryType: 'offer',
+                            copyAction: `copySingleOffer(${o.id})`,
                             priority: isQueryForOffers ? 1 : 2
                         });
                     }
                 });
             }
 
-            // 3. التنبيهات
-            alertsData.forEach(a => {
-                if (isStrictMatch(a.content) || isStrictMatch(a.tags)) {
-                    allMatchedResults.push({
-                        timeId: a.id || 0, source: "التنبيهات والإشعارات",
-                        title: a.content, subtitle: a.time,
-                        action: `jumpToAlertsTab(${a.id})`,
-                        categoryType: 'alert',
-                        priority: 1
-                    });
-                }
-            });
+            // 3. التنبيهات والإشعارات
+            if (enabledCats.includes('alerts')) {
+                alertsData.forEach(a => {
+                    if (isStrictMatch(a.content) || isStrictMatch(a.tags)) {
+                        allMatchedResults.push({
+                            timeId: a.id || 0, source: "التنبيهات والإشعارات",
+                            title: a.content, subtitle: a.time,
+                            action: `jumpToAlertsTab(${a.id})`,
+                            copyAction: `copyTextToClipboard('${a.content}', 'تم نسخ التنبيه:')`,
+                            priority: 1
+                        });
+                    }
+                });
+            }
 
-            // 4. الاستفسارات
-            inquiriesData.forEach(i => {
-                if (isStrictMatch(i.question) || isStrictMatch(i.answer) || isStrictMatch(i.tags) || isStrictMatch(i.category)) {
-                    allMatchedResults.push({
-                        timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
-                        title: i.question, subtitle: i.answer,
-                        action: `jumpToSectionAndHighlightInquiry(${i.id})`,
-                        categoryType: 'inquiry',
-                        priority: 4
-                    });
-                }
-            });
+            // 4. الاستفسارات الشائعة
+            if (enabledCats.includes('inquiries')) {
+                inquiriesData.forEach(i => {
+                    if (isStrictMatch(i.question) || isStrictMatch(i.answer) || isStrictMatch(i.tags) || isStrictMatch(i.category)) {
+                        allMatchedResults.push({
+                            timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
+                            title: i.question, subtitle: i.answer,
+                            action: `jumpToSectionAndHighlightInquiry(${i.id})`,
+                            copyAction: `copyTextToClipboard('سؤال: ${i.question}\\nإجابة: ${i.answer}', 'تم نسخ الاستفسار:')`,
+                            priority: 4
+                        });
+                    }
+                });
+            }
 
-            // 5. الخدمات والأجهزة
-            deptServicesData.forEach(s => {
-                if (isStrictMatch(s.name) || isStrictMatch(s.tags) || isStrictMatch(s.branch)) {
-                    allMatchedResults.push({
-                        timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
-                        title: s.name, subtitle: `القسم: ${s.type}`,
-                        action: `jumpToSectionAndHighlightService(${s.id})`,
-                        categoryType: 'service',
-                        priority: 4
-                    });
-                }
-            });
+            // 5. الأقسام والخدمات والأجهزة
+            if (enabledCats.includes('services')) {
+                deptServicesData.forEach(s => {
+                    if (isStrictMatch(s.name) || isStrictMatch(s.tags) || isStrictMatch(s.branch)) {
+                        allMatchedResults.push({
+                            timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
+                            title: s.name, subtitle: `القسم: ${s.type}`,
+                            action: `jumpToSectionAndHighlightService(${s.id})`,
+                            copyAction: `copyTextToClipboard('${s.name}', 'تم نسخ الخدمة:')`,
+                            priority: 4
+                        });
+                    }
+                });
+            }
 
-            // 6. الملاحظات الداخلية
-            deptNotesData.forEach((n, idx) => {
-                if (isStrictMatch(n.text) || isStrictMatch(n.tags)) {
-                    allMatchedResults.push({
-                        timeId: idx, source: "الملاحظات الداخلية",
-                        title: n.text, subtitle: `ملحوظة #${idx + 1}`,
-                        action: `jumpToSectionAndHighlightNote(${idx})`,
-                        categoryType: 'note',
-                        priority: 4
-                    });
-                }
-            });
-
-            // 7. دليل المنسقين
-            coordinatorsData.forEach(c => {
-                let rulesText = c.rules ? c.rules.join(' ') : '';
-                if (isStrictMatch(c.name) || isStrictMatch(rulesText) || isStrictMatch(c.tags)) {
-                    allMatchedResults.push({
-                        timeId: c.id || 0, source: "دليل المنسقين",
-                        title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
-                        action: `jumpToSectionAndHighlightCoordinator(${c.id})`,
-                        categoryType: 'coordinator',
-                        priority: 4
-                    });
-                }
-            });
+            // 6. دليل المنسقين
+            if (enabledCats.includes('coordinators')) {
+                coordinatorsData.forEach(c => {
+                    let rulesText = c.rules ? c.rules.join(' ') : '';
+                    if (isStrictMatch(c.name) || isStrictMatch(rulesText) || isStrictMatch(c.tags)) {
+                        allMatchedResults.push({
+                            timeId: c.id || 0, source: "دليل المنسقين",
+                            title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
+                            action: `jumpToSectionAndHighlightCoordinator(${c.id})`,
+                            copyAction: `copyTextToClipboard('${c.name}\\n' + '${c.rules ? c.rules.join("\\n") : ""}', 'تم نسخ تعليمات المنسقين:')`,
+                            priority: 4
+                        });
+                    }
+                });
+            }
 
             let uniqueMap = new Map();
             allMatchedResults.forEach(item => {
@@ -2301,13 +2330,14 @@
             });
             let finalResults = Array.from(uniqueMap.values());
 
+            // الترتيب المطلوب: الأطباء/الاسعار أولاً ثم التنبيهات ثم الأحدث
             finalResults.sort((a, b) => {
                 if (a.priority !== b.priority) return a.priority - b.priority;
                 return b.timeId - a.timeId;
             });
 
             if (finalResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}". تأكد من إضافة الكلمة في القاموس أو كتابة الاسم الصحيح.</div>`;
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة. تأكد من تفعيل الأقسام المطلوبة أو إضافتها بالقاموس.</div>`;
                 return;
             }
 
@@ -2319,7 +2349,10 @@
                             <h4>${res.title}</h4>
                             <p style="font-size:0.7rem; color:var(--text-muted);">${res.subtitle}</p>
                         </div>
-                        <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                        <div style="display:flex; gap:0.3rem;">
+                            <button class="btn btn-green" onclick="${res.copyAction}" title="نسخ سريع للعميل"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                        </div>
                     </div>`;
             });
         }
@@ -2362,13 +2395,6 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(); }, 100);
-        }
-        function jumpToSectionAndHighlightSynonym(key, subType) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('synonyms', document.querySelectorAll('.nav-link')[6]);
-            const btnEl = document.querySelectorAll('#synonymTypeTabs .offer-tab-btn')[subType === 'words' ? 0 : subType === 'letters' ? 1 : 2];
-            switchSynonymTab(subType, btnEl);
-            setTimeout(() => { renderSynonyms(); }, 100);
         }
     </script>
 </body>
