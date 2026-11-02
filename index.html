@@ -1055,24 +1055,14 @@
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                 } else {
-                    doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
-                    fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
-                    deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", customColor: "", isJoint: true, tags: "جهاز، ليزر" }];
-                    deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", color: "card-gold", tags: "أرقام" }];
-                    inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
-                    offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
-                    syncToCloud();
+                    loadDefaultData();
                 }
 
-                renderDoctors();
-                renderFridayScheduleTable();
-                renderAlerts();
-                renderDeptsAndDocs();
-                renderCoordinators();
-                renderOffersTabs();
-                renderOffers();
-                renderInquiries();
-                updateKPIs();
+                refreshAllViews();
+            }, (error) => {
+                console.error("Firebase read error, loading defaults:", error);
+                loadDefaultData();
+                refreshAllViews();
             });
             
             setInterval(() => {
@@ -1095,6 +1085,28 @@
                 document.getElementById('clockDisplay').innerText = customFormattedDate;
             }, 1000);
         });
+
+        function loadDefaultData() {
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
+            fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", customColor: "", isJoint: true, tags: "جهاز، ليزر" }];
+            deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", color: "card-gold", tags: "أرقام" }];
+            inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
+            offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان" }];
+            syncToCloud();
+        }
+
+        function refreshAllViews() {
+            renderDoctors();
+            renderFridayScheduleTable();
+            renderAlerts();
+            renderDeptsAndDocs();
+            renderCoordinators();
+            renderOffersTabs();
+            renderOffers();
+            renderInquiries();
+            updateKPIs();
+        }
 
         function toggleSearchFiltersBar() {
             const bar = document.getElementById('searchFiltersBarContainer');
@@ -1826,7 +1838,7 @@
             syncToCloud();
             renderOffersTabs();
             renderOffers();
-            openManageCategoriesModal(); // تحديث النافذة المنبثقة
+            openManageCategoriesModal();
             alert(`تم تغيير اسم القسم إلى "${trimmedName}" بنجاح!`);
         }
 
@@ -1842,7 +1854,7 @@
                 syncToCloud();
                 renderOffersTabs();
                 renderOffers();
-                openManageCategoriesModal(); // تحديث النافذة المنبثقة
+                openManageCategoriesModal();
                 alert(`تم حذف القسم "${catName}" بنجاح!`);
             }
         }
@@ -2210,7 +2222,7 @@
             setTimeout(() => { renderCoordinators(id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightService(id) {
-            document.getElementById('globalSearchResultsSection'].classList.remove('active');
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
