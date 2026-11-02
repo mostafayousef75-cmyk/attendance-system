@@ -2089,13 +2089,14 @@
                 return t.includes(normQ);
             };
 
+            // 1. بحث الأطباء (الاسم، التخصص، الوسوم، الملاحظات)
             if (enabledCats.includes('doctors')) {
                 doctorsData.forEach(d => {
                     if (isStrictMatch(d.name) || isStrictMatch(d.specialty) || isStrictMatch(d.tags) || isStrictMatch(d.notes)) {
                         allMatchedResults.push({
                             timeId: d.id || 0, source: "الأطباء",
                             title: `${d.name} (${d.specialty})`,
-                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
+                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'} ${d.tags ? '| 🏷️ ' + d.tags : ''}`,
                             action: `jumpToSectionAndHighlightDoc(${d.id})`,
                             copyAction: `copyDoctorForClient(${d.id})`
                         });
@@ -2103,13 +2104,15 @@
                 });
             }
 
+            // 2. بحث العروض والأسعار (تم تضمين الحقول والوسوم والملاحظات بشكل دقيق)
             if (enabledCats.includes('offers')) {
                 offersData.forEach(o => {
-                    if (isStrictMatch(o.name) || isStrictMatch(o.category) || isStrictMatch(o.price)) {
+                    const combinedOfferText = `${o.name || ''} ${o.category || ''} ${o.price || ''} ${o.notes || ''} ${o.tags || ''} ${o.device1 || ''} ${o.device2 || ''}`;
+                    if (isStrictMatch(combinedOfferText)) {
                         allMatchedResults.push({
                             timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
                             title: `${o.name} - السعر: ${o.price || '-'}`,
-                            subtitle: o.notes || '',
+                            subtitle: `${o.notes || ''} ${o.tags ? '| 🏷️ ' + o.tags : ''}`,
                             action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
                             copyAction: `copySingleOffer(${o.id})`
                         });
@@ -2117,12 +2120,13 @@
                 });
             }
 
+            // 3. بحث التنبيهات
             if (enabledCats.includes('alerts')) {
                 alertsData.forEach(a => {
                     if (isStrictMatch(a.content) || isStrictMatch(a.tags)) {
                         allMatchedResults.push({
                             timeId: a.id || 0, source: "التنبيهات والإشعارات",
-                            title: a.content, subtitle: a.time,
+                            title: a.content, subtitle: `${a.time} ${a.tags ? '| 🏷️ ' + a.tags : ''}`,
                             action: `jumpToAlertsTab(${a.id})`,
                             copyAction: `copyTextToClipboard('${a.content}', 'تم نسخ التنبيه:')`
                         });
@@ -2130,12 +2134,13 @@
                 });
             }
 
+            // 4. بحث الاستفسارات
             if (enabledCats.includes('inquiries')) {
                 inquiriesData.forEach(i => {
                     if (isStrictMatch(i.question) || isStrictMatch(i.answer) || isStrictMatch(i.tags)) {
                         allMatchedResults.push({
                             timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
-                            title: i.question, subtitle: i.answer,
+                            title: i.question, subtitle: `${i.answer} ${i.tags ? '| 🏷️ ' + i.tags : ''}`,
                             action: `jumpToSectionAndHighlightInquiry(${i.id})`,
                             copyAction: `copyTextToClipboard('سؤال: ${i.question}\\nإجابة: ${i.answer}', 'تم نسخ الاستفسار:')`
                         });
@@ -2143,12 +2148,13 @@
                 });
             }
 
+            // 5. بحث الأقسام والخدمات
             if (enabledCats.includes('services')) {
                 deptServicesData.forEach(s => {
                     if (isStrictMatch(s.name) || isStrictMatch(s.tags)) {
                         allMatchedResults.push({
                             timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
-                            title: s.name, subtitle: `القسم: ${s.type}`,
+                            title: s.name, subtitle: `القسم: ${s.type} ${s.tags ? '| 🏷️ ' + s.tags : ''}`,
                             action: `jumpToSectionAndHighlightService(${s.id})`,
                             copyAction: `copyTextToClipboard('${s.name}', 'تم نسخ الخدمة:')`
                         });
@@ -2156,13 +2162,14 @@
                 });
             }
 
+            // 6. بحث المنسقين
             if (enabledCats.includes('coordinators')) {
                 coordinatorsData.forEach(c => {
                     let rulesText = c.rules ? c.rules.join(' ') : '';
-                    if (isStrictMatch(c.name) || isStrictMatch(rulesText)) {
+                    if (isStrictMatch(c.name) || isStrictMatch(rulesText) || isStrictMatch(c.tags)) {
                         allMatchedResults.push({
                             timeId: c.id || 0, source: "دليل المنسقين",
-                            title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
+                            title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات ${c.tags ? '| 🏷️ ' + c.tags : ''}`,
                             action: `jumpToSectionAndHighlightCoordinator(${c.id})`,
                             copyAction: `copyTextToClipboard('${c.name}\\n' + '${c.rules ? c.rules.join("\\n") : ""}', 'تم نسخ تعليمات المنسقين:')`
                         });
