@@ -166,7 +166,7 @@
 
         .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; }
         .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.72rem; }
-        .offer-tab-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
+        .offer-tab-btn.active { background: var(--primary-color); color: #000 !important; border-color: var(--primary-color); font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.5rem; }
         .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; }
@@ -485,7 +485,10 @@
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
-                    <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
+                    <div style="display:flex; gap:0.3rem;">
+                        <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="openManageCategoriesModal()"><i class="fa-solid fa-gear"></i> إدارة الأقسام ⚙️</button>
+                        <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
+                    </div>
                 </div>
 
                 <div class="page-local-search">
@@ -538,6 +541,17 @@
         </div>
         <div class="floating-offers-body">
             <textarea id="floatingOffersTextarea" class="floating-textarea" readonly placeholder="العروض المحددة ستظهر هنا..."></textarea>
+        </div>
+    </div>
+
+    <!-- مودال إدارة وتحرير أقسام العروض -->
+    <div class="modal-overlay" id="manageCategoriesModal">
+        <div class="modal" style="max-width: 455px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-gear"></i> إدارة وتعديل أقسام العروض والأسعار</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageCategoriesModal')"></i>
+            </div>
+            <div id="manageCategoriesListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
         </div>
     </div>
 
@@ -1158,12 +1172,11 @@
         }
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         
-        // حساب المتواجدين الفعليين (باستبعاد الإجازات) وعرضهم في النافذة المنبثقة
         function updateKPIs() {
             const currentDay = getArabicDayName();
             let todayMashyCount = 0, todayWissamCount = 0;
             doctorsData.forEach(d => {
-                if (d.isLeave) return; // استبعاد أطباء الإجازات تماماً من العد
+                if (d.isLeave) return;
                 const mashyDays = d.mashyDays || d.days || [];
                 const wissamDays = d.wissamDays || [];
                 const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
@@ -1757,12 +1770,7 @@
             let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار</button>`;
             
             cats.forEach(cat => { 
-                tabsHtml += `
-                    <div style="display:inline-flex; align-items:center; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:6px; overflow:hidden;">
-                        <button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)" style="border:none; background:transparent;">${cat}</button>
-                        <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.55rem; border-radius:0;" onclick="editOfferCategory('${cat}')" title="تعديل اسم القسم"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.55rem; border-radius:0;" onclick="deleteOfferCategory('${cat}')" title="حذف القسم بالكامل"><i class="fa-solid fa-trash"></i></button>
-                    </div>`; 
+                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; 
             });
             container.innerHTML = tabsHtml;
             updateKPIs();
@@ -1774,6 +1782,29 @@
             document.querySelectorAll('#offersTabsContainer .offer-tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderOffers();
+        }
+
+        function openManageCategoriesModal() {
+            const container = document.getElementById('manageCategoriesListContainer');
+            if (!container) return;
+            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            container.innerHTML = "";
+
+            if (cats.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:1rem; color:var(--text-muted);">لا توجد أقسام مسجلة حالياً.</div>`;
+            } else {
+                cats.forEach(cat => {
+                    container.innerHTML += `
+                        <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem 0.6rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                            <strong style="color:var(--primary-color);">${cat}</strong>
+                            <div style="display:flex; gap:0.25rem;">
+                                <button class="btn btn-secondary" style="padding:0.15rem 0.35rem; font-size:0.6rem;" onclick="editOfferCategory('${cat}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                <button class="btn btn-danger" style="padding:0.15rem 0.35rem; font-size:0.6rem;" onclick="deleteOfferCategory('${cat}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                            </div>
+                        </div>`;
+                });
+            }
+            document.getElementById('manageCategoriesModal').classList.add('active');
         }
 
         function editOfferCategory(oldCatName) {
@@ -1795,6 +1826,7 @@
             syncToCloud();
             renderOffersTabs();
             renderOffers();
+            openManageCategoriesModal(); // تحديث النافذة المنبثقة
             alert(`تم تغيير اسم القسم إلى "${trimmedName}" بنجاح!`);
         }
 
@@ -1810,6 +1842,7 @@
                 syncToCloud();
                 renderOffersTabs();
                 renderOffers();
+                openManageCategoriesModal(); // تحديث النافذة المنبثقة
                 alert(`تم حذف القسم "${catName}" بنجاح!`);
             }
         }
@@ -1901,7 +1934,6 @@
             updateFloatingOffersWindow();
         }
 
-        // تحديث قائمة الأقسام في المودال بدقة بدون بقايا قديمة
         function populateOfferCategoryDropdown(selectedCat = "") {
             const selectEl = document.getElementById('offCategory');
             if (!selectEl) return;
@@ -2178,7 +2210,7 @@
             setTimeout(() => { renderCoordinators(id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
         function jumpToSectionAndHighlightService(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            document.getElementById('globalSearchResultsSection'].classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
