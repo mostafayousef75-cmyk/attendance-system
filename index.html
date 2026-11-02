@@ -972,10 +972,10 @@
         let offersData = [];
         let inquiriesData = [];
         
-        let selectedOfferTab = "⭐ كل العروض والأسعار";
-        let selectedInquiryFilter = "الكل";
+        let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
+        let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
         let selectedOfferIds = [];
-
+        
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
@@ -1710,6 +1710,7 @@
 
         function filterOfferCategory(cat, btn) {
             selectedOfferTab = cat;
+            localStorage.setItem('selectedOfferTab', cat); // حفظ التاب في الذاكرة المحلية
             document.querySelectorAll('#offersTabsContainer .offer-tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderOffers();
@@ -1872,6 +1873,7 @@
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
         function filterInquiryCategory(cat, btn) {
             selectedInquiryFilter = cat;
+            localStorage.setItem('selectedInquiryFilter', cat); // حفظ التاب في الذاكرة المحلية
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderInquiries();
