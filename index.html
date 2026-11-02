@@ -508,7 +508,7 @@
                 </div>
                 
                 <div class="offers-tabs" id="inquiriesFilterTabs">
-                    <button class="offer-tab-btn active" onclick="filterInquiryCategory('الكل', this)">الكل</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الكل', this)">الكل</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الأطباء وخدماتها', this)">الأطباء وخدماتها</button>
                     <button class="offer-tab-btn" onclick="filterInquiryCategory('الأجهزة', this)">الأجهزة</button>
@@ -990,6 +990,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            
             const savedTheme = localStorage.getItem('appTheme') || 'theme-gray';
             changeTheme(savedTheme);
 
@@ -1011,6 +1012,15 @@
             loadSearchFiltersState();
             loadTableWidths();
             initDraggableFloatingOffers();
+
+            // تفعيل تاب الاستفسارات المحفوظة عند فتح الصفحة أو الريفرش
+            document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
+                if (btn.innerText.trim() === selectedInquiryFilter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
 
             db.ref('clinicData').on('value', (snapshot) => {
                 const data = snapshot.val();
