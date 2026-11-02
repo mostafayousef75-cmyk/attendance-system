@@ -74,10 +74,12 @@
         
         .kpi-bar { display: flex; gap: 0.4rem; align-items: center; }
         
-        .kpi-card-mashy { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #fef08a; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+        .kpi-card-mashy { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #fef08a; box-shadow: 0 2px 5px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
+        .kpi-card-mashy:active { transform: scale(0.97); }
         .kpi-card-mashy .kpi-num { color: var(--primary-color); font-weight: 800; font-size: 0.8rem; }
 
-        .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+        .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; box-shadow: 0 2px 5px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
+        .kpi-card-wissam:active { transform: scale(0.97); }
         .kpi-card-wissam .kpi-num { color: var(--accent-green); font-weight: 800; font-size: 0.8rem; }
 
         .professional-ticker-bar { background-color: transparent; border: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; flex-shrink: 0; }
@@ -162,7 +164,7 @@
         .card-gold { background-color: #d97706; }
         .card-green { background-color: #166534; }
 
-        .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; }
+        .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; }
         .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.72rem; }
         .offer-tab-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
 
@@ -254,8 +256,8 @@
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
                 
                 <div class="kpi-bar">
-                    <div class="kpi-card-mashy"><i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span></div>
-                    <div class="kpi-card-wissam"><i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span></div>
+                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="اضغط لعرض المتواجدين في معشي"><i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span></div>
+                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="اضغط لعرض المتواجدين في الوسام"><i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span></div>
                 </div>
             </div>
 
@@ -536,6 +538,17 @@
         </div>
         <div class="floating-offers-body">
             <textarea id="floatingOffersTextarea" class="floating-textarea" readonly placeholder="العروض المحددة ستظهر هنا..."></textarea>
+        </div>
+    </div>
+
+    <!-- مودال الأطباء المتواجدين الآن -->
+    <div class="modal-overlay" id="activeDoctorsModal">
+        <div class="modal" style="max-width: 480px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('activeDoctorsModal')"></i>
+            </div>
+            <div id="activeDocsListContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
         </div>
     </div>
 
@@ -840,11 +853,7 @@
             <div style="display:flex; flex-direction:column; gap:0.25rem;">
                 <label>قسم العرض</label>
                 <select id="offCategory" class="form-control" onchange="checkCustomCategory(this.value)">
-                    <option value="عروض اسنان">عروض اسنان</option>
-                    <option value="عروض ليزر نساء">عروض ليزر نساء</option>
-                    <option value="عروض ليزر رجال">عروض ليزر رجال</option>
-                    <option value="عروض الجلديه والتجميل">عروض الجلديه والتجميل</option>
-                    <option value="أخرى">أخرى</option>
+                    <!-- يتم تعبئتها ديناميكياً بالأقسام المتاحة حالياً -->
                 </select>
             </div>
             <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.25rem;">
@@ -975,7 +984,7 @@
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
         let selectedOfferIds = [];
-        
+
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
@@ -990,7 +999,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            
             const savedTheme = localStorage.getItem('appTheme') || 'theme-gray';
             changeTheme(savedTheme);
 
@@ -1013,7 +1021,6 @@
             loadTableWidths();
             initDraggableFloatingOffers();
 
-            // تفعيل تاب الاستفسارات المحفوظة عند فتح الصفحة أو الريفرش
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
                     btn.classList.add('active');
@@ -1151,10 +1158,12 @@
         }
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         
+        // حساب المتواجدين الفعليين (باستبعاد الإجازات) وعرضهم في النافذة المنبثقة
         function updateKPIs() {
             const currentDay = getArabicDayName();
             let todayMashyCount = 0, todayWissamCount = 0;
             doctorsData.forEach(d => {
+                if (d.isLeave) return; // استبعاد أطباء الإجازات تماماً من العد
                 const mashyDays = d.mashyDays || d.days || [];
                 const wissamDays = d.wissamDays || [];
                 const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
@@ -1167,6 +1176,41 @@
             const wissamEl = document.getElementById('kpiTodayWissam');
             if (mashyEl) mashyEl.innerText = todayMashyCount;
             if (wissamEl) wissamEl.innerText = todayWissamCount;
+        }
+
+        function openActiveDoctorsModal(branchName) {
+            const currentDay = getArabicDayName();
+            let activeList = [];
+            doctorsData.forEach(d => {
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
+
+                if (branchName === "معشي" && isMashyToday) activeList.push(d);
+                if (branchName === "الوسام" && isWissamToday) activeList.push(d);
+            });
+
+            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${branchName} (${activeList.length})`;
+            const container = document.getElementById('activeDocsListContainer');
+            container.innerHTML = "";
+
+            if (activeList.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">لا يوجد أطباء متواجدون اليوم في هذا الفرع.</div>`;
+            } else {
+                activeList.forEach(doc => {
+                    container.innerHTML += `
+                        <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem 0.6rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
+                                <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                            </div>
+                            <button class="btn btn-green" style="padding:0.15rem 0.35rem; font-size:0.6rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})"><i class="fa-solid fa-eye"></i> عرض</button>
+                        </div>`;
+                });
+            }
+            document.getElementById('activeDoctorsModal').classList.add('active');
         }
 
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
@@ -1724,12 +1768,19 @@
             updateKPIs();
         }
 
+        function filterOfferCategory(cat, btn) {
+            selectedOfferTab = cat;
+            localStorage.setItem('selectedOfferTab', cat);
+            document.querySelectorAll('#offersTabsContainer .offer-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderOffers();
+        }
+
         function editOfferCategory(oldCatName) {
             const newName = prompt(`تعديل اسم القسم "${oldCatName}" إلى الاسم الجديد:`, oldCatName);
             if (!newName || !newName.trim() || newName.trim() === oldCatName) return;
             const trimmedName = newName.trim();
             
-            // تحديث اسم القسم في كل العروض التابعة له
             offersData.forEach(o => {
                 if (o.category === oldCatName) {
                     o.category = trimmedName;
@@ -1749,7 +1800,6 @@
 
         function deleteOfferCategory(catName) {
             if (confirm(`هل أنت متأكد من حذف القسم "${catName}" وكل العروض الموجودة بداخله؟`)) {
-                // حذف كل العروض الخاصة بالقسم ده
                 offersData = offersData.filter(o => o.category !== catName);
                 
                 if (selectedOfferTab === catName) {
@@ -1764,15 +1814,6 @@
             }
         }
 
-        function filterOfferCategory(cat, btn) {
-            selectedOfferTab = cat;
-            localStorage.setItem('selectedOfferTab', cat); // حفظ التاب في الذاكرة المحلية
-            document.querySelectorAll('#offersTabsContainer .offer-tab-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderOffers();
-        }
-
-        // دالة تنظيف وتعديل نص العرض عند النسخ (حذف كلمة جهاز تماماً من النص المنسخ للعميل)
         function formatOfferLineForClient(item) {
             let lines = [`${item.name}`], hasDeviceLines = false;
             
@@ -1786,12 +1827,9 @@
                 lines.push(`${cleanDev2}${item.price2 ? ` بـ ${item.price2}` : ""}`);
                 hasDeviceLines = true;
             }
-            
-            // إضافة السعر العام دائماً لو موجود سواء فيه أجهزة أو لا
             if (item.price && item.price.trim() !== "") {
                 lines.push(`السعر: ${item.price}`);
             }
-
             return lines.join('\n');
         }
 
@@ -1863,6 +1901,21 @@
             updateFloatingOffersWindow();
         }
 
+        // تحديث قائمة الأقسام في المودال بدقة بدون بقايا قديمة
+        function populateOfferCategoryDropdown(selectedCat = "") {
+            const selectEl = document.getElementById('offCategory');
+            if (!selectEl) return;
+            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            
+            let html = "";
+            cats.forEach(c => {
+                html += `<option value="${c}" ${c === selectedCat ? 'selected' : ''}>${c}</option>`;
+            });
+            html += `<option value="أخرى" ${!cats.includes(selectedCat) && selectedCat ? 'selected' : ''}>+ قسم جديد (أخرى)</option>`;
+            selectEl.innerHTML = html;
+            checkCustomCategory(selectEl.value);
+        }
+
         function openOfferModal() {
             document.getElementById('offerId').value = ""; document.getElementById('offName').value = "";
             document.getElementById('offDevice1').value = ""; document.getElementById('offPrice1').value = "";
@@ -1870,12 +1923,8 @@
             document.getElementById('offPrice').value = ""; document.getElementById('offNotes').value = "";
             document.getElementById('offIsPinned').checked = false; 
             
-            if (selectedOfferTab && selectedOfferTab !== '⭐ كل العروض والأسعار') {
-                document.getElementById('offCategory').value = selectedOfferTab;
-            } else {
-                document.getElementById('offCategory').value = "عروض اسنان";
-            }
-            document.getElementById('customCategoryBox').style.display = "none"; 
+            let defaultCat = (selectedOfferTab && selectedOfferTab !== '⭐ كل العروض والأسعار') ? selectedOfferTab : (offersData[0]?.category || "عروض اسنان");
+            populateOfferCategoryDropdown(defaultCat);
             document.getElementById('offerModal').classList.add('active');
         }
 
@@ -1883,6 +1932,8 @@
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
             if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
+            if (!cat) return alert("حدد أو أدخل اسم القسم!");
+
             const obj = {
                 id: id ? parseInt(id) : Date.now(), category: cat, name: document.getElementById('offName').value,
                 device1: document.getElementById('offDevice1').value.trim(), price1: document.getElementById('offPrice1').value.trim(),
@@ -1907,18 +1958,7 @@
             document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offIsPinned').checked = !!item.isPinned;
             
-            const categorySelect = document.getElementById('offCategory');
-            const customCatBox = document.getElementById('customCategoryBox');
-            let catExists = Array.from(categorySelect.options).some(opt => opt.value === item.category);
-            if (catExists) {
-                categorySelect.value = item.category;
-                customCatBox.style.display = "none";
-            } else {
-                categorySelect.value = "أخرى";
-                document.getElementById('offCustomCategory').value = item.category;
-                customCatBox.style.display = "flex";
-            }
-
+            populateOfferCategoryDropdown(item.category);
             document.getElementById('offerModal').classList.add('active');
         }
 
@@ -1929,7 +1969,7 @@
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
         function filterInquiryCategory(cat, btn) {
             selectedInquiryFilter = cat;
-            localStorage.setItem('selectedInquiryFilter', cat); // حفظ التاب في الذاكرة المحلية
+            localStorage.setItem('selectedInquiryFilter', cat);
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderInquiries();
@@ -2116,6 +2156,7 @@
         }
 
         function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal');
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
             setTimeout(() => { renderDoctors(id); document.getElementById(`doc_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
