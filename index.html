@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - البحث الشامل المتعدد</title>
+    <title>لوحة الكول سنتر والمنسقين - متصل بالسحابة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -38,26 +38,29 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
 
-        /* القائمة الجانبية مستقرة على اليمين تماماً */
         .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
-        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
+        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
+        .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
 
         .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; }
         .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; }
         .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; overflow-y: auto; }
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
-        .theme-box { padding-top: 0.5rem; border-top: 1px solid var(--border-color); }
+        
+        /* مؤشر متصل بالسحابة في القائمة الجانبية فوق السيم مباشرة */
+        .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
+
+        .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); }
         .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; margin-top: 0.2rem; font-size: 0.75rem; }
 
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* تنسيق الهيدر العلوي بشكل متناسق ومنظم */
         .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; flex-shrink: 0; }
         
-        /* مربع البحث الشامل مطول وبحجم مريح */
         .search-container { position: relative; flex: 1; min-width: 320px; max-width: 580px; display: flex; gap: 0.4rem; align-items: center; }
         .search-input-box { position: relative; flex: 1; }
         .search-input-box input { width: 100%; padding: 0.45rem 2.2rem 0.45rem 0.8rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
@@ -68,14 +71,10 @@
         .search-filter-chk { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
         .search-filter-chk input { accent-color: var(--primary-color); width: 13px; height: 13px; cursor: pointer; }
 
-        .cloud-indicator { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(22, 163, 74, 0.15); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; }
-
         .kpi-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.35rem; }
         .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.78rem; }
 
-        /* شريط التنبيهات بخلفية محذوفة وتنبيهات بلون رصاصي فاتح للتباين */
         .professional-ticker-bar { background-color: transparent; border: none; padding: 0.4rem 0.8rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; flex-shrink: 0; }
         .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.35rem 0.6rem; border-radius: 30px; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3); flex-shrink: 0; }
         
@@ -124,7 +123,6 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.65rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        /* مقبض سحب الكارت بوضوح وثبات تام بدون تأثيرات جانبية خاطئة */
         .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.95rem; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); margin-left: 5px; transition: background 0.2s; }
         .row-drag-handle:active { cursor: grabbing; background: rgba(250, 204, 21, 0.35); }
 
@@ -222,6 +220,12 @@
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
         </ul>
         
+        <!-- مؤشر متصل بالسحابة في القائمة الجانبية مباشرة فوق السيم -->
+        <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
+            <span class="cloud-dot"></span>
+            <span>متصل بالسحابة</span>
+        </div>
+
         <div class="theme-box">
             <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
             <select class="theme-select" onchange="changeTheme(this.value)">
@@ -241,11 +245,6 @@
                 </div>
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleSearchFiltersBar()" title="إظهار / إخفاء تصفية الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
-            </div>
-            
-            <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
-                <span class="cloud-dot"></span>
-                <span>اونلاين</span>
             </div>
 
             <div class="kpi-bar">
@@ -954,9 +953,9 @@
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>اونلاين</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة</span>`;
             } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">اوفلاين</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل بالسحابة</span>`;
             }
         });
 
@@ -1360,26 +1359,43 @@
         }
 
         let draggedBranch = null, draggedDocId = null;
-        function handleBranchDragStart(e, branch, id) { draggedBranch = branch; draggedDocId = id; }
+        function handleBranchDragStart(e, branch, id) { 
+            draggedBranch = branch; 
+            draggedDocId = id;
+            e.dataTransfer.setData('text/plain', id);
+        }
         function handleBranchDrop(e, branch, targetId) {
             e.preventDefault();
             if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
+            
             const search = document.getElementById('docSearchInput').value.trim().toLowerCase();
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
+            
             let currentList = doctorsData.filter(d => {
                 const matchSearch = d.name.toLowerCase().includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (branch === 'mashy' ? (d.branch === "معشي" || d.isJoint || (d.mashyDays||[]).length > 0) : (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0));
             });
-            const oldIdx = currentList.findIndex(d => d.id === draggedDocId), targetIdx = currentList.findIndex(d => d.id === targetId);
+            
+            currentList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a[branch === 'mashy' ? 'mashyOrder' : 'wissamOrder'] ?? 0) - (b[branch === 'mashy' ? 'mashyOrder' : 'wissamOrder'] ?? 0)));
+
+            const oldIdx = currentList.findIndex(d => d.id === draggedDocId);
+            const targetIdx = currentList.findIndex(d => d.id === targetId);
+
             if (oldIdx !== -1 && targetIdx !== -1) {
                 const moved = currentList.splice(oldIdx, 1)[0];
                 currentList.splice(targetIdx, 0, moved);
+                
                 currentList.forEach((doc, idx) => {
                     const mainDoc = doctorsData.find(d => d.id === doc.id);
-                    if (mainDoc) { if (branch === 'mashy') mainDoc.mashyOrder = idx; else mainDoc.wissamOrder = idx; }
+                    if (mainDoc) { 
+                        if (branch === 'mashy') mainDoc.mashyOrder = idx; 
+                        else mainDoc.wissamOrder = idx; 
+                    }
                 });
-                syncToCloud(); renderDoctors();
+                
+                syncToCloud(); 
+                renderDoctors();
             }
         }
 
