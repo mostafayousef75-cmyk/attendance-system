@@ -1711,11 +1711,57 @@
             const cats = [...new Set(offersData.map(o => o.category))];
             
             let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار</button>`;
+            
             cats.forEach(cat => { 
-                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; 
+                tabsHtml += `
+                    <div style="display:inline-flex; align-items:center; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:6px; overflow:hidden;">
+                        <button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)" style="border:none; background:transparent;">${cat}</button>
+                        <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.55rem; border-radius:0;" onclick="editOfferCategory('${cat}')" title="تعديل اسم القسم"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.55rem; border-radius:0;" onclick="deleteOfferCategory('${cat}')" title="حذف القسم بالكامل"><i class="fa-solid fa-trash"></i></button>
+                    </div>`; 
             });
             container.innerHTML = tabsHtml;
             updateKPIs();
+        }
+
+        function editOfferCategory(oldCatName) {
+            const newName = prompt(`تعديل اسم القسم "${oldCatName}" إلى الاسم الجديد:`, oldCatName);
+            if (!newName || !newName.trim() || newName.trim() === oldCatName) return;
+            const trimmedName = newName.trim();
+            
+            // تحديث اسم القسم في كل العروض التابعة له
+            offersData.forEach(o => {
+                if (o.category === oldCatName) {
+                    o.category = trimmedName;
+                }
+            });
+
+            if (selectedOfferTab === oldCatName) {
+                selectedOfferTab = trimmedName;
+                localStorage.setItem('selectedOfferTab', trimmedName);
+            }
+
+            syncToCloud();
+            renderOffersTabs();
+            renderOffers();
+            alert(`تم تغيير اسم القسم إلى "${trimmedName}" بنجاح!`);
+        }
+
+        function deleteOfferCategory(catName) {
+            if (confirm(`هل أنت متأكد من حذف القسم "${catName}" وكل العروض الموجودة بداخله؟`)) {
+                // حذف كل العروض الخاصة بالقسم ده
+                offersData = offersData.filter(o => o.category !== catName);
+                
+                if (selectedOfferTab === catName) {
+                    selectedOfferTab = "⭐ كل العروض والأسعار";
+                    localStorage.setItem('selectedOfferTab', selectedOfferTab);
+                }
+
+                syncToCloud();
+                renderOffersTabs();
+                renderOffers();
+                alert(`تم حذف القسم "${catName}" بنجاح!`);
+            }
         }
 
         function filterOfferCategory(cat, btn) {
