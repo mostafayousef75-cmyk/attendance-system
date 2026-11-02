@@ -80,7 +80,6 @@
         .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
         .kpi-card-wissam .kpi-num { color: var(--accent-green); font-weight: 800; font-size: 0.8rem; }
 
-        /* تم تكبير وتوسيع مسطرة التنبيهات البرتقالية (الـ Ruler) لتكون أكبر وأعرض كما طلبْت */
         .professional-ticker-bar { background-color: transparent; border: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; flex-shrink: 0; }
         .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; width: 44px; height: 44px; border-radius: 50%; font-size: 1.15rem; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(245, 158, 11, 0.5); flex-shrink: 0; }
         
@@ -250,7 +249,6 @@
                 </div>
             </div>
 
-            <!-- مجموعة الأزرار والـ KPI مرتبة ومنسقة بجوار البحث -->
             <div class="header-actions-group">
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleSearchFiltersBar()" title="تصفية الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
@@ -287,7 +285,6 @@
             <textarea id="shiftScratchpadText" class="scratchpad-textarea" placeholder="اكتب هنا أي تنبيه طارئ أو ملاحظة سريعة أثناء الوردية..." oninput="saveShiftScratchpad()"></textarea>
         </div>
 
-        <!-- مسطرة التنبيهات (تم تكبير وتوسيع المسطرة البرتقالية وأزرارها لتكون أكبر وأعرض) -->
         <div class="professional-ticker-bar">
             <div style="display:flex; align-items:center; gap:0.6rem; flex-shrink:0;">
                 <div class="ticker-yellow-ruler" title="تنبيهات العيادة"><i class="fa-solid fa-bell"></i></div>
@@ -861,12 +858,12 @@
             
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.3rem; background:var(--bg-card); padding:0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                 <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                    <label>اسم الجهاز الأول</label>
-                    <input type="text" id="offDevice1" class="form-control" placeholder="جنتل ماكس برو">
+                    <label>اسم الجهاز الأول (اكتب كلمة جهاز هنا براحتك)</label>
+                    <input type="text" id="offDevice1" class="form-control" placeholder="جهاز الشد الشهرة">
                 </div>
                 <div style="display:flex; flex-direction:column; gap:0.15rem;">
                     <label>سعر الجهاز 1</label>
-                    <input type="text" id="offPrice1" class="form-control" placeholder="444 ريال">
+                    <input type="text" id="offPrice1" class="form-control" placeholder="180 ريال">
                 </div>
             </div>
 
@@ -1718,13 +1715,26 @@
             renderOffers();
         }
 
+        // دالة تنظيف وتعديل نص العرض عند النسخ (حذف كلمة جهاز تماماً من النص المنسخ للعميل)
         function formatOfferLineForClient(item) {
             let lines = [`${item.name}`], hasDeviceLines = false;
-            if (item.device1 && item.device1.trim() !== "") { lines.push(`جهاز ${item.device1}${item.price1 ? ` بـ ${item.price1}` : ""}`); hasDeviceLines = true; }
-            if (item.device2 && item.device2.trim() !== "") { lines.push(`جهاز ${item.device2}${item.price2 ? ` بـ ${item.price2}` : ""}`); hasDeviceLines = true; }
-            if (!hasDeviceLines && item.price) lines.push(`السعر: ${item.price}`);
+            
+            if (item.device1 && item.device1.trim() !== "") {
+                let cleanDev1 = item.device1.replace(/جهاز\s*/g, '').trim();
+                lines.push(`${cleanDev1}${item.price1 ? ` بـ ${item.price1}` : ""}`);
+                hasDeviceLines = true;
+            }
+            if (item.device2 && item.device2.trim() !== "") {
+                let cleanDev2 = item.device2.replace(/جهاز\s*/g, '').trim();
+                lines.push(`${cleanDev2}${item.price2 ? ` بـ ${item.price2}` : ""}`);
+                hasDeviceLines = true;
+            }
+            if (!hasDeviceLines && item.price) {
+                lines.push(`السعر: ${item.price}`);
+            }
             return lines.join('\n');
         }
+
         function copySingleOffer(id) {
             const item = offersData.find(o => o.id === id); if (!item) return;
             copyTextToClipboard(formatOfferLineForClient(item), "تم نسخ العرض:");
