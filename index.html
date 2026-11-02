@@ -54,12 +54,11 @@
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.4rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; flex-shrink: 0; }
         
-        .search-container { position: relative; flex: 1; max-width: 380px; display: flex; gap: 0.3rem; align-items: center; }
+        .search-container { position: relative; flex: 1; max-width: 440px; display: flex; gap: 0.3rem; align-items: center; }
         .search-input-box { position: relative; flex: 1; }
         .search-input-box input { width: 100%; padding: 0.35rem 2rem 0.35rem 0.6rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.8rem; font-weight: 700; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
         .search-input-box i { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 0.85rem; }
 
-        /* شريط تصفية الأقسام المخفي الذي يظهر عند الضغط على زر الفلتر */
         .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.3rem 0.6rem; border-radius: 6px; display: none; align-items: center; gap: 0.8rem; font-size: 0.73rem; flex-wrap: wrap; margin: 0.2rem 0.6rem; }
         .search-filters-bar.show { display: flex; }
         .search-filter-chk { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
@@ -72,7 +71,6 @@
         .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.15rem 0.4rem; border-radius: 6px; font-size: 0.7rem; display: flex; align-items: center; gap: 0.3rem; }
         .kpi-num { color: var(--primary-color); font-weight: bold; font-size: 0.76rem; }
 
-        /* شريط التنبيهات المُقلل العرض والارتفاع بناءً على طلبك */
         .professional-ticker-bar { background-color: var(--bg-surface); border-bottom: 2px solid var(--primary-color); border-top: 1px solid var(--border-color); padding: 0.3rem 0.8rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; }
         .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 5px; font-size: 0.72rem; display: inline-flex; align-items: center; gap: 0.3rem; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3); flex-shrink: 0; }
         
@@ -104,8 +102,10 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        .shift-scratchpad-box { background: var(--bg-surface); border: 1px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.4rem 0.7rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.1); }
-        .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.72rem; resize: vertical; height: 42px; outline: none; }
+        /* صندوق ملاحظات الشيفت المنبثق المحفوظ الحالة */
+        .shift-scratchpad-box { background: var(--bg-surface); border: 1px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.4rem 0.7rem; margin: 0.3rem 0.6rem 0.1rem 0.6rem; display: none; flex-direction: column; gap: 0.2rem; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.1); }
+        .shift-scratchpad-box.show { display: flex; }
+        .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.72rem; resize: vertical; height: 50px; outline: none; }
 
         .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-items: start; }
         .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.4rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; width: 100%; }
@@ -232,6 +232,7 @@
                     <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع..." oninput="triggerGlobalSearchFromInput()">
                 </div>
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleSearchFiltersBar()" title="إظهار / إخفاء تصفية الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
+                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
             </div>
             
             <div class="cloud-indicator" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -263,6 +264,18 @@
             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
+        <!-- صندوق ملاحظات الشيفت المنبثق المحفوظ الحالة حتى لو عملت ريفرش أو تنقلت -->
+        <div class="shift-scratchpad-box" id="shiftScratchpadContainer">
+            <div style="display:flex; justify-space-between; align-items:center; font-size:0.72rem; font-weight:700; color:var(--primary-color);">
+                <span><i class="fa-solid fa-clipboard-list"></i> سجل ملاحظات وطوارئ وردية الشيفت (مستمر ومحفوظ):</span>
+                <div style="display:flex; gap:0.3rem;">
+                    <button class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الشيفت</button>
+                    <button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="toggleShiftScratchpad()"><i class="fa-solid fa-xmark"></i> إخفاء</button>
+                </div>
+            </div>
+            <textarea id="shiftScratchpadText" class="scratchpad-textarea" placeholder="اكتب هنا أي تنبيه طارئ أو ملاحظة سريعة أثناء الوردية..." oninput="saveShiftScratchpad()"></textarea>
+        </div>
+
         <!-- شريط التنبيهات المُصغر والمضغوط -->
         <div class="professional-ticker-bar">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
@@ -277,14 +290,6 @@
         </div>
 
         <div class="content-area">
-            <div class="shift-scratchpad-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; font-weight:700; color:var(--primary-color);">
-                    <span><i class="fa-solid fa-clipboard-list"></i> سجل ملاحظات وطوارئ وردية الشيفت (مؤقت):</span>
-                    <button class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الشيفت</button>
-                </div>
-                <textarea id="shiftScratchpadText" class="scratchpad-textarea" placeholder="اكتب هنا أي تنبيه طارئ أو ملاحظة سريعة أثناء الوردية..." oninput="saveShiftScratchpad()"></textarea>
-            </div>
-
             <section id="globalSearchResultsSection" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                     <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل المتعدد</h2>
@@ -983,8 +988,15 @@
             const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             if (isSidebarCollapsed) document.getElementById('appSidebar').classList.add('collapsed');
 
+            // استعادة النص المحفوظ لسجل ملاحظات الشيفت
             const savedShiftNote = localStorage.getItem('shift_scratchpad_current') || '';
             document.getElementById('shiftScratchpadText').value = savedShiftNote;
+
+            // استعادة حالة الفتح/الإغلاق المحفوظة لسجل الملاحظات
+            const isShiftScratchpadOpen = localStorage.getItem('shift_scratchpad_open') === 'true';
+            if (isShiftScratchpadOpen) {
+                document.getElementById('shiftScratchpadContainer').classList.add('show');
+            }
 
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
@@ -1036,6 +1048,13 @@
         function toggleSearchFiltersBar() {
             const bar = document.getElementById('searchFiltersBarContainer');
             bar.classList.toggle('show');
+        }
+
+        /* دالة فتح وإخفاء سجل ملاحظات الشيفت مع إبقاء حالته ثابتة بالمستند */
+        function toggleShiftScratchpad() {
+            const container = document.getElementById('shiftScratchpadContainer');
+            container.classList.toggle('show');
+            localStorage.setItem('shift_scratchpad_open', container.classList.contains('show'));
         }
 
         function saveSearchFiltersState() {
