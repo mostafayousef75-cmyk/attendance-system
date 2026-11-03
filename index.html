@@ -38,14 +38,19 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
+        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; position: relative; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
-        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
+        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select, .sidebar.collapsed .sidebar-edit-target-btn span { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
 
-        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; }
-        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; }
+        body.focus-mode .sidebar { display: none !important; }
+        body.focus-mode .professional-ticker-bar { display: none !important; }
+        body.focus-mode .top-header .kpi-bar { display: none !important; }
+
+        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between; }
+        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; }
+
         .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; overflow-y: auto; }
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
@@ -53,17 +58,24 @@
         .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; }
         .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
 
-        .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); }
-        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; margin-top: 0.2rem; font-size: 0.75rem; }
+        .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.2rem; }
+        .theme-box-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
+        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; font-size: 0.75rem; }
+        
+        /* زر التحرير الصغير أمام السيم كما طلبت تماماً */
+        .sidebar-edit-target-btn { background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; padding: 0.3rem 0.4rem; border-radius: var(--radius-md); font-size: 0.68rem; display: inline-flex; align-items: center; gap: 0.2rem; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
+        .sidebar-edit-target-btn:hover { color: var(--primary-color); border-color: var(--primary-color); }
 
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; flex-shrink: 0; }
         
-        .search-container { position: relative; flex: 1; min-width: 280px; max-width: 420px; display: flex; gap: 0.4rem; align-items: center; }
-        .search-input-box { position: relative; flex: 1; }
-        .search-input-box input { width: 100%; padding: 0.4rem 2.2rem 0.4rem 0.8rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.8rem; font-weight: 700; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
-        .search-input-box i { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 0.85rem; }
+        .search-container { position: relative; flex: 1; min-width: 280px; max-width: 440px; display: flex; gap: 0.4rem; align-items: center; }
+        .search-input-box { position: relative; flex: 1; display: flex; align-items: center; }
+        .search-input-box input { width: 100%; padding: 0.4rem 2.6rem 0.4rem 2.2rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.8rem; font-weight: 700; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
+        .search-input-box .fa-magnifying-glass { position: absolute; right: 0.7rem; color: var(--primary-color); font-size: 0.85rem; }
+        .search-input-box .mic-btn { position: absolute; left: 0.5rem; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: color 0.2s; }
+        .search-input-box .mic-btn.listening { color: var(--danger-color); animation: pulseGlow 1s infinite; }
 
         .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.3rem 0.6rem; border-radius: 6px; display: none; align-items: center; gap: 0.8rem; font-size: 0.73rem; flex-wrap: wrap; margin: 0.2rem 0.6rem; }
         .search-filters-bar.show { display: flex; }
@@ -71,28 +83,26 @@
         .search-filter-chk input { accent-color: var(--primary-color); width: 13px; height: 13px; cursor: pointer; }
 
         .header-actions-group { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
-        
         .kpi-bar { display: flex; gap: 0.4rem; align-items: center; }
         
-        .kpi-card-mashy { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #fef08a; box-shadow: 0 2px 5px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
-        .kpi-card-mashy:active { transform: scale(0.97); }
-        .kpi-card-mashy .kpi-num { color: var(--primary-color); font-weight: 800; font-size: 0.8rem; }
+        .kpi-card-mashy { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #fef08a; cursor: pointer; }
+        .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
+        .kpi-num { font-weight: 800; font-size: 0.8rem; }
 
-        .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; box-shadow: 0 2px 5px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
-        .kpi-card-wissam:active { transform: scale(0.97); }
-        .kpi-card-wissam .kpi-num { color: var(--accent-green); font-weight: 800; font-size: 0.8rem; }
-
-        .professional-ticker-bar { background-color: transparent; border: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; flex-shrink: 0; }
-        
+        .professional-ticker-bar { background-color: transparent; border: none; padding: 0.2rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; flex-shrink: 0; }
         .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border-radius: 10px; padding: 0.6rem 1rem; border: 1px solid var(--border-color); scroll-behavior: smooth; direction: rtl; box-shadow: inset 0 1px 4px rgba(0,0,0,0.4); }
-        .ticker-container::-webkit-scrollbar { height: 10px; }
-        .ticker-container::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 5px; }
-        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 5px; }
+        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border-radius: 6px; padding: 0.25rem 0.6rem; border: 1px solid var(--border-color); scroll-behavior: smooth; }
+        .ticker-container::-webkit-scrollbar { height: 6px; }
+        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
         
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1rem; align-items: center; }
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.6rem; background: #2d2d33; border: 1px solid #52525b; padding: 0.45rem 1.1rem; border-radius: 35px; font-weight: 700; color: #f4f4f5; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 0.8rem; align-items: center; }
+        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: #2d2d33; border: 1px solid #52525b; padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; color: #f4f4f5; cursor: pointer; font-size: 0.75rem; }
         .ticker-card-item:hover { border-color: var(--primary-color); background: #3f3f46; color: var(--primary-color); }
+
+        /* مسطرة المفضلة الذكية بنفس ستايل شريط التنبيهات (أصفر ومضيء وبدون خلفية رمادية مزعجة) */
+        .quick-favorites-bar { background: transparent; border: none; padding: 0.2rem 1rem; display: flex; align-items: center; gap: 0.8rem; overflow-x: auto; flex-shrink: 0; font-size: 0.75rem; }
+        .quick-fav-chip { display: inline-flex; align-items: center; gap: 0.4rem; background: #2d2d33; border: 1px solid #52525b; padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
+        .quick-fav-chip:hover { border-color: var(--primary-color); background: #3f3f46; color: var(--primary-color); }
 
         .content-area { flex: 1; padding: 0.5rem; overflow-y: auto; }
         .page-section { display: none; }
@@ -112,12 +122,12 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        .shift-scratchpad-box { background: var(--bg-surface); border: 1px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.4rem 0.7rem; margin: 0.3rem 0.6rem 0.1rem 0.6rem; display: none; flex-direction: column; gap: 0.2rem; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.1); }
+        .shift-scratchpad-box { background: var(--bg-surface); border: 1px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.4rem 0.7rem; margin: 0.3rem 0.6rem 0.1rem 0.6rem; display: none; flex-direction: column; gap: 0.2rem; }
         .shift-scratchpad-box.show { display: flex; }
         .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.72rem; resize: vertical; height: 50px; outline: none; }
 
         .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-items: start; }
-        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.4rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; width: 100%; }
+        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.4rem; display: flex; flex-direction: column; width: 100%; }
         .branch-title { font-size: 0.82rem; font-weight: 700; padding-bottom: 0.25rem; margin-bottom: 0.3rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
@@ -129,8 +139,7 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.65rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.95rem; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); margin-left: 5px; transition: background 0.2s; }
-        .row-drag-handle:active { cursor: grabbing; background: rgba(250, 204, 21, 0.35); }
+        .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.95rem; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); }
 
         .tags-tooltip-wrapper { position: relative; display: inline-flex; align-items: center; margin-top: 2px; cursor: pointer; }
         .tags-icon-badge { font-size: 0.6rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.02rem 0.25rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.15rem; }
@@ -164,19 +173,20 @@
         .card-green { background-color: #166534; }
 
         .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; position: relative; z-index: 50; }
-        .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.72rem; pointer-events: auto !important; position: relative; z-index: 51; }
-        .offer-tab-btn.active { background: var(--primary-color); color: #000 !important; border-color: var(--primary-color); font-weight: 800; }
+        .offer-tab-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.3rem 0.7rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.75rem; transition: background 0.2s, color 0.2s; }
+        .offer-tab-btn:hover { border-color: var(--primary-color); }
+        .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.5rem; }
         .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; }
         .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.5rem; padding: 0.02rem 0.15rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.08rem 0.25rem; border-radius: 4px; font-size: 0.58rem; display: inline-block; margin-top: 2px; }
 
-        .floating-offers-window { position: fixed; bottom: 25px; left: 25px; width: 300px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 8px 25px rgba(0,0,0,0.6); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        .floating-offers-window { position: fixed; bottom: 25px; left: 25px; width: 330px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 8px 25px rgba(0,0,0,0.6); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
         .floating-offers-window.active { display: flex; }
         .floating-offers-header { background: var(--bg-card); padding: 0.35rem 0.6rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.74rem; }
         .floating-offers-body { padding: 0.4rem; display: flex; flex-direction: column; gap: 0.3rem; }
-        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.7rem; resize: vertical; height: 110px; outline: none; }
+        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.7rem; resize: vertical; height: 95px; outline: none; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 100000; padding: 0.8rem; }
         .modal-overlay.active { display: flex; }
@@ -187,7 +197,7 @@
         .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem; margin-top: 0.2rem; display: none; }
         .days-checklist.show { display: grid; }
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.2rem; font-size: 0.72rem; cursor: pointer; }
-        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
 
         @media (max-width: 768px) {
             html, body { flex-direction: column; height: auto; overflow: auto; }
@@ -200,13 +210,13 @@
         }
     </style>
 </head>
-<body class="theme-amoled">
+<body class="theme-gray">
 
     <aside class="sidebar" id="appSidebar">
         <div class="brand-title">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-headset"></i>
-                <span class="brand-text">لوحة الكول سنتر</span>
+                <span class="brand-text" id="brandTitleText">لوحة الكول سنتر</span>
             </div>
             <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.8rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
@@ -217,13 +227,13 @@
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
-        <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
-            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
-            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
+        <ul class="nav-links" id="sidebarNavLinksList">
+            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
+            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
+            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
+            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -232,7 +242,11 @@
         </div>
 
         <div class="theme-box">
-            <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
+            <div class="theme-box-row">
+                <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
+                <!-- زر تعديل أسماء القائمة الصغير في المكان المطلوب تماماً أمام السيم -->
+                <button class="sidebar-edit-target-btn" onclick="openRenameSidebarModal()" title="تعديل مسميات القائمة"><i class="fa-solid fa-pen"></i> تعديل</button>
+            </div>
             <select class="theme-select" onchange="changeTheme(this.value)">
                 <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
                 <option value="theme-gray">رصاصي فحمي (Charcoal Gray)</option>
@@ -246,22 +260,35 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع..." oninput="triggerGlobalSearchFromInput()">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (Ctrl + Space للصوتي)..." oninput="triggerGlobalSearchFromInput()">
+                    <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي (Ctrl + Space)"><i class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
 
+            <!-- أزرار التركيز، فلتر، والشيفت في مكانها الأصلي بالطشريط العلوي -->
             <div class="header-actions-group">
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleSearchFiltersBar()" title="تصفية الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
-                
+                <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
+                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
+                <button class="btn btn-secondary" style="color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
+
                 <div class="kpi-bar">
-                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="اضغط لعرض المتواجدين في معشي"><i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span></div>
-                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="اضغط لعرض المتواجدين في الوسام"><i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span></div>
+                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="معشي">
+                        <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
+                    </div>
+                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="الوسام">
+                        <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
+                    </div>
                 </div>
             </div>
 
-            <div id="clockDisplay" style="font-weight: 700; font-size: 0.78rem; font-family: 'Inter', sans-serif; direction: ltr;"></div>
+            <div id="clockDisplay" style="font-weight: 700; font-size: 0.95rem; font-family: 'Inter', sans-serif; direction: ltr; color: var(--primary-color);"></div>
         </header>
+
+        <!-- مسطرة المفضلة الذكية بنفس ستايل شريط التنبيهات (أصفر ومضيء وبدون خلفية رمادية) -->
+        <div class="quick-favorites-bar" id="quickFavoritesBar">
+            <span style="color:var(--primary-color); font-weight:800; white-space:nowrap;"><i class="fa-solid fa-star"></i> المفضلة الذكية:</span>
+            <div id="quickFavsChipsList" style="display:flex; gap:0.4rem; overflow-x:auto;"></div>
+        </div>
 
         <div class="search-filters-bar" id="searchFiltersBarContainer">
             <span style="font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-filter"></i> تصفية الأقسام:</span>
@@ -288,7 +315,7 @@
 
         <div class="professional-ticker-bar">
             <div style="display:flex; align-items:center; gap:0.6rem; flex-shrink:0;">
-                <button class="btn btn-blue" style="padding:0.35rem 0.75rem; font-size:0.8rem; border-radius:8px; font-weight:700;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
+                <button class="btn btn-blue" style="padding:0.25rem 0.5rem; font-size:0.75rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
             </div>
             <div class="ticker-wrapper-outer">
                 <div class="ticker-container" id="tickerContainerBox">
@@ -481,9 +508,14 @@
 
             <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
-                    <div style="display:flex; gap:0.3rem;">
+                    <div style="display:flex; gap:0.3rem; align-items:center; flex-wrap:wrap;">
+                        <div style="display:flex; gap:0.2rem; align-items:center; background:var(--bg-card); padding:0.2rem 0.4rem; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:0.68rem; font-weight:700; color:var(--primary-color);">نقل المحدد إلى:</span>
+                            <select id="quickMoveCatSelect" class="form-control" style="width:120px; font-size:0.68rem; padding:0.15rem;"></select>
+                            <button class="btn btn-blue" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="quickMoveSelectedOffers()"><i class="fa-solid fa-arrow-right-arrow-left"></i> نقل</button>
+                        </div>
                         <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="openManageCategoriesModal()"><i class="fa-solid fa-gear"></i> إدارة الأقسام ⚙️</button>
                         <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
                     </div>
@@ -531,18 +563,66 @@
 
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
-            <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة (اسحب)</span>
+            <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
             <div style="display:flex; gap:0.25rem;">
-                <button class="btn btn-green" style="padding:0.08rem 0.3rem; font-size:0.6rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i></button>
+                <button class="btn btn-green" style="padding:0.08rem 0.3rem; font-size:0.6rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i> نسخ للعميل</button>
                 <button class="btn btn-danger" style="padding:0.08rem 0.3rem; font-size:0.6rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
         <div class="floating-offers-body">
-            <textarea id="floatingOffersTextarea" class="floating-textarea" readonly placeholder="العروض المحددة ستظهر هنا..."></textarea>
+            <textarea id="floatingOffersTextarea" class="floating-textarea" readonly placeholder="العروض المحددة..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); padding:0.25rem 0.4rem; border-radius:4px; font-size:0.7rem; font-weight:700;">
+                <span>المجموع الكلي: <span id="cartTotalPrice" style="color:var(--primary-color);">0 ريال</span></span>
+                <div style="display:flex; gap:0.2rem; align-items:center;">
+                    <span>خصم:</span>
+                    <input type="text" id="cartDiscountInput" placeholder="مثال: 10% أو 50" oninput="updateCartCalculator()" style="width:75px; font-size:0.65rem; padding:0.1rem; background:var(--bg-surface); color:var(--text-main); border:1px solid var(--border-color); border-radius:4px; text-align:center;">
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- مودال إدارة وتحرير أقسام العروض -->
+    <!-- مودال الأطباء المتواجدين الآن مع زر تحرير وترتيب الأطباء -->
+    <div class="modal-overlay" id="activeDoctorsModal">
+        <div class="modal" style="max-width: 480px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
+                <div style="display:flex; gap:0.3rem; align-items:center;">
+                    <button class="btn btn-secondary" id="toggleDocSortBtn" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="toggleActiveDocsSortMode()"><i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️</button>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:1rem;" onclick="closeModal('activeDoctorsModal')"></i>
+                </div>
+            </div>
+            <div id="activeDocsListContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
+        </div>
+    </div>
+
+    <!-- مودال تعديل أسماء القائمة الجانبية -->
+    <div class="modal-overlay" id="renameSidebarModal">
+        <div class="modal" style="max-width: 400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-pen"></i> تعديل مسميات القائمة الجانبية</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('renameSidebarModal')"></i>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;">
+                <label style="font-size:0.7rem;">عنوان اللوحة الرئيسي:</label>
+                <input type="text" id="inputBrandTitle" class="form-control">
+                <label style="font-size:0.7rem;">مواعيد الأطباء:</label>
+                <input type="text" id="inputNav_schedule" class="form-control">
+                <label style="font-size:0.7rem;">التنبيهات والإشعارات:</label>
+                <input type="text" id="inputNav_alerts" class="form-control">
+                <label style="font-size:0.7rem;">الأقسام والأطباء:</label>
+                <input type="text" id="inputNav_depts-docs" class="form-control">
+                <label style="font-size:0.7rem;">دليل المنسقين:</label>
+                <input type="text" id="inputNav_coordinators" class="form-control">
+                <label style="font-size:0.7rem;">العروض والأسعار:</label>
+                <input type="text" id="inputNav_offers" class="form-control">
+                <label style="font-size:0.7rem;">دليل الاستفسارات:</label>
+                <input type="text" id="inputNav_inquiries" class="form-control">
+            </div>
+            <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveSidebarNames()">حفظ التعديلات</button>
+        </div>
+    </div>
+
+    <!-- مودال إدارة وتعديل أقسام العروض -->
     <div class="modal-overlay" id="manageCategoriesModal">
         <div class="modal" style="max-width: 455px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -550,17 +630,6 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageCategoriesModal')"></i>
             </div>
             <div id="manageCategoriesListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
-        </div>
-    </div>
-
-    <!-- مودال الأطباء المتواجدين الآن -->
-    <div class="modal-overlay" id="activeDoctorsModal">
-        <div class="modal" style="max-width: 480px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('activeDoctorsModal')"></i>
-            </div>
-            <div id="activeDocsListContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
         </div>
     </div>
 
@@ -864,9 +933,7 @@
             <input type="hidden" id="offerId">
             <div style="display:flex; flex-direction:column; gap:0.25rem;">
                 <label>قسم العرض</label>
-                <select id="offCategory" class="form-control" onchange="checkCustomCategory(this.value)">
-                    <!-- يتم تعبئتها ديناميكياً بالأقسام المتاحة حالياً -->
-                </select>
+                <select id="offCategory" class="form-control" onchange="checkCustomCategory(this.value)"></select>
             </div>
             <div id="customCategoryBox" style="display:none; flex-direction:column; gap:0.25rem;">
                 <label>اسم القسم الجديد</label>
@@ -879,7 +946,7 @@
             
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.3rem; background:var(--bg-card); padding:0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                 <div style="display:flex; flex-direction:column; gap:0.15rem;">
-                    <label>اسم الجهاز الأول (اكتب كلمة جهاز هنا براحتك)</label>
+                    <label>اسم الجهاز الأول</label>
                     <input type="text" id="offDevice1" class="form-control" placeholder="جهاز الشد الشهرة">
                 </div>
                 <div style="display:flex; flex-direction:column; gap:0.15rem;">
@@ -975,6 +1042,23 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
+        function playChirpSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch(e){}
+        }
+
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             if (snap.val() === true) {
@@ -996,17 +1080,23 @@
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
         let selectedOfferIds = [];
+        let userFavorites = JSON.parse(localStorage.getItem('shift_user_favorites') || '[]');
+        let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
+        let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
+        let activeDocsSortMode = false;
 
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
                 .toLowerCase()
+                .replace(/ال/g, '')
                 .replace(/[إأآا]/g, 'ا')
                 .replace(/ة/g, 'ه')
                 .replace(/ى/g, 'ي')
                 .replace(/ؤ/g, 'ء')
                 .replace(/ئ/g, 'ء')
                 .replace(/[\u064b-\u0652]/g, '')
+                .replace(/\s+/g, ' ')
                 .trim();
         }
 
@@ -1032,6 +1122,16 @@
             loadSearchFiltersState();
             loadTableWidths();
             initDraggableFloatingOffers();
+            renderKpiBarOrder();
+            applyCustomSidebarNames();
+
+            // اختصار لوحة المفاتيح المحدث: زرين فقط Ctrl + Space للبحث الصوتي
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.code === 'Space') {
+                    e.preventDefault();
+                    toggleVoiceSearch();
+                }
+            });
 
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
@@ -1103,7 +1203,151 @@
             renderOffersTabs();
             renderOffers();
             renderInquiries();
+            renderQuickFavoritesBar();
             updateKPIs();
+        }
+
+        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
+
+        function openRenameSidebarModal() {
+            document.getElementById('inputBrandTitle').value = document.getElementById('brandTitleText').innerText;
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                const input = document.getElementById(`inputNav_${key}`);
+                if (input) input.value = span.innerText;
+            });
+            document.getElementById('renameSidebarModal').classList.add('active');
+        }
+
+        function saveSidebarNames() {
+            const newBrand = document.getElementById('inputBrandTitle').value.trim();
+            if (newBrand) {
+                document.getElementById('brandTitleText').innerText = newBrand;
+                customSidebarNames.brand = newBrand;
+            }
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                const input = document.getElementById(`inputNav_${key}`);
+                if (input && input.value.trim()) {
+                    span.innerText = input.value.trim();
+                    customSidebarNames[key] = input.value.trim();
+                }
+            });
+            localStorage.setItem('custom_sidebar_names', JSON.stringify(customSidebarNames));
+            closeModal('renameSidebarModal');
+            alert("تم حفظ المسميات الجديدة بنجاح!");
+        }
+
+        function applyCustomSidebarNames() {
+            if (customSidebarNames.brand) {
+                document.getElementById('brandTitleText').innerText = customSidebarNames.brand;
+            }
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                if (customSidebarNames[key]) {
+                    span.innerText = customSidebarNames[key];
+                }
+            });
+        }
+
+        function renderKpiBarOrder() {
+            const bar = document.querySelector('.kpi-bar');
+            if (!bar) return;
+            bar.innerHTML = "";
+            kpiOrder.forEach(branch => {
+                if (branch === "معشي") {
+                    bar.innerHTML += `
+                        <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="معشي">
+                            <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
+                        </div>`;
+                } else {
+                    bar.innerHTML += `
+                        <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="الوسام">
+                            <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
+                        </div>`;
+                }
+            });
+            updateKPIs();
+        }
+
+        let recognition = null;
+        function toggleVoiceSearch() {
+            const btn = document.getElementById('voiceSearchBtn');
+            const input = document.getElementById('globalSearchInput');
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                return alert("متصفحك لا يدعم البحث الصوتي المباشر!");
+            }
+
+            if (!recognition) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ar-SA';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => { btn.classList.add('listening'); };
+                recognition.onend = () => { btn.classList.remove('listening'); };
+                recognition.onresult = (event) => {
+                    const speechToText = event.results[0][0].transcript;
+                    input.value = speechToText;
+                    triggerGlobalSearchFromInput();
+                };
+            }
+
+            if (btn.classList.contains('listening')) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function toggleFavoriteItem(id, name, type) {
+            const existsIdx = userFavorites.findIndex(f => f.id === id && f.type === type);
+            if (existsIdx > -1) {
+                userFavorites.splice(existsIdx, 1);
+            } else {
+                userFavorites.push({ id, name, type });
+            }
+            localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
+            renderQuickFavoritesBar();
+            refreshAllViews();
+            playChirpSound();
+        }
+
+        function trackAutoFavorite(id, name, type) {
+            const exists = userFavorites.find(f => f.id === id && f.type === type);
+            if (!exists) {
+                userFavorites.unshift({ id, name, type });
+                if (userFavorites.length > 10) userFavorites.pop();
+                localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
+                renderQuickFavoritesBar();
+            }
+        }
+
+        function renderQuickFavoritesBar() {
+            const container = document.getElementById('quickFavsChipsList');
+            if (!container) return;
+            container.innerHTML = "";
+            if (userFavorites.length === 0) {
+                container.innerHTML = `<span style="color:var(--text-muted); font-size:0.68rem;">العناصر الأكثر استخداماً والبحث ستظهر هنا تلقائياً، أو اضغط على النجمة (⭐) للتثبيت.</span>`;
+                return;
+            }
+            userFavorites.forEach(fav => {
+                container.innerHTML += `
+                    <div class="quick-fav-chip" onclick="jumpToFavoriteItem(${fav.id}, '${fav.type}')">
+                        <i class="fa-solid fa-star" style="color:var(--primary-color);"></i> ${fav.name}
+                        <i class="fa-solid fa-xmark" style="font-size:0.6rem; cursor:pointer;" onclick="event.stopPropagation(); toggleFavoriteItem(${fav.id}, '${fav.name}', '${fav.type}')" title="إزالة"></i>
+                    </div>`;
+            });
+        }
+
+        function jumpToFavoriteItem(id, type) {
+            if (type === 'offer') {
+                jumpToSectionAndHighlightOffer(id, offersData.find(o => o.id === id)?.category || '');
+            } else if (type === 'doctor') {
+                jumpToSectionAndHighlightDoc(id);
+            }
         }
 
         function toggleSearchFiltersBar() {
@@ -1201,7 +1445,47 @@
             if (wissamEl) wissamEl.innerText = todayWissamCount;
         }
 
+        let currentActiveDocsBranch = "";
+        let activeDocsCustomOrders = JSON.parse(localStorage.getItem('active_docs_custom_orders') || '{}');
+
         function openActiveDoctorsModal(branchName) {
+            currentActiveDocsBranch = branchName;
+            activeDocsSortMode = false;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (btn) {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️`;
+            }
+            renderActiveDoctorsModalContent();
+            document.getElementById('activeDoctorsModal').classList.add('active');
+        }
+
+        function toggleActiveDocsSortMode() {
+            activeDocsSortMode = !activeDocsSortMode;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (activeDocsSortMode) {
+                btn.style.background = 'var(--primary-color)';
+                btn.style.color = '#000';
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> حفظ الترتيب 💾`;
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️`;
+                alert("تم حفظ ترتيب الأطباء المتواجدين بنجاح!");
+            }
+            renderActiveDoctorsModalContent();
+        }
+
+        let draggedActiveDocId = null;
+        function handleActiveDocDragStart(e, id) {
+            draggedActiveDocId = id;
+            e.dataTransfer.setData('text/plain', id);
+        }
+        function handleActiveDocDrop(e, targetId) {
+            e.preventDefault();
+            if (draggedActiveDocId === null || draggedActiveDocId === targetId) return;
+
             const currentDay = getArabicDayName();
             let activeList = [];
             doctorsData.forEach(d => {
@@ -1211,11 +1495,49 @@
                 const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
                 const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
 
-                if (branchName === "معشي" && isMashyToday) activeList.push(d);
-                if (branchName === "الوسام" && isWissamToday) activeList.push(d);
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
             });
 
-            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${branchName} (${activeList.length})`;
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || activeList.map(d => d.id);
+            activeList.forEach(d => { if (!customOrder.includes(d.id)) customOrder.push(d.id); });
+
+            let oldIdx = customOrder.indexOf(draggedActiveDocId);
+            let targetIdx = customOrder.indexOf(targetId);
+
+            if (oldIdx > -1 && targetIdx > -1) {
+                customOrder.splice(oldIdx, 1);
+                customOrder.splice(targetIdx, 0, draggedActiveDocId);
+                activeDocsCustomOrders[currentActiveDocsBranch] = customOrder;
+                localStorage.setItem('active_docs_custom_orders', JSON.stringify(activeDocsCustomOrders));
+                renderActiveDoctorsModalContent();
+            }
+        }
+
+        function renderActiveDoctorsModalContent() {
+            const currentDay = getArabicDayName();
+            let activeList = [];
+            doctorsData.forEach(d => {
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
+
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
+            });
+
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || [];
+            activeList.sort((a, b) => {
+                let idxA = customOrder.indexOf(a.id);
+                let idxB = customOrder.indexOf(b.id);
+                if (idxA === -1) idxA = 999;
+                if (idxB === -1) idxB = 999;
+                return idxA - idxB;
+            });
+
+            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${currentActiveDocsBranch} (${activeList.length})`;
             const container = document.getElementById('activeDocsListContainer');
             container.innerHTML = "";
 
@@ -1223,17 +1545,20 @@
                 container.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">لا يوجد أطباء متواجدون اليوم في هذا الفرع.</div>`;
             } else {
                 activeList.forEach(doc => {
+                    let dragHandle = activeDocsSortMode ? `<span class="row-drag-handle" draggable="true" ondragstart="handleActiveDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleActiveDocDrop(event, ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>` : '';
                     container.innerHTML += `
                         <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem 0.6rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
-                                <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                            <div style="display:flex; align-items:center; gap:0.4rem;">
+                                ${dragHandle}
+                                <div>
+                                    <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
+                                    <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                                </div>
                             </div>
                             <button class="btn btn-green" style="padding:0.15rem 0.35rem; font-size:0.6rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})"><i class="fa-solid fa-eye"></i> عرض</button>
                         </div>`;
                 });
             }
-            document.getElementById('activeDoctorsModal').classList.add('active');
         }
 
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
@@ -1328,12 +1653,16 @@
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
         
         function copyTextToClipboard(text, msg = "تم النسخ بنجاح!") {
-            navigator.clipboard.writeText(text).then(() => alert(`📋 ${msg}\n\n${text}`));
+            navigator.clipboard.writeText(text).then(() => {
+                playChirpSound();
+                alert(`📋 ${msg}\n\n${text}`);
+            });
         }
 
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
+            trackAutoFavorite(doc.id, doc.name, 'doctor');
             const mashyDays = doc.mashyDays || doc.days || [], wissamDays = doc.wissamDays || [];
             let scheduleLines = [];
             if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
@@ -1393,17 +1722,24 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.6rem;">⚠️ غير متواجد (إجازة)</span>` : '';
+                const isFav = userFavorites.some(f => f.id === doc.id && f.type === 'doctor');
+                const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 mashyBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
-                        <td><span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})" title="اسحب من هنا للترتيب"><i class="fa-solid fa-grip-vertical"></i></span> <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
+                        <td>
+                            <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${doc.id}, '${doc.name}', 'doctor')" title="إضافة/إزالة من المفضلة"></i>
+                            <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
                         <td><div style="font-size:0.65rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})" title="نسخ السريع"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countM++;
             });
@@ -1414,17 +1750,24 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.6rem;">⚠️ غير متواجد (إجازة)</span>` : '';
+                const isFav = userFavorites.some(f => f.id === doc.id && f.type === 'doctor');
+                const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
                 wissamBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
-                        <td><span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})" title="اسحب من هنا للترتيب"><i class="fa-solid fa-grip-vertical"></i></span> <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
+                        <td>
+                            <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${doc.id}, '${doc.name}', 'doctor')" title="إضافة/إزالة من المفضلة"></i>
+                            <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
                         <td><div style="font-size:0.65rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})" title="نسخ السريع"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countW++;
             });
@@ -1789,7 +2132,36 @@
             });
 
             container.innerHTML = tabsHtml;
+            updateQuickMoveDropdown();
             updateKPIs();
+        }
+
+        function updateQuickMoveDropdown() {
+            const sel = document.getElementById('quickMoveCatSelect');
+            if (!sel) return;
+            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            let html = "";
+            cats.forEach(c => {
+                html += `<option value="${c}">${c}</option>`;
+            });
+            sel.innerHTML = html;
+        }
+
+        function quickMoveSelectedOffers() {
+            if (selectedOfferIds.length === 0) return alert("الرجاء تحديد عرض واحد على الأقل أولاً!");
+            const targetCat = document.getElementById('quickMoveCatSelect').value;
+            if (!targetCat) return alert("اختر القسم المستهدف!");
+
+            offersData.forEach(o => {
+                if (selectedOfferIds.includes(o.id)) {
+                    o.category = targetCat;
+                }
+            });
+
+            syncToCloud();
+            renderOffersTabs();
+            renderOffers();
+            alert(`تم نقل العروض المحددة إلى قسم "${targetCat}" بنجاح!`);
         }
 
         function filterOfferCategory(cat, btn) {
@@ -1881,6 +2253,7 @@
 
         function copySingleOffer(id) {
             const item = offersData.find(o => o.id === id); if (!item) return;
+            trackAutoFavorite(item.id, item.name, 'offer');
             copyTextToClipboard(formatOfferLineForClient(item), "تم نسخ العرض:");
         }
 
@@ -1941,12 +2314,45 @@
             });
             
             textarea.value = blocks.join('\n\n');
+            updateCartCalculator();
+        }
+
+        function updateCartCalculator() {
+            let total = 0;
+            selectedOfferIds.forEach(id => {
+                const item = offersData.find(o => o.id === id);
+                if (item) {
+                    let num = 0;
+                    if (item.price) {
+                        num = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+                    } else if (item.price1) {
+                        num = parseFloat(item.price1.replace(/[^\d.]/g, '')) || 0;
+                    }
+                    total += num;
+                }
+            });
+
+            const discountVal = document.getElementById('cartDiscountInput').value.trim();
+            let finalTotal = total;
+
+            if (discountVal.includes('%')) {
+                const pct = parseFloat(discountVal.replace('%', '')) || 0;
+                finalTotal = total - (total * (pct / 100));
+            } else if (discountVal) {
+                const dec = parseFloat(discountVal) || 0;
+                finalTotal = total - dec;
+            }
+            if (finalTotal < 0) finalTotal = 0;
+
+            document.getElementById('cartTotalPrice').innerText = total > 0 ? `${finalTotal} ريال ${total !== finalTotal ? '(بعد الخصم من اصل ' + total + ')' : ''}` : '0 ريال';
         }
 
         function copyMultiOffersText() {
             const textarea = document.getElementById('floatingOffersTextarea');
+            const totalText = document.getElementById('cartTotalPrice').innerText;
             if (!textarea || !textarea.value) return;
-            copyTextToClipboard(textarea.value, "تم نسخ العروض المحددة!");
+            const fullMsg = textarea.value + `\n\n💰 الإجمالي المطلوب: ${totalText}`;
+            copyTextToClipboard(fullMsg, "تم نسخ العروض مع الإجمالي للعميل!");
         }
         function clearMultiOffersSelection() { selectedOfferIds = []; document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); updateFloatingOffersWindow(); }
         
@@ -2000,6 +2406,8 @@
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
+                const isFav = userFavorites.some(f => f.id === item.id && f.type === 'offer');
+                const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 let devicesDisplay = "";
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
                 if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
@@ -2010,10 +2418,13 @@
                         <td style="text-align:center;">
                             <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
                         </td>
-                        <td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td>
+                        <td>
+                            <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${item.id}, '${item.name}', 'offer')" title="إضافة/إزالة للمفضلة"></i>
+                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
+                        </td>
                         <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
                         <td>${devicesDisplay}</td>
-                        <td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td>
+                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
                         <td style="text-align:center;">
                             <button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button>
                             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
@@ -2078,6 +2489,7 @@
             document.getElementById('offPrice1').value = item.price1 || "";
             document.getElementById('offDevice2').value = item.device2 || ""; 
             document.getElementById('offPrice2').value = item.price2 || "";
+            document.getElementById('offerId').value = item.id;
             document.getElementById('offPrice').value = item.price || ""; 
             document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offIsPinned').checked = !!item.isPinned;
@@ -2141,16 +2553,49 @@
 
         function triggerGlobalSearchFromInput() {
             const query = document.getElementById('globalSearchInput').value;
-            handleTrueGlobalSearch(query);
+            handleSmartGlobalSearch(query);
         }
 
-        function handleTrueGlobalSearch(query) {
-            const rawQ = query.trim();
+        function handleSmartGlobalSearch(query) {
+            let rawQ = query.trim();
+            let targetCategories = [];
+
+            let normRaw = normalizeArabicText(rawQ);
+
+            if (normRaw.includes('جميع الاقسام') || normRaw.includes('كل الاقسام')) {
+                targetCategories = ['doctors', 'offers', 'alerts', 'inquiries', 'services', 'coordinators'];
+                rawQ = rawQ.replace(/جميع الاقسام|كل الاقسام/g, '').trim();
+            } else {
+                const checkAndExtractCat = (keyword, catCode) => {
+                    if (normRaw.includes(keyword)) {
+                        targetCategories.push(catCode);
+                        let regex = new RegExp(`قسم\\s*${keyword}|${keyword}\\s*قسم|${keyword}`, 'g');
+                        rawQ = rawQ.replace(regex, '').trim();
+                        return true;
+                    }
+                    return false;
+                };
+
+                checkAndExtractCat('اطباء', 'doctors');
+                checkAndExtractCat('دكتور', 'doctors');
+                checkAndExtractCat('عروض', 'offers');
+                checkAndExtractCat('اسعار', 'offers');
+                checkAndExtractCat('سعر', 'offers');
+                checkAndExtractCat('تنبيهات', 'alerts');
+                checkAndExtractCat('اشعار', 'alerts');
+                checkAndExtractCat('استفسارات', 'inquiries');
+                checkAndExtractCat('سؤال', 'inquiries');
+                checkAndExtractCat('خدمات', 'services');
+                checkAndExtractCat('أقسام', 'services');
+                checkAndExtractCat('منسقين', 'coordinators');
+            }
+
+            rawQ = rawQ.replace(/[:：]/g, '').trim();
             const normQ = normalizeArabicText(rawQ);
             const resultsSection = document.getElementById('globalSearchResultsSection');
             const resultsList = document.getElementById('globalSearchResultsList');
             
-            if (!normQ) {
+            if (!normQ && targetCategories.length === 0) {
                 resultsSection.classList.remove('active');
                 const activeTab = localStorage.getItem('activeTab') || 'schedule';
                 document.getElementById(`${activeTab}-section`).classList.add('active');
@@ -2161,10 +2606,11 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+            const enabledCats = targetCategories.length > 0 ? targetCategories : Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
             let allMatchedResults = [];
 
             const isStrictMatch = (text) => {
+                if (!normQ) return true;
                 if (!text) return false;
                 let t = normalizeArabicText(text);
                 return t.includes(normQ);
@@ -2186,11 +2632,15 @@
 
             if (enabledCats.includes('offers')) {
                 offersData.forEach(o => {
-                    const combinedOfferText = `${o.name || ''} ${o.category || ''} ${o.price || ''} ${o.notes || ''} ${o.tags || ''} ${o.device1 || ''} ${o.device2 || ''}`;
+                    const combinedOfferText = `${o.name || ''} ${o.category || ''} ${o.price || ''} ${o.notes || ''} ${o.tags || ''} ${o.device1 || ''} ${o.price1 || ''} ${o.device2 || ''} ${o.price2 || ''}`;
                     if (isStrictMatch(combinedOfferText)) {
+                        let priceSummary = o.price ? `السعر: ${o.price}` : "";
+                        if (o.device1) priceSummary += ` | ${o.device1}: ${o.price1 || ''}`;
+                        if (o.device2) priceSummary += ` | ${o.device2}: ${o.price2 || ''}`;
+
                         allMatchedResults.push({
                             timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
-                            title: `${o.name} - السعر: ${o.price || '-'}`,
+                            title: `${o.name} - ${priceSummary}`,
                             subtitle: `${o.notes || ''} ${o.tags ? '| 🏷️ ' + o.tags : ''}`,
                             action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
                             copyAction: `copySingleOffer(${o.id})`
@@ -2253,7 +2703,7 @@
             }
 
             if (allMatchedResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة.</div>`;
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
                 return;
             }
 
