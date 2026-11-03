@@ -44,7 +44,6 @@
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
 
-        /* وضع التركيز Focus Mode لإخفاء القائمة والشعارات عند الحاجة */
         body.focus-mode .sidebar { display: none !important; }
         body.focus-mode .professional-ticker-bar { display: none !important; }
         body.focus-mode .top-header .kpi-bar { display: none !important; }
@@ -94,7 +93,6 @@
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: #2d2d33; border: 1px solid #52525b; padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; color: #f4f4f5; cursor: pointer; font-size: 0.75rem; }
         .ticker-card-item:hover { border-color: var(--primary-color); background: #3f3f46; color: var(--primary-color); }
 
-        /* شريط المفضلة السريعة الشخصية للشيفت */
         .quick-favorites-bar { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0.3rem 1rem; display: flex; align-items: center; gap: 0.5rem; overflow-x: auto; flex-shrink: 0; font-size: 0.72rem; }
         .quick-fav-chip { background: var(--bg-surface); border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 15px; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; white-space: nowrap; font-weight: 700; }
         .quick-fav-chip:hover { background: var(--primary-color); color: #000; }
@@ -172,7 +170,7 @@
         .offer-tab-btn.active { background: var(--primary-color); color: #000 !important; border-color: var(--primary-color); font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.5rem; }
-        .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; cursor: pointer; }
+        .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; }
         .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.5rem; padding: 0.02rem 0.15rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.08rem 0.25rem; border-radius: 4px; font-size: 0.58rem; display: inline-block; margin-top: 2px; }
 
@@ -250,7 +248,7 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع (أو اشرع بالصوت)..." oninput="triggerGlobalSearchFromInput()">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (أو اكتب: عروض ليزر: دكتور)..." oninput="triggerGlobalSearchFromInput()">
                     <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي"><i class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
@@ -261,17 +259,24 @@
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
                 
                 <div class="kpi-bar">
-                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="اضغط لعرض المتواجدين في معشي"><i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span></div>
-                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="اضغط لعرض المتواجدين في الوسام"><i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span></div>
+                    <!-- تم تفعيل السحب والتحريك لمعشي والوسام هنا -->
+                    <div class="kpi-card-mashy" draggable="true" ondragstart="handleKpiDragStart(event, 'معشي')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'معشي')" onclick="openActiveDoctorsModal('معشي')" title="معشي (اسحب للتحريك أو اضغط)">
+                        <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                        <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
+                    </div>
+                    <div class="kpi-card-wissam" draggable="true" ondragstart="handleKpiDragStart(event, 'الوسام')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'الوسام')" onclick="openActiveDoctorsModal('الوسام')" title="الوسام (اسحب للتحريك أو اضغط)">
+                        <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                        <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
+                    </div>
                 </div>
             </div>
 
             <div id="clockDisplay" style="font-weight: 700; font-size: 0.95rem; font-family: 'Inter', sans-serif; direction: ltr; color: var(--primary-color);"></div>
         </header>
 
-        <!-- شريط المفضلة السريعة للشيفت (Quick Favorites) -->
+        <!-- شريط المفضلة السريعة الذكية (Smart Auto + Manual Favorites) -->
         <div class="quick-favorites-bar" id="quickFavoritesBar">
-            <span style="color:var(--primary-color); font-weight:800;"><i class="fa-solid fa-star"></i> المفضلة:</span>
+            <span style="color:var(--primary-color); font-weight:800;"><i class="fa-solid fa-star"></i> المفضلة الذكية:</span>
             <div id="quickFavsChipsList" style="display:flex; gap:0.4rem; overflow-x:auto;"></div>
         </div>
 
@@ -321,7 +326,7 @@
             <!-- 1. مواعيد الأطباء -->
             <section id="schedule-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
-                    <h2>جدول دوام الأطباء المقسم حسب الفروع (اضغط مرتين للتعديل السريع)</h2>
+                    <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
                     <div style="display:flex; gap:0.25rem;">
                         <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> مناوبات الجمعة</button>
                         <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
@@ -494,7 +499,7 @@
             <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.3rem;">
-                    <h2>جدول العروض والأسعار المعتمدة بالعيادات (اضغط مرتين على السعر للتعديل الفوري)</h2>
+                    <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
                     <div style="display:flex; gap:0.3rem; align-items:center; flex-wrap:wrap;">
                         <div style="display:flex; gap:0.2rem; align-items:center; background:var(--bg-card); padding:0.2rem 0.4rem; border-radius:6px; border:1px solid var(--border-color);">
                             <span style="font-size:0.68rem; font-weight:700; color:var(--primary-color);">نقل المحدد إلى:</span>
@@ -546,7 +551,6 @@
         </div>
     </main>
 
-    <!-- النافذة العائمة للسلة مع آلة حاسبة العروض المجمعة والخصم -->
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
             <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
@@ -998,15 +1002,14 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // نظام التنبيه الصوتي التفاعلي (Chirp Sound)
         function playChirpSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08); // A5
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
                 osc.connect(gain);
@@ -1038,6 +1041,7 @@
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
         let selectedOfferIds = [];
         let userFavorites = JSON.parse(localStorage.getItem('shift_user_favorites') || '[]');
+        let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1074,6 +1078,7 @@
             loadSearchFiltersState();
             loadTableWidths();
             initDraggableFloatingOffers();
+            renderKpiBarOrder();
 
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
@@ -1149,12 +1154,50 @@
             updateKPIs();
         }
 
-        /* وضع التركيز Focus Mode */
         function toggleFocusMode() {
             document.body.classList.toggle('focus-mode');
         }
 
-        /* البحث الصوتي Voice Search */
+        /* سحب وترتيب أزرار معشي والوسام العلوية */
+        let draggedKpiBranch = null;
+        function handleKpiDragStart(e, branchName) {
+            draggedKpiBranch = branchName;
+            e.dataTransfer.setData('text/plain', branchName);
+        }
+        function handleKpiDrop(e, targetBranch) {
+            e.preventDefault();
+            if (!draggedKpiBranch || draggedKpiBranch === targetBranch) return;
+            let idx1 = kpiOrder.indexOf(draggedKpiBranch);
+            let idx2 = kpiOrder.indexOf(targetBranch);
+            if (idx1 > -1 && idx2 > -1) {
+                kpiOrder.splice(idx1, 1);
+                kpiOrder.splice(idx2, 0, draggedKpiBranch);
+                localStorage.setItem('kpi_order', JSON.stringify(kpiOrder));
+                renderKpiBarOrder();
+            }
+        }
+        function renderKpiBarOrder() {
+            const bar = document.querySelector('.kpi-bar');
+            if (!bar) return;
+            bar.innerHTML = "";
+            kpiOrder.forEach(branch => {
+                if (branch === "معشي") {
+                    bar.innerHTML += `
+                        <div class="kpi-card-mashy" draggable="true" ondragstart="handleKpiDragStart(event, 'معشي')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'معشي')" onclick="openActiveDoctorsModal('معشي')" title="معشي (اسحب للتحريك)">
+                            <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                            <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
+                        </div>`;
+                } else {
+                    bar.innerHTML += `
+                        <div class="kpi-card-wissam" draggable="true" ondragstart="handleKpiDragStart(event, 'الوسام')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'الوسام')" onclick="openActiveDoctorsModal('الوسام')" title="الوسام (اسحب للتحريك)">
+                            <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                            <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
+                        </div>`;
+                }
+            });
+            updateKPIs();
+        }
+
         let recognition = null;
         function toggleVoiceSearch() {
             const btn = document.getElementById('voiceSearchBtn');
@@ -1187,9 +1230,9 @@
             }
         }
 
-        /* نظام المفضلة الشخصية للشيفت */
+        /* نظام المفضلة التلقائية (Smart Auto-Favorites) + اليدوية وتحديث فوري للنجمة */
         function toggleFavoriteItem(id, name, type) {
-            const existsIdx = userFavorites.findIndex(f => f.id === id);
+            const existsIdx = userFavorites.findIndex(f => f.id === id && f.type === type);
             if (existsIdx > -1) {
                 userFavorites.splice(existsIdx, 1);
             } else {
@@ -1197,7 +1240,18 @@
             }
             localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
             renderQuickFavoritesBar();
+            refreshAllViews();
             playChirpSound();
+        }
+
+        function trackAutoFavorite(id, name, type) {
+            const exists = userFavorites.find(f => f.id === id && f.type === type);
+            if (!exists) {
+                userFavorites.unshift({ id, name, type });
+                if (userFavorites.length > 10) userFavorites.pop(); // الاحتفاظ بأحدث 10 عناصر بحث مستخدمة
+                localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
+                renderQuickFavoritesBar();
+            }
         }
 
         function renderQuickFavoritesBar() {
@@ -1205,7 +1259,7 @@
             if (!container) return;
             container.innerHTML = "";
             if (userFavorites.length === 0) {
-                container.innerHTML = `<span style="color:var(--text-muted); font-size:0.68rem;">اضغط على أيقونة (⭐) بجانب أي عرض أو طبيب لإضافته هنا للوصول الفوري.</span>`;
+                container.innerHTML = `<span style="color:var(--text-muted); font-size:0.68rem;">العناصر الأكثر استخداماً والبحث ستظهر هنا تلقائياً، أو اضغط على النجمة (⭐) للتثبيت.</span>`;
                 return;
             }
             userFavorites.forEach(fav => {
@@ -1446,7 +1500,6 @@
         }
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
         
-        /* ميزة النسخ الذكي السريع One-Click Smart Clipboard مع التأكيد الصوتي */
         function copyTextToClipboard(text, msg = "تم النسخ بنجاح!") {
             navigator.clipboard.writeText(text).then(() => {
                 playChirpSound();
@@ -1457,6 +1510,7 @@
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
+            trackAutoFavorite(doc.id, doc.name, 'doctor');
             const mashyDays = doc.mashyDays || doc.days || [], wissamDays = doc.wissamDays || [];
             let scheduleLines = [];
             if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
@@ -1516,7 +1570,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.6rem;">⚠️ غير متواجد (إجازة)</span>` : '';
-                const isFav = userFavorites.some(f => f.id === doc.id);
+                const isFav = userFavorites.some(f => f.id === doc.id && f.type === 'doctor');
                 const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
@@ -1526,11 +1580,11 @@
                         <td>
                             <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
                             <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${doc.id}, '${doc.name}', 'doctor')" title="إضافة/إزالة من المفضلة"></i>
-                            <span class="doc-name-box" style="display:inline-block;" ondblclick="quickEditDoctorPrompt(${doc.id}, 'name', '${doc.name}')" title="اضغط مرتين للتعديل السريع">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
                         </td>
-                        <td><div class="doc-spec-box" ondblclick="quickEditDoctorPrompt(${doc.id}, 'specialty', '${doc.specialty}')">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
-                        <td><strong style="color:var(--primary-color); cursor:pointer;" ondblclick="quickEditDoctorPrompt(${doc.id}, 'fee', '${doc.fee || ''}')">${doc.fee || '75 ريال'}</strong></td>
+                        <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
+                        <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
                         <td><div style="font-size:0.65rem; color:#fef08a;">${doc.notes || '-'}</div></td>
                         <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})" title="نسخ السريع"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
@@ -1544,7 +1598,7 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.6rem;">⚠️ غير متواجد (إجازة)</span>` : '';
-                const isFav = userFavorites.some(f => f.id === doc.id);
+                const isFav = userFavorites.some(f => f.id === doc.id && f.type === 'doctor');
                 const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
@@ -1554,11 +1608,11 @@
                         <td>
                             <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
                             <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${doc.id}, '${doc.name}', 'doctor')" title="إضافة/إزالة من المفضلة"></i>
-                            <span class="doc-name-box" style="display:inline-block;" ondblclick="quickEditDoctorPrompt(${doc.id}, 'name', '${doc.name}')" title="اضغط مرتين للتعديل السريع">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
                         </td>
-                        <td><div class="doc-spec-box" ondblclick="quickEditDoctorPrompt(${doc.id}, 'specialty', '${doc.specialty}')">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
-                        <td><strong style="color:var(--primary-color); cursor:pointer;" ondblclick="quickEditDoctorPrompt(${doc.id}, 'fee', '${doc.fee || ''}')">${doc.fee || '75 ريال'}</strong></td>
+                        <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
+                        <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
                         <td><div style="font-size:0.65rem; color:#fef08a;">${doc.notes || '-'}</div></td>
                         <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})" title="نسخ السريع"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
@@ -1571,30 +1625,6 @@
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد';
             document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد';
             updateKPIs();
-        }
-
-        /* ميزة التعديل السريع المباشر (In-Place Double-Click Edit) للأطباء */
-        function quickEditDoctorPrompt(docId, fieldKey, oldVal) {
-            const newVal = prompt("تعديل مباشر سريع:", oldVal);
-            if (newVal === null) return;
-            const doc = doctorsData.find(d => d.id === docId);
-            if (doc) {
-                doc[fieldKey] = newVal.trim();
-                syncToCloud();
-                renderDoctors();
-            }
-        }
-
-        /* ميزة التعديل السريع المباشر (In-Place Double-Click Edit) للعروض */
-        function quickEditOfferPrompt(offerId, fieldKey, oldVal) {
-            const newVal = prompt("تعديل مباشر سريع للقيمة:", oldVal);
-            if (newVal === null) return;
-            const offer = offersData.find(o => o.id === offerId);
-            if (offer) {
-                offer[fieldKey] = newVal.trim();
-                syncToCloud();
-                renderOffers();
-            }
         }
 
         let draggedBranch = null, draggedDocId = null;
@@ -2071,6 +2101,7 @@
 
         function copySingleOffer(id) {
             const item = offersData.find(o => o.id === id); if (!item) return;
+            trackAutoFavorite(item.id, item.name, 'offer');
             copyTextToClipboard(formatOfferLineForClient(item), "تم نسخ العرض:");
         }
 
@@ -2105,7 +2136,6 @@
             renderOffers();
         }
 
-        /* آلة حاسبة العروض المجمعة وتطبيق الخصم */
         function updateFloatingOffersWindow() {
             const win = document.getElementById('floatingOffersWin');
             const textarea = document.getElementById('floatingOffersTextarea');
@@ -2224,7 +2254,7 @@
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
-                const isFav = userFavorites.some(f => f.id === item.id);
+                const isFav = userFavorites.some(f => f.id === item.id && f.type === 'offer');
                 const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 let devicesDisplay = "";
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
@@ -2238,11 +2268,11 @@
                         </td>
                         <td>
                             <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${item.id}, '${item.name}', 'offer')" title="إضافة/إزالة للمفضلة"></i>
-                            ${pinnedBadge}<strong ondblclick="quickEditOfferPrompt(${item.id}, 'name', '${item.name}')" title="اضغط مرتين للتعديل السريع">${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
+                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
                         </td>
                         <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
                         <td>${devicesDisplay}</td>
-                        <td><span class="price-badge" ondblclick="quickEditOfferPrompt(${item.id}, 'price', '${item.price || ''}')" title="اضغط مرتين للتعديل السريع">${item.price ? item.price : '-'}</span></td>
+                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
                         <td style="text-align:center;">
                             <button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button>
                             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
@@ -2370,11 +2400,27 @@
 
         function triggerGlobalSearchFromInput() {
             const query = document.getElementById('globalSearchInput').value;
-            handleTrueGlobalSearch(query);
+            handleSmartGlobalSearch(query);
         }
 
-        function handleTrueGlobalSearch(query) {
-            const rawQ = query.trim();
+        /* ميزة البحث الموجه بالأوامر الذكية (Smart Search Filters) */
+        function handleSmartGlobalSearch(query) {
+            let rawQ = query.trim();
+            let targetCategoryFilter = null;
+
+            // التحقق إذا كتب المستخدم أمراً موجهاً مثل: "عروض: ليزر" أو "أطباء: أبان"
+            if (rawQ.includes(':')) {
+                const parts = rawQ.split(':');
+                const cmd = normalizeArabicText(parts[0]);
+                rawQ = parts[1].trim();
+
+                if (cmd.includes('عرض') || cmd.includes('اسعار')) targetCategoryFilter = 'offers';
+                else if (cmd.includes('طبيب') || cmd.includes('دكتور')) targetCategoryFilter = 'doctors';
+                else if (cmd.includes('تنبيه')) targetCategoryFilter = 'alerts';
+                else if (cmd.includes('استفسار')) targetCategoryFilter = 'inquiries';
+                else if (cmd.includes('قسم') || cmd.includes('خدمات')) targetCategoryFilter = 'services';
+            }
+
             const normQ = normalizeArabicText(rawQ);
             const resultsSection = document.getElementById('globalSearchResultsSection');
             const resultsList = document.getElementById('globalSearchResultsList');
@@ -2390,7 +2436,7 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+            const enabledCats = targetCategoryFilter ? [targetCategoryFilter] : Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
             let allMatchedResults = [];
 
             const isStrictMatch = (text) => {
