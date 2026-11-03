@@ -38,11 +38,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
+        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; position: relative; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
         .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
+
+        /* الزر المخفي في زاوية القائمة لتعديل أسماء القائمة */
+        .hidden-edit-sidebar-btn { position: absolute; top: 5px; left: 5px; width: 14px; height: 14px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; opacity: 0; transition: opacity 0.2s; font-size: 0.6rem; }
+        .sidebar:hover .hidden-edit-sidebar-btn { opacity: 0.5; }
+        .hidden-edit-sidebar-btn:hover { opacity: 1; color: var(--primary-color); }
 
         body.focus-mode .sidebar { display: none !important; }
         body.focus-mode .professional-ticker-bar { display: none !important; }
@@ -165,9 +170,11 @@
         .card-gold { background-color: #d97706; }
         .card-green { background-color: #166534; }
 
+        /* تصميم مسطرة الأقسام العلوية (شبيه بمسطرة العروض: رصاصي وتتحول لأصفر عند الاختيار) */
         .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; position: relative; z-index: 50; }
-        .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.72rem; }
-        .offer-tab-btn.active { background: var(--primary-color); color: #000 !important; border-color: var(--primary-color); font-weight: 800; }
+        .offer-tab-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.3rem 0.7rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.75rem; transition: background 0.2s, color 0.2s; }
+        .offer-tab-btn:hover { border-color: var(--primary-color); }
+        .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.5rem; }
         .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; }
@@ -202,13 +209,16 @@
         }
     </style>
 </head>
-<body class="theme-amoled">
+<body class="theme-gray">
 
     <aside class="sidebar" id="appSidebar">
+        <!-- زر مخفي في الزاوية لتعديل أسماء القائمة الجانبية -->
+        <button class="hidden-edit-sidebar-btn" onclick="openRenameSidebarModal()" title="تعديل أسماء القائمة"><i class="fa-solid fa-pen"></i></button>
+
         <div class="brand-title">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-headset"></i>
-                <span class="brand-text">لوحة الكول سنتر</span>
+                <span class="brand-text" id="brandTitleText">لوحة الكول سنتر</span>
             </div>
             <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.8rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
@@ -219,13 +229,13 @@
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
-        <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
-            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
-            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
+        <ul class="nav-links" id="sidebarNavLinksList">
+            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
+            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
+            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
+            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -248,8 +258,8 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (أو اكتب: عروض ليزر: دكتور)..." oninput="triggerGlobalSearchFromInput()">
-                    <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي"><i class="fa-solid fa-microphone"></i></button>
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (أو: الأطباء الدكتور أبان)..." oninput="triggerGlobalSearchFromInput()">
+                    <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي بالأوامر"><i class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
 
@@ -259,12 +269,11 @@
                 <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
                 
                 <div class="kpi-bar">
-                    <!-- تم تفعيل السحب والتحريك لمعشي والوسام هنا -->
-                    <div class="kpi-card-mashy" draggable="true" ondragstart="handleKpiDragStart(event, 'معشي')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'معشي')" onclick="openActiveDoctorsModal('معشي')" title="معشي (اسحب للتحريك أو اضغط)">
+                    <div class="kpi-card-mashy" draggable="true" ondragstart="handleKpiDragStart(event, 'معشي')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'معشي')" onclick="openActiveDoctorsModal('معشي')" title="معشي (اسحب للتحريك)">
                         <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
                         <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
                     </div>
-                    <div class="kpi-card-wissam" draggable="true" ondragstart="handleKpiDragStart(event, 'الوسام')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'الوسام')" onclick="openActiveDoctorsModal('الوسام')" title="الوسام (اسحب للتحريك أو اضغط)">
+                    <div class="kpi-card-wissam" draggable="true" ondragstart="handleKpiDragStart(event, 'الوسام')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'الوسام')" onclick="openActiveDoctorsModal('الوسام')" title="الوسام (اسحب للتحريك)">
                         <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
                         <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
                     </div>
@@ -274,7 +283,6 @@
             <div id="clockDisplay" style="font-weight: 700; font-size: 0.95rem; font-family: 'Inter', sans-serif; direction: ltr; color: var(--primary-color);"></div>
         </header>
 
-        <!-- شريط المفضلة السريعة الذكية (Smart Auto + Manual Favorites) -->
         <div class="quick-favorites-bar" id="quickFavoritesBar">
             <span style="color:var(--primary-color); font-weight:800;"><i class="fa-solid fa-star"></i> المفضلة الذكية:</span>
             <div id="quickFavsChipsList" style="display:flex; gap:0.4rem; overflow-x:auto;"></div>
@@ -568,6 +576,33 @@
                     <input type="text" id="cartDiscountInput" placeholder="مثال: 10% أو 50" oninput="updateCartCalculator()" style="width:75px; font-size:0.65rem; padding:0.1rem; background:var(--bg-surface); color:var(--text-main); border:1px solid var(--border-color); border-radius:4px; text-align:center;">
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- مودال تعديل أسماء القائمة الجانبية -->
+    <div class="modal-overlay" id="renameSidebarModal">
+        <div class="modal" style="max-width: 400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-pen"></i> تعديل مسميات القائمة الجانبية</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('renameSidebarModal')"></i>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;">
+                <label style="font-size:0.7rem;">عنوان اللوحة الرئيسي:</label>
+                <input type="text" id="inputBrandTitle" class="form-control">
+                <label style="font-size:0.7rem;">مواعيد الأطباء:</label>
+                <input type="text" id="inputNav_schedule" class="form-control">
+                <label style="font-size:0.7rem;">التنبيهات والإشعارات:</label>
+                <input type="text" id="inputNav_alerts" class="form-control">
+                <label style="font-size:0.7rem;">الأقسام والأطباء:</label>
+                <input type="text" id="inputNav_depts-docs" class="form-control">
+                <label style="font-size:0.7rem;">دليل المنسقين:</label>
+                <input type="text" id="inputNav_coordinators" class="form-control">
+                <label style="font-size:0.7rem;">العروض والأسعار:</label>
+                <input type="text" id="inputNav_offers" class="form-control">
+                <label style="font-size:0.7rem;">دليل الاستفسارات:</label>
+                <input type="text" id="inputNav_inquiries" class="form-control">
+            </div>
+            <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveSidebarNames()">حفظ التعديلات</button>
         </div>
     </div>
 
@@ -1042,17 +1077,21 @@
         let selectedOfferIds = [];
         let userFavorites = JSON.parse(localStorage.getItem('shift_user_favorites') || '[]');
         let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
+        let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
 
+        // دالة تطبيع النص المتقدمة لتتجاهل همزات الألف، التاء المربوطة/الهاء، الألف المكسورة/الياء، وأل التعريف
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
                 .toLowerCase()
+                .replace(/ال/g, '') // إزالة أل التعريف لتسهيل المطابقة
                 .replace(/[إأآا]/g, 'ا')
                 .replace(/ة/g, 'ه')
                 .replace(/ى/g, 'ي')
                 .replace(/ؤ/g, 'ء')
                 .replace(/ئ/g, 'ء')
                 .replace(/[\u064b-\u0652]/g, '')
+                .replace(/\s+/g, ' ')
                 .trim();
         }
 
@@ -1079,6 +1118,7 @@
             loadTableWidths();
             initDraggableFloatingOffers();
             renderKpiBarOrder();
+            applyCustomSidebarNames();
 
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
@@ -1158,7 +1198,47 @@
             document.body.classList.toggle('focus-mode');
         }
 
-        /* سحب وترتيب أزرار معشي والوسام العلوية */
+        function openRenameSidebarModal() {
+            document.getElementById('inputBrandTitle').value = document.getElementById('brandTitleText').innerText;
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                const input = document.getElementById(`inputNav_${key}`);
+                if (input) input.value = span.innerText;
+            });
+            document.getElementById('renameSidebarModal').classList.add('active');
+        }
+
+        function saveSidebarNames() {
+            const newBrand = document.getElementById('inputBrandTitle').value.trim();
+            if (newBrand) {
+                document.getElementById('brandTitleText').innerText = newBrand;
+                customSidebarNames.brand = newBrand;
+            }
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                const input = document.getElementById(`inputNav_${key}`);
+                if (input && input.value.trim()) {
+                    span.innerText = input.value.trim();
+                    customSidebarNames[key] = input.value.trim();
+                }
+            });
+            localStorage.setItem('custom_sidebar_names', JSON.stringify(customSidebarNames));
+            closeModal('renameSidebarModal');
+            alert("تم حفظ المسميات الجديدة بنجاح!");
+        }
+
+        function applyCustomSidebarNames() {
+            if (customSidebarNames.brand) {
+                document.getElementById('brandTitleText').innerText = customSidebarNames.brand;
+            }
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                if (customSidebarNames[key]) {
+                    span.innerText = customSidebarNames[key];
+                }
+            });
+        }
+
         let draggedKpiBranch = null;
         function handleKpiDragStart(e, branchName) {
             draggedKpiBranch = branchName;
@@ -1230,7 +1310,6 @@
             }
         }
 
-        /* نظام المفضلة التلقائية (Smart Auto-Favorites) + اليدوية وتحديث فوري للنجمة */
         function toggleFavoriteItem(id, name, type) {
             const existsIdx = userFavorites.findIndex(f => f.id === id && f.type === type);
             if (existsIdx > -1) {
@@ -1248,7 +1327,7 @@
             const exists = userFavorites.find(f => f.id === id && f.type === type);
             if (!exists) {
                 userFavorites.unshift({ id, name, type });
-                if (userFavorites.length > 10) userFavorites.pop(); // الاحتفاظ بأحدث 10 عناصر بحث مستخدمة
+                if (userFavorites.length > 10) userFavorites.pop();
                 localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
                 renderQuickFavoritesBar();
             }
@@ -2403,17 +2482,36 @@
             handleSmartGlobalSearch(query);
         }
 
-        /* ميزة البحث الموجه بالأوامر الذكية (Smart Search Filters) */
+        /* محرك البحث الذكي المدعوم بفهم أوامر القسم (صوتي أو كتابي) ومعالجة الحروف الزائدة */
         function handleSmartGlobalSearch(query) {
             let rawQ = query.trim();
             let targetCategoryFilter = null;
 
-            // التحقق إذا كتب المستخدم أمراً موجهاً مثل: "عروض: ليزر" أو "أطباء: أبان"
-            if (rawQ.includes(':')) {
+            // استخراج القسم المستهدف في حال استخدام صيغة "قسم الأطباء: ..." أو "الأطباء: ..." أو "قسم الأسعار: ..."
+            let normRaw = normalizeArabicText(rawQ);
+            if (normRaw.includes('أطباء') || normRaw.includes('دكتور')) {
+                if (normRaw.includes('قسم') || normRaw.includes('الاطباء')) {
+                    targetCategoryFilter = 'doctors';
+                    rawQ = rawQ.replace(/قسم|الأطباء|اطباء|الكتور|الدكتور|دكتور/g, '').replace(/[:：]/g, '').trim();
+                }
+            } else if (normRaw.includes('عروض') || normRaw.includes('اسعار') || normRaw.includes('سعر')) {
+                if (normRaw.includes('قسم') || normRaw.includes('العروض') || normRaw.includes('الأسعار') || normRaw.includes('الاسعار')) {
+                    targetCategoryFilter = 'offers';
+                    rawQ = rawQ.replace(/قسم|العروض|عروض|الأسعار|الاسعار|الاسعار|سعر/g, '').replace(/[:：]/g, '').trim();
+                }
+            } else if (normRaw.includes('تنبيه') || normRaw.includes('اشعار')) {
+                targetCategoryFilter = 'alerts';
+                rawQ = rawQ.replace(/قسم|التنبيهات|تنبيه|الإشعارات|اشعار/g, '').replace(/[:：]/g, '').trim();
+            } else if (normRaw.includes('استفسار') || normRaw.includes('سؤال')) {
+                targetCategoryFilter = 'inquiries';
+                rawQ = rawQ.replace(/قسم|استفسارات|استفسار|سؤال/g, '').replace(/[:：]/g, '').trim();
+            } else if (normRaw.includes('خدمات') || normRaw.includes('أقسام')) {
+                targetCategoryFilter = 'services';
+                rawQ = rawQ.replace(/قسم|الخدمات|خدمات|أقسام/g, '').replace(/[:：]/g, '').trim();
+            } else if (rawQ.includes(':')) {
                 const parts = rawQ.split(':');
                 const cmd = normalizeArabicText(parts[0]);
                 rawQ = parts[1].trim();
-
                 if (cmd.includes('عرض') || cmd.includes('اسعار')) targetCategoryFilter = 'offers';
                 else if (cmd.includes('طبيب') || cmd.includes('دكتور')) targetCategoryFilter = 'doctors';
                 else if (cmd.includes('تنبيه')) targetCategoryFilter = 'alerts';
