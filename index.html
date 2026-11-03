@@ -40,11 +40,10 @@
 
         .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; position: relative; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
-        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
+        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select, .sidebar.collapsed .sidebar-top-actions { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
 
-        /* الزر المخفي في زاوية القائمة لتعديل أسماء القائمة */
         .hidden-edit-sidebar-btn { position: absolute; top: 5px; left: 5px; width: 14px; height: 14px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; opacity: 0; transition: opacity 0.2s; font-size: 0.6rem; }
         .sidebar:hover .hidden-edit-sidebar-btn { opacity: 0.5; }
         .hidden-edit-sidebar-btn:hover { opacity: 1; color: var(--primary-color); }
@@ -53,8 +52,13 @@
         body.focus-mode .professional-ticker-bar { display: none !important; }
         body.focus-mode .top-header .kpi-bar { display: none !important; }
 
-        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; }
-        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; }
+        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between; }
+        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; }
+        
+        /* أزرار الإجراءات العلوية التي تم نقلها أسفل السيم فى القائمة الجانبية */
+        .sidebar-top-actions { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .sidebar-top-actions .btn { flex: 1; font-size: 0.65rem; padding: 0.25rem 0.3rem; justify-content: center; }
+
         .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; overflow-y: auto; }
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
@@ -170,7 +174,7 @@
         .card-gold { background-color: #d97706; }
         .card-green { background-color: #166534; }
 
-        /* تصميم مسطرة الأقسام العلوية (شبيه بمسطرة العروض: رصاصي وتتحول لأصفر عند الاختيار) */
+        /* مسطرة التبويبات الموحدة (رمادي فحمي وتتحول لأصفر عند التفعيل) */
         .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; position: relative; z-index: 50; }
         .offer-tab-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.3rem 0.7rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.75rem; transition: background 0.2s, color 0.2s; }
         .offer-tab-btn:hover { border-color: var(--primary-color); }
@@ -212,7 +216,6 @@
 <body class="theme-gray">
 
     <aside class="sidebar" id="appSidebar">
-        <!-- زر مخفي في الزاوية لتعديل أسماء القائمة الجانبية -->
         <button class="hidden-edit-sidebar-btn" onclick="openRenameSidebarModal()" title="تعديل أسماء القائمة"><i class="fa-solid fa-pen"></i></button>
 
         <div class="brand-title">
@@ -243,6 +246,13 @@
             <span>متصل بالسحابة</span>
         </div>
 
+        <!-- أزرار الإجراءات العلوية التي تم نقلها وتثبيتها بجانب السيم كما طلبت -->
+        <div class="sidebar-top-actions">
+            <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
+            <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
+            <button class="btn btn-secondary" style="color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
+        </div>
+
         <div class="theme-box">
             <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
             <select class="theme-select" onchange="changeTheme(this.value)">
@@ -258,23 +268,17 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (أو: الأطباء الدكتور أبان)..." oninput="triggerGlobalSearchFromInput()">
-                    <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي بالأوامر"><i class="fa-solid fa-microphone"></i></button>
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (Ctrl + Space للصوتي)..." oninput="triggerGlobalSearchFromInput()">
+                    <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي (Ctrl + Space)"><i class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
 
             <div class="header-actions-group">
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleFocusMode()" title="وضع التركيز لشاشة أكبر"><i class="fa-solid fa-expand"></i> تركيز</button>
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleSearchFiltersBar()" title="تصفية الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
-                
                 <div class="kpi-bar">
-                    <div class="kpi-card-mashy" draggable="true" ondragstart="handleKpiDragStart(event, 'معشي')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'معشي')" onclick="openActiveDoctorsModal('معشي')" title="معشي (اسحب للتحريك)">
-                        <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="معشي">
                         <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
                     </div>
-                    <div class="kpi-card-wissam" draggable="true" ondragstart="handleKpiDragStart(event, 'الوسام')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'الوسام')" onclick="openActiveDoctorsModal('الوسام')" title="الوسام (اسحب للتحريك)">
-                        <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="الوسام">
                         <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
                     </div>
                 </div>
@@ -579,6 +583,20 @@
         </div>
     </div>
 
+    <!-- مودال الأطباء المتواجدين الآن مع زر تحرير وترتيب الأطباء -->
+    <div class="modal-overlay" id="activeDoctorsModal">
+        <div class="modal" style="max-width: 480px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
+                <div style="display:flex; gap:0.3rem; align-items:center;">
+                    <button class="btn btn-secondary" id="toggleDocSortBtn" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="toggleActiveDocsSortMode()"><i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️</button>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:1rem;" onclick="closeModal('activeDoctorsModal')"></i>
+                </div>
+            </div>
+            <div id="activeDocsListContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
+        </div>
+    </div>
+
     <!-- مودال تعديل أسماء القائمة الجانبية -->
     <div class="modal-overlay" id="renameSidebarModal">
         <div class="modal" style="max-width: 400px;">
@@ -606,7 +624,7 @@
         </div>
     </div>
 
-    <!-- مودال إدارة وتحرير أقسام العروض -->
+    <!-- مودال إدارة وتعديل أقسام العروض -->
     <div class="modal-overlay" id="manageCategoriesModal">
         <div class="modal" style="max-width: 455px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -614,17 +632,6 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageCategoriesModal')"></i>
             </div>
             <div id="manageCategoriesListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
-        </div>
-    </div>
-
-    <!-- مودال الأطباء المتواجدين الآن -->
-    <div class="modal-overlay" id="activeDoctorsModal">
-        <div class="modal" style="max-width: 480px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('activeDoctorsModal')"></i>
-            </div>
-            <div id="activeDocsListContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
         </div>
     </div>
 
@@ -1078,13 +1085,13 @@
         let userFavorites = JSON.parse(localStorage.getItem('shift_user_favorites') || '[]');
         let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
+        let activeDocsSortMode = false;
 
-        // دالة تطبيع النص المتقدمة لتتجاهل همزات الألف، التاء المربوطة/الهاء، الألف المكسورة/الياء، وأل التعريف
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
                 .toLowerCase()
-                .replace(/ال/g, '') // إزالة أل التعريف لتسهيل المطابقة
+                .replace(/ال/g, '')
                 .replace(/[إأآا]/g, 'ا')
                 .replace(/ة/g, 'ه')
                 .replace(/ى/g, 'ي')
@@ -1119,6 +1126,14 @@
             initDraggableFloatingOffers();
             renderKpiBarOrder();
             applyCustomSidebarNames();
+
+            // اختصار لوحة المفاتيح لتشغيل البحث الصوتي Ctrl + Space
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.code === 'Space') {
+                    e.preventDefault();
+                    toggleVoiceSearch();
+                }
+            });
 
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
@@ -1194,9 +1209,7 @@
             updateKPIs();
         }
 
-        function toggleFocusMode() {
-            document.body.classList.toggle('focus-mode');
-        }
+        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
 
         function openRenameSidebarModal() {
             document.getElementById('inputBrandTitle').value = document.getElementById('brandTitleText').innerText;
@@ -1239,23 +1252,6 @@
             });
         }
 
-        let draggedKpiBranch = null;
-        function handleKpiDragStart(e, branchName) {
-            draggedKpiBranch = branchName;
-            e.dataTransfer.setData('text/plain', branchName);
-        }
-        function handleKpiDrop(e, targetBranch) {
-            e.preventDefault();
-            if (!draggedKpiBranch || draggedKpiBranch === targetBranch) return;
-            let idx1 = kpiOrder.indexOf(draggedKpiBranch);
-            let idx2 = kpiOrder.indexOf(targetBranch);
-            if (idx1 > -1 && idx2 > -1) {
-                kpiOrder.splice(idx1, 1);
-                kpiOrder.splice(idx2, 0, draggedKpiBranch);
-                localStorage.setItem('kpi_order', JSON.stringify(kpiOrder));
-                renderKpiBarOrder();
-            }
-        }
         function renderKpiBarOrder() {
             const bar = document.querySelector('.kpi-bar');
             if (!bar) return;
@@ -1263,14 +1259,12 @@
             kpiOrder.forEach(branch => {
                 if (branch === "معشي") {
                     bar.innerHTML += `
-                        <div class="kpi-card-mashy" draggable="true" ondragstart="handleKpiDragStart(event, 'معشي')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'معشي')" onclick="openActiveDoctorsModal('معشي')" title="معشي (اسحب للتحريك)">
-                            <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                        <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="معشي">
                             <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
                         </div>`;
                 } else {
                     bar.innerHTML += `
-                        <div class="kpi-card-wissam" draggable="true" ondragstart="handleKpiDragStart(event, 'الوسام')" ondragover="event.preventDefault()" ondrop="handleKpiDrop(event, 'الوسام')" onclick="openActiveDoctorsModal('الوسام')" title="الوسام (اسحب للتحريك)">
-                            <i class="fa-solid fa-grip-vertical" style="font-size:0.6rem; opacity:0.7;"></i>
+                        <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="الوسام">
                             <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
                         </div>`;
                 }
@@ -1453,7 +1447,47 @@
             if (wissamEl) wissamEl.innerText = todayWissamCount;
         }
 
+        let currentActiveDocsBranch = "";
+        let activeDocsCustomOrders = JSON.parse(localStorage.getItem('active_docs_custom_orders') || '{}');
+
         function openActiveDoctorsModal(branchName) {
+            currentActiveDocsBranch = branchName;
+            activeDocsSortMode = false;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (btn) {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️`;
+            }
+            renderActiveDoctorsModalContent();
+            document.getElementById('activeDoctorsModal').classList.add('active');
+        }
+
+        function toggleActiveDocsSortMode() {
+            activeDocsSortMode = !activeDocsSortMode;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (activeDocsSortMode) {
+                btn.style.background = 'var(--primary-color)';
+                btn.style.color = '#000';
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> حفظ الترتيب 💾`;
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️`;
+                alert("تم حفظ ترتيب الأطباء المتواجدين بنجاح!");
+            }
+            renderActiveDoctorsModalContent();
+        }
+
+        let draggedActiveDocId = null;
+        function handleActiveDocDragStart(e, id) {
+            draggedActiveDocId = id;
+            e.dataTransfer.setData('text/plain', id);
+        }
+        function handleActiveDocDrop(e, targetId) {
+            e.preventDefault();
+            if (draggedActiveDocId === null || draggedActiveDocId === targetId) return;
+
             const currentDay = getArabicDayName();
             let activeList = [];
             doctorsData.forEach(d => {
@@ -1463,11 +1497,50 @@
                 const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
                 const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
 
-                if (branchName === "معشي" && isMashyToday) activeList.push(d);
-                if (branchName === "الوسام" && isWissamToday) activeList.push(d);
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
             });
 
-            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${branchName} (${activeList.length})`;
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || activeList.map(d => d.id);
+            // التأكد من وجود كل العناصر
+            activeList.forEach(d => { if (!customOrder.includes(d.id)) customOrder.push(d.id); });
+
+            let oldIdx = customOrder.indexOf(draggedActiveDocId);
+            let targetIdx = customOrder.indexOf(targetId);
+
+            if (oldIdx > -1 && targetIdx > -1) {
+                customOrder.splice(oldIdx, 1);
+                customOrder.splice(targetIdx, 0, draggedActiveDocId);
+                activeDocsCustomOrders[currentActiveDocsBranch] = customOrder;
+                localStorage.setItem('active_docs_custom_orders', JSON.stringify(activeDocsCustomOrders));
+                renderActiveDoctorsModalContent();
+            }
+        }
+
+        function renderActiveDoctorsModalContent() {
+            const currentDay = getArabicDayName();
+            let activeList = [];
+            doctorsData.forEach(d => {
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
+
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
+            });
+
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || [];
+            activeList.sort((a, b) => {
+                let idxA = customOrder.indexOf(a.id);
+                let idxB = customOrder.indexOf(b.id);
+                if (idxA === -1) idxA = 999;
+                if (idxB === -1) idxB = 999;
+                return idxA - idxB;
+            });
+
+            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${currentActiveDocsBranch} (${activeList.length})`;
             const container = document.getElementById('activeDocsListContainer');
             container.innerHTML = "";
 
@@ -1475,17 +1548,20 @@
                 container.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">لا يوجد أطباء متواجدون اليوم في هذا الفرع.</div>`;
             } else {
                 activeList.forEach(doc => {
+                    let dragHandle = activeDocsSortMode ? `<span class="row-drag-handle" draggable="true" ondragstart="handleActiveDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleActiveDocDrop(event, ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>` : '';
                     container.innerHTML += `
                         <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem 0.6rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
-                                <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                            <div style="display:flex; align-items:center; gap:0.4rem;">
+                                ${dragHandle}
+                                <div>
+                                    <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
+                                    <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                                </div>
                             </div>
                             <button class="btn btn-green" style="padding:0.15rem 0.35rem; font-size:0.6rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})"><i class="fa-solid fa-eye"></i> عرض</button>
                         </div>`;
                 });
             }
-            document.getElementById('activeDoctorsModal').classList.add('active');
         }
 
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
@@ -2416,6 +2492,7 @@
             document.getElementById('offPrice1').value = item.price1 || "";
             document.getElementById('offDevice2').value = item.device2 || ""; 
             document.getElementById('offPrice2').value = item.price2 || "";
+            document.getElementById('offerId').value = item.id;
             document.getElementById('offPrice').value = item.price || ""; 
             document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offIsPinned').checked = !!item.isPinned;
@@ -2482,48 +2559,51 @@
             handleSmartGlobalSearch(query);
         }
 
-        /* محرك البحث الذكي المدعوم بفهم أوامر القسم (صوتي أو كتابي) ومعالجة الحروف الزائدة */
+        /* محرك البحث الذكي المطور (دعم أقسام متعددة، "جميع الاقسام"، ومعالجة الأقسام سواء فى أول أو آخر الجملة) */
         function handleSmartGlobalSearch(query) {
             let rawQ = query.trim();
-            let targetCategoryFilter = null;
+            let targetCategories = [];
 
-            // استخراج القسم المستهدف في حال استخدام صيغة "قسم الأطباء: ..." أو "الأطباء: ..." أو "قسم الأسعار: ..."
             let normRaw = normalizeArabicText(rawQ);
-            if (normRaw.includes('أطباء') || normRaw.includes('دكتور')) {
-                if (normRaw.includes('قسم') || normRaw.includes('الاطباء')) {
-                    targetCategoryFilter = 'doctors';
-                    rawQ = rawQ.replace(/قسم|الأطباء|اطباء|الكتور|الدكتور|دكتور/g, '').replace(/[:：]/g, '').trim();
-                }
-            } else if (normRaw.includes('عروض') || normRaw.includes('اسعار') || normRaw.includes('سعر')) {
-                if (normRaw.includes('قسم') || normRaw.includes('العروض') || normRaw.includes('الأسعار') || normRaw.includes('الاسعار')) {
-                    targetCategoryFilter = 'offers';
-                    rawQ = rawQ.replace(/قسم|العروض|عروض|الأسعار|الاسعار|الاسعار|سعر/g, '').replace(/[:：]/g, '').trim();
-                }
-            } else if (normRaw.includes('تنبيه') || normRaw.includes('اشعار')) {
-                targetCategoryFilter = 'alerts';
-                rawQ = rawQ.replace(/قسم|التنبيهات|تنبيه|الإشعارات|اشعار/g, '').replace(/[:：]/g, '').trim();
-            } else if (normRaw.includes('استفسار') || normRaw.includes('سؤال')) {
-                targetCategoryFilter = 'inquiries';
-                rawQ = rawQ.replace(/قسم|استفسارات|استفسار|سؤال/g, '').replace(/[:：]/g, '').trim();
-            } else if (normRaw.includes('خدمات') || normRaw.includes('أقسام')) {
-                targetCategoryFilter = 'services';
-                rawQ = rawQ.replace(/قسم|الخدمات|خدمات|أقسام/g, '').replace(/[:：]/g, '').trim();
-            } else if (rawQ.includes(':')) {
-                const parts = rawQ.split(':');
-                const cmd = normalizeArabicText(parts[0]);
-                rawQ = parts[1].trim();
-                if (cmd.includes('عرض') || cmd.includes('اسعار')) targetCategoryFilter = 'offers';
-                else if (cmd.includes('طبيب') || cmd.includes('دكتور')) targetCategoryFilter = 'doctors';
-                else if (cmd.includes('تنبيه')) targetCategoryFilter = 'alerts';
-                else if (cmd.includes('استفسار')) targetCategoryFilter = 'inquiries';
-                else if (cmd.includes('قسم') || cmd.includes('خدمات')) targetCategoryFilter = 'services';
+
+            // التحقق من طلب جميع الأقسام
+            if (normRaw.includes('جميع الاقسام') || normRaw.includes('كل الاقسام')) {
+                targetCategories = ['doctors', 'offers', 'alerts', 'inquiries', 'services', 'coordinators'];
+                rawQ = rawQ.replace(/جميع الاقسام|كل الاقسام/g, '').trim();
+            } else {
+                // الكشف عن الأقسام المحددة سواء كانت في أول أو آخر الجملة
+                const checkAndExtractCat = (keyword, catCode) => {
+                    if (normRaw.includes(keyword)) {
+                        targetCategories.push(catCode);
+                        // إزالة كلمة القسم من النص ليبقى مصطلح البحث الفعلي
+                        let regex = new RegExp(`قسم\\s*${keyword}|${keyword}\\s*قسم|${keyword}`, 'g');
+                        rawQ = rawQ.replace(regex, '').trim();
+                        return true;
+                    }
+                    return false;
+                };
+
+                checkAndExtractCat('اطباء', 'doctors');
+                checkAndExtractCat('دكتور', 'doctors');
+                checkAndExtractCat('عروض', 'offers');
+                checkAndExtractCat('اسعار', 'offers');
+                checkAndExtractCat('سعر', 'offers');
+                checkAndExtractCat('تنبيهات', 'alerts');
+                checkAndExtractCat('اشعار', 'alerts');
+                checkAndExtractCat('استفسارات', 'inquiries');
+                checkAndExtractCat('سؤال', 'inquiries');
+                checkAndExtractCat('خدمات', 'services');
+                checkAndExtractCat('أقسام', 'services');
+                checkAndExtractCat('منسقين', 'coordinators');
             }
 
+            // تنظيف النص النهائي للبحث
+            rawQ = rawQ.replace(/[:：]/g, '').trim();
             const normQ = normalizeArabicText(rawQ);
             const resultsSection = document.getElementById('globalSearchResultsSection');
             const resultsList = document.getElementById('globalSearchResultsList');
             
-            if (!normQ) {
+            if (!normQ && targetCategories.length === 0) {
                 resultsSection.classList.remove('active');
                 const activeTab = localStorage.getItem('activeTab') || 'schedule';
                 document.getElementById(`${activeTab}-section`).classList.add('active');
@@ -2534,10 +2614,11 @@
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            const enabledCats = targetCategoryFilter ? [targetCategoryFilter] : Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+            const enabledCats = targetCategories.length > 0 ? targetCategories : Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
             let allMatchedResults = [];
 
             const isStrictMatch = (text) => {
+                if (!normQ) return true; // إذا تم تحديد القسم فقط بدون كلمة بحث إضافية
                 if (!text) return false;
                 let t = normalizeArabicText(text);
                 return t.includes(normQ);
@@ -2630,7 +2711,7 @@
             }
 
             if (allMatchedResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة.</div>`;
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
                 return;
             }
 
