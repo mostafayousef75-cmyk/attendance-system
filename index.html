@@ -88,7 +88,7 @@
         .header-time-text { color: #38bdf8; font-weight: 800; }
         .header-date-text { color: var(--primary-color); }
 
-        /* شريط المفضلة الذكية - 4 عناصر فقط متكررة */
+        /* شريط المفضلة الذكية - يدوي فقط بالنجوم */
         .fav-searches-bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 1rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .fav-title { font-size: 0.7rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
         .fav-chips-container { display: flex; align-items: center; gap: 0.35rem; flex: 1; overflow-x: auto; }
@@ -96,18 +96,21 @@
         .fav-chip:hover { background: var(--primary-color); color: #000; }
         .fav-chip .remove-fav-btn { color: var(--danger-color); font-size: 0.6rem; border-radius: 50%; padding: 1px 2px; }
 
-        /* شريط التنبيهات المتحركة ملاصق بدون فراغ */
-        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-        .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; scroll-behavior: smooth; position: relative; }
-        .ticker-container::-webkit-scrollbar { height: 5px; }
-        .ticker-container::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 3px; }
+        /* شريط التنبيهات المتحركة مع زر إيقاف/استئناف وسرعات العرض */
+        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+        .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; scroll-behavior: auto; position: relative; }
+        .ticker-container::-webkit-scrollbar { height: 0px; display: none; }
         
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 0.8rem; align-items: center; }
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
 
-        /* سجل الشيفت المدمج مباشرة تحت شريط التنبيهات بدون أي فراغات */
+        .ticker-speed-controls { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
+        .speed-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.62rem; font-weight: 700; cursor: pointer; }
+        .speed-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
+
+        /* سجل الشيفت المدمج مباشرة تحت شريط التنبيهات */
         .shift-scratchpad-box { background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: 0 0 var(--radius-lg) var(--radius-lg); padding: 0.45rem; box-shadow: 0 6px 18px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 0.3rem; margin-bottom: 0.4rem; flex-shrink: 0; }
         .shift-scratchpad-box.show { display: flex; }
         .scratchpad-header { padding-bottom: 0.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
@@ -281,7 +284,7 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بالموقع..." onchange="recordSearchTermFromInput(this.value)" oninput="debouncedGlobalSearch()">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام..." oninput="debouncedGlobalSearch()">
                 </div>
             </div>
 
@@ -322,26 +325,34 @@
             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
-        <!-- شريط المفضلة الذكية (أكثر 4 أبحاث تكراراً فقط) -->
+        <!-- شريط المفضلة الذكية (يدوي فقط بالنجوم) -->
         <div class="fav-searches-bar" id="favSearchesBarContainer">
-            <span class="fav-title"><i class="fa-solid fa-star"></i> المفضلة الذكية (أكثر 4):</span>
+            <span class="fav-title"><i class="fa-solid fa-star"></i> المفضلة الذكية (المتكرر المختار):</span>
             <div class="fav-chips-container" id="favChipsContainer"></div>
-            <button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.55rem; margin-right:auto;" onclick="clearTopSearchHistory()" title="تصفير السجل"><i class="fa-solid fa-rotate-left"></i> تصفير</button>
         </div>
 
-        <!-- شريط الإشعارات والتنبيهات المتحركة ملاصق بدون فراغ -->
+        <!-- شريط الإشعارات والتنبيهات المتحركة مع زر إيقاف/استئناف وسرعات العرض وإعادة الضبط -->
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
-            <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">
-                <button class="btn btn-blue" style="padding:0.25rem 0.6rem; font-size:0.72rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-shrink:0;">
+                <button class="btn btn-blue" style="padding:0.25rem 0.5rem; font-size:0.68rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="إعادة الضبط للأحدث"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
+                <button id="tickerPausePlayBtn" class="btn btn-secondary" style="padding:0.25rem 0.4rem; font-size:0.68rem;" onclick="toggleTickerPausePlay()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i></button>
             </div>
+            
             <div class="ticker-wrapper-outer">
                 <div class="ticker-container" id="tickerContainerBox">
                     <div class="ticker-track" id="tickerTrackContainer"></div>
                 </div>
             </div>
+
+            <div class="ticker-speed-controls">
+                <button class="speed-btn" onclick="setTickerSpeed(0.25, this)">1/4x</button>
+                <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">1/2x</button>
+                <button class="speed-btn active" onclick="setTickerSpeed(1, this)">1x</button>
+                <button class="speed-btn" onclick="setTickerSpeed(2, this)">2x</button>
+            </div>
         </div>
 
-        <!-- سجل الشيفت المدمج (مباشرة تحت شريط الإشعارات بدون أي فراغ ومقسم 3 صفحات) -->
+        <!-- سجل الشيفت المدمج (مقسم 3 صفحات) -->
         <div class="shift-scratchpad-box" id="shiftScratchpadContainer">
             <div class="scratchpad-header">
                 <span style="font-size:0.72rem; font-weight:800; color:var(--primary-color);"><i class="fa-solid fa-clipboard-list"></i> سجل الشيفت والطوارئ (مقسم 3 صفحات) 📝</span>
@@ -624,15 +635,12 @@
         </div>
     </div>
 
-    <!-- المودالات المباشرة -->
+    <!-- المودالات -->
     <div class="modal-overlay" id="activeDoctorsModal">
         <div class="modal" style="max-width: 460px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
-                <div style="display:flex; gap:0.25rem; align-items:center;">
-                    <button class="btn btn-secondary" id="toggleDocSortBtn" style="padding:0.12rem 0.3rem; font-size:0.62rem;" onclick="toggleActiveDocsSortMode()"><i class="fa-solid fa-arrows-up-down"></i> ترتيب ⚙️</button>
-                    <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.95rem;" onclick="closeModal('activeDoctorsModal')"></i>
-                </div>
+                <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.95rem;" onclick="closeModal('activeDoctorsModal')"></i>
             </div>
             <div id="activeDocsListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.25rem; margin-top:0.25rem;"></div>
         </div>
@@ -1123,11 +1131,13 @@
         let activeDocsSortMode = false;
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         
-        // المفضلة الذكية مقيدة بـ 4 عناصر فقط متكررة
-        let searchHistoryList = JSON.parse(localStorage.getItem('search_history_list') || '[]').slice(0, 4);
         let starredOfferIds = JSON.parse(localStorage.getItem('starred_offer_ids') || '[]');
         let currentGlobalSearchResults = [];
         let searchDebounceTimer = null;
+
+        let tickerScrollInterval = null;
+        let tickerPaused = false;
+        let currentTickerSpeedMultiplier = 1;
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1203,7 +1213,38 @@
                 loadDefaultData();
                 refreshAllViews();
             });
+
+            initSmoothAutoTicker();
         });
+
+        // شريط التنبيهات المتحرك مع دعم السرعات البطيئة وأزرار التحكم
+        function initSmoothAutoTicker() {
+            if (tickerScrollInterval) clearInterval(tickerScrollInterval);
+            tickerScrollInterval = setInterval(() => {
+                if (tickerPaused) return;
+                const container = document.getElementById('tickerContainerBox');
+                if (!container) return;
+                
+                container.scrollLeft -= (0.7 * currentTickerSpeedMultiplier);
+                if (container.scrollLeft <= 0) {
+                    container.scrollLeft = container.scrollWidth;
+                }
+            }, 30);
+        }
+
+        function setTickerSpeed(multiplier, btnElement) {
+            currentTickerSpeedMultiplier = multiplier;
+            document.querySelectorAll('.ticker-speed-controls .speed-btn').forEach(b => b.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+        }
+
+        function toggleTickerPausePlay() {
+            tickerPaused = !tickerPaused;
+            const btn = document.getElementById('tickerPausePlayBtn');
+            if (btn) {
+                btn.innerHTML = tickerPaused ? `<i class="fa-solid fa-play"></i>` : `<i class="fa-solid fa-pause"></i>`;
+            }
+        }
 
         function updateLiveClockAndDate() {
             const now = new Date();
@@ -1215,6 +1256,7 @@
             hours = hours ? hours : 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
             
+            // ضبط صيغة التاريخ ليكون: اليوم، الشهر، السنة (مثال: 4, Nov, 2026)
             const dayNum = now.getDate();
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const monthStr = months[now.getMonth()];
@@ -1445,28 +1487,13 @@
             if (wissamEl) wissamEl.innerText = todayWissamCount;
         }
 
-        function recordSearchTermFromInput(term) {
-            const clean = term.trim();
-            if (!clean || clean.length < 2) return;
-            
-            searchHistoryList = searchHistoryList.filter(item => item !== clean);
-            searchHistoryList.unshift(clean);
-            
-            if (searchHistoryList.length > 4) {
-                searchHistoryList = searchHistoryList.slice(0, 4);
-            }
-            
-            localStorage.setItem('search_history_list', JSON.stringify(searchHistoryList));
-            renderTopFavoriteSearches();
-        }
-
+        // المفضلة يدوية فقط من خلال النجوم على العروض
         function renderTopFavoriteSearches() {
             const container = document.getElementById('favChipsContainer');
             if (!container) return;
             container.innerHTML = "";
 
             let chipsHtml = "";
-
             starredOfferIds.forEach(id => {
                 const offer = offersData.find(o => o.id === id);
                 if (offer) {
@@ -1479,44 +1506,10 @@
                 }
             });
 
-            // إظهار أكثر 4 أبحاث فقط
-            searchHistoryList.slice(0, 4).forEach(term => {
-                chipsHtml += `
-                    <div class="fav-chip" onclick="applyFavoriteSearch('${term}')">
-                        <i class="fa-solid fa-magnifying-glass" style="font-size:0.58rem;"></i>
-                        <span>${term}</span>
-                        <i class="fa-solid fa-xmark remove-fav-btn" onclick="removeFavoriteSearch(event, '${term}')"></i>
-                    </div>`;
-            });
-
             if (!chipsHtml) {
-                container.innerHTML = `<span style="font-size:0.65rem; color:var(--text-muted);">انقر على نجوم الأسعار أو أكمل بحثاً لتظهر هنا...</span>`;
+                container.innerHTML = `<span style="font-size:0.65rem; color:var(--text-muted);">انقر على نجوم العروض والأسعار لتظهر هنا كعناصر متكررة ومفضلة...</span>`;
             } else {
                 container.innerHTML = chipsHtml;
-            }
-        }
-
-        function applyFavoriteSearch(term) {
-            const input = document.getElementById('globalSearchInput');
-            if (input) {
-                input.value = term;
-                debouncedGlobalSearch();
-            }
-        }
-
-        function removeFavoriteSearch(e, term) {
-            e.stopPropagation();
-            searchHistoryList = searchHistoryList.filter(t => t !== term);
-            localStorage.setItem('search_history_list', JSON.stringify(searchHistoryList));
-            renderTopFavoriteSearches();
-        }
-
-        function clearTopSearchHistory() {
-            if (confirm("هل تريد تصفير سجل المفضلة الذكية؟")) {
-                searchHistoryList = [];
-                localStorage.removeItem('search_history_list');
-                renderTopFavoriteSearches();
-                playChirpSound();
             }
         }
 
@@ -1546,79 +1539,23 @@
         }
 
         let currentActiveDocsBranch = "";
-        let activeDocsCustomOrders = JSON.parse(localStorage.getItem('active_docs_custom_orders') || '{}');
 
         function openActiveDoctorsModal(branchName) {
             currentActiveDocsBranch = branchName;
-            activeDocsSortMode = false;
-            const btn = document.getElementById('toggleDocSortBtn');
-            if (btn) {
-                btn.style.background = '';
-                btn.style.color = '';
-                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> ترتيب ⚙️`;
-            }
             renderActiveDoctorsModalContent();
             document.getElementById('activeDoctorsModal').classList.add('active');
-        }
-
-        function toggleActiveDocsSortMode() {
-            activeDocsSortMode = !activeDocsSortMode;
-            const btn = document.getElementById('toggleDocSortBtn');
-            if (activeDocsSortMode) {
-                btn.style.background = 'var(--primary-color)';
-                btn.style.color = '#000';
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> حفظ الترتيب 💾`;
-            } else {
-                btn.style.background = '';
-                btn.style.color = '';
-                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> ترتيب ⚙️`;
-                playChirpSound();
-                alert("تم حفظ ترتيب الأطباء المتواجدين بنجاح!");
-            }
-            renderActiveDoctorsModalContent();
-        }
-
-        let draggedActiveDocId = null;
-        function handleActiveDocDragStart(e, id) {
-            draggedActiveDocId = id;
-            e.dataTransfer.setData('text/plain', id);
-        }
-        function handleActiveDocDrop(e, targetId) {
-            e.preventDefault();
-            if (draggedActiveDocId === null || draggedActiveDocId === targetId) return;
-
-            const currentDay = getArabicDayName();
-            let activeList = [];
-            doctorsData.forEach(d => {
-                if (d.isLeave) return;
-                const mashyDays = d.mashyDays || d.days || [];
-                const wissamDays = d.wissamDays || [];
-                const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
-                const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
-
-                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
-                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
-            });
-
-            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || activeList.map(d => d.id);
-            activeList.forEach(d => { if (!customOrder.includes(d.id)) customOrder.push(d.id); });
-
-            let oldIdx = customOrder.indexOf(draggedActiveDocId);
-            let targetIdx = customOrder.indexOf(targetId);
-
-            if (oldIdx > -1 && targetIdx > -1) {
-                customOrder.splice(oldIdx, 1);
-                customOrder.splice(targetIdx, 0, draggedActiveDocId);
-                activeDocsCustomOrders[currentActiveDocsBranch] = customOrder;
-                localStorage.setItem('active_docs_custom_orders', JSON.stringify(activeDocsCustomOrders));
-                renderActiveDoctorsModalContent();
-            }
         }
 
         function renderActiveDoctorsModalContent() {
             const currentDay = getArabicDayName();
             let activeList = [];
-            doctorsData.forEach(d => {
+            
+            // جلب أطباء الفرع بنفس ترتيبهم تماماً في صفحة الأطباء دون سحب وإفلات
+            let sourceList = (currentActiveDocsBranch === "معشي") 
+                ? doctorsData.filter(d => d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0)
+                : doctorsData.filter(d => d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
+
+            sourceList.forEach(d => {
                 if (d.isLeave) return;
                 const mashyDays = d.mashyDays || d.days || [];
                 const wissamDays = d.wissamDays || [];
@@ -1627,15 +1564,6 @@
 
                 if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
                 if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
-            });
-
-            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || [];
-            activeList.sort((a, b) => {
-                let idxA = customOrder.indexOf(a.id);
-                let idxB = customOrder.indexOf(b.id);
-                if (idxA === -1) idxA = 999;
-                if (idxB === -1) idxB = 999;
-                return idxA - idxB;
             });
 
             document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${currentActiveDocsBranch} (${activeList.length})`;
@@ -1646,11 +1574,9 @@
                 container.innerHTML = `<div style="text-align:center; padding:1.2rem; color:var(--text-muted);">لا يوجد أطباء متواجدون اليوم في هذا الفرع.</div>`;
             } else {
                 activeList.forEach(doc => {
-                    let dragHandle = activeDocsSortMode ? `<span class="row-drag-handle" draggable="true" ondragstart="handleActiveDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleActiveDocDrop(event, ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>` : '';
                     container.innerHTML += `
                         <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
                             <div style="display:flex; align-items:center; gap:0.35rem;">
-                                ${dragHandle}
                                 <div>
                                     <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.6rem; color:var(--text-muted);">${doc.nationality || ''}</span>
                                     <div style="font-size:0.65rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
@@ -2729,7 +2655,7 @@
             saveSearchFiltersState();
         }
 
-        // تحسين وتسريع البحث باستخدام Debounce لمنع الثقل أثناء الكتابة
+        // البحث الشامل المطور ليغطي كل الأقسام والوسوم تماماً ويحل مشكلة العثور على الأسعار والوسوم
         function debouncedGlobalSearch() {
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
@@ -2782,9 +2708,7 @@
                 if (!normQ) return true;
                 if (!text) return false;
                 let t = normalizeArabicText(text);
-                let queryWords = normQ.split(' ').filter(w => w.length > 0 && !['و', 'في', 'عن', 'مع', 'الاقسام', 'الأطباء', 'المنسقين'].includes(w));
-                if (queryWords.length === 0) return t.includes(normQ);
-                return queryWords.every(qw => t.includes(qw)) || t.includes(normQ);
+                return t.includes(normQ);
             };
 
             if (targetCategories.includes('doctors')) {
@@ -2814,7 +2738,7 @@
                         currentGlobalSearchResults.push({
                             id: `offer_${o.id}`,
                             title: `${o.name} - ${priceSummary}`,
-                            subtitle: `${o.notes || ''}`,
+                            subtitle: `${o.notes || ''} | الوسوم: ${o.tags || ''}`,
                             copyText: formatOfferLineForClient(o),
                             source: `العروض والأسعار (${o.category})`,
                             action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`
@@ -2829,7 +2753,7 @@
                         currentGlobalSearchResults.push({
                             id: `alert_${a.id}`,
                             title: a.content,
-                            subtitle: a.time,
+                            subtitle: `الوسوم: ${a.tags || ''} | ${a.time}`,
                             copyText: a.content,
                             source: "التنبيهات والإشعارات",
                             action: `jumpToAlertsTab(${a.id})`
@@ -2844,7 +2768,7 @@
                         currentGlobalSearchResults.push({
                             id: `inq_${i.id}`,
                             title: i.question,
-                            subtitle: i.answer,
+                            subtitle: `${i.answer} | الوسوم: ${i.tags || ''}`,
                             copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`,
                             source: `دليل الاستفسارات (${i.category})`,
                             action: `jumpToSectionAndHighlightInquiry(${i.id})`
@@ -2859,7 +2783,7 @@
                         currentGlobalSearchResults.push({
                             id: `srv_${s.id}`,
                             title: s.name,
-                            subtitle: `القسم: ${s.type}`,
+                            subtitle: `القسم: ${s.type} | الوسوم: ${s.tags || ''}`,
                             copyText: s.name,
                             source: `أقسام وفروع العيادات (${s.branch})`,
                             action: `jumpToSectionAndHighlightService(${s.id})`
@@ -2888,7 +2812,7 @@
                         currentGlobalSearchResults.push({
                             id: `coord_${c.id}`,
                             title: c.name,
-                            subtitle: c.rules ? c.rules[0] : '',
+                            subtitle: `${c.rules ? c.rules[0] : ''} | الوسوم: ${c.tags || ''}`,
                             copyText: `${c.name}\n` + (c.rules ? c.rules.join('\n') : ''),
                             source: "دليل المنسقين",
                             action: `jumpToSectionAndHighlightCoordinator(${c.id})`
