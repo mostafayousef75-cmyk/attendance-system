@@ -84,7 +84,7 @@
         .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.3rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
         .kpi-num { font-weight: 800; font-size: 0.75rem; }
 
-        /* تعديل صيغة التاريخ لتكون بالشكل المطلوب: 05, Nov, 2026 */
+        /* تعديل التاريخ ليكون اليوم أولاً: 05, Nov, 2026 */
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
         .header-time-text { color: #38bdf8; font-weight: 800; }
         .header-date-text { color: var(--primary-color); }
@@ -96,15 +96,20 @@
         .fav-chip:hover { background: var(--primary-color); color: #000; }
         .fav-chip .remove-fav-btn { color: var(--danger-color); font-size: 0.6rem; border-radius: 50%; padding: 1px 2px; }
 
-        /* شريط التنبيهات مع سرعات بطيئة جداً (0.25x و 0.5x) */
+        /* شريط التنبيهات المتحرك مع السرعات الحقيقية */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; }
+        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; }
         
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation-timing-function: linear; animation-iteration-count: infinite; }
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScroll linear infinite; direction: rtl; width: max-content; }
         .ticker-track:hover { animation-play-state: paused; }
 
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; }
+        @keyframes smoothTickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+        }
+
+        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
 
         .ticker-speed-controls { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
@@ -152,7 +157,6 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.62rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        /* أيقونة تحريك الكروت */
         .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.85rem; padding: 3px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); vertical-align: middle; margin-left: 5px; }
         .row-drag-handle:active { cursor: grabbing; }
 
@@ -285,6 +289,7 @@
             </div>
 
             <div class="header-actions-group">
+                <!-- التاريخ والوقت بدقة: اليوم أولاً 05, Nov, 2026 -->
                 <div class="header-datetime-box">
                     <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
@@ -326,7 +331,7 @@
             <div class="fav-chips-container" id="favChipsContainer"></div>
         </div>
 
-        <!-- شريط التنبيهات مع سرعات بطيئة جداً (0.25x, 0.5x, 1x, 2x) -->
+        <!-- شريط التنبيهات المتحرك مع أزرار السرعات والتحكم -->
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
                 <button class="btn btn-blue" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث</button>
@@ -673,7 +678,6 @@
         </div>
     </div>
 
-    <!-- موديل الأطباء مع الوسوم -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -820,7 +824,6 @@
         </div>
     </div>
 
-    <!-- موديل التنبيهات مع الوسوم -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -850,7 +853,6 @@
         </div>
     </div>
 
-    <!-- موديل الأقسام والخدمات مع الوسوم -->
     <div class="modal-overlay" id="deptServiceModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -897,7 +899,6 @@
         </div>
     </div>
 
-    <!-- موديل الملاحظات مع الوسوم -->
     <div class="modal-overlay" id="deptNoteModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -927,7 +928,6 @@
         </div>
     </div>
 
-    <!-- موديل المنسقين مع الوسوم -->
     <div class="modal-overlay" id="coordModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -962,7 +962,6 @@
         </div>
     </div>
 
-    <!-- موديل العروض والأسعار (مع حقل ملحوظات / شروط معتمدة / الوسوم tags كما طلبت) -->
     <div class="modal-overlay" id="offerModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1022,7 +1021,6 @@
         </div>
     </div>
 
-    <!-- موديل الاستفسارات مع الوسوم -->
     <div class="modal-overlay" id="inquiryModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1209,7 +1207,7 @@
             });
         });
 
-        // ضبط التاريخ بالشكل المطلوب بدقة: 05, Nov, 2026
+        // ضبط التاريخ بحيث يكون اليوم أولاً بدقة: 05, Nov, 2026
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1624,7 +1622,6 @@
 
         function cleanSearchText(str) { return normalizeArabicText(str); }
 
-        // تحريك الأطباء صعوداً وهبوطاً عبر الأيقونة فقط
         function moveDoctorOrder(id, direction) {
             const idx = doctorsData.findIndex(d => d.id === id);
             if (idx === -1) return;
@@ -1833,7 +1830,6 @@
         function applyTickerSpeed() {
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
-            // 28 ثانية للسرعة الطبيعية 1x، وكلما قل المضرب زادت مدة الحركة (حركة أبطأ جداً)
             let baseDuration = 28;
             let calculatedDuration = baseDuration / tickerSpeedMultiplier;
             track.style.animation = `smoothTickerScroll ${calculatedDuration}s linear infinite`;
@@ -2265,7 +2261,6 @@
             updateFloatingOffersWindow(); 
         }
 
-        // تحريك العروض صعوداً وهبوطاً عبر الأيقونة فقط
         function moveOfferOrder(id, direction) {
             const idx = offersData.findIndex(o => o.id === id);
             if (idx === -1) return;
@@ -2463,7 +2458,6 @@
             }, 150);
         }
 
-        // البحث الشامل المربوط بكل الأقسام والوسوم معاً
         function handleSmartGlobalSearch(query) {
             let rawQ = query.trim();
             if (!rawQ) {
@@ -2490,7 +2484,6 @@
                 return normalizeArabicText(text).includes(normQ);
             };
 
-            // البحث الشامل في الأطباء (الاسم، التخصص، الملاحظات، الوسوم)
             doctorsData.forEach(d => {
                 if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.notes) || isMatch(d.tags)) {
                     let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
@@ -2502,7 +2495,6 @@
                 }
             });
 
-            // البحث في العروض والأسعار (الاسم، الأجهزة، ملاحظات/شروط، الوسوم، القسم)
             offersData.forEach(o => {
                 const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
                 if (isMatch(combinedOfferText)) {
@@ -2515,7 +2507,6 @@
                 }
             });
 
-            // البحث في التنبيهات والوسوم
             alertsData.forEach(a => {
                 if (isMatch(a.content) || isMatch(a.tags)) {
                     currentGlobalSearchResults.push({
@@ -2525,7 +2516,6 @@
                 }
             });
 
-            // البحث في الاستفسارات والوسوم
             inquiriesData.forEach(i => {
                 if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
                     currentGlobalSearchResults.push({
@@ -2536,7 +2526,6 @@
                 }
             });
 
-            // البحث في الخدمات والأقسام والوسوم
             deptServicesData.forEach(s => {
                 if (isMatch(s.name) || isMatch(s.tags)) {
                     currentGlobalSearchResults.push({
@@ -2546,7 +2535,6 @@
                 }
             });
 
-            // البحث في ملحوظات الأقسام
             deptNotesData.forEach((n, idx) => {
                 if (isMatch(n.text) || isMatch(n.tags)) {
                     currentGlobalSearchResults.push({
@@ -2556,7 +2544,6 @@
                 }
             });
 
-            // البحث في المنسقين
             coordinatorsData.forEach(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
                 if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
