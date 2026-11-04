@@ -88,6 +88,7 @@
         .header-time-text { color: #38bdf8; font-weight: 800; }
         .header-date-text { color: var(--primary-color); }
 
+        /* شريط المفضلة الذكية - 4 عناصر فقط متكررة */
         .fav-searches-bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 1rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .fav-title { font-size: 0.7rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
         .fav-chips-container { display: flex; align-items: center; gap: 0.35rem; flex: 1; overflow-x: auto; }
@@ -95,6 +96,7 @@
         .fav-chip:hover { background: var(--primary-color); color: #000; }
         .fav-chip .remove-fav-btn { color: var(--danger-color); font-size: 0.6rem; border-radius: 50%; padding: 1px 2px; }
 
+        /* شريط التنبيهات المتحركة ملاصق بدون فراغ */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; scroll-behavior: smooth; position: relative; }
@@ -105,6 +107,7 @@
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
 
+        /* سجل الشيفت المدمج مباشرة تحت شريط التنبيهات بدون أي فراغات */
         .shift-scratchpad-box { background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: 0 0 var(--radius-lg) var(--radius-lg); padding: 0.45rem; box-shadow: 0 6px 18px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 0.3rem; margin-bottom: 0.4rem; flex-shrink: 0; }
         .shift-scratchpad-box.show { display: flex; }
         .scratchpad-header { padding-bottom: 0.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
@@ -319,12 +322,14 @@
             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
+        <!-- شريط المفضلة الذكية (أكثر 4 أبحاث تكراراً فقط) -->
         <div class="fav-searches-bar" id="favSearchesBarContainer">
             <span class="fav-title"><i class="fa-solid fa-star"></i> المفضلة الذكية (أكثر 4):</span>
             <div class="fav-chips-container" id="favChipsContainer"></div>
             <button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.55rem; margin-right:auto;" onclick="clearTopSearchHistory()" title="تصفير السجل"><i class="fa-solid fa-rotate-left"></i> تصفير</button>
         </div>
 
+        <!-- شريط الإشعارات والتنبيهات المتحركة ملاصق بدون فراغ -->
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">
                 <button class="btn btn-blue" style="padding:0.25rem 0.6rem; font-size:0.72rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
@@ -336,6 +341,7 @@
             </div>
         </div>
 
+        <!-- سجل الشيفت المدمج (مباشرة تحت شريط الإشعارات بدون أي فراغ ومقسم 3 صفحات) -->
         <div class="shift-scratchpad-box" id="shiftScratchpadContainer">
             <div class="scratchpad-header">
                 <span style="font-size:0.72rem; font-weight:800; color:var(--primary-color);"><i class="fa-solid fa-clipboard-list"></i> سجل الشيفت والطوارئ (مقسم 3 صفحات) 📝</span>
@@ -604,6 +610,7 @@
         </div>
     </main>
 
+    <!-- سلة العروض المحددة الثابتة -->
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
             <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
@@ -617,11 +624,15 @@
         </div>
     </div>
 
+    <!-- المودالات المباشرة -->
     <div class="modal-overlay" id="activeDoctorsModal">
         <div class="modal" style="max-width: 460px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.95rem;" onclick="closeModal('activeDoctorsModal')"></i>
+                <div style="display:flex; gap:0.25rem; align-items:center;">
+                    <button class="btn btn-secondary" id="toggleDocSortBtn" style="padding:0.12rem 0.3rem; font-size:0.62rem;" onclick="toggleActiveDocsSortMode()"><i class="fa-solid fa-arrows-up-down"></i> ترتيب ⚙️</button>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:0.95rem;" onclick="closeModal('activeDoctorsModal')"></i>
+                </div>
             </div>
             <div id="activeDocsListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.25rem; margin-top:0.25rem;"></div>
         </div>
@@ -1193,7 +1204,6 @@
             });
         });
 
-        // ضبط التاريخ بالشكل المطلوب (اليوم، الشهر، السنة): 4, Nov, 2026
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1534,12 +1544,73 @@
         }
 
         let currentActiveDocsBranch = "";
+        let activeDocsCustomOrders = JSON.parse(localStorage.getItem('active_docs_custom_orders') || '{}');
 
-        // فتح نافذة الأطباء المتواجدين بدون ترتيب يدوي (عرض طبيعي)
         function openActiveDoctorsModal(branchName) {
             currentActiveDocsBranch = branchName;
+            activeDocsSortMode = false;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (btn) {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> ترتيب ⚙️`;
+            }
             renderActiveDoctorsModalContent();
             document.getElementById('activeDoctorsModal').classList.add('active');
+        }
+
+        function toggleActiveDocsSortMode() {
+            activeDocsSortMode = !activeDocsSortMode;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (activeDocsSortMode) {
+                btn.style.background = 'var(--primary-color)';
+                btn.style.color = '#000';
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> حفظ الترتيب 💾`;
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> ترتيب ⚙️`;
+                playChirpSound();
+                alert("تم حفظ ترتيب الأطباء المتواجدين بنجاح!");
+            }
+            renderActiveDoctorsModalContent();
+        }
+
+        let draggedActiveDocId = null;
+        function handleActiveDocDragStart(e, id) {
+            draggedActiveDocId = id;
+            e.dataTransfer.setData('text/plain', id);
+        }
+        function handleActiveDocDrop(e, targetId) {
+            e.preventDefault();
+            if (draggedActiveDocId === null || draggedActiveDocId === targetId) return;
+
+            const currentDay = getArabicDayName();
+            let activeList = [];
+            doctorsData.forEach(d => {
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
+
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
+            });
+
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || activeList.map(d => d.id);
+            activeList.forEach(d => { if (!customOrder.includes(d.id)) customOrder.push(d.id); });
+
+            let oldIdx = customOrder.indexOf(draggedActiveDocId);
+            let targetIdx = customOrder.indexOf(targetId);
+
+            if (oldIdx > -1 && targetIdx > -1) {
+                customOrder.splice(oldIdx, 1);
+                customOrder.splice(targetIdx, 0, draggedActiveDocId);
+                activeDocsCustomOrders[currentActiveDocsBranch] = customOrder;
+                localStorage.setItem('active_docs_custom_orders', JSON.stringify(activeDocsCustomOrders));
+                renderActiveDoctorsModalContent();
+            }
         }
 
         function renderActiveDoctorsModalContent() {
@@ -1556,6 +1627,15 @@
                 if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
             });
 
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || [];
+            activeList.sort((a, b) => {
+                let idxA = customOrder.indexOf(a.id);
+                let idxB = customOrder.indexOf(b.id);
+                if (idxA === -1) idxA = 999;
+                if (idxB === -1) idxB = 999;
+                return idxA - idxB;
+            });
+
             document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${currentActiveDocsBranch} (${activeList.length})`;
             const container = document.getElementById('activeDocsListContainer');
             container.innerHTML = "";
@@ -1564,9 +1644,11 @@
                 container.innerHTML = `<div style="text-align:center; padding:1.2rem; color:var(--text-muted);">لا يوجد أطباء متواجدون اليوم في هذا الفرع.</div>`;
             } else {
                 activeList.forEach(doc => {
+                    let dragHandle = activeDocsSortMode ? `<span class="row-drag-handle" draggable="true" ondragstart="handleActiveDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleActiveDocDrop(event, ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>` : '';
                     container.innerHTML += `
                         <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
                             <div style="display:flex; align-items:center; gap:0.35rem;">
+                                ${dragHandle}
                                 <div>
                                     <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.6rem; color:var(--text-muted);">${doc.nationality || ''}</span>
                                     <div style="font-size:0.65rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
@@ -1879,506 +1961,4 @@
             document.getElementById('docId').value = ""; document.getElementById('docName').value = "";
             document.getElementById('docNationality').value = ""; document.getElementById('docSpecialty').value = "";
             document.getElementById('docFee').value = ""; document.getElementById('docTiming').value = "";
-            document.getElementById('docNotes').value = ""; document.getElementById('docTags').value = "";
-            document.getElementById('docCustomColor').value = ""; document.getElementById('docIsJoint').checked = false;
-            document.getElementById('docIsPinned').checked = false; document.getElementById('docIsLeave').checked = false;
-            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
-            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = false);
-            document.getElementById('mashyDaysBox').classList.remove('show'); document.getElementById('wissamDaysBox').classList.remove('show');
-            document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; document.getElementById('doctorModal').classList.add('active');
-        }
-
-        function saveDoctor() {
-            const id = document.getElementById('docId').value;
-            const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
-            const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
-            const existingDoc = id ? doctorsData.find(d => d.id == id) : null;
-            const isLeaveVal = document.getElementById('docIsLeave').checked;
-            let docNameVal = document.getElementById('docName').value.trim();
-
-            if (docNameVal) {
-                if (!docNameVal.startsWith("د.") && !docNameVal.startsWith("الدكتور")) {
-                    docNameVal = "د. " + docNameVal;
-                }
-            }
-
-            const docObj = {
-                id: id ? parseInt(id) : Date.now(),
-                name: docNameVal,
-                nationality: document.getElementById('docNationality').value,
-                specialty: document.getElementById('docSpecialty').value,
-                fee: document.getElementById('docFee').value,
-                branch: document.getElementById('docBranch').value,
-                customColor: document.getElementById('docCustomColor').value,
-                isJoint: document.getElementById('docIsJoint').checked,
-                isPinned: document.getElementById('docIsPinned').checked,
-                isLeave: isLeaveVal,
-                mashyDays, wissamDays,
-                timing: document.getElementById('docTiming').value,
-                notes: document.getElementById('docNotes').value,
-                tags: document.getElementById('docTags').value.trim(),
-                mashyOrder: existingDoc ? (existingDoc.mashyOrder ?? doctorsData.length) : doctorsData.length,
-                wissamOrder: existingDoc ? (existingDoc.wissamOrder ?? doctorsData.length) : doctorsData.length
-            };
-            if (!docObj.name) return alert("أدخل اسم الطبيب!");
-
-            if (isLeaveVal && (!existingDoc || !existingDoc.isLeave)) {
-                alertsData.push({
-                    id: Date.now(),
-                    content: `⚠️ تنبيه إجازة: الدكتور ${docNameVal} غير متواجد حالياً في العيادة.`,
-                    tags: `${docNameVal} إجازة أطباء`,
-                    media: "", mediaType: "",
-                    time: new Date().toLocaleString('en-US')
-                });
-            }
-
-            if (id) { doctorsData[doctorsData.findIndex(d => d.id == id)] = docObj; } else { doctorsData.push(docObj); }
-            syncToCloud(); renderDoctors(); closeModal('doctorModal');
-            playChirpSound();
-        }
-
-        function editDoctor(id) {
-            const doc = doctorsData.find(d => d.id === id);
-            if (!doc) return;
-            document.getElementById('docId').value = doc.id; document.getElementById('docName').value = doc.name;
-            document.getElementById('docNationality').value = doc.nationality || ""; document.getElementById('docSpecialty').value = doc.specialty;
-            document.getElementById('docFee').value = doc.fee || ""; document.getElementById('docBranch').value = doc.branch;
-            document.getElementById('docCustomColor').value = doc.customColor || ""; document.getElementById('docIsJoint').checked = !!doc.isJoint;
-            document.getElementById('docIsPinned').checked = !!doc.isPinned; document.getElementById('docIsLeave').checked = !!doc.isLeave;
-            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : false);
-            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false);
-            document.getElementById('docTiming').value = doc.timing; document.getElementById('docNotes').value = doc.notes || "";
-            document.getElementById('docTags').value = doc.tags || ""; document.getElementById('doctorModal').classList.add('active');
-        }
-
-        function deleteDoctor(id) {
-            if (confirm("حذف؟")) { 
-                doctorsData = doctorsData.filter(d => d.id !== id); 
-                syncToCloud(); 
-                renderDoctors(); 
-                playChirpSound();
-            }
-        }
-
-        function renderAlerts(highlightId = null) {
-            const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
-            if(!grid || !tickerTrack) return;
-            grid.innerHTML = ""; tickerTrack.innerHTML = "";
-            const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
-            let alertCardsHtml = "";
-            sortedAlerts.forEach(item => {
-                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
-            });
-            tickerTrack.innerHTML = alertCardsHtml;
-
-            sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
-                let mediaHtml = "";
-                if (item.media) {
-                    if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
-                    else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
-                }
-                const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
-                grid.innerHTML += `
-                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
-                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span>${getTagsTooltipHtml(item.tags)}</div>
-                        ${mediaHtml}
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
-            });
-            updateKPIs();
-        }
-
-        function resetTickerToStart() {
-            const container = document.getElementById('tickerContainerBox');
-            if (container) { container.scrollLeft = container.scrollWidth; }
-        }
-
-        function jumpToAlertsTab(alertId) {
-            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
-            if (alertId) {
-                setTimeout(() => {
-                    const el = document.getElementById(`alert_card_${alertId}`);
-                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); }
-                }, 100);
-            }
-        }
-
-        function openAlertModal() {
-            document.getElementById('alertId').value = ""; document.getElementById('alertContent').value = "";
-            document.getElementById('alertTags').value = ""; document.getElementById('alertMediaBase64').value = "";
-            document.getElementById('alertMediaType').value = ""; document.getElementById('alertFileInput').value = "";
-            document.getElementById('mediaPreviewContainer').style.display = 'none'; document.getElementById('alertModal').classList.add('active');
-        }
-
-        function previewAndCompressMedia(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0], reader = new FileReader();
-                if (file.type === "application/pdf") {
-                    reader.onload = function(e) {
-                        const blobUrl = URL.createObjectURL(new Blob([file], { type: 'application/pdf' }));
-                        document.getElementById('alertMediaBase64').value = blobUrl; document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${blobUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
-                        document.getElementById('mediaPreviewContainer').style.display = 'block';
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    reader.onload = function(e) {
-                        const img = new Image(); img.src = e.target.result;
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), maxW = 500, scale = maxW / img.width;
-                            canvas.width = (img.width > maxW) ? maxW : img.width; canvas.height = (img.width > maxW) ? img.height * scale : img.height;
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            const compressed = canvas.toDataURL('image/jpeg', 0.7);
-                            document.getElementById('alertMediaBase64').value = compressed; document.getElementById('alertMediaType').value = "image";
-                            document.getElementById('mediaPreviewBox').innerHTML = `<img src="${compressed}" style="height:32px; border-radius:4px; object-fit:cover;">`;
-                            document.getElementById('mediaPreviewContainer').style.display = 'block';
-                        };
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
-
-        function removeAlertMedia() {
-            document.getElementById('alertMediaBase64').value = ""; document.getElementById('alertMediaType').value = "";
-            document.getElementById('alertFileInput').value = ""; document.getElementById('mediaPreviewContainer').style.display = 'none';
-        }
-
-        function saveAlert() {
-            const id = document.getElementById('alertId').value, content = document.getElementById('alertContent').value;
-            const tags = document.getElementById('alertTags').value.trim(), media = document.getElementById('alertMediaBase64').value, mediaType = document.getElementById('alertMediaType').value;
-            if (!content) return alert("أدخل نص التنبيه!");
-            const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, media, mediaType, time: new Date().toLocaleString('en-US') };
-            if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
-            syncToCloud(); renderAlerts(); closeModal('alertModal');
-            playChirpSound();
-        }
-
-        function editAlert(id) {
-            const item = alertsData.find(a => a.id === id);
-            if (!item) return;
-            document.getElementById('alertId').value = item.id; document.getElementById('alertContent').value = item.content;
-            document.getElementById('alertTags').value = item.tags || ""; document.getElementById('alertMediaBase64').value = item.media || "";
-            document.getElementById('alertMediaType').value = item.mediaType || "";
-            if (item.media) {
-                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
-                else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:32px; border-radius:4px; object-fit:cover;">`;
-                document.getElementById('mediaPreviewContainer').style.display = 'block';
-            } else document.getElementById('mediaPreviewContainer').style.display = 'none';
-            document.getElementById('alertModal').classList.add('active');
-        }
-
-        function deleteAlert(id) {
-            if (confirm("حذف؟")) { 
-                alertsData = alertsData.filter(a => a.id !== id); 
-                syncToCloud(); 
-                renderAlerts(); 
-                playChirpSound();
-            }
-        }
-
-        function renderDeptsAndDocs(highlightServiceId = null) {
-            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
-            if(bodies.some(b => !b)) return;
-            bodies.forEach(b => b.innerHTML = "");
-
-            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach(item => {
-                const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
-                const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
-                const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge} ${getTagsTooltipHtml(item.tags)}</td><td style="text-align:center;"><div class="actions-col-group"><button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
-                if (item.branch === "معشي") {
-                    if (item.type === "derm") bodies[0].innerHTML += rowHtml; else bodies[1].innerHTML += rowHtml;
-                } else {
-                    if (item.type === "derm") bodies[2].innerHTML += rowHtml; else bodies[3].innerHTML += rowHtml;
-                }
-            });
-
-            const notesContainer = document.getElementById('deptNotesContainer');
-            if(!notesContainer) return; notesContainer.innerHTML = "";
-            deptNotesData.forEach((noteObj, idx) => {
-                if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
-                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
-                }
-            });
-        }
-
-        function openDeptServiceModal() {
-            document.getElementById('deptRowId').value = ""; document.getElementById('deptBranchSelect').value = "معشي";
-            document.getElementById('deptCategorySelect').value = "derm"; document.getElementById('deptItemName').value = "";
-            document.getElementById('deptItemTags').value = ""; document.getElementById('deptCustomColor').value = "";
-            document.getElementById('deptIsJoint').checked = false; document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز";
-            document.getElementById('deptServiceModal').classList.add('active');
-        }
-
-        function saveDeptService() {
-            const id = document.getElementById('deptRowId').value;
-            const rowObj = {
-                id: id ? parseInt(id) : Date.now(),
-                branch: document.getElementById('deptBranchSelect').value,
-                type: document.getElementById('deptCategorySelect').value,
-                name: document.getElementById('deptItemName').value.trim(),
-                tags: document.getElementById('deptItemTags').value.trim(),
-                customColor: document.getElementById('deptCustomColor').value,
-                isJoint: document.getElementById('deptIsJoint').checked
-            };
-            if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
-            if (id) deptServicesData[deptServicesData.findIndex(s => s.id == id)] = rowObj; else deptServicesData.push(rowObj);
-            syncToCloud(); renderDeptsAndDocs(); closeModal('deptServiceModal');
-            playChirpSound();
-        }
-
-        function editDeptService(id) {
-            const item = deptServicesData.find(s => s.id === id);
-            if (!item) return;
-            document.getElementById('deptRowId').value = item.id; document.getElementById('deptBranchSelect').value = item.branch || "معشي";
-            document.getElementById('deptCategorySelect').value = item.type || "derm"; document.getElementById('deptItemName').value = item.name || "";
-            document.getElementById('deptItemTags').value = item.tags || ""; document.getElementById('deptCustomColor').value = item.customColor || "";
-            document.getElementById('deptIsJoint').checked = !!item.isJoint; document.getElementById('deptServiceModal').classList.add('active');
-        }
-
-        function deleteDeptService(id) {
-            if (confirm("حذف؟")) { 
-                deptServicesData = deptServicesData.filter(s => s.id !== id); 
-                syncToCloud(); 
-                renderDeptsAndDocs(); 
-                playChirpSound();
-            }
-        }
-
-        function openDeptNoteModal() {
-            document.getElementById('noteIndex').value = ""; document.getElementById('deptNoteText').value = "";
-            document.getElementById('deptNoteTags').value = ""; document.getElementById('deptNoteColor').value = "card-gold";
-            document.getElementById('deptNoteModal').classList.add('active');
-        }
-
-        function saveDeptNote() {
-            const idx = document.getElementById('noteIndex').value, text = document.getElementById('deptNoteText').value.trim();
-            const tags = document.getElementById('deptNoteTags').value.trim(), color = document.getElementById('deptNoteColor').value;
-            if (!text) return;
-            const noteObj = { text, tags, color };
-            if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
-            syncToCloud(); renderDeptsAndDocs(); closeModal('deptNoteModal');
-            playChirpSound();
-        }
-
-        function editDeptNote(idx) {
-            const noteObj = deptNotesData[idx]; if (!noteObj) return;
-            document.getElementById('noteIndex').value = idx; document.getElementById('deptNoteText').value = noteObj.text;
-            document.getElementById('deptNoteTags').value = noteObj.tags || ""; document.getElementById('deptNoteColor').value = noteObj.color || "card-gold";
-            document.getElementById('deptNoteModal').classList.add('active');
-        }
-
-        function deleteDeptNote(idx) {
-            if (confirm("حذف؟")) { 
-                deptNotesData.splice(idx, 1); 
-                syncToCloud(); 
-                renderDeptsAndDocs(); 
-                playChirpSound();
-            }
-        }
-
-        let draggedCoordIdx = null;
-        function renderCoordinators(highlightId = null) {
-            const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
-            
-            coordinatorsData.filter(c => {
-                let rulesText = c.rules ? c.rules.join(' ') : '';
-                return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
-            }).forEach((c, idx) => {
-                let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();playChirpSound();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.25rem;">${c.name}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
-            });
-        }
-
-        function openCoordinatorModal() {
-            document.getElementById('coordId').value = ""; document.getElementById('coordName').value = "";
-            document.getElementById('coordTags').value = ""; document.getElementById('coordRules').value = "";
-            document.getElementById('coordModal').classList.add('active');
-        }
-
-        function saveCoordinator() {
-            const id = document.getElementById('coordId').value, rules = document.getElementById('coordRules').value.split('\n').filter(r => r.trim() !== "");
-            const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('coordName').value, tags: document.getElementById('coordTags').value.trim(), color: document.getElementById('coordColor').value, rules };
-            if (id) coordinatorsData[coordinatorsData.findIndex(c => c.id == id)] = obj; else coordinatorsData.push(obj);
-            syncToCloud(); renderCoordinators(); closeModal('coordModal');
-            playChirpSound();
-        }
-
-        function editCoordinator(id) {
-            const item = coordinatorsData.find(c => c.id === id); if (!item) return;
-            document.getElementById('coordId').value = item.id; document.getElementById('coordName').value = item.name;
-            document.getElementById('coordTags').value = item.tags || ""; document.getElementById('coordColor').value = item.color || "card-teal";
-            document.getElementById('coordRules').value = item.rules.join('\n'); document.getElementById('coordModal').classList.add('active');
-        }
-
-        function deleteCoordinator(id) {
-            if (confirm("حذف؟")) { 
-                coordinatorsData = coordinatorsData.filter(c => c.id !== id); 
-                syncToCloud(); 
-                renderCoordinators(); 
-                playChirpSound();
-            }
-        }
-
-        function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
-        
-        function renderOffersTabs() {
-            const container = document.getElementById('offersTabsContainer');
-            if (!container) return;
-            container.innerHTML = "";
-
-            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            const totalCount = offersData.length;
-
-            let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار (${totalCount})</button>`;
-
-            cats.forEach(cat => {
-                const catCount = offersData.filter(o => o.category === cat).length;
-                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat} (${catCount})</button>`;
-            });
-
-            container.innerHTML = tabsHtml;
-            updateQuickMoveDropdown();
-            updateKPIs();
-        }
-
-        function updateQuickMoveDropdown() {
-            const sel = document.getElementById('quickMoveCatSelect');
-            if (!sel) return;
-            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            let html = "";
-            cats.forEach(c => {
-                html += `<option value="${c}">${c}</option>`;
-            });
-            sel.innerHTML = html;
-        }
-
-        function quickMoveSelectedOffers() {
-            if (selectedOfferIds.length === 0) return alert("الرجاء تحديد عرض واحد على الأقل أولاً!");
-            const targetCat = document.getElementById('quickMoveCatSelect').value;
-            if (!targetCat) return alert("اختر القسم المستهدف!");
-
-            offersData.forEach(o => {
-                if (selectedOfferIds.includes(o.id)) {
-                    o.category = targetCat;
-                }
-            });
-
-            syncToCloud();
-            renderOffersTabs();
-            renderOffers();
-            playChirpSound();
-            alert(`تم نقل العروض المحددة إلى قسم "${targetCat}" بنجاح!`);
-        }
-
-        function filterOfferCategory(cat, btn) {
-            selectedOfferTab = cat;
-            localStorage.setItem('selectedOfferTab', cat);
-            document.querySelectorAll('#offersTabsContainer .offer-tab-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderOffers();
-        }
-
-        function openManageCategoriesModal() {
-            const container = document.getElementById('manageCategoriesListContainer');
-            if (!container) return;
-            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            container.innerHTML = "";
-
-            if (cats.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:1rem; color:var(--text-muted);">لا توجد أقسام مسجلة حالياً.</div>`;
-            } else {
-                cats.forEach(cat => {
-                    container.innerHTML += `
-                        <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <strong style="color:var(--primary-color);">${cat}</strong>
-                            <div style="display:flex; gap:0.2rem;">
-                                <button class="btn btn-secondary" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="editOfferCategory('${cat}')"><i class="fa-solid fa-pen"></i> تعديل</button>
-                                <button class="btn btn-danger" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="deleteOfferCategory('${cat}')"><i class="fa-solid fa-trash"></i> حذف</button>
-                            </div>
-                        </div>`;
-                });
-            }
-            document.getElementById('manageCategoriesModal').classList.add('active');
-        }
-
-        function editOfferCategory(oldCatName) {
-            const newName = prompt(`تعديل اسم القسم "${oldCatName}" إلى الاسم الجديد:`, oldCatName);
-            if (!newName || !newName.trim() || newName.trim() === oldCatName) return;
-            const trimmedName = newName.trim();
-            
-            offersData.forEach(o => {
-                if (o.category === oldCatName) {
-                    o.category = trimmedName;
-                }
-            });
-
-            if (selectedOfferTab === oldCatName) {
-                selectedOfferTab = trimmedName;
-                localStorage.setItem('selectedOfferTab', trimmedName);
-            }
-
-            syncToCloud();
-            renderOffersTabs();
-            renderOffers();
-            openManageCategoriesModal();
-            playChirpSound();
-            alert(`تم تغيير اسم القسم إلى "${trimmedName}" بنجاح!`);
-        }
-
-        function deleteOfferCategory(catName) {
-            if (confirm(`هل أنت متأكد من حذف القسم "${catName}" وكل العروض الموجودة بداخله؟`)) {
-                offersData = offersData.filter(o => o.category !== catName);
-                
-                if (selectedOfferTab === catName) {
-                    selectedOfferTab = "⭐ كل العروض والأسعار";
-                    localStorage.setItem('selectedOfferTab', selectedOfferTab);
-                }
-
-                syncToCloud();
-                renderOffersTabs();
-                renderOffers();
-                openManageCategoriesModal();
-                playChirpSound();
-                alert(`تم حذف القسم "${catName}" بنجاح!`);
-            }
-        }
-
-        function formatOfferLineForClient(item) {
-            let lines = [`${item.name}`];
-            if (item.device1 && item.device1.trim() !== "") {
-                let cleanDev1 = item.device1.replace(/جهاز\s*/g, '').trim();
-                lines.push(`${cleanDev1}${item.price1 ? ` بـ ${item.price1}` : ""}`);
-            }
-            if (item.device2 && item.device2.trim() !== "") {
-                let cleanDev2 = item.device2.replace(/جهاز\s*/g, '').trim();
-                lines.push(`${cleanDev2}${item.price2 ? ` بـ ${item.price2}` : ""}`);
-            }
-            if (item.price && item.price.trim() !== "") {
-                lines.push(`السعر: ${item.price}`);
-            }
-            return lines.join('\n');
-        }
-
-        function copySingleOffer(id) {
-            const item = offersData.find(o => o.id === id); if (!item) return;
-            copyTextToClipboard(formatOfferLineForClient(item), "تم نسخ العرض:");
-        }
-
-        function handleOfferCheckboxChange(id, checkboxEl) {
-            const offerId = parseInt(id);
-            if (checkboxEl.checked) { if (!selectedOfferIds.includes(offerId)) selectedOfferIds.push(offerId); }
-            else { selectedOfferIds = selectedOfferIds.filter(i => i !== offerId); }
-            updateFloatingOffersWindow();
-        }
-
-        function toggleSelectAllOffers(masterCheckbox) {
-            const searchInput = document.getElementById('offerSearchInput');
-            const search = searchInput ? clean
+            document.getElementById('docNotes').value = ""; document.getElementById
