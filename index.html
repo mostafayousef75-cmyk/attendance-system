@@ -1128,7 +1128,6 @@
         let selectedGlobalSearchIds = [];
         let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
-        let activeDocsSortMode = false;
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         
         let starredOfferIds = JSON.parse(localStorage.getItem('starred_offer_ids') || '[]');
@@ -1450,7 +1449,7 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
             document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            const targetSec = document.getElementById(`${tabId}-section`);
+            const targetSec = document.getElementById(tabId + '-section');
             if (targetSec) targetSec.classList.add('active');
             if (elem) elem.classList.add('active');
             if (save) localStorage.setItem('activeTab', tabId);
@@ -1525,7 +1524,7 @@
             
             localStorage.setItem('starred_offer_ids', JSON.stringify(starredOfferIds));
             
-            const btn = document.getElementById(`star_btn_${id}`);
+            const btn = document.getElementById('star_btn_' + id);
             if (btn) {
                 if (starredOfferIds.includes(id)) {
                     btn.classList.add('starred');
@@ -1601,8 +1600,8 @@
 
         function saveTableWidths() {
             let widths = {};
-            document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { widths[`mashy_${idx}`] = th.style.width; });
-            document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { widths[`wissam_${idx}`] = th.style.width; });
+            document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { widths['mashy_' + idx] = th.style.width; });
+            document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { widths['wissam_' + idx] = th.style.width; });
             localStorage.setItem('clinic_table_widths', JSON.stringify(widths));
         }
 
@@ -1611,8 +1610,8 @@
             if (!saved) return;
             try {
                 const widths = JSON.parse(saved);
-                document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { if (widths[`mashy_${idx}`]) th.style.width = widths[`mashy_${idx}`]; });
-                document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { if (widths[`wissam_${idx}`]) th.style.width = widths[`wissam_${idx}`]; });
+                document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { if (widths['mashy_' + idx]) th.style.width = widths['mashy_' + idx]; });
+                document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { if (widths['wissam_' + idx]) th.style.width = widths['wissam_' + idx]; });
             } catch(e){}
         }
 
@@ -1624,7 +1623,7 @@
 
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
-            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_${Date.now()}.json`);
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", 'backup_' + Date.now() + '.json');
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
 
@@ -1831,8 +1830,8 @@
                 countW++;
             });
 
-            document.getElementById('countMashy').innerText = `${countM} أطباء`;
-            document.getElementById('countWissam').innerText = `${countW} أطباء`;
+            document.getElementById('countMashy').innerText = countM + ' أطباء';
+            document.getElementById('countWissam').innerText = countW + ' أطباء';
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد';
             document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد';
             updateKPIs();
@@ -1964,7 +1963,7 @@
             switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
             if (alertId) {
                 setTimeout(() => {
-                    const el = document.getElementById(`alert_card_${alertId}`);
+                    const el = document.getElementById('alert_card_' + alertId);
                     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); }
                 }, 100);
             }
@@ -2237,7 +2236,7 @@
             renderOffersTabs();
             renderOffers();
             playChirpSound();
-            alert(`تم نقل العروض المحددة إلى قسم "${targetCat}" بنجاح!`);
+            alert("تم نقل العروض المحددة إلى قسم \"" + targetCat + "\" بنجاح!");
         }
 
         function filterOfferCategory(cat, btn) {
@@ -2272,7 +2271,7 @@
         }
 
         function editOfferCategory(oldCatName) {
-            const newName = prompt(`تعديل اسم القسم "${oldCatName}" إلى الاسم الجديد:`, oldCatName);
+            const newName = prompt("تعديل اسم القسم \"" + oldCatName + "\" إلى الاسم الجديد:", oldCatName);
             if (!newName || !newName.trim() || newName.trim() === oldCatName) return;
             const trimmedName = newName.trim();
             
@@ -2292,11 +2291,11 @@
             renderOffers();
             openManageCategoriesModal();
             playChirpSound();
-            alert(`تم تغيير اسم القسم إلى "${trimmedName}" بنجاح!`);
+            alert("تم تغيير اسم القسم إلى \"" + trimmedName + "\" بنجاح!");
         }
 
         function deleteOfferCategory(catName) {
-            if (confirm(`هل أنت متأكد من حذف القسم "${catName}" وكل العروض الموجودة بداخله؟`)) {
+            if (confirm("هل أنت متأكد من حذف القسم \"" + catName + "\" وكل العروض الموجودة بداخله؟")) {
                 offersData = offersData.filter(o => o.category !== catName);
                 
                 if (selectedOfferTab === catName) {
@@ -2309,22 +2308,22 @@
                 renderOffers();
                 openManageCategoriesModal();
                 playChirpSound();
-                alert(`تم حذف القسم "${catName}" بنجاح!`);
+                alert("تم حذف القسم \"" + catName + "\" بنجاح!");
             }
         }
 
         function formatOfferLineForClient(item) {
-            let lines = [`${item.name}`];
+            let lines = [item.name];
             if (item.device1 && item.device1.trim() !== "") {
                 let cleanDev1 = item.device1.replace(/جهاز\s*/g, '').trim();
-                lines.push(`${cleanDev1}${item.price1 ? ` بـ ${item.price1}` : ""}`);
+                lines.push(cleanDev1 + (item.price1 ? " بـ " + item.price1 : ""));
             }
             if (item.device2 && item.device2.trim() !== "") {
                 let cleanDev2 = item.device2.replace(/جهاز\s*/g, '').trim();
-                lines.push(`${cleanDev2}${item.price2 ? ` بـ ${item.price2}` : ""}`);
+                lines.push(cleanDev2 + (item.price2 ? " بـ " + item.price2 : ""));
             }
             if (item.price && item.price.trim() !== "") {
-                lines.push(`السعر: ${item.price}`);
+                lines.push("السعر: " + item.price);
             }
             return lines.join('\n');
         }
@@ -2562,7 +2561,7 @@
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span style="flex:1; margin:0 0.25rem;">${item.question}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button><button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span style="flex:1; margin:0 0.25rem;">${item.question}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + (${item.name ? item.name : item.question}) + '\\nإجابة: ' + ${item.answer}, 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button><button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
 
@@ -2619,7 +2618,7 @@
             if (!rawQ) {
                 document.getElementById('globalSearchResultsSection').classList.remove('active');
                 const activeTab = localStorage.getItem('activeTab') || 'schedule';
-                document.getElementById(`${activeTab}-section`).classList.add('active');
+                document.getElementById(activeTab + '-section').classList.add('active');
                 currentGlobalSearchResults = [];
                 selectedGlobalSearchIds = [];
                 return;
@@ -2664,14 +2663,14 @@
             if (targetCategories.includes('doctors')) {
                 doctorsData.forEach(d => {
                     if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes)) {
-                        let docTextForCopy = `الطبيب: ${d.name} (${d.nationality || ''})\nالتخصص: ${d.specialty}\nالكشفية: ${d.fee || '75 ريال'}\nالساعات: ${d.timing || ''}`;
+                        let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال') + "\nالساعات: " + (d.timing || '');
                         currentGlobalSearchResults.push({
-                            id: `doc_${d.id}`,
-                            title: `${d.name} (${d.specialty})`,
-                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
+                            id: 'doc_' + d.id,
+                            title: d.name + " (" + d.specialty + ")",
+                            subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الكشف: " + (d.fee || '75 ريال'),
                             copyText: docTextForCopy,
                             source: "الأطباء",
-                            action: `jumpToSectionAndHighlightDoc(${d.id})`
+                            action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
                         });
                     }
                 });
@@ -2679,19 +2678,19 @@
 
             if (targetCategories.includes('offers')) {
                 offersData.forEach(o => {
-                    const combinedOfferText = `${o.name || ''} ${o.category || ''} ${o.price || ''} ${o.notes || ''} ${o.tags || ''} ${o.device1 || ''} ${o.price1 || ''} ${o.device2 || ''} ${o.price2 || ''}`;
+                    const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.tags || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
                     if (isMatch(combinedOfferText)) {
-                        let priceSummary = o.price ? `السعر: ${o.price}` : "";
-                        if (o.device1) priceSummary += ` | ${o.device1}: ${o.price1 || ''}`;
-                        if (o.device2) priceSummary += ` | ${o.device2}: ${o.price2 || ''}`;
+                        let priceSummary = o.price ? "السعر: " + o.price : "";
+                        if (o.device1) priceSummary += " | " + o.device1 + ": " + (o.price1 || '');
+                        if (o.device2) priceSummary += " | " + o.device2 + ": " + (o.price2 || '');
 
                         currentGlobalSearchResults.push({
-                            id: `offer_${o.id}`,
-                            title: `${o.name} - ${priceSummary}`,
-                            subtitle: `${o.notes || ''} | الوسوم: ${o.tags || ''}`,
+                            id: 'offer_' + o.id,
+                            title: o.name + " - " + priceSummary,
+                            subtitle: (o.notes || '') + " | الوسوم: " + (o.tags || ''),
                             copyText: formatOfferLineForClient(o),
-                            source: `العروض والأسعار (${o.category})`,
-                            action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`
+                            source: "العروض والأسعار (" + o.category + ")",
+                            action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
                         });
                     }
                 });
@@ -2701,12 +2700,12 @@
                 alertsData.forEach(a => {
                     if (isMatch(a.content) || isMatch(a.tags)) {
                         currentGlobalSearchResults.push({
-                            id: `alert_${a.id}`,
+                            id: 'alert_' + a.id,
                             title: a.content,
-                            subtitle: `الوسوم: ${a.tags || ''} | ${a.time}`,
+                            subtitle: "الوسوم: " + (a.tags || '') + " | " + a.time,
                             copyText: a.content,
                             source: "التنبيهات والإشعارات",
-                            action: `jumpToAlertsTab(${a.id})`
+                            action: "jumpToAlertsTab(" + a.id + ")"
                         });
                     }
                 });
@@ -2716,12 +2715,12 @@
                 inquiriesData.forEach(i => {
                     if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
                         currentGlobalSearchResults.push({
-                            id: `inq_${i.id}`,
+                            id: 'inq_' + i.id,
                             title: i.question,
-                            subtitle: `${i.answer} | الوسوم: ${i.tags || ''}`,
-                            copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`,
-                            source: `دليل الاستفسارات (${i.category})`,
-                            action: `jumpToSectionAndHighlightInquiry(${i.id})`
+                            subtitle: i.answer + " | الوسوم: " + (i.tags || ''),
+                            copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
+                            source: "دليل الاستفسارات (" + i.category + ")",
+                            action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
                         });
                     }
                 });
@@ -2731,12 +2730,12 @@
                 deptServicesData.forEach(s => {
                     if (isMatch(s.name) || isMatch(s.tags)) {
                         currentGlobalSearchResults.push({
-                            id: `srv_${s.id}`,
+                            id: 'srv_' + s.id,
                             title: s.name,
-                            subtitle: `القسم: ${s.type} | الوسوم: ${s.tags || ''}`,
+                            subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || ''),
                             copyText: s.name,
-                            source: `أقسام وفروع العيادات (${s.branch})`,
-                            action: `jumpToSectionAndHighlightService(${s.id})`
+                            source: "أقسام وفروع العيادات (" + s.branch + ")",
+                            action: "jumpToSectionAndHighlightService(" + s.id + ")"
                         });
                     }
                 });
@@ -2744,12 +2743,12 @@
                 deptNotesData.forEach((note, idx) => {
                     if (isMatch(note.text) || isMatch(note.tags)) {
                         currentGlobalSearchResults.push({
-                            id: `note_${idx}`,
-                            title: `ملحوظة: ${note.text}`,
-                            subtitle: `الوسوم: ${note.tags || 'بدون'}`,
+                            id: 'note_' + idx,
+                            title: "ملحوظة: " + note.text,
+                            subtitle: "الوسوم: " + (note.tags || 'بدون'),
                             copyText: note.text,
                             source: "ملحوظات الأقسام",
-                            action: `switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])`
+                            action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
                         });
                     }
                 });
@@ -2760,12 +2759,12 @@
                     let rulesText = c.rules ? c.rules.join(' ') : '';
                     if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
                         currentGlobalSearchResults.push({
-                            id: `coord_${c.id}`,
+                            id: 'coord_' + c.id,
                             title: c.name,
-                            subtitle: `${c.rules ? c.rules[0] : ''} | الوسوم: ${c.tags || ''}`,
-                            copyText: `${c.name}\n` + (c.rules ? c.rules.join('\n') : ''),
+                            subtitle: (c.rules ? c.rules[0] : '') + " | الوسوم: " + (c.tags || ''),
+                            copyText: c.name + "\n" + (c.rules ? c.rules.join('\n') : ''),
                             source: "دليل المنسقين",
-                            action: `jumpToSectionAndHighlightCoordinator(${c.id})`
+                            action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
                         });
                     }
                 });
@@ -2846,39 +2845,39 @@
             currentGlobalSearchResults = [];
             selectedGlobalSearchIds = [];
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
-            switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
         }
 
         function jumpToSectionAndHighlightDoc(id) {
             closeModal('activeDoctorsModal');
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
-            setTimeout(() => { renderDoctors(id); document.getElementById(`doc_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function jumpToSectionAndHighlightOffer(id, cat) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('offers', document.querySelectorAll('.nav-link')[4]);
             selectedOfferTab = cat; renderOffersTabs();
-            setTimeout(() => { renderOffers(id); document.getElementById(`offer_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function jumpToSectionAndHighlightInquiry(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
-            setTimeout(() => { renderInquiries(id); document.getElementById(`inquiry_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function jumpToSectionAndHighlightCoordinator(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switch`tabular`('coordinators', document.querySelectorAll('.nav-link')[3]);
-            setTimeout(() => { renderCoordinators(id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function jumpToSectionAndHighlightService(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
-            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
     </script>
 </body>
