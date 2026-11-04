@@ -38,14 +38,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; }
+        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; position: relative; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
-        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select { display: none !important; }
+        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select, .sidebar.collapsed .sidebar-edit-target-btn span { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
 
-        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; }
-        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; }
+        body.focus-mode .sidebar { display: none !important; }
+
+        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between; }
+        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; }
+
         .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; overflow-y: auto; }
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
@@ -53,20 +56,23 @@
         .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; }
         .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
 
-        .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); }
-        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; margin-top: 0.2rem; font-size: 0.75rem; }
+        .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.2rem; }
+        .theme-box-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
+        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; font-size: 0.75rem; }
+        
+        .sidebar-edit-target-btn { background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; padding: 0.3rem 0.4rem; border-radius: var(--radius-md); font-size: 0.68rem; display: inline-flex; align-items: center; gap: 0.2rem; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
+        .sidebar-edit-target-btn:hover { color: var(--primary-color); border-color: var(--primary-color); }
 
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; flex-shrink: 0; }
         
-        .search-container { position: relative; flex: 1; min-width: 280px; max-width: 420px; display: flex; gap: 0.4rem; align-items: center; }
-        .search-input-box { position: relative; flex: 1; }
-        .search-input-box input { width: 100%; padding: 0.5rem 2.4rem 0.5rem 2.2rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
-        .search-input-box i.fa-magnifying-glass { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 0.9rem; }
-        .voice-btn { position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--primary-color); font-size: 1rem; cursor: pointer; transition: transform 0.2s; }
-        .voice-btn.recording { color: var(--danger-color); animation: pulseVoice 1s infinite; }
-        @keyframes pulseVoice { 0% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.2); } 100% { transform: translateY(-50%) scale(1); } }
+        .search-container { position: relative; flex: 1; min-width: 280px; max-width: 440px; display: flex; gap: 0.4rem; align-items: center; }
+        .search-input-box { position: relative; flex: 1; display: flex; align-items: center; }
+        .search-input-box input { width: 100%; padding: 0.4rem 2.6rem 0.4rem 2.2rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.8rem; font-weight: 700; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
+        .search-input-box .fa-magnifying-glass { position: absolute; right: 0.7rem; color: var(--primary-color); font-size: 0.85rem; }
+        .search-input-box .mic-btn { position: absolute; left: 0.5rem; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: color 0.2s; }
+        .search-input-box .mic-btn.listening { color: var(--danger-color); animation: pulseGlow 1s infinite; }
 
         .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.3rem 0.6rem; border-radius: 6px; display: none; align-items: center; gap: 0.8rem; font-size: 0.73rem; flex-wrap: wrap; margin: 0.2rem 0.6rem; }
         .search-filters-bar.show { display: flex; }
@@ -74,34 +80,33 @@
         .search-filter-chk input { accent-color: var(--primary-color); width: 13px; height: 13px; cursor: pointer; }
 
         .header-actions-group { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
-        
         .kpi-bar { display: flex; gap: 0.4rem; align-items: center; }
         
-        .kpi-card-mashy { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #fef08a; box-shadow: 0 2px 5px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
-        .kpi-card-mashy:active { transform: scale(0.97); }
-        .kpi-card-mashy .kpi-num { color: var(--primary-color); font-weight: 800; font-size: 0.8rem; }
+        .kpi-card-mashy { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #fef08a; cursor: pointer; }
+        .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
+        .kpi-num { font-weight: 800; font-size: 0.8rem; }
 
-        .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #bbf7d0; box-shadow: 0 2px 5px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
-        .kpi-card-wissam:active { transform: scale(0.97); }
-        .kpi-card-wissam .kpi-num { color: var(--accent-green); font-weight: 800; font-size: 0.8rem; }
-
-        /* الشريط الأصفر المحسّن والكبير */
-        .professional-ticker-bar { background-color: rgba(245, 158, 11, 0.08); border: 1.5px solid var(--primary-color); border-radius: 12px; padding: 0.6rem 0.8rem; margin: 0.4rem 0.6rem 0.2rem 0.6rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.85rem; flex-shrink: 0; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18); }
-        .ticker-yellow-ruler { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; width: 48px; height: 48px; border-radius: 50%; font-size: 1.25rem; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(245, 158, 11, 0.5); flex-shrink: 0; }
-        
-        .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; overflow: hidden; }
-        .top-smart-favorites { display: flex; align-items: center; gap: 0.4rem; overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
-        .fav-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--primary-color); color: #fef08a; padding: 0.15rem 0.5rem; border-radius: 15px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .fav-badge:hover { background: var(--primary-color); color: #000; }
-
-        .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border-radius: 8px; padding: 0.5rem 0.8rem; border: 1px solid var(--border-color); scroll-behavior: smooth; direction: rtl; box-shadow: inset 0 1px 4px rgba(0,0,0,0.4); }
-        .ticker-container::-webkit-scrollbar { height: 8px; }
-        .ticker-container::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 4px; }
-        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 4px; }
+        /* شريط التنبيهات بدون خلفية رصاصي */
+        .professional-ticker-bar { background: transparent; padding: 0.2rem 1rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; flex-shrink: 0; }
+        .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .ticker-container { overflow-x: auto; white-space: nowrap; background: transparent; padding: 0.15rem 0.2rem; scroll-behavior: smooth; position: relative; }
+        .ticker-container::-webkit-scrollbar { height: 4px; }
+        .ticker-container::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
         
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 0.8rem; align-items: center; }
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.6rem; background: #2d2d33; border: 1px solid #52525b; padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 700; color: #f4f4f5; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
-        .ticker-card-item:hover { border-color: var(--primary-color); background: #3f3f46; color: var(--primary-color); transform: translateY(-1px); }
+        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: #242429; border: 1px solid #3f3f46; padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; }
+        .ticker-card-item:hover { background: #121214; color: var(--primary-color); }
+        
+        /* المسطرة الصفراء المضيئة الكبيرة والقابلة للحركة */
+        .yellow-glowing-ruler { height: 6px; background: linear-gradient(90deg, #f59e0b, #fde047, #f59e0b); width: 100%; box-shadow: 0 0 12px rgba(245, 158, 11, 0.9); margin-top: 2px; margin-bottom: 3px; border-radius: 3px; flex-shrink: 0; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #fde047 #242429; cursor: pointer; }
+        .yellow-glowing-ruler::-webkit-scrollbar { height: 6px; }
+        .yellow-glowing-ruler::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 3px; }
+        .yellow-glowing-ruler::-webkit-scrollbar-thumb { background: #fde047; border-radius: 3px; box-shadow: 0 0 8px #f59e0b; }
+
+        /* المفضلة الذكية بدون خلفية رصاصي */
+        .quick-favorites-bar { background: transparent; padding: 0.2rem 1rem; display: flex; align-items: center; gap: 0.8rem; overflow-x: auto; flex-shrink: 0; font-size: 0.75rem; position: relative; }
+        .quick-fav-chip { display: inline-flex; align-items: center; gap: 0.4rem; background: #000000; border: 1px solid #3f3f46; padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
+        .quick-fav-chip:hover { background: #1a1a1e; color: var(--primary-color); border-color: var(--primary-color); }
 
         .content-area { flex: 1; padding: 0.5rem; overflow-y: auto; }
         .page-section { display: none; }
@@ -121,14 +126,14 @@
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* نافذة الشيفت العائمة والمتحركة */
-        .shift-floating-window { position: fixed; top: 100px; left: 100px; width: 340px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 99999; display: none; flex-direction: column; overflow: hidden; }
-        .shift-floating-window.show { display: flex; }
-        .shift-header { background: var(--bg-card); padding: 0.4rem 0.7rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.8rem; }
-        .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: none; padding: 0.5rem; font-size: 0.75rem; resize: vertical; height: 120px; outline: none; }
+        /* مربع الشيفت المتحرك بحرية (Draggable) */
+        .shift-scratchpad-box { position: fixed; bottom: 80px; right: 30px; width: 340px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); padding: 0.4rem 0.7rem; box-shadow: 0 8px 25px rgba(0,0,0,0.7); z-index: 99999; display: none; flex-direction: column; gap: 0.3rem; resize: both; overflow: hidden; min-width: 250px; min-height: 120px; }
+        .shift-scratchpad-box.show { display: flex; }
+        .scratchpad-header { cursor: move; padding: 0.2rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .scratchpad-textarea { width: 100%; flex: 1; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.75rem; resize: none; min-height: 80px; outline: none; }
 
         .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-items: start; }
-        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.4rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; width: 100%; }
+        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.4rem; display: flex; flex-direction: column; width: 100%; }
         .branch-title { font-size: 0.82rem; font-weight: 700; padding-bottom: 0.25rem; margin-bottom: 0.3rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
@@ -140,8 +145,7 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.65rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.95rem; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); margin-left: 5px; transition: background 0.2s; }
-        .row-drag-handle:active { cursor: grabbing; background: rgba(250, 204, 21, 0.35); }
+        .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.95rem; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); }
 
         .tags-tooltip-wrapper { position: relative; display: inline-flex; align-items: center; margin-top: 2px; cursor: pointer; }
         .tags-icon-badge { font-size: 0.6rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.02rem 0.25rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.15rem; }
@@ -154,7 +158,7 @@
         @keyframes pulseGlow {
             0% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1.01); }
             50% { background-color: rgba(245, 158, 11, 0.1); transform: scale(1); }
-            100% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1.01); }
+            100% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1); }
         }
 
         .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; }
@@ -174,20 +178,21 @@
         .card-gold { background-color: #d97706; }
         .card-green { background-color: #166534; }
 
-        .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; }
-        .offer-tab-btn { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.72rem; }
-        .offer-tab-btn.active { background: var(--primary-color); color: #000 !important; border-color: var(--primary-color); font-weight: 800; }
+        .offers-tabs { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.2rem; overflow-x: auto; align-items: center; flex-wrap: wrap; position: relative; z-index: 50; }
+        .offer-tab-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.3rem 0.7rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.75rem; transition: background 0.2s, color 0.2s; }
+        .offer-tab-btn:hover { border-color: var(--primary-color); }
+        .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.5rem; }
         .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; }
         .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.5rem; padding: 0.02rem 0.15rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.08rem 0.25rem; border-radius: 4px; font-size: 0.58rem; display: inline-block; margin-top: 2px; }
 
-        .floating-offers-window { position: fixed; bottom: 25px; left: 25px; width: 300px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 8px 25px rgba(0,0,0,0.6); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        .floating-offers-window { position: fixed; bottom: 25px; left: 25px; width: 330px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 8px 25px rgba(0,0,0,0.6); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
         .floating-offers-window.active { display: flex; }
         .floating-offers-header { background: var(--bg-card); padding: 0.35rem 0.6rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.74rem; }
         .floating-offers-body { padding: 0.4rem; display: flex; flex-direction: column; gap: 0.3rem; }
-        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.7rem; resize: vertical; height: 110px; outline: none; }
+        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.7rem; resize: vertical; height: 95px; outline: none; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 100000; padding: 0.8rem; }
         .modal-overlay.active { display: flex; }
@@ -198,7 +203,7 @@
         .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem; margin-top: 0.2rem; display: none; }
         .days-checklist.show { display: grid; }
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.2rem; font-size: 0.72rem; cursor: pointer; }
-        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
 
         @media (max-width: 768px) {
             html, body { flex-direction: column; height: auto; overflow: auto; }
@@ -211,13 +216,13 @@
         }
     </style>
 </head>
-<body class="theme-amoled">
+<body class="theme-gray">
 
     <aside class="sidebar" id="appSidebar">
         <div class="brand-title">
             <div style="display:flex; align-items:center; gap:0.4rem;">
                 <i class="fa-solid fa-headset"></i>
-                <span class="brand-text">لوحة الكول سنتر</span>
+                <span class="brand-text" id="brandTitleText">لوحة الكول سنتر</span>
             </div>
             <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.8rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
         </div>
@@ -228,13 +233,13 @@
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
-        <ul class="nav-links">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span>مواعيد الأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span>التنبيهات والإشعارات</span></a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span>الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span>دليل المنسقين</span></a></li>
-            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span>العروض والأسعار</span></a></li>
-            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span>دليل الاستفسارات</span></a></li>
+        <ul class="nav-links" id="sidebarNavLinksList">
+            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
+            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
+            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
+            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
@@ -243,7 +248,10 @@
         </div>
 
         <div class="theme-box">
-            <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
+            <div class="theme-box-row">
+                <label style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
+                <button class="sidebar-edit-target-btn" onclick="openRenameSidebarModal()" title="تعديل مسميات القائمة"><i class="fa-solid fa-pen"></i> تعديل</button>
+            </div>
             <select class="theme-select" onchange="changeTheme(this.value)">
                 <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
                 <option value="theme-gray">رصاصي فحمي (Charcoal Gray)</option>
@@ -257,21 +265,35 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل بكل الموقع..." oninput="triggerGlobalSearchFromInput()">
-                    <button class="voice-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="البحث الصوتي الذكي"><i class="fa-solid fa-microphone"></i></button>
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل (Ctrl + Space للصوتي)..." oninput="triggerGlobalSearchFromInput()">
+                    <button class="mic-btn" id="voiceSearchBtn" onclick="toggleVoiceSearch()" title="بحث صوتي (Ctrl + Space)"><i class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
 
             <div class="header-actions-group">
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem;" onclick="toggleSearchFiltersBar()" title="تصفية الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
-                <button class="btn btn-secondary" style="padding:0.35rem 0.5rem; color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل ملاحظات الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
-                
+                <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
+                <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إظهار / إخفاء الأشرطة الذكية"><i class="fa-solid fa-eye-slash"></i> الأشرطة</button>
+                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
+                <button class="btn btn-secondary" style="color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
+
                 <div class="kpi-bar">
-                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="اضغط لعرض المتواجدين في معشي"><i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span></div>
-                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="اضغط لعرض المتواجدين في الوسام"><i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span></div>
+                    <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="معشي">
+                        <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
+                    </div>
+                    <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="الوسام">
+                        <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
+                    </div>
                 </div>
             </div>
         </header>
+
+        <!-- مسطرة المفضلة الذكية بدون جسم رصاصي -->
+        <div class="quick-favorites-bar" id="quickFavoritesBarContainer">
+            <span style="color:var(--primary-color); font-weight:800; white-space:nowrap;"><i class="fa-solid fa-star"></i> المفضلة الذكية (أكثر 5 تكراراً):</span>
+            <div id="quickFavsChipsList" style="display:flex; gap:0.4rem; overflow-x:auto;"></div>
+        </div>
+        <!-- المسطرة الصفراء المضيئة الكبيرة تحت المفضلة الذكية -->
+        <div class="yellow-glowing-ruler" id="favBarRuler"></div>
 
         <div class="search-filters-bar" id="searchFiltersBarContainer">
             <span style="font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-filter"></i> تصفية الأقسام:</span>
@@ -285,33 +307,31 @@
             <button class="btn btn-secondary" style="padding:0.1rem 0.25rem; font-size:0.6rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
-        <!-- نافذة الشيفت العائمة والمتحركة بمرونة -->
-        <div class="shift-floating-window" id="shiftScratchpadContainer">
-            <div class="shift-header" id="shiftWindowHeader">
-                <span><i class="fa-solid fa-clipboard-list"></i> ملاحظات الشيفت (اسحب من هنا)</span>
+        <!-- مربع الشيفت المتحرك بحرية (Draggable Scratchpad) -->
+        <div class="shift-scratchpad-box" id="shiftScratchpadContainer">
+            <div class="scratchpad-header" id="shiftScratchpadHeader">
+                <span style="font-size:0.72rem; font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-arrows-up-down-left-right"></i> سجل الشيفت والطوارئ 📝</span>
                 <div style="display:flex; gap:0.3rem;">
                     <button class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح</button>
-                    <button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="toggleShiftScratchpad()"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="toggleShiftScratchpad()"><i class="fa-solid fa-xmark"></i> إخفاء</button>
                 </div>
             </div>
             <textarea id="shiftScratchpadText" class="scratchpad-textarea" placeholder="اكتب هنا أي تنبيه طارئ أو ملاحظة سريعة أثناء الوردية..." oninput="saveShiftScratchpad()"></textarea>
         </div>
 
-        <!-- الشريط الأصفر البارز (شريط الإشعارات والمفضلة الذكية 5 كلمات) -->
-        <div class="professional-ticker-bar">
-            <div class="ticker-yellow-ruler" title="تنبيهات العيادة"><i class="fa-solid fa-bell"></i></div>
-            
+        <!-- شريط التنبيهات بدون جسم رصاصي -->
+        <div class="professional-ticker-bar" id="professionalTickerBarContainer">
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-shrink:0;">
+                <button class="btn btn-blue" style="padding:0.25rem 0.5rem; font-size:0.75rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
+            </div>
             <div class="ticker-wrapper-outer">
-                <div class="top-smart-favorites" id="smartFavoritesContainer">
-                    <span style="font-size:0.75rem; font-weight:800; color:var(--primary-color);"><i class="fa-solid fa-star"></i> المفضلة الذكية (الأكثر تكراراً):</span>
-                </div>
                 <div class="ticker-container" id="tickerContainerBox">
                     <div class="ticker-track" id="tickerTrackContainer"></div>
                 </div>
             </div>
-
-            <button class="btn btn-blue" style="padding:0.4rem 0.8rem; font-size:0.8rem; border-radius:8px; font-weight:800; flex-shrink:0;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
         </div>
+        <!-- المسطرة الصفراء المضيئة الكبيرة تحت شريط التنبيهات -->
+        <div class="yellow-glowing-ruler" id="tickerBarRuler"></div>
 
         <div class="content-area">
             <section id="globalSearchResultsSection" class="page-section">
@@ -497,9 +517,14 @@
 
             <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
-                    <div style="display:flex; gap:0.3rem;">
+                    <div style="display:flex; gap:0.3rem; align-items:center; flex-wrap:wrap;">
+                        <div style="display:flex; gap:0.2rem; align-items:center; background:var(--bg-card); padding:0.2rem 0.4rem; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:0.68rem; font-weight:700; color:var(--primary-color);">نقل المحدد إلى:</span>
+                            <select id="quickMoveCatSelect" class="form-control" style="width:120px; font-size:0.68rem; padding:0.15rem;"></select>
+                            <button class="btn btn-blue" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="quickMoveSelectedOffers()"><i class="fa-solid fa-arrow-right-arrow-left"></i> نقل</button>
+                        </div>
                         <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="openManageCategoriesModal()"><i class="fa-solid fa-gear"></i> إدارة الأقسام ⚙️</button>
                         <button class="btn btn-green" onclick="openOfferModal()"><i class="fa-solid fa-plus"></i> إضافة عرض</button>
                     </div>
@@ -547,25 +572,21 @@
 
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
-            <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة (اسحب)</span>
+            <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
             <div style="display:flex; gap:0.25rem;">
-                <button class="btn btn-green" style="padding:0.08rem 0.3rem; font-size:0.6rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i></button>
+                <button class="btn btn-green" style="padding:0.08rem 0.3rem; font-size:0.6rem;" onclick="copyMultiOffersText()"><i class="fa-solid fa-copy"></i> نسخ للعميل</button>
                 <button class="btn btn-danger" style="padding:0.08rem 0.3rem; font-size:0.6rem;" onclick="clearMultiOffersSelection()"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
         <div class="floating-offers-body">
-            <textarea id="floatingOffersTextarea" class="floating-textarea" readonly placeholder="العروض المحددة ستظهر هنا..."></textarea>
-        </div>
-    </div>
-
-    <!-- مودال إدارة وتحرير أقسام العروض -->
-    <div class="modal-overlay" id="manageCategoriesModal">
-        <div class="modal" style="max-width: 455px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3><i class="fa-solid fa-gear"></i> إدارة وتعديل أقسام العروض والأسعار</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageCategoriesModal')"></i>
+            <textarea id="floatingOffersTextarea" class="floating-textarea" readonly placeholder="العروض المحددة..."></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); padding:0.25rem 0.4rem; border-radius:4px; font-size:0.7rem; font-weight:700;">
+                <span>المجموع الكلي: <span id="cartTotalPrice" style="color:var(--primary-color);">0 ريال</span></span>
+                <div style="display:flex; gap:0.2rem; align-items:center;">
+                    <span>خصم:</span>
+                    <input type="text" id="cartDiscountInput" placeholder="مثال: 10% أو 50" oninput="updateCartCalculator()" style="width:75px; font-size:0.65rem; padding:0.1rem; background:var(--bg-surface); color:var(--text-main); border:1px solid var(--border-color); border-radius:4px; text-align:center;">
+                </div>
             </div>
-            <div id="manageCategoriesListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
         </div>
     </div>
 
@@ -574,9 +595,50 @@
         <div class="modal" style="max-width: 480px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 id="activeDocsModalTitle"><i class="fa-solid fa-users"></i> الأطباء المتواجدون اليوم</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('activeDoctorsModal')"></i>
+                <div style="display:flex; gap:0.3rem; align-items:center;">
+                    <button class="btn btn-secondary" id="toggleDocSortBtn" style="padding:0.15rem 0.35rem; font-size:0.65rem;" onclick="toggleActiveDocsSortMode()"><i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️</button>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer; font-size:1rem;" onclick="closeModal('activeDoctorsModal')"></i>
+                </div>
             </div>
             <div id="activeDocsListContainer" style="max-height: 320px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
+        </div>
+    </div>
+
+    <!-- مودال تعديل أسماء القائمة الجانبية -->
+    <div class="modal-overlay" id="renameSidebarModal">
+        <div class="modal" style="max-width: 400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-pen"></i> تعديل مسميات القائمة الجانبية</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('renameSidebarModal')"></i>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;">
+                <label style="font-size:0.7rem;">عنوان اللوحة الرئيسي:</label>
+                <input type="text" id="inputBrandTitle" class="form-control">
+                <label style="font-size:0.7rem;">مواعيد الأطباء:</label>
+                <input type="text" id="inputNav_schedule" class="form-control">
+                <label style="font-size:0.7rem;">التنبيهات والإشعارات:</label>
+                <input type="text" id="inputNav_alerts" class="form-control">
+                <label style="font-size:0.7rem;">الأقسام والأطباء:</label>
+                <input type="text" id="inputNav_depts-docs" class="form-control">
+                <label style="font-size:0.7rem;">دليل المنسقين:</label>
+                <input type="text" id="inputNav_coordinators" class="form-control">
+                <label style="font-size:0.7rem;">العروض والأسعار:</label>
+                <input type="text" id="inputNav_offers" class="form-control">
+                <label style="font-size:0.7rem;">دليل الاستفسارات:</label>
+                <input type="text" id="inputNav_inquiries" class="form-control">
+            </div>
+            <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveSidebarNames()">حفظ التعديلات</button>
+        </div>
+    </div>
+
+    <!-- مودال إدارة وتعديل أقسام العروض -->
+    <div class="modal-overlay" id="manageCategoriesModal">
+        <div class="modal" style="max-width: 455px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-gear"></i> إدارة وتعديل أقسام العروض والأسعار</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageCategoriesModal')"></i>
+            </div>
+            <div id="manageCategoriesListContainer" style="max-height: 300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
         </div>
     </div>
 
@@ -894,7 +956,7 @@
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.3rem; background:var(--bg-card); padding:0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                 <div style="display:flex; flex-direction:column; gap:0.15rem;">
                     <label>اسم الجهاز الأول</label>
-                    <input type="text" id="offDevice1" class="form-control" placeholder="جهاز الشد الشهرة">
+                    <input type="text" id="offDevice1" class="form-control" placeholder="جهاز الشد الشهير">
                 </div>
                 <div style="display:flex; flex-direction:column; gap:0.15rem;">
                     <label>سعر الجهاز 1</label>
@@ -989,6 +1051,23 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
+        function playChirpSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch(e){}
+        }
+
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             if (snap.val() === true) {
@@ -1010,20 +1089,23 @@
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
         let selectedOfferIds = [];
-        let searchFrequencyHistory = JSON.parse(localStorage.getItem('search_freq_history') || '{}');
+        let userFavorites = JSON.parse(localStorage.getItem('shift_user_favorites') || '[]');
+        let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
+        let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
+        let activeDocsSortMode = false;
+        let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
 
-        // تطهير النص وإلغاء فوارق د/دكتور/دكتورة لتوفير بحث مرن ومزدوج دقيق
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString()
                 .toLowerCase()
-                .replace(/^(الدكتور|الدكتوره|دكتورة|دكتور|د\.)\s+/g, '')
+                .replace(/[\u064b-\u0652]/g, '')
                 .replace(/[إأآا]/g, 'ا')
                 .replace(/ة/g, 'ه')
                 .replace(/ى/g, 'ي')
                 .replace(/ؤ/g, 'ء')
                 .replace(/ئ/g, 'ء')
-                .replace(/[\u064b-\u0652]/g, '')
+                .replace(/\s+/g, ' ')
                 .trim();
         }
 
@@ -1042,6 +1124,9 @@
                 document.getElementById('shiftScratchpadContainer').classList.add('show');
             }
 
+            applyTopBarsVisibilityState(topBarsVisible);
+            initDraggableScratchpad();
+
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
             switchTab(activeTab, targetNav, false);
@@ -1049,8 +1134,15 @@
             loadSearchFiltersState();
             loadTableWidths();
             initDraggableFloatingOffers();
-            initDraggableShiftWindow();
-            renderSmartFavoritesBar();
+            renderKpiBarOrder();
+            applyCustomSidebarNames();
+
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.code === 'Space') {
+                    e.preventDefault();
+                    toggleVoiceSearch();
+                }
+            });
 
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
@@ -1102,7 +1194,173 @@
             renderOffersTabs();
             renderOffers();
             renderInquiries();
+            renderQuickFavoritesBar();
             updateKPIs();
+        }
+
+        function toggleFocusMode() { 
+            document.body.classList.toggle('focus-mode'); 
+        }
+
+        function toggleTopBarsVisibility() {
+            topBarsVisible = !topBarsVisible;
+            localStorage.setItem('top_bars_visible', topBarsVisible);
+            applyTopBarsVisibilityState(topBarsVisible);
+        }
+
+        function applyTopBarsVisibilityState(isVisible) {
+            const favBar = document.getElementById('quickFavoritesBarContainer');
+            const favRuler = document.getElementById('favBarRuler');
+            const tickerBar = document.getElementById('professionalTickerBarContainer');
+            const tickerRuler = document.getElementById('tickerBarRuler');
+            const displayVal = isVisible ? 'flex' : 'none';
+            const rulerDisplayVal = isVisible ? 'block' : 'none';
+            if (favBar) favBar.style.display = displayVal;
+            if (favRuler) favRuler.style.display = rulerDisplayVal;
+            if (tickerBar) tickerBar.style.display = displayVal;
+            if (tickerRuler) tickerRuler.style.display = rulerDisplayVal;
+        }
+
+        function openRenameSidebarModal() {
+            document.getElementById('inputBrandTitle').value = document.getElementById('brandTitleText').innerText;
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                const input = document.getElementById(`inputNav_${key}`);
+                if (input) input.value = span.innerText;
+            });
+            document.getElementById('renameSidebarModal').classList.add('active');
+        }
+
+        function saveSidebarNames() {
+            const newBrand = document.getElementById('inputBrandTitle').value.trim();
+            if (newBrand) {
+                document.getElementById('brandTitleText').innerText = newBrand;
+                customSidebarNames.brand = newBrand;
+            }
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                const input = document.getElementById(`inputNav_${key}`);
+                if (input && input.value.trim()) {
+                    span.innerText = input.value.trim();
+                    customSidebarNames[key] = input.value.trim();
+                }
+            });
+            localStorage.setItem('custom_sidebar_names', JSON.stringify(customSidebarNames));
+            closeModal('renameSidebarModal');
+            playChirpSound();
+            alert("تم حفظ المسميات الجديدة بنجاح!");
+        }
+
+        function applyCustomSidebarNames() {
+            if (customSidebarNames.brand) {
+                document.getElementById('brandTitleText').innerText = customSidebarNames.brand;
+            }
+            document.querySelectorAll('#sidebarNavLinksList span[data-nav-key]').forEach(span => {
+                const key = span.getAttribute('data-nav-key');
+                if (customSidebarNames[key]) {
+                    span.innerText = customSidebarNames[key];
+                }
+            });
+        }
+
+        function renderKpiBarOrder() {
+            const bar = document.querySelector('.kpi-bar');
+            if (!bar) return;
+            bar.innerHTML = "";
+            kpiOrder.forEach(branch => {
+                if (branch === "معشي") {
+                    bar.innerHTML += `
+                        <div class="kpi-card-mashy" onclick="openActiveDoctorsModal('معشي')" title="معشي">
+                            <i class="fa-solid fa-clinic-medical"></i> معشي: <span id="kpiTodayMashy" class="kpi-num">0</span>
+                        </div>`;
+                } else {
+                    bar.innerHTML += `
+                        <div class="kpi-card-wissam" onclick="openActiveDoctorsModal('الوسام')" title="الوسام">
+                            <i class="fa-solid fa-hospital-user"></i> الوسام: <span id="kpiTodayWissam" class="kpi-num">0</span>
+                        </div>`;
+                }
+            });
+            updateKPIs();
+        }
+
+        let recognition = null;
+        function toggleVoiceSearch() {
+            const btn = document.getElementById('voiceSearchBtn');
+            const input = document.getElementById('globalSearchInput');
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                return alert("متصفحك لا يدعم البحث الصوتي المباشر!");
+            }
+
+            if (!recognition) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ar-SA';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => { btn.classList.add('listening'); };
+                recognition.onend = () => { btn.classList.remove('listening'); };
+                recognition.onresult = (event) => {
+                    const speechToText = event.results[0][0].transcript;
+                    input.value = speechToText;
+                    triggerGlobalSearchFromInput();
+                };
+            }
+
+            if (btn.classList.contains('listening')) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function toggleFavoriteItem(id, name, type) {
+            const existsIdx = userFavorites.findIndex(f => f.id === id && f.type === type);
+            if (existsIdx > -1) {
+                userFavorites.splice(existsIdx, 1);
+            } else {
+                userFavorites.push({ id, name, type });
+            }
+            localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
+            renderQuickFavoritesBar();
+            refreshAllViews();
+            playChirpSound();
+        }
+
+        function trackAutoFavorite(id, name, type) {
+            const exists = userFavorites.find(f => f.id === id && f.type === type);
+            if (!exists) {
+                userFavorites.unshift({ id, name, type });
+                if (userFavorites.length > 5) userFavorites.pop(); // تقييد بأكثر 5 عناصر تكراراً واستخداماً فقط
+                localStorage.setItem('shift_user_favorites', JSON.stringify(userFavorites));
+                renderQuickFavoritesBar();
+            }
+        }
+
+        function renderQuickFavoritesBar() {
+            const container = document.getElementById('quickFavsChipsList');
+            if (!container) return;
+            container.innerHTML = "";
+            if (userFavorites.length === 0) {
+                container.innerHTML = `<span style="color:var(--text-muted); font-size:0.68rem;">العناصر الخمسة الأكثر استخداماً والبحث ستظهر هنا تلقائياً، أو اضغط على النجمة (⭐) للتثبيت.</span>`;
+                return;
+            }
+            userFavorites.slice(0, 5).forEach(fav => {
+                container.innerHTML += `
+                    <div class="quick-fav-chip" onclick="jumpToFavoriteItem(${fav.id}, '${fav.type}')">
+                        <i class="fa-solid fa-star" style="color:var(--primary-color);"></i> ${fav.name}
+                        <i class="fa-solid fa-xmark" style="font-size:0.6rem; cursor:pointer;" onclick="event.stopPropagation(); toggleFavoriteItem(${fav.id}, '${fav.name}', '${fav.type}')" title="إزالة"></i>
+                    </div>`;
+            });
+        }
+
+        function jumpToFavoriteItem(id, type) {
+            if (type === 'offer') {
+                jumpToSectionAndHighlightOffer(id, offersData.find(o => o.id === id)?.category || '');
+            } else if (type === 'doctor') {
+                jumpToSectionAndHighlightDoc(id);
+            }
         }
 
         function toggleSearchFiltersBar() {
@@ -1114,6 +1372,38 @@
             const container = document.getElementById('shiftScratchpadContainer');
             container.classList.toggle('show');
             localStorage.setItem('shift_scratchpad_open', container.classList.contains('show'));
+        }
+
+        // جعل مربع الشيفت متحركاً بحرية بالسحب من الهيدر الخاص به
+        function initDraggableScratchpad() {
+            const box = document.getElementById('shiftScratchpadContainer');
+            const header = document.getElementById('shiftScratchpadHeader');
+            let isDragging = false, startX = 0, startY = 0;
+
+            if (!header || !box) return;
+
+            header.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'I') return;
+                isDragging = true;
+                startX = e.clientX - box.offsetLeft;
+                startY = e.clientY - box.offsetTop;
+                document.addEventListener('mousemove', onDragBox);
+                document.addEventListener('mouseup', stopDragBox);
+            });
+
+            function onDragBox(e) {
+                if (!isDragging) return;
+                box.style.left = (e.clientX - startX) + 'px';
+                box.style.top = (e.clientY - startY) + 'px';
+                box.style.right = 'auto';
+                box.style.bottom = 'auto';
+            }
+
+            function stopDragBox() {
+                isDragging = false;
+                document.removeEventListener('mousemove', onDragBox);
+                document.removeEventListener('mouseup', stopDragBox);
+            }
         }
 
         function saveSearchFiltersState() {
@@ -1143,6 +1433,7 @@
             if (confirm("مسح ملاحظات وردية الشيفت؟")) {
                 document.getElementById('shiftScratchpadText').value = "";
                 localStorage.removeItem('shift_scratchpad_current');
+                playChirpSound();
             }
         }
         function toggleSidebar() {
@@ -1179,7 +1470,9 @@
             const selectEl = document.querySelector('.theme-select');
             if(selectEl) selectEl.value = themeName;
         }
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+        function closeModal(modalId) { 
+            document.getElementById(modalId).classList.remove('active'); 
+        }
         
         function updateKPIs() {
             const currentDay = getArabicDayName();
@@ -1200,7 +1493,48 @@
             if (wissamEl) wissamEl.innerText = todayWissamCount;
         }
 
+        let currentActiveDocsBranch = "";
+        let activeDocsCustomOrders = JSON.parse(localStorage.getItem('active_docs_custom_orders') || '{}');
+
         function openActiveDoctorsModal(branchName) {
+            currentActiveDocsBranch = branchName;
+            activeDocsSortMode = false;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (btn) {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️`;
+            }
+            renderActiveDoctorsModalContent();
+            document.getElementById('activeDoctorsModal').classList.add('active');
+        }
+
+        function toggleActiveDocsSortMode() {
+            activeDocsSortMode = !activeDocsSortMode;
+            const btn = document.getElementById('toggleDocSortBtn');
+            if (activeDocsSortMode) {
+                btn.style.background = 'var(--primary-color)';
+                btn.style.color = '#000';
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> حفظ الترتيب 💾`;
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> تحرير وترتيب ⚙️`;
+                playChirpSound();
+                alert("تم حفظ ترتيب الأطباء المتواجدين بنجاح!");
+            }
+            renderActiveDoctorsModalContent();
+        }
+
+        let draggedActiveDocId = null;
+        function handleActiveDocDragStart(e, id) {
+            draggedActiveDocId = id;
+            e.dataTransfer.setData('text/plain', id);
+        }
+        function handleActiveDocDrop(e, targetId) {
+            e.preventDefault();
+            if (draggedActiveDocId === null || draggedActiveDocId === targetId) return;
+
             const currentDay = getArabicDayName();
             let activeList = [];
             doctorsData.forEach(d => {
@@ -1210,11 +1544,49 @@
                 const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
                 const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
 
-                if (branchName === "معشي" && isMashyToday) activeList.push(d);
-                if (branchName === "الوسام" && isWissamToday) activeList.push(d);
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
             });
 
-            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${branchName} (${activeList.length})`;
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || activeList.map(d => d.id);
+            activeList.forEach(d => { if (!customOrder.includes(d.id)) customOrder.push(d.id); });
+
+            let oldIdx = customOrder.indexOf(draggedActiveDocId);
+            let targetIdx = customOrder.indexOf(targetId);
+
+            if (oldIdx > -1 && targetIdx > -1) {
+                customOrder.splice(oldIdx, 1);
+                customOrder.splice(targetIdx, 0, draggedActiveDocId);
+                activeDocsCustomOrders[currentActiveDocsBranch] = customOrder;
+                localStorage.setItem('active_docs_custom_orders', JSON.stringify(activeDocsCustomOrders));
+                renderActiveDoctorsModalContent();
+            }
+        }
+
+        function renderActiveDoctorsModalContent() {
+            const currentDay = getArabicDayName();
+            let activeList = [];
+            doctorsData.forEach(d => {
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                const isMashyToday = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                const isWissamToday = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
+
+                if (currentActiveDocsBranch === "معشي" && isMashyToday) activeList.push(d);
+                if (currentActiveDocsBranch === "الوسام" && isWissamToday) activeList.push(d);
+            });
+
+            let customOrder = activeDocsCustomOrders[currentActiveDocsBranch] || [];
+            activeList.sort((a, b) => {
+                let idxA = customOrder.indexOf(a.id);
+                let idxB = customOrder.indexOf(b.id);
+                if (idxA === -1) idxA = 999;
+                if (idxB === -1) idxB = 999;
+                return idxA - idxB;
+            });
+
+            document.getElementById('activeDocsModalTitle').innerHTML = `<i class="fa-solid fa-users"></i> المتواجدون اليوم في فرع ${currentActiveDocsBranch} (${activeList.length})`;
             const container = document.getElementById('activeDocsListContainer');
             container.innerHTML = "";
 
@@ -1222,17 +1594,20 @@
                 container.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">لا يوجد أطباء متواجدون اليوم في هذا الفرع.</div>`;
             } else {
                 activeList.forEach(doc => {
+                    let dragHandle = activeDocsSortMode ? `<span class="row-drag-handle" draggable="true" ondragstart="handleActiveDocDragStart(event, ${doc.id})" ondragover="event.preventDefault()" ondrop="handleActiveDocDrop(event, ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>` : '';
                     container.innerHTML += `
                         <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.4rem 0.6rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
-                                <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                            <div style="display:flex; align-items:center; gap:0.4rem;">
+                                ${dragHandle}
+                                <div>
+                                    <strong style="color:var(--primary-color);">${doc.name}</strong> <span style="font-size:0.65rem; color:var(--text-muted);">${doc.nationality || ''}</span>
+                                    <div style="font-size:0.68rem; color:var(--text-main);">${doc.specialty} | ${doc.timing || ''}</div>
+                                </div>
                             </div>
                             <button class="btn btn-green" style="padding:0.15rem 0.35rem; font-size:0.6rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})"><i class="fa-solid fa-eye"></i> عرض</button>
                         </div>`;
                 });
             }
-            document.getElementById('activeDoctorsModal').classList.add('active');
         }
 
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
@@ -1245,6 +1620,7 @@
             } else {
                 btn.style.background = ''; btn.style.color = ''; btn.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة`;
                 saveTableWidths();
+                playChirpSound();
             }
         }
         function saveTableWidths() {
@@ -1265,6 +1641,7 @@
         function resetTableWidths() {
             localStorage.removeItem('clinic_table_widths');
             document.querySelectorAll('#mashyTableElement th, #wissamTableElement th').forEach(th => th.style.width = '');
+            playChirpSound();
         }
 
         function exportJSON() {
@@ -1287,7 +1664,9 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
-                        syncToCloud(); alert("تم الاستيراد بنجاح!");
+                        syncToCloud(); 
+                        playChirpSound();
+                        alert("تم الاستيراد بنجاح!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
                 reader.readAsText(input.files[0]);
@@ -1307,6 +1686,7 @@
             } else { fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal }); }
             syncToCloud(); document.getElementById('fridayDocName').value = ""; document.getElementById('fridayDate').value = "";
             renderFridayScheduleTable(); renderDoctors();
+            playChirpSound();
         }
         function editFridaySchedule(id) {
             const item = fridaySchedules.find(f => f.id === id);
@@ -1315,7 +1695,13 @@
             document.getElementById('fridayBranch').value = item.branch; document.getElementById('fridayDocName').value = item.doc;
         }
         function deleteFridaySchedule(id) {
-            if (confirm("حذف؟")) { fridaySchedules = fridaySchedules.filter(f => f.id !== id); syncToCloud(); renderFridayScheduleTable(); renderDoctors(); }
+            if (confirm("حذف؟")) { 
+                fridaySchedules = fridaySchedules.filter(f => f.id !== id); 
+                syncToCloud(); 
+                renderFridayScheduleTable(); 
+                renderDoctors(); 
+                playChirpSound();
+            }
         }
         function renderFridayScheduleTable() {
             const tbody = document.getElementById('fridayScheduleTableBody');
@@ -1327,12 +1713,15 @@
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
         
         function copyTextToClipboard(text, msg = "تم النسخ بنجاح!") {
-            navigator.clipboard.writeText(text).then(() => alert(`📋 ${msg}\n\n${text}`));
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`📋 ${msg}\n\n${text}`);
+            });
         }
 
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
+            trackAutoFavorite(doc.id, doc.name, 'doctor');
             const mashyDays = doc.mashyDays || doc.days || [], wissamDays = doc.wissamDays || [];
             let scheduleLines = [];
             if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
@@ -1347,9 +1736,10 @@
             if (!tagsStr || !tagsStr.trim()) return '';
             return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
         }
+        function cleanSearchText(str) { return normalizeArabicText(str); }
 
         function renderDoctors(highlightId = null) {
-            const searchInput = document.getElementById('docSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const searchInput = document.getElementById('docSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
             const specDropdown = document.getElementById('specialtyFilter'), currentSpecVal = specDropdown.value;
             const uniqueSpecialties = [...new Set(doctorsData.map(d => d.specialty).filter(Boolean))];
@@ -1372,14 +1762,14 @@
 
             let todayMashyDocs = [], todayWissamDocs = [];
             const mashyList = doctorsData.filter(d => {
-                const matchSearch = !search || normalizeArabicText(d.name).includes(search) || normalizeArabicText(d.specialty).includes(search) || normalizeArabicText(d.tags).includes(search);
+                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
             });
             mashyList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a.mashyOrder ?? 0) - (b.mashyOrder ?? 0)));
 
             const wissamList = doctorsData.filter(d => {
-                const matchSearch = !search || normalizeArabicText(d.name).includes(search) || normalizeArabicText(d.specialty).includes(search) || normalizeArabicText(d.tags).includes(search);
+                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
             });
@@ -1391,17 +1781,30 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.6rem;">⚠️ غير متواجد (إجازة)</span>` : '';
+                const isFav = userFavorites.some(f => f.id === doc.id && f.type === 'doctor');
+                const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
+                // ضمان ظهور اسم الطبيب دائماً بصيغة (د. فلان) بوضوح تام في الجدول
+                let formattedDocName = doc.name.trim();
+                if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) {
+                    formattedDocName = "د. " + formattedDocName;
+                }
+
                 mashyBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
-                        <td><span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})" title="اسحب من هنا للترتيب"><i class="fa-solid fa-grip-vertical"></i></span> <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
+                        <td>
+                            <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${doc.id}, '${doc.name}', 'doctor')" title="إضافة/إزالة من المفضلة"></i>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
+                        <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</div></td>
                         <td><div style="font-size:0.65rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})" title="نسخ السريع"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countM++;
             });
@@ -1412,17 +1815,29 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.6rem;">⚠️ غير متواجد (إجازة)</span>` : '';
+                const isFav = userFavorites.some(f => f.id === doc.id && f.type === 'doctor');
+                const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
 
+                let formattedDocName = doc.name.trim();
+                if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) {
+                    formattedDocName = "د. " + formattedDocName;
+                }
+
                 wissamBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
-                        <td><span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})" title="اسحب من هنا للترتيب"><i class="fa-solid fa-grip-vertical"></i></span> <span class="doc-name-box" style="display:inline-block;">${doc.name} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span><span class="doc-nat-badge">${doc.nationality || ''}</span></td>
+                        <td>
+                            <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${doc.id}, '${doc.name}', 'doctor')" title="إضافة/إزالة من المفضلة"></i>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</td>
+                        <td><div style="font-size:0.68rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.62rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</div></td>
                         <td><div style="font-size:0.65rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
+                        <td style="text-align:center;"><div style="display:flex; flex-direction:column; gap:3px; align-items:center;"><button class="btn btn-green" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="copyDoctorForClient(${doc.id})" title="نسخ السريع"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="editDoctor(${doc.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.15rem; width:24px; height:24px; justify-content:center;" onclick="deleteDoctor(${doc.id})"><i class="fa-solid fa-trash"></i></button></div></td>
                     </tr>`;
                 countW++;
             });
@@ -1444,11 +1859,11 @@
             e.preventDefault();
             if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
             
-            const search = normalizeArabicText(document.getElementById('docSearchInput').value);
+            const search = document.getElementById('docSearchInput').value.trim().toLowerCase();
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
             
             let currentList = doctorsData.filter(d => {
-                const matchSearch = normalizeArabicText(d.name).includes(search);
+                const matchSearch = d.name.toLowerCase().includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (branch === 'mashy' ? (d.branch === "معشي" || d.isJoint || (d.mashyDays||[]).length > 0) : (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0));
             });
@@ -1472,6 +1887,7 @@
                 
                 syncToCloud(); 
                 renderDoctors();
+                playChirpSound();
             }
         }
 
@@ -1528,6 +1944,7 @@
 
             if (id) { doctorsData[doctorsData.findIndex(d => d.id == id)] = docObj; } else { doctorsData.push(docObj); }
             syncToCloud(); renderDoctors(); closeModal('doctorModal');
+            playChirpSound();
         }
 
         function editDoctor(id) {
@@ -1544,11 +1961,16 @@
             document.getElementById('docTags').value = doc.tags || ""; document.getElementById('doctorModal').classList.add('active');
         }
         function deleteDoctor(id) {
-            if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); renderDoctors(); }
+            if (confirm("حذف؟")) { 
+                doctorsData = doctorsData.filter(d => d.id !== id); 
+                syncToCloud(); 
+                renderDoctors(); 
+                playChirpSound();
+            }
         }
 
         function renderAlerts(highlightId = null) {
-            const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
@@ -1559,7 +1981,7 @@
             });
             tickerTrack.innerHTML = alertCardsHtml;
 
-            sortedAlerts.filter(a => !search || normalizeArabicText(a.content).includes(search) || normalizeArabicText(a.tags).includes(search)).forEach(item => {
+            sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
@@ -1635,6 +2057,7 @@
             const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, media, mediaType, time: new Date().toLocaleString('en-US') };
             if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
             syncToCloud(); renderAlerts(); closeModal('alertModal');
+            playChirpSound();
         }
         function editAlert(id) {
             const item = alertsData.find(a => a.id === id);
@@ -1650,16 +2073,21 @@
             document.getElementById('alertModal').classList.add('active');
         }
         function deleteAlert(id) {
-            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); renderAlerts(); }
+            if (confirm("حذف؟")) { 
+                alertsData = alertsData.filter(a => a.id !== id); 
+                syncToCloud(); 
+                renderAlerts(); 
+                playChirpSound();
+            }
         }
 
         function renderDeptsAndDocs(highlightServiceId = null) {
-            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
             if(bodies.some(b => !b)) return;
             bodies.forEach(b => b.innerHTML = "");
 
-            deptServicesData.filter(s => s.name && (!search || normalizeArabicText(s.name).includes(search) || normalizeArabicText(s.tags).includes(search))).forEach(item => {
+            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
@@ -1674,7 +2102,7 @@
             const notesContainer = document.getElementById('deptNotesContainer');
             if(!notesContainer) return; notesContainer.innerHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
-                if (!search || normalizeArabicText(noteObj.text).includes(search) || normalizeArabicText(noteObj.tags).includes(search)) {
+                if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
                     notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="editDeptNote(${idx})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="deleteDeptNote(${idx})"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
                 }
             });
@@ -1700,6 +2128,7 @@
             if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
             if (id) deptServicesData[deptServicesData.findIndex(s => s.id == id)] = rowObj; else deptServicesData.push(rowObj);
             syncToCloud(); renderDeptsAndDocs(); closeModal('deptServiceModal');
+            playChirpSound();
         }
         function editDeptService(id) {
             const item = deptServicesData.find(s => s.id === id);
@@ -1710,7 +2139,12 @@
             document.getElementById('deptIsJoint').checked = !!item.isJoint; document.getElementById('deptServiceModal').classList.add('active');
         }
         function deleteDeptService(id) {
-            if (confirm("حذف؟")) { deptServicesData = deptServicesData.filter(s => s.id !== id); syncToCloud(); renderDeptsAndDocs(); }
+            if (confirm("حذف؟")) { 
+                deptServicesData = deptServicesData.filter(s => s.id !== id); 
+                syncToCloud(); 
+                renderDeptsAndDocs(); 
+                playChirpSound();
+            }
         }
         function openDeptNoteModal() {
             document.getElementById('noteIndex').value = ""; document.getElementById('deptNoteText').value = "";
@@ -1724,6 +2158,7 @@
             const noteObj = { text, tags, color };
             if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
             syncToCloud(); renderDeptsAndDocs(); closeModal('deptNoteModal');
+            playChirpSound();
         }
         function editDeptNote(idx) {
             const noteObj = deptNotesData[idx]; if (!noteObj) return;
@@ -1732,20 +2167,25 @@
             document.getElementById('deptNoteModal').classList.add('active');
         }
         function deleteDeptNote(idx) {
-            if (confirm("حذف؟")) { deptNotesData.splice(idx, 1); syncToCloud(); renderDeptsAndDocs(); }
+            if (confirm("حذف؟")) { 
+                deptNotesData.splice(idx, 1); 
+                syncToCloud(); 
+                renderDeptsAndDocs(); 
+                playChirpSound();
+            }
         }
 
         let draggedCoordIdx = null;
         function renderCoordinators(highlightId = null) {
-            const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
             
             coordinatorsData.filter(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
-                return !search || normalizeArabicText(c.name).includes(search) || normalizeArabicText(rulesText).includes(search) || normalizeArabicText(c.tags).includes(search);
+                return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
             }).forEach((c, idx) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
+                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();playChirpSound();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${c.name}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="editCoordinator(${c.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="deleteCoordinator(${c.id})"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
             });
         }
         function openCoordinatorModal() {
@@ -1758,6 +2198,7 @@
             const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('coordName').value, tags: document.getElementById('coordTags').value.trim(), color: document.getElementById('coordColor').value, rules };
             if (id) coordinatorsData[coordinatorsData.findIndex(c => c.id == id)] = obj; else coordinatorsData.push(obj);
             syncToCloud(); renderCoordinators(); closeModal('coordModal');
+            playChirpSound();
         }
         function editCoordinator(id) {
             const item = coordinatorsData.find(c => c.id === id); if (!item) return;
@@ -1766,22 +2207,63 @@
             document.getElementById('coordRules').value = item.rules.join('\n'); document.getElementById('coordModal').classList.add('active');
         }
         function deleteCoordinator(id) {
-            if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); }
+            if (confirm("حذف؟")) { 
+                coordinatorsData = coordinatorsData.filter(c => c.id !== id); 
+                syncToCloud(); 
+                renderCoordinators(); 
+                playChirpSound();
+            }
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
         
         function renderOffersTabs() {
-            const container = document.getElementById('offersTabsContainer'); if(!container) return; container.innerHTML = "";
-            const cats = [...new Set(offersData.map(o => o.category))];
-            
-            let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار</button>`;
-            
-            cats.forEach(cat => { 
-                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat}</button>`; 
+            const container = document.getElementById('offersTabsContainer');
+            if (!container) return;
+            container.innerHTML = "";
+
+            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            const totalCount = offersData.length;
+
+            let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار (${totalCount})</button>`;
+
+            cats.forEach(cat => {
+                const catCount = offersData.filter(o => o.category === cat).length;
+                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat} (${catCount})</button>`;
             });
+
             container.innerHTML = tabsHtml;
+            updateQuickMoveDropdown();
             updateKPIs();
+        }
+
+        function updateQuickMoveDropdown() {
+            const sel = document.getElementById('quickMoveCatSelect');
+            if (!sel) return;
+            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            let html = "";
+            cats.forEach(c => {
+                html += `<option value="${c}">${c}</option>`;
+            });
+            sel.innerHTML = html;
+        }
+
+        function quickMoveSelectedOffers() {
+            if (selectedOfferIds.length === 0) return alert("الرجاء تحديد عرض واحد على الأقل أولاً!");
+            const targetCat = document.getElementById('quickMoveCatSelect').value;
+            if (!targetCat) return alert("اختر القسم المستهدف!");
+
+            offersData.forEach(o => {
+                if (selectedOfferIds.includes(o.id)) {
+                    o.category = targetCat;
+                }
+            });
+
+            syncToCloud();
+            renderOffersTabs();
+            renderOffers();
+            playChirpSound();
+            alert(`تم نقل العروض المحددة إلى قسم "${targetCat}" بنجاح!`);
         }
 
         function filterOfferCategory(cat, btn) {
@@ -1835,6 +2317,7 @@
             renderOffersTabs();
             renderOffers();
             openManageCategoriesModal();
+            playChirpSound();
             alert(`تم تغيير اسم القسم إلى "${trimmedName}" بنجاح!`);
         }
 
@@ -1851,22 +2334,20 @@
                 renderOffersTabs();
                 renderOffers();
                 openManageCategoriesModal();
+                playChirpSound();
                 alert(`تم حذف القسم "${catName}" بنجاح!`);
             }
         }
 
         function formatOfferLineForClient(item) {
-            let lines = [`${item.name}`], hasDeviceLines = false;
-            
+            let lines = [`${item.name}`];
             if (item.device1 && item.device1.trim() !== "") {
                 let cleanDev1 = item.device1.replace(/جهاز\s*/g, '').trim();
                 lines.push(`${cleanDev1}${item.price1 ? ` بـ ${item.price1}` : ""}`);
-                hasDeviceLines = true;
             }
             if (item.device2 && item.device2.trim() !== "") {
                 let cleanDev2 = item.device2.replace(/جهاز\s*/g, '').trim();
                 lines.push(`${cleanDev2}${item.price2 ? ` بـ ${item.price2}` : ""}`);
-                hasDeviceLines = true;
             }
             if (item.price && item.price.trim() !== "") {
                 lines.push(`السعر: ${item.price}`);
@@ -1876,6 +2357,7 @@
 
         function copySingleOffer(id) {
             const item = offersData.find(o => o.id === id); if (!item) return;
+            trackAutoFavorite(item.id, item.name, 'offer');
             copyTextToClipboard(formatOfferLineForClient(item), "تم نسخ العرض:");
         }
 
@@ -1885,21 +2367,102 @@
             else { selectedOfferIds = selectedOfferIds.filter(i => i !== offerId); }
             updateFloatingOffersWindow();
         }
-        function updateFloatingOffersWindow() {
-            const win = document.getElementById('floatingOffersWin'), textarea = document.getElementById('floatingOffersTextarea');
-            if (!win || !textarea) return;
-            if (selectedOfferIds.length === 0) { win.classList.remove('active'); textarea.value = ""; return; }
-            win.classList.add('active');
-            let blocks = [];
-            selectedOfferIds.forEach(id => { const item = offersData.find(o => o.id === id); if (item) blocks.push(formatOfferLineForClient(item)); });
-            textarea.value = blocks.join('\n\n');
+
+        function toggleSelectAllOffers(masterCheckbox) {
+            const searchInput = document.getElementById('offerSearchInput');
+            const search = searchInput ? cleanSearchText(searchInput.value) : "";
+            
+            let filteredOffers = [];
+            if (selectedOfferTab === '⭐ كل العروض والأسعار') {
+                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search) || cleanSearchText(o.category).includes(search));
+            } else {
+                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
+            }
+
+            filteredOffers.forEach(item => {
+                if (masterCheckbox.checked) {
+                    if (!selectedOfferIds.includes(item.id)) {
+                        selectedOfferIds.push(item.id);
+                    }
+                } else {
+                    selectedOfferIds = selectedOfferIds.filter(id => id !== item.id);
+                }
+            });
+
+            renderOffers();
         }
+
+        function updateFloatingOffersWindow() {
+            const win = document.getElementById('floatingOffersWin');
+            const textarea = document.getElementById('floatingOffersTextarea');
+            const headerTitle = document.querySelector('#floatingOffersHeader span');
+            
+            if (!win || !textarea) return;
+            
+            if (selectedOfferIds.length === 0) {
+                win.classList.remove('active');
+                textarea.value = "";
+                return;
+            }
+            
+            win.classList.add('active');
+            
+            if (headerTitle) {
+                headerTitle.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة (${selectedOfferIds.length})`;
+            }
+            
+            let blocks = [];
+            selectedOfferIds.forEach(id => {
+                const item = offersData.find(o => o.id === id);
+                if (item) blocks.push(formatOfferLineForClient(item));
+            });
+            
+            textarea.value = blocks.join('\n\n');
+            updateCartCalculator();
+        }
+
+        function updateCartCalculator() {
+            let total = 0;
+            selectedOfferIds.forEach(id => {
+                const item = offersData.find(o => o.id === id);
+                if (item) {
+                    let num = 0;
+                    if (item.price) {
+                        num = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+                    } else if (item.price1) {
+                        num = parseFloat(item.price1.replace(/[^\d.]/g, '')) || 0;
+                    }
+                    total += num;
+                }
+            });
+
+            const discountVal = document.getElementById('cartDiscountInput').value.trim();
+            let finalTotal = total;
+
+            if (discountVal.includes('%')) {
+                const pct = parseFloat(discountVal.replace('%', '')) || 0;
+                finalTotal = total - (total * (pct / 100));
+            } else if (discountVal) {
+                const dec = parseFloat(discountVal) || 0;
+                finalTotal = total - dec;
+            }
+            if (finalTotal < 0) finalTotal = 0;
+
+            document.getElementById('cartTotalPrice').innerText = total > 0 ? `${finalTotal} ريال ${total !== finalTotal ? '(بعد الخصم من اصل ' + total + ')' : ''}` : '0 ريال';
+        }
+
         function copyMultiOffersText() {
             const textarea = document.getElementById('floatingOffersTextarea');
+            const totalText = document.getElementById('cartTotalPrice').innerText;
             if (!textarea || !textarea.value) return;
-            copyTextToClipboard(textarea.value, "تم نسخ العروض المحددة!");
+            const fullMsg = textarea.value + `\n\n💰 الإجمالي المطلوب: ${totalText}`;
+            copyTextToClipboard(fullMsg, "تم نسخ العروض مع الإجمالي للعميل!");
         }
-        function clearMultiOffersSelection() { selectedOfferIds = []; document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); updateFloatingOffersWindow(); }
+        function clearMultiOffersSelection() { 
+            selectedOfferIds = []; 
+            document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); 
+            updateFloatingOffersWindow(); 
+        }
         
         function initDraggableFloatingOffers() {
             const win = document.getElementById('floatingOffersWin'), header = document.getElementById('floatingOffersHeader');
@@ -1916,45 +2479,68 @@
             function stopDragWin() { isDragging = false; document.removeEventListener('mousemove', onDragWin); document.removeEventListener('mouseup', stopDragWin); }
         }
 
-        // جعل شباك الشيفت قابلاً للسحب في كل الشاشة
-        function initDraggableShiftWindow() {
-            const win = document.getElementById('shiftScratchpadContainer'), header = document.getElementById('shiftWindowHeader');
-            let isDragging = false, startX = 0, startY = 0;
-            if(!header) return;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true; startX = e.clientX - win.offsetLeft; startY = e.clientY - win.offsetTop;
-                document.addEventListener('mousemove', onDragWin); document.addEventListener('mouseup', stopDragWin);
-            });
-            function onDragWin(e) {
-                if (!isDragging) return;
-                win.style.left = (e.clientX - startX) + 'px'; win.style.top = (e.clientY - startY) + 'px';
-                win.style.right = 'auto'; win.style.bottom = 'auto';
-            }
-            function stopDragWin() { isDragging = false; document.removeEventListener('mousemove', onDragWin); document.removeEventListener('mouseup', stopDragWin); }
-        }
-
         function renderOffers(highlightOfferId = null) {
-            const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
-            const tableEl = document.getElementById('offersTableElement'); if(!tableEl) return;
-            
+            const searchInput = document.getElementById('offerSearchInput');
+            const search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const tableEl = document.getElementById('offersTableElement');
+            if (!tableEl) return;
+
             let filteredOffers = [];
             if (selectedOfferTab === '⭐ كل العروض والأسعار') {
-                filteredOffers = offersData.filter(o => !search || normalizeArabicText(o.name).includes(search) || normalizeArabicText(o.price).includes(search) || normalizeArabicText(o.notes).includes(search) || normalizeArabicText(o.tags).includes(search) || normalizeArabicText(o.category).includes(search));
+                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search) || cleanSearchText(o.category).includes(search));
             } else {
-                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || normalizeArabicText(o.name).includes(search) || normalizeArabicText(o.price).includes(search) || normalizeArabicText(o.notes).includes(search) || normalizeArabicText(o.tags).includes(search)));
+                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
             }
             filteredOffers.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
-            let bodyHtml = `<thead><tr><th style="width: 32px; text-align:center;"><i class="fa-solid fa-check-square"></i></th><th style="width: 25%;">الخدمة / العرض</th><th style="width: 20%;">القسم</th><th style="width: 25%;">الأجهزة والأسعار</th><th style="width: 15%;">السعر العام</th><th style="width: 10%; text-align:center;">إدارة</th></tr></thead><tbody>`;
+            const allFilteredIds = filteredOffers.map(o => o.id);
+            const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
+
+            let bodyHtml = `
+                <thead>
+                    <tr>
+                        <th style="width: 38px; text-align:center;">
+                            <input type="checkbox" id="selectAllOffersChk" ${isAllChecked ? 'checked' : ''} onchange="toggleSelectAllOffers(this)" title="تحديد / إلغاء تحديد الكل">
+                        </th>
+                        <th style="width: 25%;">الخدمة / العرض</th>
+                        <th style="width: 20%;">القسم</th>
+                        <th style="width: 25%;">الأجهزة والأسعار</th>
+                        <th style="width: 15%;">السعر العام</th>
+                        <th style="width: 10%; text-align:center;">إدارة</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
+                const isFav = userFavorites.some(f => f.id === item.id && f.type === 'offer');
+                const favStarStyle = isFav ? "color:#f59e0b;" : "color:var(--text-muted); opacity:0.4;";
                 let devicesDisplay = "";
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
                 if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
                 if (!devicesDisplay) devicesDisplay = "-";
-                bodyHtml += `<tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}"><td style="text-align:center;"><input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)"></td><td>${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}</td><td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td><td>${devicesDisplay}</td><td>${item.price ? `<span class="price-badge">${item.price}</span>` : '-'}</td><td style="text-align:center;"><button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button> <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+
+                bodyHtml += `
+                    <tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}">
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
+                        </td>
+                        <td>
+                            <i class="fa-solid fa-star" style="cursor:pointer; ${favStarStyle}; font-size:0.75rem;" onclick="toggleFavoriteItem(${item.id}, '${item.name}', 'offer')" title="إضافة/إزالة للمفضلة"></i>
+                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
+                        </td>
+                        <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
+                        <td>${devicesDisplay}</td>
+                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
+                        <td style="text-align:center;">
+                            <button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="editOffer(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.6rem;" onclick="deleteOffer(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
             });
+
             tableEl.innerHTML = bodyHtml + `</tbody>`;
             updateFloatingOffersWindow();
         }
@@ -2001,6 +2587,7 @@
             if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
             if (id) offersData[offersData.findIndex(o => o.id == id)] = obj; else offersData.push(obj);
             syncToCloud(); renderOffersTabs(); renderOffers(); closeModal('offerModal');
+            playChirpSound();
         }
 
         function editOffer(id) {
@@ -2011,6 +2598,7 @@
             document.getElementById('offPrice1').value = item.price1 || "";
             document.getElementById('offDevice2').value = item.device2 || ""; 
             document.getElementById('offPrice2').value = item.price2 || "";
+            document.getElementById('offerId').value = item.id;
             document.getElementById('offPrice').value = item.price || ""; 
             document.getElementById('offNotes').value = item.notes || "";
             document.getElementById('offIsPinned').checked = !!item.isPinned;
@@ -2020,7 +2608,13 @@
         }
 
         function deleteOffer(id) {
-            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); renderOffersTabs(); renderOffers(); }
+            if (confirm("حذف؟")) { 
+                offersData = offersData.filter(o => o.id !== id); 
+                syncToCloud(); 
+                renderOffersTabs(); 
+                renderOffers(); 
+                playChirpSound();
+            }
         }
 
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -2034,10 +2628,10 @@
 
         let draggedInquiryIdx = null;
         function renderInquiries(highlightId = null) {
-            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
-            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || normalizeArabicText(i.question).includes(search) || normalizeArabicText(i.answer).includes(search) || normalizeArabicText(i.tags).includes(search))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.7rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.58rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item, idx) => {
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();playChirpSound();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.3rem;">${item.question}</span><div style="display:flex; gap:0.2rem;"><button class="btn btn-green" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')"><i class="fa-solid fa-copy"></i></button><button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="editInquiry(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="deleteInquiry(${item.id})"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.7rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.58rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
         function openInquiryModal() {
@@ -2054,6 +2648,7 @@
             if (!obj.question) return;
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
             syncToCloud(); renderInquiries(); closeModal('inquiryModal');
+            playChirpSound();
         }
         function editInquiry(id) {
             const item = inquiriesData.find(i => i.id === id); if (!item) return;
@@ -2063,7 +2658,12 @@
             document.getElementById('inquiryModal').classList.add('active');
         }
         function deleteInquiry(id) {
-            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); }
+            if (confirm("حذف؟")) { 
+                inquiriesData = inquiriesData.filter(i => i.id !== id); 
+                syncToCloud(); 
+                renderInquiries(); 
+                playChirpSound();
+            }
         }
 
         function toggleAllSearchCats(status) {
@@ -2072,86 +2672,81 @@
             triggerGlobalSearchFromInput();
         }
 
-        // تسجيل تكرار عمليات البحث لإنشاء أعلى 5 كلمات مفضلة
-        function recordSearchTerm(term) {
-            let clean = term.trim();
-            if (!clean || clean.length < 2) return;
-            searchFrequencyHistory[clean] = (searchFrequencyHistory[clean] || 0) + 1;
-            localStorage.setItem('search_freq_history', JSON.stringify(searchFrequencyHistory));
-            renderSmartFavoritesBar();
-        }
-
-        function renderSmartFavoritesBar() {
-            const container = document.getElementById('smartFavoritesContainer');
-            if(!container) return;
-            
-            // ترتيب وأخذ أكثر 5 كلمات تكراراً
-            let sortedArr = Object.keys(searchFrequencyHistory).sort((a,b) => searchFrequencyHistory[b] - searchFrequencyHistory[a]).slice(0, 5);
-            
-            let html = `<span style="font-size:0.75rem; font-weight:800; color:var(--primary-color);"><i class="fa-solid fa-star"></i> المفضلة الذكية:</span>`;
-            if (sortedArr.length === 0) {
-                html += `<span style="font-size:0.68rem; color:var(--text-muted);">تظهر العبارات الأكثر بحثاً تلقائياً هنا</span>`;
-            } else {
-                sortedArr.forEach(word => {
-                    html += `<span class="fav-badge" onclick="executeQuickSearch('${word}')">${word}</span>`;
-                });
-            }
-            container.innerHTML = html;
-        }
-
-        function executeQuickSearch(word) {
-            document.getElementById('globalSearchInput').value = word;
-            handleTrueGlobalSearch(word);
-        }
-
-        let searchDebounceTimer = null;
         function triggerGlobalSearchFromInput() {
-            clearTimeout(searchDebounceTimer);
-            searchDebounceTimer = setTimeout(() => {
-                const query = document.getElementById('globalSearchInput').value;
-                if (query.trim().length >= 2) { recordSearchTerm(query); }
-                handleTrueGlobalSearch(query);
-            }, 180);
+            const query = document.getElementById('globalSearchInput').value;
+            handleSmartGlobalSearch(query);
         }
 
-        // محرك البحث الذكي المزدوج والسريع للغاية
-        function handleTrueGlobalSearch(query) {
-            const rawQ = query.trim();
-            const normQ = normalizeArabicText(rawQ);
-            const resultsSection = document.getElementById('globalSearchResultsSection');
-            const resultsList = document.getElementById('globalSearchResultsList');
-            
-            if (!normQ) {
-                resultsSection.classList.remove('active');
+        // محرك البحث الشامل الذكي المحدث ليعمل بكفاءة عالية (يدعم البحث المزدوج وألقاب الأطباء)
+        function handleSmartGlobalSearch(query) {
+            let rawQ = query.trim();
+            if (!rawQ) {
+                document.getElementById('globalSearchResultsSection').classList.remove('active');
                 const activeTab = localStorage.getItem('activeTab') || 'schedule';
                 document.getElementById(`${activeTab}-section`).classList.add('active');
                 return;
             }
 
+            let activeFilterCategories = [];
+            document.querySelectorAll('.search-cat-chk:checked').forEach(chk => {
+                activeFilterCategories.push(chk.value);
+            });
+
+            let detectedCategories = [];
+            let normRaw = normalizeArabicText(rawQ);
+
+            const checkAndExtractCat = (keywords, catCode) => {
+                keywords.forEach(kw => {
+                    if (normRaw.includes(kw)) {
+                        if (!detectedCategories.includes(catCode)) detectedCategories.push(catCode);
+                    }
+                });
+            };
+
+            checkAndExtractCat(['اطباء', 'دكتور', 'طبيب', 'دكتوره'], 'doctors');
+            checkAndExtractCat(['عروض', 'اسعار', 'سعر', 'عرض'], 'offers');
+            checkAndExtractCat(['تنبيهات', 'اشعار', 'اشعارات', 'تنبيه'], 'alerts');
+            checkAndExtractCat(['استفسارات', 'سؤال', 'اسئلة', 'استفسار'], 'inquiries');
+            checkAndExtractCat(['خدمات', 'اقسام', 'الاقسام', 'أجهزة', 'جهاز'], 'services');
+            checkAndExtractCat(['منسقين', 'منسق'], 'coordinators');
+
+            let targetCategories = detectedCategories.length > 0 
+                ? detectedCategories.filter(c => activeFilterCategories.includes(c)) 
+                : activeFilterCategories;
+
+            if (targetCategories.length === 0) targetCategories = activeFilterCategories;
+
+            // إزالة الكلمات الزائدة مع الاحتفاظ باسم الطبيب بالكامل (مثل سامي أو تبيان)
+            let cleanQueryText = rawQ.replace(/(الدكتور|الدكتوره|د\.|د\/|د)/g, '').trim();
+            if (!cleanQueryText) cleanQueryText = rawQ;
+
+            let normQ = normalizeArabicText(cleanQueryText);
+            
+            const resultsSection = document.getElementById('globalSearchResultsSection');
+            const resultsList = document.getElementById('globalSearchResultsList');
+            
             document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
             resultsSection.classList.add('active');
             resultsList.innerHTML = "";
 
-            const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
             let allMatchedResults = [];
 
-            // تفتيت الاستعلام لنص كامل وللكلمات المنفصلة لتفعيل البحث المزدوج المتعدد
-            let queryTokens = normQ.split(/\s+/).filter(t => t.length > 0);
-
-            const isStrictMatch = (text) => {
+            const isMatch = (text) => {
+                if (!normQ) return true;
                 if (!text) return false;
                 let t = normalizeArabicText(text);
-                if (t.includes(normQ)) return true;
-                return queryTokens.length > 1 && queryTokens.every(token => t.includes(token));
+                let queryWords = normQ.split(' ').filter(w => w.length > 0 && !['و', 'في', 'عن', 'مع', 'الاقسام', 'الأطباء', 'المنسقين'].includes(w));
+                if (queryWords.length === 0) return true;
+                return queryWords.every(qw => t.includes(qw));
             };
 
-            if (enabledCats.includes('doctors')) {
+            if (targetCategories.includes('doctors')) {
                 doctorsData.forEach(d => {
-                    if (isStrictMatch(d.name) || isStrictMatch(d.specialty) || isStrictMatch(d.tags) || isStrictMatch(d.notes)) {
+                    if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes)) {
                         allMatchedResults.push({
                             timeId: d.id || 0, source: "الأطباء",
                             title: `${d.name} (${d.specialty})`,
-                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
+                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'} ${d.tags ? '| 🏷️ ' + d.tags : ''}`,
                             action: `jumpToSectionAndHighlightDoc(${d.id})`,
                             copyAction: `copyDoctorForClient(${d.id})`
                         });
@@ -2159,13 +2754,18 @@
                 });
             }
 
-            if (enabledCats.includes('offers')) {
+            if (targetCategories.includes('offers')) {
                 offersData.forEach(o => {
-                    if (isStrictMatch(o.name) || isStrictMatch(o.category) || isStrictMatch(o.price) || isStrictMatch(o.notes)) {
+                    const combinedOfferText = `${o.name || ''} ${o.category || ''} ${o.price || ''} ${o.notes || ''} ${o.tags || ''} ${o.device1 || ''} ${o.price1 || ''} ${o.device2 || ''} ${o.price2 || ''}`;
+                    if (isMatch(combinedOfferText)) {
+                        let priceSummary = o.price ? `السعر: ${o.price}` : "";
+                        if (o.device1) priceSummary += ` | ${o.device1}: ${o.price1 || ''}`;
+                        if (o.device2) priceSummary += ` | ${o.device2}: ${o.price2 || ''}`;
+
                         allMatchedResults.push({
                             timeId: o.id || 0, source: `العروض والأسعار (${o.category})`,
-                            title: `${o.name} - السعر: ${o.price || '-'}`,
-                            subtitle: o.notes || '',
+                            title: `${o.name} - ${priceSummary}`,
+                            subtitle: `${o.notes || ''} ${o.tags ? '| 🏷️ ' + o.tags : ''}`,
                             action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`,
                             copyAction: `copySingleOffer(${o.id})`
                         });
@@ -2173,25 +2773,25 @@
                 });
             }
 
-            if (enabledCats.includes('alerts')) {
+            if (targetCategories.includes('alerts')) {
                 alertsData.forEach(a => {
-                    if (isStrictMatch(a.content) || isStrictMatch(a.tags)) {
+                    if (isMatch(a.content) || isMatch(a.tags)) {
                         allMatchedResults.push({
                             timeId: a.id || 0, source: "التنبيهات والإشعارات",
-                            title: a.content, subtitle: a.time,
+                            title: a.content, subtitle: `${a.time} ${a.tags ? '| 🏷️ ' + a.tags : ''}`,
                             action: `jumpToAlertsTab(${a.id})`,
-                            copyAction: `copyTextToClipboard('${a.content.replace(/'/g, "\\'")}', 'تم نسخ التنبيه:')`
+                            copyAction: `copyTextToClipboard('${a.content}', 'تم نسخ التنبيه:')`
                         });
                     }
                 });
             }
 
-            if (enabledCats.includes('inquiries')) {
+            if (targetCategories.includes('inquiries')) {
                 inquiriesData.forEach(i => {
-                    if (isStrictMatch(i.question) || isStrictMatch(i.answer) || isStrictMatch(i.tags)) {
+                    if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
                         allMatchedResults.push({
                             timeId: i.id || 0, source: `دليل الاستفسارات (${i.category})`,
-                            title: i.question, subtitle: i.answer,
+                            title: i.question, subtitle: `${i.answer} ${i.tags ? '| 🏷️ ' + i.tags : ''}`,
                             action: `jumpToSectionAndHighlightInquiry(${i.id})`,
                             copyAction: `copyTextToClipboard('سؤال: ${i.question}\\nإجابة: ${i.answer}', 'تم نسخ الاستفسار:')`
                         });
@@ -2199,26 +2799,36 @@
                 });
             }
 
-            if (enabledCats.includes('services')) {
+            if (targetCategories.includes('services')) {
                 deptServicesData.forEach(s => {
-                    if (isStrictMatch(s.name) || isStrictMatch(s.tags)) {
+                    if (isMatch(s.name) || isMatch(s.tags)) {
                         allMatchedResults.push({
                             timeId: s.id || 0, source: `أقسام وفروع العيادات (${s.branch})`,
-                            title: s.name, subtitle: `القسم: ${s.type}`,
+                            title: s.name, subtitle: `القسم: ${s.type} ${s.tags ? '| 🏷️ ' + s.tags : ''}`,
                             action: `jumpToSectionAndHighlightService(${s.id})`,
                             copyAction: `copyTextToClipboard('${s.name}', 'تم نسخ الخدمة:')`
                         });
                     }
                 });
+                deptNotesData.forEach((n, nIdx) => {
+                    if (isMatch(n.text) || isMatch(n.tags)) {
+                        allMatchedResults.push({
+                            timeId: nIdx, source: "ملحوظات الأقسام",
+                            title: n.text, subtitle: `ملحوظة قسم ${n.tags ? '| 🏷️ ' + n.tags : ''}`,
+                            action: `switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])`,
+                            copyAction: `copyTextToClipboard('${n.text}', 'تم نسخ الملحوظة:')`
+                        });
+                    }
+                });
             }
 
-            if (enabledCats.includes('coordinators')) {
+            if (targetCategories.includes('coordinators')) {
                 coordinatorsData.forEach(c => {
                     let rulesText = c.rules ? c.rules.join(' ') : '';
-                    if (isStrictMatch(c.name) || isStrictMatch(rulesText) || isStrictMatch(c.tags)) {
+                    if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
                         allMatchedResults.push({
                             timeId: c.id || 0, source: "دليل المنسقين",
-                            title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات`,
+                            title: c.name, subtitle: `${c.rules ? c.rules.length : 0} شروط وتعليمات ${c.tags ? '| 🏷️ ' + c.tags : ''}`,
                             action: `jumpToSectionAndHighlightCoordinator(${c.id})`,
                             copyAction: `copyTextToClipboard('${c.name}\\n' + '${c.rules ? c.rules.join("\\n") : ""}', 'تم نسخ تعليمات المنسقين:')`
                         });
@@ -2227,7 +2837,7 @@
             }
 
             if (allMatchedResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة.</div>`;
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
                 return;
             }
 
@@ -2245,54 +2855,6 @@
                         </div>
                     </div>`;
             });
-        }
-
-        // ميزة التعرف على الصوت المتقدم والمزدوج
-        let isRecording = false, recognition = null;
-        function toggleVoiceSearch() {
-            const voiceBtn = document.getElementById('voiceSearchBtn');
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                return alert("متصفحك لا يدعم خاصية البحث الصوتي المباشر. استخدم متصفح Chrome.");
-            }
-
-            if (isRecording) {
-                if (recognition) recognition.stop();
-                return;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'ar-SA';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onstart = function() {
-                isRecording = true;
-                voiceBtn.classList.add('recording');
-            };
-
-            recognition.onresult = function(e) {
-                const transcript = e.results[0][0].transcript;
-                document.getElementById('globalSearchInput').value = transcript;
-                recordSearchTerm(transcript);
-                handleTrueGlobalSearch(transcript);
-            };
-
-            recognition.onerror = function(e) {
-                console.error("Speech recognition error", e);
-                stopVoiceState();
-            };
-
-            recognition.onend = function() {
-                stopVoiceState();
-            };
-
-            function stopVoiceState() {
-                isRecording = false;
-                voiceBtn.classList.remove('recording');
-            }
-
-            recognition.start();
         }
 
         function clearGlobalSearch() {
@@ -2332,4 +2894,3 @@
     </script>
 </body>
 </html>
-```eof
