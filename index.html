@@ -96,7 +96,7 @@
         .fav-chip:hover { background: var(--primary-color); color: #000; }
         .fav-chip .remove-fav-btn { color: var(--danger-color); font-size: 0.6rem; border-radius: 50%; padding: 1px 2px; }
 
-        /* شريط التنبيهات المتحركة المستمرة مع زر إيقاف/استئناف وسرعات العرض */
+        /* شريط التنبيهات المتحركة مع زر إيقاف/استئناف وسرعات العرض */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .ticker-container { overflow-x: auto; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; scroll-behavior: auto; position: relative; }
@@ -294,7 +294,7 @@
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
                     <span style="color:var(--border-color);">|</span>
                     <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
-                    <span id="liveDateDisplay" class="header-date-text">4,Nov,2026</span>
+                    <span id="liveDateDisplay" class="header-date-text">05, Nov, 2026</span>
                 </div>
 
                 <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
@@ -331,7 +331,7 @@
             <div class="fav-chips-container" id="favChipsContainer"></div>
         </div>
 
-        <!-- شريط الإشعارات والتنبيهات المتحركة المستمرة مع زر إيقاف/استئناف وسرعات العرض وإعادة الضبط -->
+        <!-- شريط الإشعارات والتنبيهات المتحركة مع زر إيقاف/استئناف وسرعات العرض وإعادة الضبط -->
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-shrink:0;">
                 <button class="btn btn-blue" style="padding:0.25rem 0.5rem; font-size:0.68rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="إعادة الضبط للأحدث"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث إشعار</button>
@@ -417,7 +417,7 @@
                 <div style="display:flex; gap:0.25rem; margin-bottom:0.25rem; align-items:center;">
                     <div class="page-local-search" style="flex:1; margin-bottom:0;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء والشروط..." oninput="renderDoctors()">
+                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء..." oninput="renderDoctors()">
                     </div>
                     <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.62rem; padding:0.25rem 0.45rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة
@@ -444,7 +444,7 @@
                                         <th id="th_mashy_1" style="width: 15%;">التخصص</th>
                                         <th id="th_mashy_2" style="width: 10%;">الكشف</th>
                                         <th id="th_mashy_3" style="width: 25%;">فرع معشي والمواعيد</th>
-                                        <th id="th_mashy_4" style="width: 20%;">الملاحظات والشروط</th>
+                                        <th id="th_mashy_4" style="width: 20%;">الملاحظات</th>
                                         <th id="th_mashy_5" style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
                                 </thead>
@@ -466,7 +466,7 @@
                                         <th id="th_wissam_1" style="width: 15%;">التخصص</th>
                                         <th id="th_wissam_2" style="width: 10%;">الكشف</th>
                                         <th id="th_wissam_3" style="width: 25%;">فرع الوسام والمواعيد</th>
-                                        <th id="th_wissam_4" style="width: 20%;">الملاحظات والشروط</th>
+                                        <th id="th_wissam_4" style="width: 20%;">الملاحظات</th>
                                         <th id="th_wissam_5" style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
                                 </thead>
@@ -776,8 +776,12 @@
                 <input type="text" id="docTiming" class="form-control" placeholder="يومياً من 2م - 10م">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
-                <label>الملاحظات والشروط</label>
-                <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات وشروط ووسوم تظهر بالبحث..."></textarea>
+                <label>الملاحظات</label>
+                <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات داخلية..."></textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.12rem;">
+                <label>الوسوم / كلمات مفتاحية (Tags)</label>
+                <input type="text" id="docTags" class="form-control" placeholder="أسنان، طوارئ">
             </div>
             <button class="btn btn-green" onclick="saveDoctor()">حفظ البيانات</button>
         </div>
@@ -832,8 +836,12 @@
             </div>
             <input type="hidden" id="alertId">
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>نص التنبيه والملاحظات / الشروط</label>
-                <textarea id="alertContent" class="form-control" rows="3" placeholder="ملاحظات وتنبيهات ووسوم..."></textarea>
+                <label>نص التنبيه</label>
+                <textarea id="alertContent" class="form-control" rows="3"></textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>الوسوم (Tags)</label>
+                <input type="text" id="alertTags" class="form-control" placeholder="أبان، إجازة، عاجل">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>إرفاق صورة أو PDF</label>
@@ -871,8 +879,12 @@
                 </select>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
-                <label>اسم الخدمة أو الجهاز والشروط</label>
-                <input type="text" id="deptItemName" class="form-control" placeholder="مثال: جنتل ماكس برو - ملاحظات">
+                <label>اسم الخدمة أو الجهاز</label>
+                <input type="text" id="deptItemName" class="form-control" placeholder="مثال: جنتل ماكس برو">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.12rem;">
+                <label>الوسوم (Tags)</label>
+                <input type="text" id="deptItemTags" class="form-control" placeholder="جهاز، ليزر">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem; margin-top:0.12rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون التمييز:</label>
@@ -899,8 +911,12 @@
             </div>
             <input type="hidden" id="noteIndex">
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>نص الملحوظة والشروط</label>
-                <textarea id="deptNoteText" class="form-control" rows="3" placeholder="اكتب الملحوظة والكلمات البحثية هنا..."></textarea>
+                <label>نص الملحوظة</label>
+                <textarea id="deptNoteText" class="form-control" rows="3"></textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>الوسوم (Tags)</label>
+                <input type="text" id="deptNoteTags" class="form-control" placeholder="أرقام، توجيهات">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>لون الكارت</label>
@@ -928,6 +944,10 @@
                 <input type="text" id="coordName" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>الوسوم (Tags)</label>
+                <input type="text" id="coordTags" class="form-control" placeholder="حجز، موعد">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>لون الكارت</label>
                 <select id="coordColor" class="form-control">
                     <option value="card-teal">أزرق ملكي</option>
@@ -939,7 +959,7 @@
                 </select>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>التفاصيل والشروط (والكلمات البحثية)</label>
+                <label>التفاصيل والشروط</label>
                 <textarea id="coordRules" class="form-control" rows="4"></textarea>
             </div>
             <button class="btn btn-green" onclick="saveCoordinator()">حفظ</button>
@@ -962,8 +982,8 @@
                 <input type="text" id="offCustomCategory" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>اسم الخدمة / العرض (مثل: بوتوكس)</label>
-                <input type="text" id="offName" class="form-control" placeholder="3 جلسات جسم كامل أو بوتوكس">
+                <label>اسم الخدمة / العرض</label>
+                <input type="text" id="offName" class="form-control" placeholder="3 جلسات جسم كامل">
             </div>
             
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.25rem; background:var(--bg-card); padding:0.3rem; border-radius:6px; border:1px solid var(--border-color);">
@@ -994,8 +1014,12 @@
             </div>
             
             <div style="display:flex; flex-direction:column; gap:0.1rem;">
-                <label>ملحوظات / شروط أو كلمات للبحث (معتمدة بالبحث الشامل)</label>
-                <input type="text" id="offNotes" class="form-control" placeholder="تشمل الكشفية، بوتوكس، عرض خاص">
+                <label>ملحوظات / شروط أو وسم (Tags)</label>
+                <input type="text" id="offNotes" class="form-control" placeholder="تشمل الكشفية">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.1rem;">
+                <label>وسوم مخصصة للبحث (Tags)</label>
+                <input type="text" id="offTags" class="form-control" placeholder="أكونت ماجستي، ليزر، عروض">
             </div>
             <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.12rem;">
                 <input type="checkbox" id="offIsPinned" style="width:13px; height:13px;">
@@ -1043,8 +1067,12 @@
                 <input type="text" id="inqQuestion" class="form-control">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>الإجابة (والشروط والكلمات البحثية)</label>
+                <label>الإجابة</label>
                 <textarea id="inqAnswer" class="form-control" rows="3"></textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label>الوسوم (Tags)</label>
+                <input type="text" id="inqTags" class="form-control" placeholder="رتوش، جلسة">
             </div>
             <button class="btn btn-green" onclick="saveInquiry()">حفظ</button>
         </div>
@@ -1100,6 +1128,7 @@
         let selectedGlobalSearchIds = [];
         let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
+        let activeDocsSortMode = false;
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         
         let starredOfferIds = JSON.parse(localStorage.getItem('starred_offer_ids') || '[]');
@@ -1171,7 +1200,7 @@
                     alertsData = data.alertsData || [];
                     coordinatorsData = data.coordinatorsData || [];
                     deptServicesData = data.deptServicesData || [];
-                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
+                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold', tags: '' } : n) : [];
                     offersData = data.offersData || [];
                     inquiriesData = data.inquiriesData || [];
                 } else {
@@ -1216,7 +1245,6 @@
             }
         }
 
-        // صيغة التاريخ المضبوطة بدقة: اليوم، الشهر، السنة (4,Nov,2026)
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1227,11 +1255,12 @@
             hours = hours ? hours : 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
             
-            const dayNum = now.getDate();
+            // ضبط صيغة التاريخ ليكون باليوم والشهر والسنة بدقة (مثال: 05, Nov, 2026)
+            const dayNum = String(now.getDate()).padStart(2, '0');
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const monthStr = months[now.getMonth()];
             const yearNum = now.getFullYear();
-            const dateStr = `${dayNum},${monthStr},${yearNum}`;
+            const dateStr = `${dayNum}, ${monthStr}, ${yearNum}`;
 
             const clockEl = document.getElementById('liveClockDisplay');
             const dateEl = document.getElementById('liveDateDisplay');
@@ -1240,13 +1269,12 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, notes: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", customColor: "" }];
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", isJoint: false, isLeave: false, isPinned: true, tags: "أبان، اسنان، طوارئ", mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
-            alertsData = [{ id: 1, content: "تنبيه هام للعيادات", notes: "أبان، إجازة", media: "", mediaType: "", time: "11/4/2026" }];
-            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", customColor: "", isJoint: true }];
-            deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 ) - أكونت ماجستي", color: "card-gold" }];
-            inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue" }];
-            offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "أسنان، أكونت ماجستي", isPinned: true }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", customColor: "", isJoint: true, tags: "جهاز، ليزر" }];
+            deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 ) - أكونت ماجستي", color: "card-gold", tags: "أرقام، أكونت ماجستي" }];
+            inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", color: "card-darkblue", tags: "رتوش" }];
+            offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "", isPinned: true, tags: "أسنان، أكونت ماجستي" }];
             syncToCloud();
         }
 
@@ -1516,7 +1544,6 @@
             document.getElementById('activeDoctorsModal').classList.add('active');
         }
 
-        // مطابقة تامة لترتيب القائمة الرئيسية للأطباء
         function renderActiveDoctorsModalContent() {
             const currentDay = getArabicDayName();
             let activeList = [];
@@ -1524,8 +1551,6 @@
             let sourceList = (currentActiveDocsBranch === "معشي") 
                 ? doctorsData.filter(d => d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0)
                 : doctorsData.filter(d => d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
-
-            sourceList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a[currentActiveDocsBranch === 'معشي' ? 'mashyOrder' : 'wissamOrder'] ?? 0) - (b[currentActiveDocsBranch === 'معشي' ? 'mashyOrder' : 'wissamOrder'] ?? 0)));
 
             sourceList.forEach(d => {
                 if (d.isLeave) return;
@@ -1692,9 +1717,9 @@
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
-        function getNotesTooltipHtml(notesStr) {
-            if (!notesStr || !notesStr.trim()) return '';
-            return `<div class="tags-tooltip-wrapper" title="${notesStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> شروط/وسوم</span><div class="tags-tooltip-popup">🏷️ ${notesStr}</div></div>`;
+        function getTagsTooltipHtml(tagsStr) {
+            if (!tagsStr || !tagsStr.trim()) return '';
+            return `<div class="tags-tooltip-wrapper" title="${tagsStr}"><span class="tags-icon-badge"><i class="fa-solid fa-tag"></i> وسوم</span><div class="tags-tooltip-popup">🏷️ ${tagsStr}</div></div>`;
         }
 
         function cleanSearchText(str) { return normalizeArabicText(str); }
@@ -1723,14 +1748,14 @@
 
             let todayMashyDocs = [], todayWissamDocs = [];
             const mashyList = doctorsData.filter(d => {
-                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.notes).includes(search);
+                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
             });
             mashyList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a.mashyOrder ?? 0) - (b.mashyOrder ?? 0)));
 
             const wissamList = doctorsData.filter(d => {
-                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.notes).includes(search);
+                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
             });
@@ -1753,14 +1778,13 @@
                 mashyBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
                         <td>
-                            <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'mashy', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'mashy', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
-                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${getNotesTooltipHtml(doc.notes)}</td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</div></td>
+                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div></td>
                         <td style="text-align:center;">
                             <div class="actions-col-group">
                                 <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
@@ -1789,14 +1813,13 @@
                 wissamBody.innerHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
                         <td>
-                            <span class="row-drag-handle" draggable="true" ondragstart="handleBranchDragStart(event, 'wissam', ${doc.id})" ondragover="event.preventDefault()" ondrop="handleBranchDrop(event, 'wissam', ${doc.id})" title="اسحب للترتيب"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
-                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${getNotesTooltipHtml(doc.notes)}</td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div>${getTagsTooltipHtml(doc.tags)}</div></td>
+                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div></td>
                         <td style="text-align:center;">
                             <div class="actions-col-group">
                                 <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
@@ -1815,53 +1838,11 @@
             updateKPIs();
         }
 
-        let draggedBranch = null, draggedDocId = null;
-        function handleBranchDragStart(e, branch, id) { 
-            draggedBranch = branch; 
-            draggedDocId = id;
-            e.dataTransfer.setData('text/plain', id);
-        }
-        function handleBranchDrop(e, branch, targetId) {
-            e.preventDefault();
-            if (draggedBranch !== branch || draggedDocId === null || draggedDocId === targetId) return;
-            
-            const search = document.getElementById('docSearchInput').value.trim().toLowerCase();
-            const selectedSpecialty = document.getElementById('specialtyFilter').value;
-            
-            let currentList = doctorsData.filter(d => {
-                const matchSearch = d.name.toLowerCase().includes(search);
-                const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (branch === 'mashy' ? (d.branch === "معشي" || d.isJoint || (d.mashyDays||[]).length > 0) : (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0));
-            });
-            
-            currentList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || ((a[branch === 'mashy' ? 'mashyOrder' : 'wissamOrder'] ?? 0) - (b[branch === 'mashy' ? 'mashyOrder' : 'wissamOrder'] ?? 0)));
-
-            const oldIdx = currentList.findIndex(d => d.id === draggedDocId);
-            const targetIdx = currentList.findIndex(d => d.id === targetId);
-
-            if (oldIdx !== -1 && targetIdx !== -1) {
-                const moved = currentList.splice(oldIdx, 1)[0];
-                currentList.splice(targetIdx, 0, moved);
-                
-                currentList.forEach((doc, idx) => {
-                    const mainDoc = doctorsData.find(d => d.id === doc.id);
-                    if (mainDoc) { 
-                        if (branch === 'mashy') mainDoc.mashyOrder = idx; 
-                        else mainDoc.wissamOrder = idx; 
-                    }
-                });
-                
-                syncToCloud(); 
-                renderDoctors();
-                playChirpSound();
-            }
-        }
-
         function openDoctorModal() {
             document.getElementById('docId').value = ""; document.getElementById('docName').value = "";
             document.getElementById('docNationality').value = ""; document.getElementById('docSpecialty').value = "";
             document.getElementById('docFee').value = ""; document.getElementById('docTiming').value = "";
-            document.getElementById('docNotes').value = "";
+            document.getElementById('docNotes').value = ""; document.getElementById('docTags').value = "";
             document.getElementById('docCustomColor').value = ""; document.getElementById('docIsJoint').checked = false;
             document.getElementById('docIsPinned').checked = false; document.getElementById('docIsLeave').checked = false;
             document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
@@ -1897,7 +1878,8 @@
                 isLeave: isLeaveVal,
                 mashyDays, wissamDays,
                 timing: document.getElementById('docTiming').value,
-                notes: document.getElementById('docNotes').value.trim(),
+                notes: document.getElementById('docNotes').value,
+                tags: document.getElementById('docTags').value.trim(),
                 mashyOrder: existingDoc ? (existingDoc.mashyOrder ?? doctorsData.length) : doctorsData.length,
                 wissamOrder: existingDoc ? (existingDoc.wissamOrder ?? doctorsData.length) : doctorsData.length
             };
@@ -1907,7 +1889,7 @@
                 alertsData.push({
                     id: Date.now(),
                     content: `⚠️ تنبيه إجازة: الدكتور ${docNameVal} غير متواجد حالياً في العيادة.`,
-                    notes: `${docNameVal} إجازة أطباء`,
+                    tags: `${docNameVal} إجازة أطباء`,
                     media: "", mediaType: "",
                     time: new Date().toLocaleString('en-US')
                 });
@@ -1929,7 +1911,7 @@
             document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : false);
             document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false);
             document.getElementById('docTiming').value = doc.timing; document.getElementById('docNotes').value = doc.notes || "";
-            document.getElementById('doctorModal').classList.add('active');
+            document.getElementById('docTags').value = doc.tags || ""; document.getElementById('doctorModal').classList.add('active');
         }
 
         function deleteDoctor(id) {
@@ -1953,7 +1935,7 @@
             });
             tickerTrack.innerHTML = alertCardsHtml;
 
-            sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.notes).includes(search)).forEach(item => {
+            sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
@@ -1962,7 +1944,7 @@
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 grid.innerHTML += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
-                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span>${getNotesTooltipHtml(item.notes)}</div>
+                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span>${getTagsTooltipHtml(item.tags)}</div>
                         ${mediaHtml}
                         <div class="actions-col-group">
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
@@ -1990,7 +1972,7 @@
 
         function openAlertModal() {
             document.getElementById('alertId').value = ""; document.getElementById('alertContent').value = "";
-            document.getElementById('alertMediaBase64').value = "";
+            document.getElementById('alertTags').value = ""; document.getElementById('alertMediaBase64').value = "";
             document.getElementById('alertMediaType').value = ""; document.getElementById('alertFileInput').value = "";
             document.getElementById('mediaPreviewContainer').style.display = 'none'; document.getElementById('alertModal').classList.add('active');
         }
@@ -2031,9 +2013,9 @@
 
         function saveAlert() {
             const id = document.getElementById('alertId').value, content = document.getElementById('alertContent').value;
-            const media = document.getElementById('alertMediaBase64').value, mediaType = document.getElementById('alertMediaType').value;
+            const tags = document.getElementById('alertTags').value.trim(), media = document.getElementById('alertMediaBase64').value, mediaType = document.getElementById('alertMediaType').value;
             if (!content) return alert("أدخل نص التنبيه!");
-            const alertObj = { id: id ? parseInt(id) : Date.now(), content, notes: content, media, mediaType, time: new Date().toLocaleString('en-US') };
+            const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, media, mediaType, time: new Date().toLocaleString('en-US') };
             if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
             syncToCloud(); renderAlerts(); closeModal('alertModal');
             playChirpSound();
@@ -2043,7 +2025,7 @@
             const item = alertsData.find(a => a.id === id);
             if (!item) return;
             document.getElementById('alertId').value = item.id; document.getElementById('alertContent').value = item.content;
-            document.getElementById('alertMediaBase64').value = item.media || "";
+            document.getElementById('alertTags').value = item.tags || ""; document.getElementById('alertMediaBase64').value = item.media || "";
             document.getElementById('alertMediaType').value = item.mediaType || "";
             if (item.media) {
                 if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
@@ -2068,11 +2050,11 @@
             if(bodies.some(b => !b)) return;
             bodies.forEach(b => b.innerHTML = "");
 
-            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search))).forEach(item => {
+            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
-                const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge}</td><td style="text-align:center;"><div class="actions-col-group"><button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
+                const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge} ${getTagsTooltipHtml(item.tags)}</td><td style="text-align:center;"><div class="actions-col-group"><button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
                 if (item.branch === "معشي") {
                     if (item.type === "derm") bodies[0].innerHTML += rowHtml; else bodies[1].innerHTML += rowHtml;
                 } else {
@@ -2083,8 +2065,8 @@
             const notesContainer = document.getElementById('deptNotesContainer');
             if(!notesContainer) return; notesContainer.innerHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
-                if (!search || cleanSearchText(noteObj.text).includes(search)) {
-                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p></div>`;
+                if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
+                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${getTagsTooltipHtml(noteObj.tags)}</div>`;
                 }
             });
         }
@@ -2092,7 +2074,7 @@
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = ""; document.getElementById('deptBranchSelect').value = "معشي";
             document.getElementById('deptCategorySelect').value = "derm"; document.getElementById('deptItemName').value = "";
-            document.getElementById('deptCustomColor').value = "";
+            document.getElementById('deptItemTags').value = ""; document.getElementById('deptCustomColor').value = "";
             document.getElementById('deptIsJoint').checked = false; document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز";
             document.getElementById('deptServiceModal').classList.add('active');
         }
@@ -2104,6 +2086,7 @@
                 branch: document.getElementById('deptBranchSelect').value,
                 type: document.getElementById('deptCategorySelect').value,
                 name: document.getElementById('deptItemName').value.trim(),
+                tags: document.getElementById('deptItemTags').value.trim(),
                 customColor: document.getElementById('deptCustomColor').value,
                 isJoint: document.getElementById('deptIsJoint').checked
             };
@@ -2118,7 +2101,7 @@
             if (!item) return;
             document.getElementById('deptRowId').value = item.id; document.getElementById('deptBranchSelect').value = item.branch || "معشي";
             document.getElementById('deptCategorySelect').value = item.type || "derm"; document.getElementById('deptItemName').value = item.name || "";
-            document.getElementById('deptCustomColor').value = item.customColor || "";
+            document.getElementById('deptItemTags').value = item.tags || ""; document.getElementById('deptCustomColor').value = item.customColor || "";
             document.getElementById('deptIsJoint').checked = !!item.isJoint; document.getElementById('deptServiceModal').classList.add('active');
         }
 
@@ -2133,15 +2116,15 @@
 
         function openDeptNoteModal() {
             document.getElementById('noteIndex').value = ""; document.getElementById('deptNoteText').value = "";
-            document.getElementById('deptNoteColor').value = "card-gold";
+            document.getElementById('deptNoteTags').value = ""; document.getElementById('deptNoteColor').value = "card-gold";
             document.getElementById('deptNoteModal').classList.add('active');
         }
 
         function saveDeptNote() {
             const idx = document.getElementById('noteIndex').value, text = document.getElementById('deptNoteText').value.trim();
-            const color = document.getElementById('deptNoteColor').value;
+            const tags = document.getElementById('deptNoteTags').value.trim(), color = document.getElementById('deptNoteColor').value;
             if (!text) return;
-            const noteObj = { text, color };
+            const noteObj = { text, tags, color };
             if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
             syncToCloud(); renderDeptsAndDocs(); closeModal('deptNoteModal');
             playChirpSound();
@@ -2150,7 +2133,7 @@
         function editDeptNote(idx) {
             const noteObj = deptNotesData[idx]; if (!noteObj) return;
             document.getElementById('noteIndex').value = idx; document.getElementById('deptNoteText').value = noteObj.text;
-            document.getElementById('deptNoteColor').value = noteObj.color || "card-gold";
+            document.getElementById('deptNoteTags').value = noteObj.tags || ""; document.getElementById('deptNoteColor').value = noteObj.color || "card-gold";
             document.getElementById('deptNoteModal').classList.add('active');
         }
 
@@ -2163,29 +2146,28 @@
             }
         }
 
-        let draggedCoordIdx = null;
         function renderCoordinators(highlightId = null) {
             const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
             
             coordinatorsData.filter(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
-                return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search);
-            }).forEach((c, idx) => {
+                return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
+            }).forEach((c) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
-                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedCoordIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=coordinatorsData.splice(draggedCoordIdx,1)[0];coordinatorsData.splice(${idx},0,m);syncToCloud();renderCoordinators();playChirpSound();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.25rem;">${c.name}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div></div>`;
+                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span style="flex:1; margin:0 0.25rem;">${c.name}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${getTagsTooltipHtml(c.tags)}</div>`;
             });
         }
 
         function openCoordinatorModal() {
             document.getElementById('coordId').value = ""; document.getElementById('coordName').value = "";
-            document.getElementById('coordRules').value = "";
+            document.getElementById('coordTags').value = ""; document.getElementById('coordRules').value = "";
             document.getElementById('coordModal').classList.add('active');
         }
 
         function saveCoordinator() {
             const id = document.getElementById('coordId').value, rules = document.getElementById('coordRules').value.split('\n').filter(r => r.trim() !== "");
-            const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('coordName').value, color: document.getElementById('coordColor').value, rules };
+            const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('coordName').value, tags: document.getElementById('coordTags').value.trim(), color: document.getElementById('coordColor').value, rules };
             if (id) coordinatorsData[coordinatorsData.findIndex(c => c.id == id)] = obj; else coordinatorsData.push(obj);
             syncToCloud(); renderCoordinators(); closeModal('coordModal');
             playChirpSound();
@@ -2194,7 +2176,7 @@
         function editCoordinator(id) {
             const item = coordinatorsData.find(c => c.id === id); if (!item) return;
             document.getElementById('coordId').value = item.id; document.getElementById('coordName').value = item.name;
-            document.getElementById('coordColor').value = item.color || "card-teal";
+            document.getElementById('coordTags').value = item.tags || ""; document.getElementById('coordColor').value = item.color || "card-teal";
             document.getElementById('coordRules').value = item.rules.join('\n'); document.getElementById('coordModal').classList.add('active');
         }
 
@@ -2365,9 +2347,9 @@
             
             let filteredOffers = [];
             if (selectedOfferTab === '⭐ كل العروض والأسعار') {
-                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search));
+                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search) || cleanSearchText(o.category).includes(search));
             } else {
-                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search)));
+                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
             }
 
             filteredOffers.forEach(item => {
@@ -2431,9 +2413,9 @@
 
             let filteredOffers = [];
             if (selectedOfferTab === '⭐ كل العروض والأسعار') {
-                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search));
+                filteredOffers = offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search) || cleanSearchText(o.category).includes(search));
             } else {
-                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search)));
+                filteredOffers = offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.tags).includes(search)));
             }
             filteredOffers.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
@@ -2473,7 +2455,7 @@
                         <td>
                             <button type="button" id="star_btn_${item.id}" class="offer-star-btn ${isStarred}" onclick="toggleStarOffer(event, ${item.id})" title="إضافة للمفضلة وتنبيه"><i class="fa-solid fa-star"></i></button>
                             ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
-                            ${getNotesTooltipHtml(item.notes)}
+                            ${getTagsTooltipHtml(item.tags)}
                         </td>
                         <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
                         <td>${devicesDisplay}</td>
@@ -2511,6 +2493,7 @@
             document.getElementById('offDevice1').value = ""; document.getElementById('offPrice1').value = "";
             document.getElementById('offDevice2').value = ""; document.getElementById('offPrice2').value = "";
             document.getElementById('offPrice').value = ""; document.getElementById('offNotes').value = "";
+            document.getElementById('offTags').value = "";
             document.getElementById('offIsPinned').checked = false; 
             
             let defaultCat = (selectedOfferTab && selectedOfferTab !== '⭐ كل العروض والأسعار') ? selectedOfferTab : (offersData[0]?.category || "عروض اسنان");
@@ -2529,6 +2512,7 @@
                 device1: document.getElementById('offDevice1').value.trim(), price1: document.getElementById('offPrice1').value.trim(),
                 device2: document.getElementById('offDevice2').value.trim(), price2: document.getElementById('offPrice2').value.trim(),
                 price: document.getElementById('offPrice').value.trim(), notes: document.getElementById('offNotes').value.trim(),
+                tags: document.getElementById('offTags').value.trim(),
                 isPinned: document.getElementById('offIsPinned').checked
             };
             if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
@@ -2548,6 +2532,7 @@
             document.getElementById('offerId').value = item.id;
             document.getElementById('offPrice').value = item.price || ""; 
             document.getElementById('offNotes').value = item.notes || "";
+            document.getElementById('offTags').value = item.tags || "";
             document.getElementById('offIsPinned').checked = !!item.isPinned;
             
             populateOfferCategoryDropdown(item.category);
@@ -2573,18 +2558,17 @@
             renderInquiries();
         }
 
-        let draggedInquiryIdx = null;
         function renderInquiries(highlightId = null) {
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
-            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search))).forEach((item, idx) => {
-                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span class="card-drag-handle" draggable="true" ondragstart="draggedInquiryIdx=${idx}" ondragover="event.preventDefault()" ondrop="const m=inquiriesData.splice(draggedInquiryIdx,1)[0];inquiriesData.splice(${idx},0,m);syncToCloud();renderInquiries();playChirpSound();"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.25rem;">${item.question}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button><button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
+            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item) => {
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span style="flex:1; margin:0 0.25rem;">${item.question}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ${item.name || item.question}\\nإجابة: ${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button><button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p><span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
 
         function openInquiryModal() {
             document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
-            document.getElementById('inqAnswer').value = "";
+            document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
             document.getElementById('inqCategory').value = "الليزر"; document.getElementById('inqColor').value = "card-darkblue";
             document.getElementById('inqCustomCatBox').style.display = "none"; document.getElementById('inquiryModal').classList.add('active');
         }
@@ -2593,7 +2577,7 @@
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
-            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, color: document.getElementById('inqColor').value };
+            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
             if (!obj.question) return;
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
             syncToCloud(); renderInquiries(); closeModal('inquiryModal');
@@ -2601,4 +2585,301 @@
         }
 
         function editInquiry(id) {
-            const item
+            const item = inquiriesData.find(i => i.id === id); if (!item) return;
+            document.getElementById('inquiryId').value = item.id; document.getElementById('inqQuestion').value = item.question;
+            document.getElementById('inqAnswer').value = item.answer; document.getElementById('inqTags').value = item.tags || "";
+            document.getElementById('inqCategory').value = item.category || "الليزر"; document.getElementById('inqColor').value = item.color || "card-darkblue";
+            document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function deleteInquiry(id) {
+            if (confirm("حذف؟")) { 
+                inquiriesData = inquiriesData.filter(i => i.id !== id); 
+                syncToCloud(); 
+                renderInquiries(); 
+                playChirpSound();
+            }
+        }
+
+        function toggleAllSearchCats(status) {
+            document.querySelectorAll('.search-cat-chk').forEach(c => c.checked = status);
+            saveSearchFiltersState();
+        }
+
+        function debouncedGlobalSearch() {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                const query = document.getElementById('globalSearchInput').value;
+                handleSmartGlobalSearch(query);
+            }, 150);
+        }
+
+        function handleSmartGlobalSearch(query) {
+            let rawQ = query.trim();
+            if (!rawQ) {
+                document.getElementById('globalSearchResultsSection').classList.remove('active');
+                const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                document.getElementById(`${activeTab}-section`).classList.add('active');
+                currentGlobalSearchResults = [];
+                selectedGlobalSearchIds = [];
+                return;
+            }
+
+            let normRaw = normalizeArabicText(rawQ);
+            
+            let explicitCategories = [];
+            if (normRaw.includes('طبيب') || normRaw.includes('دكتور') || normRaw.includes('الاطباء') || normRaw.includes('اطباء')) explicitCategories.push('doctors');
+            if (normRaw.includes('عرض') || normRaw.includes('عروض') || normRaw.includes('اسعار') || normRaw.includes('سعر')) explicitCategories.push('offers');
+            if (normRaw.includes('تنبيه') || normRaw.includes('تنبيهات') || normRaw.includes('اشعار') || normRaw.includes('اشعارات')) explicitCategories.push('alerts');
+            if (normRaw.includes('استفسار') || normRaw.includes('استفسارات') || normRaw.includes('سؤال') || normRaw.includes('اسئلة')) explicitCategories.push('inquiries');
+            if (normRaw.includes('قسم') || normRaw.includes('اقسام') || normRaw.includes('خدمة') || normRaw.includes('خدمات') || normRaw.includes('جهاز') || normRaw.includes('أجهزة') || normRaw.includes('الاقسام') || normRaw.includes('ملحوظة') || normRaw.includes('ملحوظات')) explicitCategories.push('services');
+            if (normRaw.includes('منسق') || normRaw.includes('منسقين')) explicitCategories.push('coordinators');
+
+            let targetCategories = explicitCategories.length > 0 ? explicitCategories : ['doctors', 'offers', 'alerts', 'inquiries', 'services', 'coordinators'];
+
+            let cleanQueryText = rawQ
+                .replace(/(الأطباء|اطباء|دكتور|طبيب|دكتوره|الدكتوره|العروض|الأسعار|عروض|اسعار|التنبيهات|تنبيهات|الاستفسارات|استفسارات|المنسقين|منسقين|الأقسام|اقسام|ملحوظة|ملحوظات|و)/g, '')
+                .replace(/(الدكتور|الدكتوره|د\.|د\/|د)/g, '')
+                .trim();
+
+            if (!cleanQueryText) cleanQueryText = rawQ;
+            let normQ = normalizeArabicText(cleanQueryText);
+            
+            const resultsSection = document.getElementById('globalSearchResultsSection');
+            const resultsList = document.getElementById('globalSearchResultsList');
+            
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            resultsSection.classList.add('active');
+            resultsList.innerHTML = "";
+
+            currentGlobalSearchResults = [];
+
+            const isMatch = (text) => {
+                if (!normQ) return true;
+                if (!text) return false;
+                let t = normalizeArabicText(text);
+                return t.includes(normQ);
+            };
+
+            if (targetCategories.includes('doctors')) {
+                doctorsData.forEach(d => {
+                    if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.tags) || isMatch(d.notes)) {
+                        let docTextForCopy = `الطبيب: ${d.name} (${d.nationality || ''})\nالتخصص: ${d.specialty}\nالكشفية: ${d.fee || '75 ريال'}\nالساعات: ${d.timing || ''}`;
+                        currentGlobalSearchResults.push({
+                            id: `doc_${d.id}`,
+                            title: `${d.name} (${d.specialty})`,
+                            subtitle: `الفرع: ${d.branch || 'مشترك'} | الكشف: ${d.fee || '75 ريال'}`,
+                            copyText: docTextForCopy,
+                            source: "الأطباء",
+                            action: `jumpToSectionAndHighlightDoc(${d.id})`
+                        });
+                    }
+                });
+            }
+
+            if (targetCategories.includes('offers')) {
+                offersData.forEach(o => {
+                    const combinedOfferText = `${o.name || ''} ${o.category || ''} ${o.price || ''} ${o.notes || ''} ${o.tags || ''} ${o.device1 || ''} ${o.price1 || ''} ${o.device2 || ''} ${o.price2 || ''}`;
+                    if (isMatch(combinedOfferText)) {
+                        let priceSummary = o.price ? `السعر: ${o.price}` : "";
+                        if (o.device1) priceSummary += ` | ${o.device1}: ${o.price1 || ''}`;
+                        if (o.device2) priceSummary += ` | ${o.device2}: ${o.price2 || ''}`;
+
+                        currentGlobalSearchResults.push({
+                            id: `offer_${o.id}`,
+                            title: `${o.name} - ${priceSummary}`,
+                            subtitle: `${o.notes || ''} | الوسوم: ${o.tags || ''}`,
+                            copyText: formatOfferLineForClient(o),
+                            source: `العروض والأسعار (${o.category})`,
+                            action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')`
+                        });
+                    }
+                });
+            }
+
+            if (targetCategories.includes('alerts')) {
+                alertsData.forEach(a => {
+                    if (isMatch(a.content) || isMatch(a.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: `alert_${a.id}`,
+                            title: a.content,
+                            subtitle: `الوسوم: ${a.tags || ''} | ${a.time}`,
+                            copyText: a.content,
+                            source: "التنبيهات والإشعارات",
+                            action: `jumpToAlertsTab(${a.id})`
+                        });
+                    }
+                });
+            }
+
+            if (targetCategories.includes('inquiries')) {
+                inquiriesData.forEach(i => {
+                    if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: `inq_${i.id}`,
+                            title: i.question,
+                            subtitle: `${i.answer} | الوسوم: ${i.tags || ''}`,
+                            copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`,
+                            source: `دليل الاستفسارات (${i.category})`,
+                            action: `jumpToSectionAndHighlightInquiry(${i.id})`
+                        });
+                    }
+                });
+            }
+
+            if (targetCategories.includes('services')) {
+                deptServicesData.forEach(s => {
+                    if (isMatch(s.name) || isMatch(s.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: `srv_${s.id}`,
+                            title: s.name,
+                            subtitle: `القسم: ${s.type} | الوسوم: ${s.tags || ''}`,
+                            copyText: s.name,
+                            source: `أقسام وفروع العيادات (${s.branch})`,
+                            action: `jumpToSectionAndHighlightService(${s.id})`
+                        });
+                    }
+                });
+                
+                deptNotesData.forEach((note, idx) => {
+                    if (isMatch(note.text) || isMatch(note.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: `note_${idx}`,
+                            title: `ملحوظة: ${note.text}`,
+                            subtitle: `الوسوم: ${note.tags || 'بدون'}`,
+                            copyText: note.text,
+                            source: "ملحوظات الأقسام",
+                            action: `switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])`
+                        });
+                    }
+                });
+            }
+
+            if (targetCategories.includes('coordinators')) {
+                coordinatorsData.forEach(c => {
+                    let rulesText = c.rules ? c.rules.join(' ') : '';
+                    if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: `coord_${c.id}`,
+                            title: c.name,
+                            subtitle: `${c.rules ? c.rules[0] : ''} | الوسوم: ${c.tags || ''}`,
+                            copyText: `${c.name}\n` + (c.rules ? c.rules.join('\n') : ''),
+                            source: "دليل المنسقين",
+                            action: `jumpToSectionAndHighlightCoordinator(${c.id})`
+                        });
+                    }
+                });
+            }
+
+            if (currentGlobalSearchResults.length === 0) {
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
+                return;
+            }
+
+            currentGlobalSearchResults.forEach((res) => {
+                const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
+                resultsList.innerHTML += `
+                    <div class="search-result-card">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                            <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                            <div>
+                                <span class="source-badge">${res.source}</span>
+                                <h4>${res.title}</h4>
+                                <p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:0.25rem;">
+                            <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'")}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                        </div>
+                    </div>`;
+            });
+            updateSelectedSearchCountDisplay();
+        }
+
+        function handleSearchCheckboxChange(resId, chk) {
+            if (chk.checked) {
+                if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId);
+            } else {
+                selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId);
+            }
+            updateSelectedSearchCountDisplay();
+        }
+
+        function toggleSelectAllGlobalSearch(masterChk) {
+            if (masterChk.checked) {
+                selectedGlobalSearchIds = currentGlobalSearchResults.map(r => r.id);
+            } else {
+                selectedGlobalSearchIds = [];
+            }
+            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
+            updateSelectedSearchCountDisplay();
+        }
+
+        function updateSelectedSearchCountDisplay() {
+            const countSpan = document.getElementById('selectedSearchCountNum');
+            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
+        }
+
+        function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
+            let blocks = [];
+            currentGlobalSearchResults.forEach(res => {
+                if (selectedGlobalSearchIds.includes(res.id)) {
+                    blocks.push(res.copyText);
+                }
+            });
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults || currentGlobalSearchResults.length === 0) {
+                return alert("لا توجد نتائج بحث حالية لنسخها!");
+            }
+            let blocks = currentGlobalSearchResults.map(r => r.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ جميع نتائج البحث دفعة واحدة!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = [];
+            selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector(`.nav-link[data-tab="${activeTab}"]`));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal');
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector(`.nav-link[data-tab="schedule"]`));
+            setTimeout(() => { renderDoctors(id); document.getElementById(`doc_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { renderOffers(id); document.getElementById(`offer_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
+            setTimeout(() => { renderInquiries(id); document.getElementById(`inquiry_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switch`tabular`('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById(`coord_card_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById(`dept_service_row_${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+    </script>
+</body>
+</html>
