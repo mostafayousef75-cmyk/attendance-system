@@ -1449,25 +1449,34 @@
         function triggerImportJSON() { document.getElementById('jsonFileInput').click(); }
 
         function importJSON(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (data.doctorsData) doctorsData = data.doctorsData;
-                        if (data.fridaySchedules) fridaySchedules = data.fridaySchedules;
-                        if (data.alertsData) alertsData = data.alertsData;
-                        if (data.coordinatorsData) coordinatorsData = data.coordinatorsData;
-                        if (data.deptServicesData) deptServicesData = data.deptServicesData;
-                        if (data.deptNotesData) deptNotesData = data.deptNotesData;
-                        if (data.offersData) offersData = data.offersData;
-                        if (data.inquiriesData) inquiriesData = data.inquiriesData;
-                        syncToCloud(); playChirpSound(); alert("تم الاستيراد بنجاح وحفظ البيانات على السحابة!");
-                    } catch (err) { alert("ملف غير صالح!"); }
-                };
-                reader.readAsText(input.files[0]);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                // التأكد من قبول الملف حتى لو ناقص بعض المفاتيح الفرعية
+                doctorsData = data.doctorsData || [];
+                fridaySchedules = data.fridaySchedules || [];
+                alertsData = data.alertsData || [];
+                coordinatorsData = data.coordinatorsData || [];
+                deptServicesData = data.deptServicesData || [];
+                deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
+                offersData = data.offersData || [];
+                inquiriesData = data.inquiriesData || [];
+
+                // الحفظ الفوري والسحب على السحابة
+                syncToCloud(); 
+                playChirpSound(); 
+                alert("تم الاستيراد بنجاح وحفظ البيانات على السحابة!");
+            } catch (err) { 
+                console.error("JSON Parse Error:", err);
+                alert("⚠️ الملف غير صالح أو تنسيق الـ JSON غير صحيح!"); 
             }
-        }
+        };
+        reader.readAsText(input.files[0]);
+    }
+}
 
         function openFridayScheduleModal() {
             document.getElementById('fridayEditId').value = ""; document.getElementById('fridayDate').value = ""; document.getElementById('fridayDocName').value = "";
