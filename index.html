@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - النسخة الفورية الخارقة</title>
+    <title>لوحة الكول سنتر والمنسقين - Supabase (محدث وسريع)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK (v8 Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Supabase JS SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -62,6 +61,7 @@
         .sidebar-edit-target-btn:hover { color: var(--primary-color); border-color: var(--primary-color); }
 
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
         .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.4rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; flex-shrink: 0; }
         
         .search-container { position: relative; flex: 1; min-width: 260px; max-width: 420px; display: flex; gap: 0.3rem; align-items: center; }
@@ -236,7 +236,7 @@
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
             <span class="cloud-dot"></span>
-            <span>متصل بالسحابة</span>
+            <span>متصل بالسحابة (Supabase)</span>
         </div>
 
         <div class="theme-box">
@@ -1017,9 +1017,12 @@
     </div>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://majety-6ecf8-default-rtdb.europe-west1.firebasedatabase.app/" };
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const db = firebase.database();
+        // إعدادات ربط سحابة Supabase الخاصة بك
+        const SUPABASE_URL = "https://xwsaolkszmsmntduibhf.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_qF9r3P4xB7ul5bNNStnV5g_KPXyRfmi";
+        
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function playChirpSound() {
             try {
@@ -1037,15 +1040,6 @@
                 osc.stop(audioCtx.currentTime + 0.08);
             } catch(e){}
         }
-
-        db.ref('.info/connected').on('value', function(snap) {
-            const badge = document.getElementById('cloudStatusBadge');
-            if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة</span>`;
-            } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل بالسحابة (وضع العمل دون إنترنت)</span>`;
-            }
-        });
 
         let doctorsData = [];
         let fridaySchedules = [];
@@ -1067,10 +1061,10 @@
         
         let currentGlobalSearchResults = [];
 
-        // نظام التحميل الفوري الصاروخي (Instant Local Storage Cache)
+        // نظام التخزين المؤقت المحلي للسرعة (Caching)
         function loadFromLocalStorageCache() {
             try {
-                const cached = localStorage.getItem('clinic_data_cache_v4');
+                const cached = localStorage.getItem('supabase_clinic_full_cache');
                 if (cached) {
                     const data = JSON.parse(cached);
                     doctorsData = data.doctorsData || [];
@@ -1090,8 +1084,69 @@
         function saveToLocalStorageCache() {
             try {
                 const data = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                localStorage.setItem('clinic_data_cache_v4', JSON.stringify(data));
+                localStorage.setItem('supabase_clinic_full_cache', JSON.stringify(data));
             } catch(e){}
+        }
+
+        // جلب البيانات من سحابة Supabase
+        async function fetchFromSupabase() {
+            try {
+                const { data, error } = await _supabase.from('clinic_data').select('*').limit(1);
+                if (data && data.length > 0 && data[0].data) {
+                    const payload = data[0].data;
+                    doctorsData = payload.doctorsData || [];
+                    fridaySchedules = payload.fridaySchedules || [];
+                    alertsData = payload.alertsData || [];
+                    coordinatorsData = payload.coordinatorsData || [];
+                    deptServicesData = payload.deptServicesData || [];
+                    deptNotesData = payload.deptNotesData ? payload.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
+                    offersData = payload.offersData || [];
+                    inquiriesData = payload.inquiriesData || [];
+
+                    saveToLocalStorageCache();
+                    refreshAllViews();
+                    updateCloudBadge(true);
+                } else {
+                    updateCloudBadge(true);
+                }
+            } catch (err) {
+                console.error("Supabase Connection Error:", err.message);
+                updateCloudBadge(false);
+            }
+        }
+
+        function updateCloudBadge(isConnected) {
+            const badge = document.getElementById('cloudStatusBadge');
+            if (!badge) return;
+            if (isConnected) {
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة (Supabase)</span>`;
+            } else {
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل (وضع أوفلاين)</span>`;
+            }
+        }
+
+        // حفظ ومزامنة البيانات مع Supabase
+        let syncTimeout = null;
+        function syncToCloud() {
+            saveToLocalStorageCache();
+            refreshAllViews();
+            
+            if (syncTimeout) clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(async () => {
+                try {
+                    const fullPayload = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
+                    const { data } = await _supabase.from('clinic_data').select('id').limit(1);
+                    if (data && data.length > 0) {
+                        await _supabase.from('clinic_data').update({ data: fullPayload }).eq('id', data[0].id);
+                    } else {
+                        await _supabase.from('clinic_data').insert([{ data: fullPayload }]);
+                    }
+                    updateCloudBadge(true);
+                } catch (err) {
+                    console.error("Supabase Sync Error:", err.message);
+                    updateCloudBadge(false);
+                }
+            }, 500);
         }
 
         function normalizeArabicText(str) {
@@ -1108,7 +1163,7 @@
                 .trim();
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-gray';
             changeTheme(savedTheme);
 
@@ -1144,7 +1199,7 @@
                 }
             });
 
-            // الخطوة الحاسمة: تحميل الداتا فوراً من ذاكرة الجهاز المحلية (بدون انتظار السحابة نهائياً)
+            // تحميل سريع أولاً من التخزين المحلي
             if (loadFromLocalStorageCache()) {
                 refreshAllViews();
             } else {
@@ -1152,25 +1207,8 @@
                 refreshAllViews();
             }
 
-            // تحميل بيانات السحابة مرة واحدة فقط عند فتح الصفحة في الخلفية دون إعادة كتابة البيانات المحلية فوق إضافاتك الجديدة
-            db.ref('clinicData').once('value').then((snapshot) => {
-                const cloudData = snapshot.val();
-                if (cloudData) {
-                    // دمج البيانات أو جلبها إذا كانت الذاكرة المحلية فارغة
-                    if (doctorsData.length <= 1 && cloudData.doctorsData) {
-                        doctorsData = cloudData.doctorsData;
-                        fridaySchedules = cloudData.fridaySchedules || [];
-                        alertsData = cloudData.alertsData || [];
-                        coordinatorsData = cloudData.coordinatorsData || [];
-                        deptServicesData = cloudData.deptServicesData || [];
-                        deptNotesData = cloudData.deptNotesData || [];
-                        offersData = cloudData.offersData || [];
-                        inquiriesData = cloudData.inquiriesData || [];
-                        saveToLocalStorageCache();
-                        refreshAllViews();
-                    }
-                }
-            });
+            // ثم الربط الفوري وجلب البيانات المحدثة سحابياً
+            await fetchFromSupabase();
         });
 
         function updateLiveClockAndDate() {
@@ -1317,17 +1355,6 @@
             const sidebar = document.getElementById('appSidebar');
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-        }
-
-        // الحفظ الفوري المزدوج (محلياً وفي السحابة معاً لضمان تثبيت إضافاتك للأبد)
-        function syncToCloud() {
-            saveToLocalStorageCache();
-            refreshAllViews();
-            db.ref('clinicData').set({ 
-                doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData
-            }).catch(err => {
-                console.log("Cloud sync notice: " + err.message);
-            });
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -1602,7 +1629,7 @@
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
 
             if (id) { doctorsData[doctorsData.findIndex(d => d.id == id)] = docObj; } else { doctorsData.push(docObj); }
-            syncToCloud(); closeModal('doctorModal'); playChirpSound();
+            syncToCloud(); renderDoctors(); closeModal('doctorModal'); playChirpSound();
         }
 
         function editDoctor(id) {
@@ -1621,7 +1648,7 @@
         }
 
         function deleteDoctor(id) {
-            if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); renderDoctors(); playChirpSound(); }
         }
 
         function setTickerSpeed(mult, btnEl) {
@@ -1782,7 +1809,7 @@
             if (!content) return alert("أدخل نص التنبيه!");
             const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, media, mediaType, time: new Date().toLocaleString('en-US') };
             if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
-            syncToCloud(); closeModal('alertModal'); playChirpSound();
+            syncToCloud(); renderAlerts(); closeModal('alertModal'); playChirpSound();
         }
 
         function editAlert(id) {
@@ -1800,7 +1827,7 @@
         }
 
         function deleteAlert(id) {
-            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); renderAlerts(); playChirpSound(); }
         }
 
         function renderDeptsAndDocs(highlightServiceId = null) {
@@ -1869,7 +1896,7 @@
             };
             if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
             if (id) deptServicesData[deptServicesData.findIndex(s => s.id == id)] = rowObj; else deptServicesData.push(rowObj);
-            syncToCloud(); closeModal('deptServiceModal'); playChirpSound();
+            syncToCloud(); renderDeptsAndDocs(); closeModal('deptServiceModal'); playChirpSound();
         }
 
         function editDeptService(id) {
@@ -1883,7 +1910,7 @@
         }
 
         function deleteDeptService(id) {
-            if (confirm("حذف؟")) { deptServicesData = deptServicesData.filter(s => s.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { deptServicesData = deptServicesData.filter(s => s.id !== id); syncToCloud(); renderDeptsAndDocs(); playChirpSound(); }
         }
 
         function openDeptNoteModal() {
@@ -1899,7 +1926,7 @@
             if (!text) return;
             const noteObj = { text, tags, color };
             if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
-            syncToCloud(); closeModal('deptNoteModal'); playChirpSound();
+            syncToCloud(); renderDeptsAndDocs(); closeModal('deptNoteModal'); playChirpSound();
         }
 
         function editDeptNote(idx) {
@@ -1910,7 +1937,7 @@
         }
 
         function deleteDeptNote(idx) {
-            if (confirm("حذف؟")) { deptNotesData.splice(idx, 1); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { deptNotesData.splice(idx, 1); syncToCloud(); renderDeptsAndDocs(); playChirpSound(); }
         }
 
         function renderCoordinators(highlightId = null) {
@@ -1955,7 +1982,7 @@
             const id = document.getElementById('coordId').value, rules = document.getElementById('coordRules').value.split('\n').filter(r => r.trim() !== "");
             const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('coordName').value, color: document.getElementById('coordColor').value, rules, tags: document.getElementById('coordTags').value.trim() };
             if (id) coordinatorsData[coordinatorsData.findIndex(c => c.id == id)] = obj; else coordinatorsData.push(obj);
-            syncToCloud(); closeModal('coordModal'); playChirpSound();
+            syncToCloud(); renderCoordinators(); closeModal('coordModal'); playChirpSound();
         }
 
         function editCoordinator(id) {
@@ -1968,7 +1995,7 @@
         }
 
         function deleteCoordinator(id) {
-            if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); playChirpSound(); }
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -2007,7 +2034,7 @@
             if (!targetCat) return alert("اختر القسم المستهدف!");
 
             offersData.forEach(o => { if (selectedOfferIds.includes(o.id)) o.category = targetCat; });
-            syncToCloud(); playChirpSound();
+            syncToCloud(); renderOffersTabs(); renderOffers(); playChirpSound();
             alert("تم نقل العروض المحددة إلى قسم \"" + targetCat + "\" بنجاح!");
         }
 
@@ -2053,7 +2080,7 @@
                 localStorage.setItem('selectedOfferTab', trimmedName);
             }
 
-            syncToCloud(); openManageCategoriesModal(); playChirpSound();
+            syncToCloud(); renderOffersTabs(); renderOffers(); openManageCategoriesModal(); playChirpSound();
             alert("تم تغيير اسم القسم إلى \"" + trimmedName + "\" بنجاح!");
         }
 
@@ -2064,7 +2091,7 @@
                     selectedOfferTab = "⭐ كل العروض والأسعار";
                     localStorage.setItem('selectedOfferTab', selectedOfferTab);
                 }
-                syncToCloud(); openManageCategoriesModal(); playChirpSound();
+                syncToCloud(); renderOffersTabs(); renderOffers(); openManageCategoriesModal(); playChirpSound();
             }
         }
 
@@ -2241,7 +2268,7 @@
             };
             if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
             if (id) offersData[offersData.findIndex(o => o.id == id)] = obj; else offersData.push(obj);
-            syncToCloud(); closeModal('offerModal'); playChirpSound();
+            syncToCloud(); renderOffersTabs(); renderOffers(); closeModal('offerModal'); playChirpSound();
         }
 
         function editOffer(id) {
@@ -2256,7 +2283,7 @@
         }
 
         function deleteOffer(id) {
-            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); renderOffersTabs(); renderOffers(); playChirpSound(); }
         }
 
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -2313,7 +2340,7 @@
             const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
             if (!obj.question) return;
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
-            syncToCloud(); closeModal('inquiryModal'); playChirpSound();
+            syncToCloud(); renderInquiries(); closeModal('inquiryModal'); playChirpSound();
         }
 
         function editInquiry(id) {
@@ -2325,7 +2352,7 @@
         }
 
         function deleteInquiry(id) {
-            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); playChirpSound(); }
         }
 
         function toggleAllSearchCats(status) {
@@ -2333,6 +2360,7 @@
             saveSearchFiltersState();
         }
 
+        // تحسين أداء البحث الشامل الفوري
         let globalSearchTimeout = null;
         function handleSmartGlobalSearch(query) {
             if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
@@ -2456,7 +2484,7 @@
                         </div>`;
                 });
                 updateSelectedCountDisplay();
-            }, 100);
+            }, 150);
         }
 
         function handleSearchCheckboxChange(resId, chk) {
