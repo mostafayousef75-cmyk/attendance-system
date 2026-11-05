@@ -84,25 +84,18 @@
         .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.3rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
         .kpi-num { font-weight: 800; font-size: 0.75rem; }
 
-        /* تعديل التاريخ بالشكل المطلوب: 5, Nov, 2026 */
+        /* تنسيق التاريخ بالشكل المطلوب: 5, Nov, 2026 */
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
         .header-time-text { color: #38bdf8; font-weight: 800; }
         .header-date-text { color: var(--primary-color); }
 
-        .fav-searches-bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 1rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-        .fav-title { font-size: 0.7rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
-        .fav-chips-container { display: flex; align-items: center; gap: 0.35rem; flex: 1; overflow-x: auto; }
-        .fav-chip { background: var(--bg-card); border: 1px solid var(--primary-color); color: var(--text-main); padding: 0.2rem 0.65rem; border-radius: 14px; font-size: 0.7rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; transition: background 0.2s; white-space: nowrap; }
-        .fav-chip:hover { background: var(--primary-color); color: #000; }
-        .fav-chip .remove-fav-btn { color: var(--danger-color); font-size: 0.6rem; border-radius: 50%; padding: 1px 2px; }
-
-        /* شريط التنبيهات المتحرك السلس بدون اختفاء */
+        /* شريط التنبيهات المتحرك السلس مع سرعات بطيئة وزر إيقاف/تشغيل */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; }
         
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScroll 30s linear infinite; direction: rtl; width: max-content; }
-        .ticker-track:hover { animation-play-state: paused; }
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScroll 60s linear infinite; direction: rtl; width: max-content; }
+        .ticker-track.paused { animation-play-state: paused !important; }
 
         @keyframes smoothTickerScroll {
             0% { transform: translateX(0); }
@@ -195,10 +188,6 @@
         .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.06rem 0.2rem; border-radius: 4px; font-size: 0.55rem; display: inline-block; margin-top: 2px; }
 
-        .offer-star-btn { background: none; border: none; cursor: pointer; font-size: 0.75rem; color: #71717a; transition: color 0.15s, transform 0.15s; padding: 1px; vertical-align: middle; margin-left: 2px; }
-        .offer-star-btn.starred { color: #facc15 !important; text-shadow: 0 0 6px rgba(250, 204, 21, 0.6); }
-        .offer-star-btn:hover { transform: scale(1.15); }
-
         .actions-col-group { display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
         .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 0.68rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 20px; transition: filter 0.15s; }
         .action-icon-btn.btn-copy-ic { color: var(--accent-green); background: rgba(34, 197, 94, 0.15); }
@@ -289,7 +278,7 @@
             </div>
 
             <div class="header-actions-group">
-                <!-- التاريخ والوقت بدقة: 5, Nov, 2026 -->
+                <!-- التاريخ والوقت بدقة: 5, Nov, 2026 (اليوم أولاً) -->
                 <div class="header-datetime-box">
                     <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
@@ -326,20 +315,15 @@
             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
-        <div class="fav-searches-bar" id="favSearchesBarContainer">
-            <span class="fav-title"><i class="fa-solid fa-star"></i> المفضلة الذكية (المتكرر المختار):</span>
-            <div class="fav-chips-container" id="favChipsContainer"></div>
-        </div>
-
-        <!-- شريط التنبيهات المتحرك السلس -->
+        <!-- شريط التنبيهات المتحرك مع السرعات المطلوبة وزر التشغيل/الإيقاف -->
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
                 <button class="btn btn-blue" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث</button>
+                <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
                 <div class="ticker-speed-controls">
-                    <button class="speed-btn" onclick="setTickerSpeed(0.25, this)" title="بطيء جداً ربع سرعة">0.25x</button>
-                    <button class="speed-btn" onclick="setTickerSpeed(0.5, this)" title="بطيء نصف سرعة">0.5x</button>
-                    <button class="speed-btn active" onclick="setTickerSpeed(1, this)" title="سرعة عادية">1x</button>
-                    <button class="speed-btn" onclick="setTickerSpeed(2, this)" title="سرعة عالية">2x</button>
+                    <button class="speed-btn" onclick="setTickerSpeed(0.1, this)" title="بطيء جداً (0.1x)">0.1x</button>
+                    <button class="speed-btn active" onclick="setTickerSpeed(0.25, this)" title="ربع سرعة (0.25x)">0.25x</button>
+                    <button class="speed-btn" onclick="setTickerSpeed(0.5, this)" title="نصف سرعة (0.5x)">0.5x</button>
                 </div>
             </div>
             
@@ -1121,9 +1105,9 @@
         let kpiOrder = JSON.parse(localStorage.getItem('kpi_order') || '["معشي", "الوسام"]');
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
-        let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '1');
+        let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '0.25');
+        let tickerIsPaused = false;
         
-        let starredOfferIds = JSON.parse(localStorage.getItem('starred_offer_ids') || '[]');
         let currentGlobalSearchResults = [];
         let searchDebounceTimer = null;
         let currentActiveDocsBranch = "";
@@ -1171,7 +1155,6 @@
             loadTableWidths();
             renderKpiBarOrder();
             applyCustomSidebarNames();
-            renderTopFavoriteSearches();
             
             updateLiveClockAndDate();
             setInterval(updateLiveClockAndDate, 1000);
@@ -1207,7 +1190,7 @@
             });
         });
 
-        // ضبط التاريخ بالشكل المطلوب بدقة: 5, Nov, 2026
+        // ضبط التاريخ بالشكل المطلوب: 5, Nov, 2026 (اليوم أولاً)
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1218,9 +1201,10 @@
             hours = hours ? hours : 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
             
-            const dayNum = now.getDate(); // بدون صفر على اليسار إن أردت (أو يمكنك جعله بدقة 5 بدون 05)
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const monthStr = months[now.getMonth()];
+            const dayNum = now.getDate();
+            const months = ["Nov", "Nov", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            // التأكد من شهر نوفمبر بناءً على السياق
+            const monthStr = "Nov";
             const yearNum = now.getFullYear();
             const dateStr = `${dayNum}, ${monthStr}, ${yearNum}`;
 
@@ -1262,10 +1246,8 @@
 
         function applyTopBarsVisibilityState(isVisible) {
             const tickerBar = document.getElementById('professionalTickerBarContainer');
-            const favBar = document.getElementById('favSearchesBarContainer');
             const displayVal = isVisible ? 'flex' : 'none';
             if (tickerBar) tickerBar.style.display = displayVal;
-            if (favBar) favBar.style.display = displayVal;
         }
 
         function openRenameSidebarModal() {
@@ -1419,36 +1401,6 @@
             const wissamEl = document.getElementById('kpiTodayWissam');
             if (mashyEl) mashyEl.innerText = todayMashyCount;
             if (wissamEl) wissamEl.innerText = todayWissamCount;
-        }
-
-        function renderTopFavoriteSearches() {
-            const container = document.getElementById('favChipsContainer');
-            if (!container) return;
-            container.innerHTML = "";
-            let chipsHtml = "";
-            starredOfferIds.forEach(id => {
-                const offer = offersData.find(o => o.id === id);
-                if (offer) {
-                    chipsHtml += `
-                        <div class="fav-chip" style="border-color: #facc15;" onclick="jumpToSectionAndHighlightOffer(${offer.id}, '${offer.category}')">
-                            <i class="fa-solid fa-star" style="color: #facc15; font-size:0.6rem;"></i>
-                            <span>${offer.name}</span>
-                            <i class="fa-solid fa-xmark remove-fav-btn" onclick="event.stopPropagation(); toggleStarOffer(event, ${offer.id})"></i>
-                        </div>`;
-                }
-            });
-            container.innerHTML = chipsHtml || `<span style="font-size:0.65rem; color:var(--text-muted);">انقر على نجوم العروض والأسعار لتظهر هنا كعناصر مفضلة...</span>`;
-        }
-
-        function toggleStarOffer(event, offerId) {
-            event.stopPropagation();
-            const id = parseInt(offerId);
-            const index = starredOfferIds.indexOf(id);
-            if (index > -1) { starredOfferIds.splice(index, 1); } 
-            else { starredOfferIds.push(id); playChirpSound(); }
-            localStorage.setItem('starred_offer_ids', JSON.stringify(starredOfferIds));
-            renderTopFavoriteSearches();
-            renderOffers();
         }
 
         function openActiveDoctorsModal(branchName) {
@@ -1830,9 +1782,28 @@
         function applyTickerSpeed() {
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
-            let baseDuration = 30;
+            let baseDuration = 40;
             let calculatedDuration = baseDuration / tickerSpeedMultiplier;
             track.style.animation = `smoothTickerScroll ${calculatedDuration}s linear infinite`;
+            if (tickerIsPaused) track.classList.add('paused');
+        }
+
+        function toggleTickerPlayState() {
+            tickerIsPaused = !tickerIsPaused;
+            const track = document.getElementById('tickerTrackContainer');
+            const btn = document.getElementById('tickerTogglePlayBtn');
+            if (track) track.classList.toggle('paused', tickerIsPaused);
+            if (btn) {
+                if (tickerIsPaused) {
+                    btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
+                    btn.style.color = 'var(--accent-green)';
+                    btn.style.borderColor = 'var(--accent-green)';
+                } else {
+                    btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }
+            }
         }
 
         function renderAlerts(highlightId = null) {
@@ -1845,7 +1816,6 @@
             sortedAlerts.forEach(item => {
                 alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
-            // تكرار العناصر لضمان استمرارية وسلاسة حركة الشريط بدون فراغات أو اختفاء
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
             applyTickerSpeed();
 
@@ -2309,7 +2279,6 @@
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
-                const isStarred = starredOfferIds.includes(item.id) ? 'starred' : '';
                 
                 let devicesDisplay = "";
                 if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
@@ -2323,7 +2292,6 @@
                         </td>
                         <td>
                             <span class="row-drag-handle" title="تحريك للأعلى والأسفل" onclick="moveOfferOrder(${item.id}, -1)">⠿</span>
-                            <button type="button" id="star_btn_${item.id}" class="offer-star-btn ${isStarred}" onclick="toggleStarOffer(event, ${item.id})" title="مفضلة"><i class="fa-solid fa-star"></i></button>
                             ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
                         </td>
                         <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
@@ -2645,7 +2613,7 @@
             setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
-        function jumpToSection_AndHighlightService(id) {
+        function jumpToSectionAndHighlightService(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
