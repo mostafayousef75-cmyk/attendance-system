@@ -246,7 +246,7 @@
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
             <span class="cloud-dot"></span>
-            <span>جاري الاتصال...</span>
+            <span>متصل بالسحابة</span>
         </div>
 
         <div class="theme-box">
@@ -1152,42 +1152,28 @@
                 }
             });
 
-            // بدء المزامنة الذكية مع السحابة والكاش المحلي
-            initCloudSync();
-        });
-
-        // نظام المزامنة السريعة مع الكاش المباشر
-        function initCloudSync() {
-            const cachedData = localStorage.getItem('clinic_cache_master');
-            if (cachedData) {
-                try {
-                    applyDataToApp(JSON.parse(cachedData));
-                } catch(e) {}
-            }
-
             db.ref('clinicData').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    applyDataToApp(data);
-                    localStorage.setItem('clinic_cache_master', JSON.stringify(data));
+                    doctorsData = data.doctorsData || [];
+                    fridaySchedules = data.fridaySchedules || [];
+                    alertsData = data.alertsData || [];
+                    coordinatorsData = data.coordinatorsData || [];
+                    deptServicesData = data.deptServicesData || [];
+                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
+                    offersData = data.offersData || [];
+                    inquiriesData = data.inquiriesData || [];
+                } else {
+                    loadDefaultData();
                 }
+
+                refreshAllViews();
             }, (error) => {
-                console.error("Firebase Read Error:", error);
+                console.error("Firebase read error, loading defaults:", error);
+                loadDefaultData();
+                refreshAllViews();
             });
-        }
-
-        function applyDataToApp(data) {
-            doctorsData = data.doctorsData || [];
-            fridaySchedules = data.fridaySchedules || [];
-            alertsData = data.alertsData || [];
-            coordinatorsData = data.coordinatorsData || [];
-            deptServicesData = data.deptServicesData || [];
-            deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
-            offersData = data.offersData || [];
-            inquiriesData = data.inquiriesData || [];
-
-            refreshAllViews();
-        }
+        });
 
         function updateLiveClockAndDate() {
             const now = new Date();
@@ -1208,6 +1194,16 @@
             const dateEl = document.getElementById('liveDateDisplay');
             if (clockEl) clockEl.innerText = timeStr;
             if (dateEl) dateEl.innerText = dateStr;
+        }
+
+        function loadDefaultData() {
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
+            fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
+            deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
+            inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", tags: "رتوش، ليزر", color: "card-darkblue" }];
+            offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "عرض نوفمبر. عروض", tags: "عروض، أسنان", isPinned: true }];
+            syncToCloud();
         }
 
         function refreshAllViews() {
@@ -1347,11 +1343,9 @@
         }
 
         function syncToCloud() {
-            const fullData = { 
+            db.ref('clinicData').set({ 
                 doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData
-            };
-            localStorage.setItem('clinic_cache_master', JSON.stringify(fullData));
-            db.ref('clinicData').set(fullData);
+            });
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -1449,34 +1443,25 @@
         function triggerImportJSON() { document.getElementById('jsonFileInput').click(); }
 
         function importJSON(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                
-                // التأكد من قبول الملف حتى لو ناقص بعض المفاتيح الفرعية
-                doctorsData = data.doctorsData || [];
-                fridaySchedules = data.fridaySchedules || [];
-                alertsData = data.alertsData || [];
-                coordinatorsData = data.coordinatorsData || [];
-                deptServicesData = data.deptServicesData || [];
-                deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
-                offersData = data.offersData || [];
-                inquiriesData = data.inquiriesData || [];
-
-                // الحفظ الفوري والسحب على السحابة
-                syncToCloud(); 
-                playChirpSound(); 
-                alert("تم الاستيراد بنجاح وحفظ البيانات على السحابة!");
-            } catch (err) { 
-                console.error("JSON Parse Error:", err);
-                alert("⚠️ الملف غير صالح أو تنسيق الـ JSON غير صحيح!"); 
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.doctorsData) doctorsData = data.doctorsData;
+                        if (data.fridaySchedules) fridaySchedules = data.fridaySchedules;
+                        if (data.alertsData) alertsData = data.alertsData;
+                        if (data.coordinatorsData) coordinatorsData = data.coordinatorsData;
+                        if (data.deptServicesData) deptServicesData = data.deptServicesData;
+                        if (data.deptNotesData) deptNotesData = data.deptNotesData;
+                        if (data.offersData) offersData = data.offersData;
+                        if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        syncToCloud(); playChirpSound(); alert("تم الاستيراد بنجاح!");
+                    } catch (err) { alert("ملف غير صالح!"); }
+                };
+                reader.readAsText(input.files[0]);
             }
-        };
-        reader.readAsText(input.files[0]);
-    }
-}
+        }
 
         function openFridayScheduleModal() {
             document.getElementById('fridayEditId').value = ""; document.getElementById('fridayDate').value = ""; document.getElementById('fridayDocName').value = "";
@@ -1535,6 +1520,7 @@
 
         function cleanSearchText(str) { return normalizeArabicText(str); }
 
+        // سحب وإفلات خفيف ونظيف من الأيقونة فقط بدون أي تهنيج أو ذبذبة أو تأثيرات بصرية مزعجة
         function enableHandleDrag(handleEl, cardEl, type, index) {
             handleEl.setAttribute('draggable', 'true');
             
@@ -2632,19 +2618,19 @@
                         </div>
                     </div>`;
             });
-            updateSelectedCountDisplay();
+            updateSelectedSearchCountDisplay();
         }
 
         function handleSearchCheckboxChange(resId, chk) {
             if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
             else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
-            updateSelectedCountDisplay();
+            updateSelectedSearchCountDisplay();
         }
 
         function toggleSelectAllGlobalSearch(masterChk) {
             selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
             document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
-            updateSelectedCountDisplay();
+            updateSelectedSearchCountDisplay();
         }
 
         function updateSelectedCountDisplay() {
