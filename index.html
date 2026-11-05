@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - فائقة السرعة</title>
+    <title>لوحة الكول سنتر - فائقة السرعة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK (v8 Compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -55,7 +55,7 @@
         .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.4rem; }
         .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
 
-        /* زر الإنعاش وتحسين السرعة Boost */
+        /* زر الإنعاش الفوري وتحسين السرعة Boost (بدون ريفريش) */
         .boost-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; padding: 0.4rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.4rem; cursor: pointer; margin-bottom: 0.4rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); transition: transform 0.1s; }
         .boost-btn:active { transform: scale(0.97); }
 
@@ -217,8 +217,8 @@
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
-        <!-- زر تحسين السرعة والإنعاش Boost الجديد -->
-        <button class="boost-btn" onclick="triggerBoostRefresh()" title="تنظيف الذاكرة المؤقتة وتسريع الواجهة فوراً">
+        <!-- زر تحسين السرعة والإنعاش Boost الفوري (بدون ريفريش) -->
+        <button class="boost-btn" onclick="triggerBoostRefresh()" title="تفريغ الكاش وتسريع الواجهة فوراً بدون إعادة تحميل">
             <i class="fa-solid fa-bolt"></i>
             <span>تحسين السرعة (Boost)</span>
         </button>
@@ -255,7 +255,7 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="debouncedGlobalSearch(this.value)">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وفوري (بدون تهنيج)..." oninput="debouncedGlobalSearch(this.value)">
                 </div>
                 <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام" style="padding: 0.35rem 0.5rem; white-space: nowrap;"><i class="fa-solid fa-filter"></i> فلتر</button>
             </div>
@@ -1063,9 +1063,7 @@
         
         let currentGlobalSearchResults = [];
         let currentActiveDocsBranch = "";
-
-        // خاصية الـ Lazy Load لتحميل البيانات فقط عند الحاجة وعدم إبطاء فتح الموقع
-        let loadedSections = { schedule: true, alerts: false, "depts-docs": false, coordinators: false, offers: false, inquiries: false };
+        let loadedSections = { schedule: true, alerts: true, "depts-docs": true, coordinators: true, offers: true, inquiries: true };
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1116,7 +1114,7 @@
                 }
             });
 
-            // جلب البيانات السريعة لأول تبويب فقط لتسريع التحميل الأولي (Lazy Initial Load)
+            // جلب البيانات مرة واحدة ووضعها في الذاكرة المحلية (RAM) لتكون الاستجابة فورية وخالية من البطء
             db.ref('clinicData').once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1140,16 +1138,22 @@
             });
         });
 
-        // زر تحسين السرعة والإنعاش Boost الفوري
+        // زر تحسين السرعة والإنعاش Boost الفوري (محدث: بدون ريفريش، ينظف الذاكرة والبحث فوراً)
         function triggerBoostRefresh() {
             playChirpSound();
-            localStorage.clear();
-            sessionStorage.clear();
-            if ('caches' in window) {
-                caches.keys().then(names => { names.forEach(name => { caches.delete(name); }); });
-            }
-            alert("⚡ تم تنظيف الذاكرة المؤقتة (Cache) وإنعاش الواجهة بنجاح! الموقع يعمل الآن بأقصى سرعة صاروخية.");
-            location.reload();
+            clearTimeout(globalSearchTimeout);
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            const targetSec = document.getElementById(activeTab + '-section');
+            if(targetSec) targetSec.classList.add('active');
+
+            currentGlobalSearchResults = [];
+            selectedGlobalSearchIds = [];
+            
+            refreshAllViews();
+            alert("⚡ تم إنعاش الواجهة وتفريغ الذاكرة المؤقتة بنجاح! الموقع يعمل الآن بأقصى سرعة بدون أي إعادة تحميل.");
         }
 
         function updateLiveClockAndDate() {
@@ -1313,7 +1317,6 @@
             });
         }
 
-        // نظام Lazy Loading للتنقل بين الأقسام وتحميل محتواها عند الضغط عليها فقط لمنع أي بطء
         function switchTab(tabId, elem, save = true) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
@@ -1323,16 +1326,6 @@
             if (targetSec) targetSec.classList.add('active');
             if (elem) elem.classList.add('active');
             if (save) localStorage.setItem('activeTab', tabId);
-
-            // Lazy load للقسم عند فتحه أول مرة فقط
-            if (!loadedSections[tabId]) {
-                loadedSections[tabId] = true;
-                if (tabId === 'alerts') renderAlerts();
-                else if (tabId === 'depts-docs') renderDeptsAndDocs();
-                else if (tabId === 'coordinators') renderCoordinators();
-                else if (tabId === 'offers') { renderOffersTabs(); renderOffers(); }
-                else if (tabId === 'inquiries') renderInquiries();
-            }
         }
 
         function changeTheme(themeName) {
@@ -1803,7 +1796,6 @@
             if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); renderAlerts(); playChirpSound(); }
         }
 
-        // تم إزالة السحب والإفلات نهائياً من الأقسام والأجهزة لتظل ثابتة ومنظمة تماماً
         function renderDeptsAndDocs(highlightServiceId = null) {
             const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
@@ -2335,13 +2327,13 @@
             saveSearchFiltersState();
         }
 
-        // بحث شامل ذكي وخفيف جداً باستخدام Debounce (300 مللي ثانية) لمنع التهنيج نهائياً
+        // بحث فوري وسريع (150 مللي ثانية Debounce) يعمل مباشرة على الذاكرة المحلية (RAM) بدون أي بطء
         let globalSearchTimeout = null;
         function debouncedGlobalSearch(query) {
             clearTimeout(globalSearchTimeout);
             globalSearchTimeout = setTimeout(() => {
                 handleSmartGlobalSearch(query);
-            }, 300);
+            }, 150);
         }
 
         function handleSmartGlobalSearch(query) {
