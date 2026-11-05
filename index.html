@@ -84,10 +84,10 @@
         .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.3rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
         .kpi-num { font-weight: 800; font-size: 0.75rem; }
 
-        /* الترتيب الجديد: التاريخ أولاً على اليمين ثم الساعة على اليسار */
+        /* الترتيب المطلوب: الوقت على اليمين والتاريخ على الشمال (5/11/2026) */
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
-        .header-date-text { color: var(--primary-color); font-weight: 800; }
         .header-time-text { color: #38bdf8; font-weight: 800; }
+        .header-date-text { color: var(--primary-color); font-weight: 800; }
 
         /* شريط التنبيهات المتحرك - اتجاه اليمين */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
@@ -150,7 +150,6 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.62rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        /* أيقونة السحب حصرياً بالضغط والإمساك بها */
         .card-drag-handle { cursor: grab; color: #facc15; font-size: 0.85rem; padding: 2px 5px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); vertical-align: middle; margin-left: 4px; user-select: none; }
         .card-drag-handle:active { cursor: grabbing; }
 
@@ -276,19 +275,19 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="debouncedGlobalSearch()">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="handleSmartGlobalSearch(this.value)">
                 </div>
                 <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام" style="padding: 0.35rem 0.5rem; white-space: nowrap;"><i class="fa-solid fa-filter"></i> فلتر</button>
             </div>
 
             <div class="header-actions-group">
-                <!-- الترتيب المحدث: التاريخ أولاً على اليمين ثم الساعة على اليسار -->
+                <!-- الترتيب المحدث: الوقت على اليمين والتاريخ على الشمال (5/11/2026) -->
                 <div class="header-datetime-box">
-                    <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
-                    <span id="liveDateDisplay" class="header-date-text">5,Nov,2026</span>
-                    <span style="color:var(--border-color);">|</span>
                     <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
+                    <span style="color:var(--border-color);">|</span>
+                    <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
+                    <span id="liveDateDisplay" class="header-date-text">5/11/2026</span>
                 </div>
 
                 <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
@@ -1111,10 +1110,8 @@
         let tickerIsPaused = false;
         
         let currentGlobalSearchResults = [];
-        let searchDebounceTimer = null;
         let currentActiveDocsBranch = "";
 
-        // متغيرات التحكم بالسحب والإفلات عن طريق الأيقونة فقط
         let draggedType = null;
         let draggedIndex = null;
 
@@ -1193,7 +1190,7 @@
             });
         });
 
-        // تم ضبط الترتيب: التاريخ أولاً على اليمين ثم الساعة على اليسار بالتنسيق المطلوب (5,Nov,2026)
+        // ضبط الوقت على اليمين والتاريخ على الشمال بصيغة 5/11/2026
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1204,10 +1201,10 @@
             hours = hours ? hours : 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
             
-            const dayNum = now.getDate();
-            const monthStr = "Nov";
+            const dayNum = String(now.getDate()).padStart(2, '0');
+            const monthNum = String(now.getMonth() + 1).padStart(2, '0');
             const yearNum = now.getFullYear();
-            const dateStr = `${dayNum},${monthStr},${yearNum}`;
+            const dateStr = `${dayNum}/${monthNum}/${yearNum}`;
 
             const clockEl = document.getElementById('liveClockDisplay');
             const dateEl = document.getElementById('liveDateDisplay');
@@ -1575,7 +1572,6 @@
 
         function cleanSearchText(str) { return normalizeArabicText(str); }
 
-        // --- محرك السحب والإفلات حصرياً عن طريق الأيقونة ---
         function enableHandleDrag(handleEl, cardEl, type, index) {
             handleEl.setAttribute('draggable', 'true');
             handleEl.onmousedown = () => { cardEl.setAttribute('draggable', 'true'); };
@@ -1883,8 +1879,11 @@
             sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
-                    if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
-                    else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
+                    if (item.mediaType === "pdf") {
+                        mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
+                    } else {
+                        mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
+                    }
                 }
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
@@ -2544,14 +2543,7 @@
             saveSearchFiltersState();
         }
 
-        function debouncedGlobalSearch() {
-            clearTimeout(searchDebounceTimer);
-            searchDebounceTimer = setTimeout(() => {
-                const query = document.getElementById('globalSearchInput').value;
-                handleSmartGlobalSearch(query);
-            }, 50);
-        }
-
+        // بحث شامل ولحظي 100% بدون أي تأخير أو انتظار
         function handleSmartGlobalSearch(query) {
             let rawQ = query.trim();
             if (!rawQ) {
