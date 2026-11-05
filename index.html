@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - النسخة الخارقة والسريعة</title>
+    <title>لوحة الكول سنتر والمنسقين - النسخة الفورية السريعة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -1067,10 +1067,10 @@
         
         let currentGlobalSearchResults = [];
 
-        // نظام التخزين المؤقت الفوري (Instant Cache First) لمنع شاشة الانتظار
+        // نظام التحميل الفوري من الذاكرة المحلية (Instant Cache First)
         function loadFromLocalStorageCache() {
             try {
-                const cached = localStorage.getItem('clinic_data_cache_v2');
+                const cached = localStorage.getItem('clinic_data_cache_v3');
                 if (cached) {
                     const data = JSON.parse(cached);
                     doctorsData = data.doctorsData || [];
@@ -1090,7 +1090,7 @@
         function saveToLocalStorageCache() {
             try {
                 const data = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                localStorage.setItem('clinic_data_cache_v2', JSON.stringify(data));
+                localStorage.setItem('clinic_data_cache_v3', JSON.stringify(data));
             } catch(e){}
         }
 
@@ -1144,7 +1144,7 @@
                 }
             });
 
-            // تحميل فوري من الذاكرة المحلية (بدون أي انتظار)
+            // تحميل فوري وصاروخي بدون شاشة انتظار
             if (loadFromLocalStorageCache()) {
                 refreshAllViews();
             } else {
@@ -1152,7 +1152,7 @@
                 refreshAllViews();
             }
 
-            // الاستماع للسحابة للتحديث التلقائي بصمت وبدون تداخل
+            // الاستماع للسحابة للتحديث التلقائي بصمت
             db.ref('clinicData').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1312,19 +1312,18 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('appSidebar');
-            sidebar.classList.collapsed; // syntax check
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        // الحفظ الفوري المزدوج (محلياً وفي السحابة مع بعض لضمان عدم ضياع التعديلات)
+        // الحفظ الفوري المزدوج (محلياً وفي السحابة معاً لضمان عدم ضياع أي إضافة)
         function syncToCloud() {
             saveToLocalStorageCache();
             refreshAllViews();
             db.ref('clinicData').set({ 
                 doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData
             }).catch(err => {
-                console.log("Cloud save notice: " + err.message);
+                console.log("Cloud sync notice: " + err.message);
             });
         }
 
