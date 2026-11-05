@@ -55,7 +55,7 @@
         .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.4rem; }
         .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
 
-        /* زر الإنعاش الفوري وتحسين السرعة Boost (بدون ريفريش) */
+        /* زر الإنعاش الفوري وتحسين السرعة Boost (بدون ريفريش وبدون شاشة فاضية) */
         .boost-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; padding: 0.4rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.4rem; cursor: pointer; margin-bottom: 0.4rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); transition: transform 0.1s; }
         .boost-btn:active { transform: scale(0.97); }
 
@@ -217,7 +217,7 @@
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
-        <!-- زر تحسين السرعة والإنعاش Boost الفوري (بدون ريفريش) -->
+        <!-- زر تحسين السرعة والإنعاش Boost الفوري (محدث: فوري وبدون شاشة فاضية) -->
         <button class="boost-btn" onclick="triggerBoostRefresh()" title="تفريغ الكاش وتسريع الواجهة فوراً بدون إعادة تحميل">
             <i class="fa-solid fa-bolt"></i>
             <span>تحسين السرعة (Boost)</span>
@@ -255,7 +255,7 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وفوري (بدون تهنيج)..." oninput="debouncedGlobalSearch(this.value)">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وفوري (يلتزم بالفلتر)..." oninput="debouncedGlobalSearch(this.value)">
                 </div>
                 <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام" style="padding: 0.35rem 0.5rem; white-space: nowrap;"><i class="fa-solid fa-filter"></i> فلتر</button>
             </div>
@@ -427,7 +427,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (الأجهزة والخدمات - ثابتة بدون سحب وإفلات) -->
+            <!-- 3. الأقسام والأطباء (الأجهزة والخدمات) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2>أقسام وفروع وخدمات العيادات (ثابتة ومنظمة)</h2>
@@ -1063,7 +1063,6 @@
         
         let currentGlobalSearchResults = [];
         let currentActiveDocsBranch = "";
-        let loadedSections = { schedule: true, alerts: true, "depts-docs": true, coordinators: true, offers: true, inquiries: true };
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1114,7 +1113,7 @@
                 }
             });
 
-            // جلب البيانات مرة واحدة ووضعها في الذاكرة المحلية (RAM) لتكون الاستجابة فورية وخالية من البطء
+            // جلب البيانات مرة واحدة ووضعها في الذاكرة المحلية (RAM)
             db.ref('clinicData').once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1138,11 +1137,9 @@
             });
         });
 
-        // زر تحسين السرعة والإنعاش Boost الفوري (محدث: بدون ريفريش، ينظف الذاكرة والبحث فوراً)
+        // زر تحسين السرعة والإنعاش Boost الفوري (محدث: فوري تماماً وبدون شاشة فاضية وبدون ريفريش)
         function triggerBoostRefresh() {
             playChirpSound();
-            clearTimeout(globalSearchTimeout);
-            document.getElementById('globalSearchInput').value = "";
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
@@ -1153,7 +1150,7 @@
             selectedGlobalSearchIds = [];
             
             refreshAllViews();
-            alert("⚡ تم إنعاش الواجهة وتفريغ الذاكرة المؤقتة بنجاح! الموقع يعمل الآن بأقصى سرعة بدون أي إعادة تحميل.");
+            alert("⚡ تم إنعاش الواجهة وتفريغ الذاكرة المؤقتة بنجاح! الموقع يعمل الآن بأقصى سرعة.");
         }
 
         function updateLiveClockAndDate() {
@@ -2327,7 +2324,7 @@
             saveSearchFiltersState();
         }
 
-        // بحث فوري وسريع (150 مللي ثانية Debounce) يعمل مباشرة على الذاكرة المحلية (RAM) بدون أي بطء
+        // بحث فوري وسريع يلتزم حصرياً بالأقسام المحددة في الفلتر اليدوي
         let globalSearchTimeout = null;
         function debouncedGlobalSearch(query) {
             clearTimeout(globalSearchTimeout);
@@ -2362,78 +2359,94 @@
                 return normalizeArabicText(text).includes(normQ);
             };
 
-            doctorsData.forEach(d => {
-                if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.notes) || isMatch(d.tags)) {
-                    let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
-                    currentGlobalSearchResults.push({
-                        id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
-                        subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
-                        copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
-                    });
-                }
+            const enabledCats = {};
+            document.querySelectorAll('.search-cat-chk').forEach(chk => {
+                enabledCats[chk.value] = chk.checked;
             });
 
-            offersData.forEach(o => {
-                const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
-                if (isMatch(combinedOfferText)) {
-                    let priceSummary = o.price ? "السعر: " + o.price : "";
-                    currentGlobalSearchResults.push({
-                        id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
-                        subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
-                        source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
-                    });
-                }
-            });
+            if (enabledCats['doctors'] !== false) {
+                doctorsData.forEach(d => {
+                    if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.notes) || isMatch(d.tags)) {
+                        let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
+                        currentGlobalSearchResults.push({
+                            id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
+                            subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
+                            copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
+                        });
+                    }
+                });
+            }
 
-            alertsData.forEach(a => {
-                if (isMatch(a.content) || isMatch(a.tags)) {
-                    currentGlobalSearchResults.push({
-                        id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
-                        copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
-                    });
-                }
-            });
+            if (enabledCats['offers'] !== false) {
+                offersData.forEach(o => {
+                    const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
+                    if (isMatch(combinedOfferText)) {
+                        let priceSummary = o.price ? "السعر: " + o.price : "";
+                        currentGlobalSearchResults.push({
+                            id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
+                            subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
+                            source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
+                        });
+                    }
+                });
+            }
 
-            inquiriesData.forEach(i => {
-                if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
-                    currentGlobalSearchResults.push({
-                        id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
-                        copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
-                        source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
-                    });
-                }
-            });
+            if (enabledCats['alerts'] !== false) {
+                alertsData.forEach(a => {
+                    if (isMatch(a.content) || isMatch(a.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
+                            copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
+                        });
+                    }
+                });
+            }
 
-            deptServicesData.forEach(s => {
-                if (isMatch(s.name) || isMatch(s.tags)) {
-                    currentGlobalSearchResults.push({
-                        id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
-                        copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
-                    });
-                }
-            });
+            if (enabledCats['inquiries'] !== false) {
+                inquiriesData.forEach(i => {
+                    if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
+                            copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
+                            source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
+                        });
+                    }
+                });
+            }
 
-            deptNotesData.forEach((n, idx) => {
-                if (isMatch(n.text) || isMatch(n.tags)) {
-                    currentGlobalSearchResults.push({
-                        id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
-                        copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
-                    });
-                }
-            });
+            if (enabledCats['services'] !== false) {
+                deptServicesData.forEach(s => {
+                    if (isMatch(s.name) || isMatch(s.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
+                            copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
+                        });
+                    }
+                });
+                deptNotesData.forEach((n, idx) => {
+                    if (isMatch(n.text) || isMatch(n.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
+                            copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
+                        });
+                    }
+                });
+            }
 
-            coordinatorsData.forEach(c => {
-                let rulesText = c.rules ? c.rules.join(' ') : '';
-                if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
-                    currentGlobalSearchResults.push({
-                        id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
-                        copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
-                    });
-                }
-            });
+            if (enabledCats['coordinators'] !== false) {
+                coordinatorsData.forEach(c => {
+                    let rulesText = c.rules ? c.rules.join(' ') : '';
+                    if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
+                        currentGlobalSearchResults.push({
+                            id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
+                            copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
+                        });
+                    }
+                });
+            }
 
             if (currentGlobalSearchResults.length === 0) {
-                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
+                resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة.</div>`;
                 return;
             }
 
