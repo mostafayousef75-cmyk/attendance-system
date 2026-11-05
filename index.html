@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - النسخة الفورية السريعة</title>
+    <title>لوحة الكول سنتر والمنسقين - النسخة الفورية الخارقة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -1067,10 +1067,10 @@
         
         let currentGlobalSearchResults = [];
 
-        // نظام التحميل الفوري من الذاكرة المحلية (Instant Cache First)
+        // نظام التحميل الفوري الصاروخي (Instant Local Storage Cache)
         function loadFromLocalStorageCache() {
             try {
-                const cached = localStorage.getItem('clinic_data_cache_v3');
+                const cached = localStorage.getItem('clinic_data_cache_v4');
                 if (cached) {
                     const data = JSON.parse(cached);
                     doctorsData = data.doctorsData || [];
@@ -1090,7 +1090,7 @@
         function saveToLocalStorageCache() {
             try {
                 const data = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                localStorage.setItem('clinic_data_cache_v3', JSON.stringify(data));
+                localStorage.setItem('clinic_data_cache_v4', JSON.stringify(data));
             } catch(e){}
         }
 
@@ -1144,7 +1144,7 @@
                 }
             });
 
-            // تحميل فوري وصاروخي بدون شاشة انتظار
+            // الخطوة الحاسمة: تحميل الداتا فوراً من ذاكرة الجهاز المحلية (بدون انتظار السحابة نهائياً)
             if (loadFromLocalStorageCache()) {
                 refreshAllViews();
             } else {
@@ -1152,20 +1152,23 @@
                 refreshAllViews();
             }
 
-            // الاستماع للسحابة للتحديث التلقائي بصمت
-            db.ref('clinicData').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    doctorsData = data.doctorsData || [];
-                    fridaySchedules = data.fridaySchedules || [];
-                    alertsData = data.alertsData || [];
-                    coordinatorsData = data.coordinatorsData || [];
-                    deptServicesData = data.deptServicesData || [];
-                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
-                    offersData = data.offersData || [];
-                    inquiriesData = data.inquiriesData || [];
-                    saveToLocalStorageCache();
-                    refreshAllViews();
+            // تحميل بيانات السحابة مرة واحدة فقط عند فتح الصفحة في الخلفية دون إعادة كتابة البيانات المحلية فوق إضافاتك الجديدة
+            db.ref('clinicData').once('value').then((snapshot) => {
+                const cloudData = snapshot.val();
+                if (cloudData) {
+                    // دمج البيانات أو جلبها إذا كانت الذاكرة المحلية فارغة
+                    if (doctorsData.length <= 1 && cloudData.doctorsData) {
+                        doctorsData = cloudData.doctorsData;
+                        fridaySchedules = cloudData.fridaySchedules || [];
+                        alertsData = cloudData.alertsData || [];
+                        coordinatorsData = cloudData.coordinatorsData || [];
+                        deptServicesData = cloudData.deptServicesData || [];
+                        deptNotesData = cloudData.deptNotesData || [];
+                        offersData = cloudData.offersData || [];
+                        inquiriesData = cloudData.inquiriesData || [];
+                        saveToLocalStorageCache();
+                        refreshAllViews();
+                    }
                 }
             });
         });
@@ -1316,7 +1319,7 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        // الحفظ الفوري المزدوج (محلياً وفي السحابة معاً لضمان عدم ضياع أي إضافة)
+        // الحفظ الفوري المزدوج (محلياً وفي السحابة معاً لضمان تثبيت إضافاتك للأبد)
         function syncToCloud() {
             saveToLocalStorageCache();
             refreshAllViews();
@@ -2420,115 +2423,4 @@
                 });
 
                 coordinatorsData.forEach(c => {
-                    let rulesText = c.rules ? c.rules.join(' ') : '';
-                    if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
-                        currentGlobalSearchResults.push({
-                            id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
-                            copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
-                        });
-                    }
-                });
-
-                if (currentGlobalSearchResults.length === 0) {
-                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
-                    return;
-                }
-
-                currentGlobalSearchResults.forEach((res) => {
-                    const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
-                    resultsList.innerHTML += `
-                        <div class="search-result-card">
-                            <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
-                                <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
-                                <div>
-                                    <span class="source-badge">${res.source}</span>
-                                    <h4>${res.title}</h4>
-                                    <p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:0.25rem;">
-                                <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'")}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
-                                <button class="btn btn-blue" onclick="${res.action}">عرض</button>
-                            </div>
-                        </div>`;
-                });
-                updateSelectedCountDisplay();
-            }, 100);
-        }
-
-        function handleSearchCheckboxChange(resId, chk) {
-            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
-            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
-            updateSelectedCountDisplay();
-        }
-
-        function toggleSelectAllGlobalSearch(masterChk) {
-            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
-            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
-            updateSelectedCountDisplay();
-        }
-
-        function updateSelectedCountDisplay() {
-            const countSpan = document.getElementById('selectedSearchCountNum');
-            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
-        }
-
-        function copySelectedGlobalSearchResults() {
-            if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
-            let blocks = [];
-            currentGlobalSearchResults.forEach(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
-            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
-        }
-
-        function copyAllGlobalSearchResults() {
-            if (!currentGlobalSearchResults || currentGlobalSearchResults.length === 0) return alert("لا توجد نتائج بحث حالية لنسخها!");
-            let blocks = currentGlobalSearchResults.map(r => r.copyText);
-            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ جميع نتائج البحث دفعة واحدة!");
-        }
-
-        function clearGlobalSearch() {
-            document.getElementById('globalSearchInput').value = "";
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
-            const activeTab = localStorage.getItem('activeTab') || 'schedule';
-            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
-        }
-
-        function jumpToSectionAndHighlightDoc(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
-            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightOffer(id, cat) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
-            selectedOfferTab = cat; renderOffersTabs();
-            setTimeout(() => { renderOffers(id); document.getElementById('offer_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightInquiry(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
-            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightCoordinator(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
-            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightService(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
-            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function openLightbox(imgSrc) {
-            document.getElementById('lightboxImg').src = imgSrc;
-            document.getElementById('lightboxModal').classList.add('active');
-        }
-    </script>
-</body>
-</html>
+                    let rulesText = c.rules ? c.
