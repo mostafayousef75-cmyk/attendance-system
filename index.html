@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - متصل بالسحابة (Firebase)</title>
+    <title>لوحة الكول سنتر والمنسقين - نظام محلي أولاً (Local-First)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -237,7 +237,7 @@
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
             <span class="cloud-dot"></span>
-            <span>متصل بالسحابة (Firebase)</span>
+            <span>متصل بالسحابة (محلي أولاً)</span>
         </div>
 
         <div class="theme-box">
@@ -1042,9 +1042,9 @@
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة (Firebase)</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة (مزامنة خلفية صامتة)</span>`;
             } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل بالسحابة (وضع العمل دون إنترنت)</span>`;
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل بالإنترنت (يعمل محلياً بكفاءة)</span>`;
             }
         });
 
@@ -1144,6 +1144,7 @@
                 }
             });
 
+            // 1. التشغيل المحلي الفوري (Local-First) بلا انتظار
             if (loadFromLocalStorageCache()) {
                 refreshAllViews();
             } else {
@@ -1151,22 +1152,23 @@
                 refreshAllViews();
             }
 
-            db.ref('clinicData').on('value', (snapshot) => {
+            // 2. مزامنة صامتة في الخلفية لجلب أحدث التحديثات من السحابة دون تعطيل الواجهة
+            db.ref('clinicData').once('value').then((snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    doctorsData = data.doctorsData || [];
-                    fridaySchedules = data.fridaySchedules || [];
-                    alertsData = data.alertsData || [];
-                    coordinatorsData = data.coordinatorsData || [];
-                    deptServicesData = data.deptServicesData || [];
-                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
-                    offersData = data.offersData || [];
-                    inquiriesData = data.inquiriesData || [];
+                    doctorsData = data.doctorsData || doctorsData;
+                    fridaySchedules = data.fridaySchedules || fridaySchedules;
+                    alertsData = data.alertsData || alertsData;
+                    coordinatorsData = data.coordinatorsData || coordinatorsData;
+                    deptServicesData = data.deptServicesData || deptServicesData;
+                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : deptNotesData;
+                    offersData = data.offersData || offersData;
+                    inquiriesData = data.inquiriesData || inquiriesData;
                     saveToLocalStorageCache();
                     refreshAllViews();
                 }
-            }, (error) => {
-                console.error("Firebase sync fallback:", error);
+            }).catch((error) => {
+                console.error("Background sync fallback:", error);
             });
         });
 
@@ -1318,13 +1320,16 @@
 
         let syncTimeout = null;
         function syncToCloud() {
+            // الحفظ الفوري محلياً لضمان السرعة المطلقة
             saveToLocalStorageCache();
+            
+            // الرفع الصامت للسحابة في الخلفية بتأخير زمني بسيط لتجنب أي ضغط أو بطء
             if (syncTimeout) clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
                 db.ref('clinicData').set({ 
                     doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData
-                });
-            }, 600);
+                }).catch(err => console.log("Background sync pending..."));
+            }, 1000);
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -2453,7 +2458,7 @@
                         </div>`;
                 });
                 updateSelectedCountDisplay();
-            }, 150);
+            }, 50);
         }
 
         function handleSearchCheckboxChange(resId, chk) {
@@ -2476,7 +2481,7 @@
         function copySelectedGlobalSearchResults() {
             if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
             let blocks = [];
-            currentGlobalSearchResults.path(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
+            currentGlobalSearchResults.forEach(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
             copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
         }
 
@@ -2504,7 +2509,7 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('offers', document.querySelectorAll('.nav-link')[4]);
             selectedOfferTab = cat; renderOffersTabs();
-            setTimeout(() => { renderOffers(id); document.getElementById('offer_row_' + id)?.scrollIntoView({, block: 'center' }); }, 100);
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function jumpToSectionAndHighlightInquiry(id) {
@@ -2521,7 +2526,7 @@
 
         function jumpToSectionAndHighlightService(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('depts-docs', document.querySelectorAll('.nav-link'][2]);
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
