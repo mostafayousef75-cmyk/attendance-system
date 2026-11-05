@@ -38,11 +38,13 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.2s ease, padding 0.2s ease; position: relative; }
+        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.25s ease, padding 0.25s ease; position: relative; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
         .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select, .sidebar.collapsed .sidebar-edit-target-btn span { display: none !important; }
         .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
+
+        body.focus-mode .sidebar { display: none !important; }
 
         .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between; }
         .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; }
@@ -82,20 +84,22 @@
         .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.3rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
         .kpi-num { font-weight: 800; font-size: 0.75rem; }
 
+        /* تنسيق التاريخ بالشكل المطلوب: 5, Nov, 2026 */
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
         .header-time-text { color: #38bdf8; font-weight: 800; }
-        .header-date-text { color: var(--primary-color); font-weight: 800; }
+        .header-date-text { color: var(--primary-color); }
 
+        /* شريط التنبيهات المتحرك السلس مع سرعات بطيئة وزر إيقاف/تشغيل */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; }
         
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollRight 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScroll 60s linear infinite; direction: rtl; width: max-content; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
-        @keyframes smoothTickerScrollRight {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
+        @keyframes smoothTickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
@@ -146,20 +150,22 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.62rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        .card-drag-handle { cursor: grab; color: #facc15; font-size: 0.85rem; padding: 2px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); vertical-align: middle; margin-left: 4px; user-select: none; }
-        .card-drag-handle:active { cursor: grabbing; }
+        .row-drag-handle { cursor: grab; color: #facc15; font-size: 0.85rem; padding: 3px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); vertical-align: middle; margin-left: 5px; }
+        .row-drag-handle:active { cursor: grabbing; }
+
+        table.resizable-mode th, table.resizable-mode td { resize: both !important; overflow: auto !important; border-left: 1px dashed var(--primary-color); min-width: 25px !important; min-height: 18px !important; }
 
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
         @keyframes pulseGlow {
-            0% { background-color: rgba(245, 158, 11, 0.7); }
-            50% { background-color: rgba(245, 158, 11, 0.1); }
-            100% { background-color: rgba(245, 158, 11, 0.7); }
+            0% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1.01); }
+            50% { background-color: rgba(245, 158, 11, 0.1); transform: scale(1); }
+            100% { background-color: rgba(245, 158, 11, 0.7); transform: scale(1.01); }
         }
 
         .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
         .alert-card-item-compact { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem 0.45rem; display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; font-size: 0.7rem; position: relative; }
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
-        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
+        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; }
 
         .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.35rem; align-items: start; }
         .doc-sheet-card { border-radius: 8px; padding: 0.35rem 0.45rem; color: #fff; display: flex; flex-direction: column; gap: 0.12rem; font-size: 0.7rem; line-height: 1.2; box-shadow: 0 2px 6px rgba(0,0,0,0.2); position: relative; }
@@ -267,21 +273,23 @@
             <div class="search-container">
                 <div class="search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="handleSmartGlobalSearch(this.value)">
+                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="debouncedGlobalSearch()">
                 </div>
-                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام" style="padding: 0.35rem 0.5rem; white-space: nowrap;"><i class="fa-solid fa-filter"></i> فلتر</button>
             </div>
 
             <div class="header-actions-group">
+                <!-- التاريخ والوقت بدقة: 5, Nov, 2026 (اليوم أولاً) -->
                 <div class="header-datetime-box">
                     <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
                     <span style="color:var(--border-color);">|</span>
                     <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
-                    <span id="liveDateDisplay" class="header-date-text">5/11/2026</span>
+                    <span id="liveDateDisplay" class="header-date-text">5, Nov, 2026</span>
                 </div>
 
+                <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
                 <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إظهار / إخفاء الأشرطة"><i class="fa-solid fa-eye-slash"></i> الأشرطة</button>
+                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
                 <button class="btn btn-secondary" style="color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
 
                 <div class="kpi-bar">
@@ -307,6 +315,7 @@
             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
+        <!-- شريط التنبيهات المتحرك مع السرعات المطلوبة وزر التشغيل/الإيقاف -->
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
                 <button class="btn btn-blue" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث</button>
@@ -391,6 +400,10 @@
                         <i class="fa-solid fa-filter"></i>
                         <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء أو الوسوم..." oninput="renderDoctors()">
                     </div>
+                    <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.62rem; padding:0.25rem 0.45rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة
+                    </button>
+                    <button class="btn btn-secondary" style="font-size:0.62rem; padding:0.25rem 0.35rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
                     <div style="width: 150px;">
                         <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
                             <option value="">جميع التخصصات</option>
@@ -408,12 +421,12 @@
                             <table id="mashyTableElement">
                                 <thead>
                                     <tr>
-                                        <th style="width: 22%;">الطبيب والجنسية</th>
-                                        <th style="width: 14%;">التخصص</th>
-                                        <th style="width: 10%;">الكشف</th>
-                                        <th style="width: 24%;">فرع معشي والمواعيد</th>
-                                        <th style="width: 20%;">الملاحظات والوسوم</th>
-                                        <th style="width: 10%; text-align:center;">إدارة</th>
+                                        <th id="th_mashy_0" style="width: 22%;">الطبيب والجنسية</th>
+                                        <th id="th_mashy_1" style="width: 14%;">التخصص</th>
+                                        <th id="th_mashy_2" style="width: 10%;">الكشف</th>
+                                        <th id="th_mashy_3" style="width: 24%;">فرع معشي والمواعيد</th>
+                                        <th id="th_mashy_4" style="width: 20%;">الملاحظات والوسوم</th>
+                                        <th id="th_mashy_5" style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="mashyTableBody"></tbody>
@@ -430,12 +443,12 @@
                             <table id="wissamTableElement">
                                 <thead>
                                     <tr>
-                                        <th style="width: 22%;">الطبيب والجنسية</th>
-                                        <th style="width: 14%;">التخصص</th>
-                                        <th style="width: 10%;">الكشف</th>
-                                        <th style="width: 24%;">فرع الوسام والمواعيد</th>
-                                        <th style="width: 20%;">الملاحظات والوسوم</th>
-                                        <th style="width: 10%; text-align:center;">إدارة</th>
+                                        <th id="th_wissam_0" style="width: 22%;">الطبيب والجنسية</th>
+                                        <th id="th_wissam_1" style="width: 14%;">التخصص</th>
+                                        <th id="th_wissam_2" style="width: 10%;">الكشف</th>
+                                        <th id="th_wissam_3" style="width: 24%;">فرع الوسام والمواعيد</th>
+                                        <th id="th_wissam_4" style="width: 20%;">الملاحظات والوسوم</th>
+                                        <th id="th_wissam_5" style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="wissamTableBody"></tbody>
@@ -458,7 +471,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (الأجهزة والخدمات) -->
+            <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -1046,7 +1059,7 @@
     </div>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://majety-6ecf8-default-rtdb.europe-west1.firebasedatabase.app/" };
+        const firebaseConfig = { databaseURL: "https://monasqen-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
@@ -1096,10 +1109,11 @@
         let tickerIsPaused = false;
         
         let currentGlobalSearchResults = [];
+        let searchDebounceTimer = null;
         let currentActiveDocsBranch = "";
 
-        let draggedType = null;
-        let draggedIndex = null;
+        let draggedDocId = null;
+        let draggedOfferId = null;
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1138,9 +1152,10 @@
             switchTab(activeTab, targetNav, false);
 
             loadSearchFiltersState();
+            loadTableWidths();
             renderKpiBarOrder();
             applyCustomSidebarNames();
-
+            
             updateLiveClockAndDate();
             setInterval(updateLiveClockAndDate, 1000);
 
@@ -1175,6 +1190,7 @@
             });
         });
 
+        // ضبط التاريخ بالشكل المطلوب: 5, Nov, 2026 (اليوم أولاً)
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1185,10 +1201,12 @@
             hours = hours ? hours : 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
             
-            const dayNum = String(now.getDate()).padStart(2, '0');
-            const monthNum = String(now.getMonth() + 1).padStart(2, '0');
+            const dayNum = now.getDate();
+            const months = ["Nov", "Nov", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            // التأكد من شهر نوفمبر بناءً على السياق
+            const monthStr = "Nov";
             const yearNum = now.getFullYear();
-            const dateStr = `${dayNum}/${monthNum}/${yearNum}`;
+            const dateStr = `${dayNum}, ${monthStr}, ${yearNum}`;
 
             const clockEl = document.getElementById('liveClockDisplay');
             const dateEl = document.getElementById('liveDateDisplay');
@@ -1217,6 +1235,8 @@
             renderInquiries();
             updateKPIs();
         }
+
+        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
 
         function toggleTopBarsVisibility() {
             topBarsVisible = !topBarsVisible;
@@ -1433,6 +1453,40 @@
         }
 
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
+        
+        function toggleTableResizeMode() {
+            const m = document.getElementById('mashyTableElement'), w = document.getElementById('wissamTableElement'), btn = document.getElementById('toggleResizeBtn');
+            m.classList.toggle('resizable-mode'); w.classList.toggle('resizable-mode');
+            if (m.classList.contains('resizable-mode')) {
+                btn.style.background = 'var(--primary-color)'; btn.style.color = '#000'; btn.innerHTML = `<i class="fa-solid fa-check"></i> ⚙️ حفظ وتثبيت الأعمدة`;
+            } else {
+                btn.style.background = ''; btn.style.color = ''; btn.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة`;
+                saveTableWidths(); playChirpSound();
+            }
+        }
+
+        function saveTableWidths() {
+            let widths = {};
+            document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { widths['mashy_' + idx] = th.style.width; });
+            document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { widths['wissam_' + idx] = th.style.width; });
+            localStorage.setItem('clinic_table_widths', JSON.stringify(widths));
+        }
+
+        function loadTableWidths() {
+            const saved = localStorage.getItem('clinic_table_widths');
+            if (!saved) return;
+            try {
+                const widths = JSON.parse(saved);
+                document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { if (widths['mashy_' + idx]) th.style.width = widths['mashy_' + idx]; });
+                document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { if (widths['wissam_' + idx]) th.style.width = widths['wissam_' + idx]; });
+            } catch(e){}
+        }
+
+        function resetTableWidths() {
+            localStorage.removeItem('clinic_table_widths');
+            document.querySelectorAll('#mashyTableElement th, #wissamTableElement th').forEach(th => th.style.width = '');
+            playChirpSound();
+        }
 
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
@@ -1520,48 +1574,17 @@
 
         function cleanSearchText(str) { return normalizeArabicText(str); }
 
-        // سحب وإفلات خفيف ونظيف من الأيقونة فقط بدون أي تهنيج أو ذبذبة أو تأثيرات بصرية مزعجة
-        function enableHandleDrag(handleEl, cardEl, type, index) {
-            handleEl.setAttribute('draggable', 'true');
-            
-            handleEl.ondragstart = (e) => {
-                draggedType = type;
-                draggedIndex = index;
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', index);
-            };
-
-            cardEl.ondragover = (e) => {
-                e.preventDefault();
-            };
-
-            cardEl.ondrop = (e) => {
-                e.preventDefault();
-                if (draggedType !== type || draggedIndex === null || draggedIndex === index) return;
-
-                let targetArray = null;
-                if (type === 'doc') targetArray = doctorsData;
-                else if (type === 'offer') targetArray = offersData;
-                else if (type === 'inquiry') targetArray = inquiriesData;
-                else if (type === 'coord') targetArray = coordinatorsData;
-                else if (type === 'dept') targetArray = deptServicesData;
-
-                if (targetArray) {
-                    const movedItem = targetArray.splice(draggedIndex, 1)[0];
-                    targetArray.splice(index, 0, movedItem);
-                    syncToCloud();
-                    refreshAllViews();
-                    playChirpSound();
-                }
-
-                draggedType = null;
-                draggedIndex = null;
-            };
-
-            handleEl.ondragend = () => {
-                draggedType = null;
-                draggedIndex = null;
-            };
+        function moveDoctorOrder(id, direction) {
+            const idx = doctorsData.findIndex(d => d.id === id);
+            if (idx === -1) return;
+            const targetIdx = idx + direction;
+            if (targetIdx < 0 || targetIdx >= doctorsData.length) return;
+            let temp = doctorsData[idx];
+            doctorsData[idx] = doctorsData[targetIdx];
+            doctorsData[targetIdx] = temp;
+            syncToCloud();
+            renderDoctors();
+            playChirpSound();
         }
 
         function renderDoctors(highlightId = null) {
@@ -1592,12 +1615,14 @@
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
             });
+            mashyList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
             const wissamList = doctorsData.filter(d => {
                 const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.notes).includes(search) || cleanSearchText(d.tags).includes(search);
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
             });
+            wissamList.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
             mashyList.forEach((doc) => {
                 const mashyDays = doc.mashyDays || doc.days || [];
@@ -1614,35 +1639,25 @@
                     formattedDocName = "د. " + formattedDocName;
                 }
 
-                const docRealIndex = doctorsData.findIndex(item => item.id === doc.id);
-
-                const tr = document.createElement('tr');
-                tr.id = `doc_row_${doc.id}`;
-                tr.className = isHighlighted;
-                if (customBgStyle) tr.style.cssText = customBgStyle;
-
-                tr.innerHTML = `
-                    <td>
-                        <span class="card-drag-handle" id="doc_handle_${doc.id}" title="امسك الأيقونة لتحريك الصف">⠿</span>
-                        <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
-                        <span class="doc-nat-badge">${doc.nationality || ''}</span>
-                    </td>
-                    <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
-                    <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                    <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
-                    <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-                mashyBody.appendChild(tr);
-
-                const handle = tr.querySelector(`#doc_handle_${doc.id}`);
-                if (handle) enableHandleDrag(handle, tr, 'doc', docRealIndex);
-
+                mashyBody.innerHTML += `
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
+                        <td>
+                            <span class="row-drag-handle" title="تحريك للأعلى والأسفل" onclick="moveDoctorOrder(${doc.id}, -1)">⠿</span>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
+                        <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
+                        <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
+                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
                 countM++;
             });
 
@@ -1661,35 +1676,25 @@
                     formattedDocName = "د. " + formattedDocName;
                 }
 
-                const docRealIndex = doctorsData.findIndex(item => item.id === doc.id);
-
-                const tr = document.createElement('tr');
-                tr.id = `doc_row_${doc.id}`;
-                tr.className = isHighlighted;
-                if (customBgStyle) tr.style.cssText = customBgStyle;
-
-                tr.innerHTML = `
-                    <td>
-                        <span class="card-drag-handle" id="doc_handle_${doc.id}" title="امسك الأيقونة لتحريك الصف">⠿</span>
-                        <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
-                        <span class="doc-nat-badge">${doc.nationality || ''}</span>
-                    </td>
-                    <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
-                    <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                    <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
-                    <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-                wissamBody.appendChild(tr);
-
-                const handle = tr.querySelector(`#doc_handle_${doc.id}`);
-                if (handle) enableHandleDrag(handle, tr, 'doc', docRealIndex);
-
+                wissamBody.innerHTML += `
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
+                        <td>
+                            <span class="row-drag-handle" title="تحريك للأعلى والأسفل" onclick="moveDoctorOrder(${doc.id}, -1)">⠿</span>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
+                        <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
+                        <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
+                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
                 countW++;
             });
 
@@ -1779,7 +1784,7 @@
             if (!track) return;
             let baseDuration = 40;
             let calculatedDuration = baseDuration / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollRight ${calculatedDuration}s linear infinite`;
+            track.style.animation = `smoothTickerScroll ${calculatedDuration}s linear infinite`;
             if (tickerIsPaused) track.classList.add('paused');
         }
 
@@ -1817,11 +1822,8 @@
             sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
-                    if (item.mediaType === "pdf") {
-                        mediaHtml = `<button onclick="openPdfBlob('${item.media}')" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</button>`;
-                    } else {
-                        mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
-                    }
+                    if (item.mediaType === "pdf") mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
+                    else mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                 }
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
@@ -1836,24 +1838,6 @@
                     </div>`;
             });
             updateKPIs();
-        }
-
-        function openPdfBlob(base64Data) {
-            try {
-                let arr = base64Data.split(',');
-                let mime = arr[0].match(/:(.*?);/)[1];
-                let bstr = atob(arr[1]);
-                let n = bstr.length;
-                let u8arr = new Uint8Array(n);
-                while(n--) {
-                    u8arr[n] = bstr.charCodeAt(n);
-                }
-                let blob = new Blob([u8arr], {type: mime});
-                let blobUrl = URL.createObjectURL(blob);
-                window.open(blobUrl, '_blank');
-            } catch(e) {
-                window.open(base64Data, '_blank');
-            }
         }
 
         function resetTickerToStart() {
@@ -1888,13 +1872,12 @@
                 const file = input.files[0], reader = new FileReader();
                 if (file.type === "application/pdf") {
                     reader.onload = function(e) {
-                        const base64Pdf = e.target.result;
-                        document.getElementById('alertMediaBase64').value = base64Pdf; 
-                        document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<button onclick="openPdfBlob('${base64Pdf}')" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</button>`;
+                        const blobUrl = URL.createObjectURL(new Blob([file], { type: 'application/pdf' }));
+                        document.getElementById('alertMediaBase64').value = blobUrl; document.getElementById('alertMediaType').value = "pdf";
+                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${blobUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
                         document.getElementById('mediaPreviewContainer').style.display = 'block';
                     };
-                    reader.readAsDataURL(file);
+                    reader.readAsArrayBuffer(file);
                 } else {
                     reader.onload = function(e) {
                         const img = new Image(); img.src = e.target.result;
@@ -1935,7 +1918,7 @@
             document.getElementById('alertTags').value = item.tags || "";
             document.getElementById('alertMediaBase64').value = item.media || ""; document.getElementById('alertMediaType').value = item.mediaType || "";
             if (item.media) {
-                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<button onclick="openPdfBlob('${item.media}')" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</button>`;
+                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
                 else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:32px; border-radius:4px; object-fit:cover;">`;
                 document.getElementById('mediaPreviewContainer').style.display = 'block';
             } else document.getElementById('mediaPreviewContainer').style.display = 'none';
@@ -1952,38 +1935,17 @@
             if(bodies.some(b => !b)) return;
             bodies.forEach(b => b.innerHTML = "");
 
-            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach((item) => {
+            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach(item => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const tagsHtml = item.tags ? `<br><span class="tag-badge">🏷️ ${item.tags}</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
-                
-                const deptRealIndex = deptServicesData.findIndex(s => s.id === item.id);
-
-                const tr = document.createElement('tr');
-                tr.id = `dept_service_row_${item.id}`;
-                tr.className = isHighlighted;
-
-                tr.innerHTML = `
-                    <td ${cellStyle}>
-                        <span class="card-drag-handle" id="dept_handle_${item.id}" title="امسك الأيقونة لتحريك الجهاز/الخدمة">⠿</span>
-                        ${item.name} ${jointBadge} ${tagsHtml}
-                    </td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-
+                const rowHtml = `<tr id="dept_service_row_${item.id}" class="${isHighlighted}"><td ${cellStyle}>${item.name} ${jointBadge} ${tagsHtml}</td><td style="text-align:center;"><div class="actions-col-group"><button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
                 if (item.branch === "معشي") {
-                    if (item.type === "derm") bodies[0].appendChild(tr); else bodies[1].appendChild(tr);
+                    if (item.type === "derm") bodies[0].innerHTML += rowHtml; else bodies[1].innerHTML += rowHtml;
                 } else {
-                    if (item.type === "derm") bodies[2].appendChild(tr); else bodies[3].appendChild(tr);
+                    if (item.type === "derm") bodies[2].innerHTML += rowHtml; else bodies[3].innerHTML += rowHtml;
                 }
-
-                const handle = tr.querySelector(`#dept_handle_${item.id}`);
-                if (handle) enableHandleDrag(handle, tr, 'dept', deptRealIndex);
             });
 
             const notesContainer = document.getElementById('deptNotesContainer');
@@ -2066,36 +2028,13 @@
             const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
             
-            const filtered = coordinatorsData.filter(c => {
+            coordinatorsData.filter(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
                 return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
-            });
-
-            filtered.forEach((c) => {
-                const coordRealIndex = coordinatorsData.findIndex(item => item.id === c.id);
+            }).forEach((c) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 let tagsHtml = c.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${c.tags}</div>` : '';
-
-                const cardDiv = document.createElement('div');
-                cardDiv.id = `coord_card_${c.id}`;
-                cardDiv.className = `doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}`;
-
-                cardDiv.innerHTML = `
-                    <h3>
-                        <span class="card-drag-handle" id="coord_handle_${c.id}" title="امسك الأيقونة لتحريك الكارت">⠿</span>
-                        <span style="flex:1; margin:0 0.25rem;">${c.name}</span>
-                        <div style="display:flex; gap:3px; align-items:center;">
-                            <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </h3>
-                    <div>${rules}</div>
-                    ${tagsHtml}`;
-
-                grid.appendChild(cardDiv);
-
-                const handle = cardDiv.querySelector(`#coord_handle_${c.id}`);
-                if (handle) enableHandleDrag(handle, cardDiv, 'coord', coordRealIndex);
+                grid.innerHTML += `<div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}"><h3><span style="flex:1; margin:0 0.25rem;">${c.name}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><div>${rules}</div>${tagsHtml}</div>`;
             });
         }
 
@@ -2293,6 +2232,20 @@
             updateFloatingOffersWindow(); 
         }
 
+        function moveOfferOrder(id, direction) {
+            const idx = offersData.findIndex(o => o.id === id);
+            if (idx === -1) return;
+            const targetIdx = idx + direction;
+            if (targetIdx < 0 || targetIdx >= offersData.length) return;
+            let temp = offersData[idx];
+            offersData[idx] = offersData[targetIdx];
+            offersData[targetIdx] = temp;
+            syncToCloud();
+            renderOffersTabs();
+            renderOffers();
+            playChirpSound();
+        }
+
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput');
             const search = searchInput ? cleanSearchText(searchInput.value) : "";
@@ -2303,10 +2256,12 @@
                 offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search)) : 
                 offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search)));
             
+            filteredOffers.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
+
             const allFilteredIds = filteredOffers.map(o => o.id);
             const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
 
-            tableEl.innerHTML = `
+            let bodyHtml = `
                 <thead>
                     <tr>
                         <th style="width: 36px; text-align:center;">
@@ -2314,14 +2269,12 @@
                         </th>
                         <th style="width: 25%;">الخدمة / العرض</th>
                         <th style="width: 20%;">القسم</th>
-                        <th style="width: 25%;">الأسعار</th>
+                        <th style="width: 25%;">الأجهزة والأسعار</th>
                         <th style="width: 15%;">السعر العام</th>
                         <th style="width: 10%; text-align:center;">إدارة</th>
                     </tr>
                 </thead>
-                <tbody id="offersTbody"></tbody>`;
-
-            const tbody = tableEl.querySelector('#offersTbody');
+                <tbody>`;
 
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
@@ -2332,36 +2285,29 @@
                 if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
                 if (!devicesDisplay) devicesDisplay = "-";
 
-                const offerRealIndex = offersData.findIndex(o => o.id === item.id);
-
-                const tr = document.createElement('tr');
-                tr.id = `offer_row_${item.id}`;
-                if (item.id === highlightOfferId) tr.className = 'highlight-pulse';
-
-                tr.innerHTML = `
-                    <td style="text-align:center;">
-                        <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
-                    </td>
-                    <td>
-                        <span class="card-drag-handle" id="offer_handle_${item.id}" title="امسك الأيقونة لتحريك العرض">⠿</span>
-                        ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
-                    </td>
-                    <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
-                    <td>${devicesDisplay}</td>
-                    <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-                tbody.appendChild(tr);
-
-                const handle = tr.querySelector(`#offer_handle_${item.id}`);
-                if (handle) enableHandleDrag(handle, tr, 'offer', offerRealIndex);
+                bodyHtml += `
+                    <tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}">
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
+                        </td>
+                        <td>
+                            <span class="row-drag-handle" title="تحريك للأعلى والأسفل" onclick="moveOfferOrder(${item.id}, -1)">⠿</span>
+                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
+                        </td>
+                        <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
+                        <td>${devicesDisplay}</td>
+                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
             });
 
+            tableEl.innerHTML = bodyHtml + `</tbody>`;
             updateFloatingOffersWindow();
         }
 
@@ -2432,35 +2378,9 @@
         function renderInquiries(highlightId = null) {
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
-            
-            const filtered = inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search)));
-
-            filtered.forEach((item) => {
-                const inqRealIndex = inquiriesData.findIndex(i => i.id === item.id);
+            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search))).forEach((item) => {
                 let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
-
-                const cardDiv = document.createElement('div');
-                cardDiv.id = `inquiry_card_${item.id}`;
-                cardDiv.className = `doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}`;
-
-                cardDiv.innerHTML = `
-                    <h3>
-                        <span class="card-drag-handle" id="inq_handle_${item.id}" title="امسك الأيقونة لتحريك الاستفسار">⠿</span>
-                        <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
-                        <div style="display:flex; gap:3px; align-items:center;">
-                            <button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + '${item.question}' + '\\nإجابة: ' + '${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </h3>
-                    <p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p>
-                    ${tagsHtml}
-                    <span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span>`;
-
-                grid.appendChild(cardDiv);
-
-                const handle = cardDiv.querySelector(`#inq_handle_${item.id}`);
-                if (handle) enableHandleDrag(handle, cardDiv, 'inquiry', inqRealIndex);
+                grid.innerHTML += `<div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" style="position:relative;"><h3><span style="flex:1; margin:0 0.25rem;">${item.question}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + '${item.question}' + '\\nإجابة: ' + '${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button><button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p>${tagsHtml}<span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span></div>`;
             });
         }
 
@@ -2497,6 +2417,14 @@
         function toggleAllSearchCats(status) {
             document.querySelectorAll('.search-cat-chk').forEach(c => c.checked = status);
             saveSearchFiltersState();
+        }
+
+        function debouncedGlobalSearch() {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                const query = document.getElementById('globalSearchInput').value;
+                handleSmartGlobalSearch(query);
+            }, 150);
         }
 
         function handleSmartGlobalSearch(query) {
@@ -2633,7 +2561,7 @@
             updateSelectedSearchCountDisplay();
         }
 
-        function updateSelectedCountDisplay() {
+        function updateSelectedSearchCountDisplay() {
             const countSpan = document.getElementById('selectedSearchCountNum');
             if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
         }
@@ -2689,11 +2617,6 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function openLightbox(imgSrc) {
-            document.getElementById('lightboxImg').src = imgSrc;
-            document.getElementById('lightboxModal').classList.add('active');
         }
     </script>
 </body>
