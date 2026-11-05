@@ -150,12 +150,11 @@
         .doc-nat-badge { font-weight: 600; font-size: 0.62rem; color: #38bdf8; display: block; margin-top: 2px; }
         .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
         
-        .card-drag-handle { cursor: grab; color: #facc15; font-size: 0.85rem; padding: 2px 5px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); vertical-align: middle; margin-left: 4px; user-select: none; }
+        /* تصميم أيقونة السحب الثابتة بدقة */
+        .card-drag-handle { cursor: grab; color: #facc15; font-size: 0.85rem; padding: 2px 6px; display: inline-flex; align-items: center; justify-content: center; background: rgba(250, 204, 21, 0.15); border-radius: 4px; border: 1px solid rgba(250, 204, 21, 0.3); vertical-align: middle; margin-left: 4px; user-select: none; }
         .card-drag-handle:active { cursor: grabbing; }
 
-        .drag-over-card { border: 2px dashed var(--primary-color) !important; transform: scale(1.01); transition: transform 0.15s ease; }
-
-        table.resizable-mode th, table.resizable-mode td { resize: both !important; overflow: auto !important; border-left: 1px dashed var(--primary-color); min-width: 25px !important; min-height: 18px !important; }
+        .drag-over-card { border: 2px dashed var(--primary-color) !important; transform: scale(1.01); transition: transform 0.15s ease; background-color: rgba(245, 158, 11, 0.08) !important; }
 
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
         @keyframes pulseGlow {
@@ -401,10 +400,6 @@
                         <i class="fa-solid fa-filter"></i>
                         <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء أو الوسوم..." oninput="renderDoctors()">
                     </div>
-                    <button id="toggleResizeBtn" class="btn btn-secondary" style="font-size:0.62rem; padding:0.25rem 0.45rem; white-space:nowrap;" onclick="toggleTableResizeMode()">
-                        <i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة
-                    </button>
-                    <button class="btn btn-secondary" style="font-size:0.62rem; padding:0.25rem 0.35rem;" onclick="resetTableWidths()" title="إعادة الأعمدة للافتراضي"><i class="fa-solid fa-rotate-right"></i></button>
                     <div style="width: 150px;">
                         <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
                             <option value="">جميع التخصصات</option>
@@ -422,12 +417,12 @@
                             <table id="mashyTableElement">
                                 <thead>
                                     <tr>
-                                        <th id="th_mashy_0" style="width: 22%;">الطبيب والجنسية</th>
-                                        <th id="th_mashy_1" style="width: 14%;">التخصص</th>
-                                        <th id="th_mashy_2" style="width: 10%;">الكشف</th>
-                                        <th id="th_mashy_3" style="width: 24%;">فرع معشي والمواعيد</th>
-                                        <th id="th_mashy_4" style="width: 20%;">الملاحظات والوسوم</th>
-                                        <th id="th_mashy_5" style="width: 10%; text-align:center;">إدارة</th>
+                                        <th style="width: 22%;">الطبيب والجنسية</th>
+                                        <th style="width: 14%;">التخصص</th>
+                                        <th style="width: 10%;">الكشف</th>
+                                        <th style="width: 24%;">فرع معشي والمواعيد</th>
+                                        <th style="width: 20%;">الملاحظات والوسوم</th>
+                                        <th style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="mashyTableBody"></tbody>
@@ -444,12 +439,12 @@
                             <table id="wissamTableElement">
                                 <thead>
                                     <tr>
-                                        <th id="th_wissam_0" style="width: 22%;">الطبيب والجنسية</th>
-                                        <th id="th_wissam_1" style="width: 14%;">التخصص</th>
-                                        <th id="th_wissam_2" style="width: 10%;">الكشف</th>
-                                        <th id="th_wissam_3" style="width: 24%;">فرع الوسام والمواعيد</th>
-                                        <th id="th_wissam_4" style="width: 20%;">الملاحظات والوسوم</th>
-                                        <th id="th_wissam_5" style="width: 10%; text-align:center;">إدارة</th>
+                                        <th style="width: 22%;">الطبيب والجنسية</th>
+                                        <th style="width: 14%;">التخصص</th>
+                                        <th style="width: 10%;">الكشف</th>
+                                        <th style="width: 24%;">فرع الوسام والمواعيد</th>
+                                        <th style="width: 20%;">الملاحظات والوسوم</th>
+                                        <th style="width: 10%; text-align:center;">إدارة</th>
                                     </tr>
                                 </thead>
                                 <tbody id="wissamTableBody"></tbody>
@@ -1152,7 +1147,6 @@
             switchTab(activeTab, targetNav, false);
 
             loadSearchFiltersState();
-            loadTableWidths();
             renderKpiBarOrder();
             applyCustomSidebarNames();
 
@@ -1451,40 +1445,6 @@
         }
 
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
-        
-        function toggleTableResizeMode() {
-            const m = document.getElementById('mashyTableElement'), w = document.getElementById('wissamTableElement'), btn = document.getElementById('toggleResizeBtn');
-            m.classList.toggle('resizable-mode'); w.classList.toggle('resizable-mode');
-            if (m.classList.contains('resizable-mode')) {
-                btn.style.background = 'var(--primary-color)'; btn.style.color = '#000'; btn.innerHTML = `<i class="fa-solid fa-check"></i> ⚙️ حفظ وتثبيت الأعمدة`;
-            } else {
-                btn.style.background = ''; btn.style.color = ''; btn.innerHTML = `<i class="fa-solid fa-arrows-split-up-and-left"></i> ⚙️ تعديل الأعمدة`;
-                saveTableWidths(); playChirpSound();
-            }
-        }
-
-        function saveTableWidths() {
-            let widths = {};
-            document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { widths['mashy_' + idx] = th.style.width; });
-            document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { widths['wissam_' + idx] = th.style.width; });
-            localStorage.setItem('clinic_table_widths', JSON.stringify(widths));
-        }
-
-        function loadTableWidths() {
-            const saved = localStorage.getItem('clinic_table_widths');
-            if (!saved) return;
-            try {
-                const widths = JSON.parse(saved);
-                document.querySelectorAll('#mashyTableElement th').forEach((th, idx) => { if (widths['mashy_' + idx]) th.style.width = widths['mashy_' + idx]; });
-                document.querySelectorAll('#wissamTableElement th').forEach((th, idx) => { if (widths['wissam_' + idx]) th.style.width = widths['wissam_' + idx]; });
-            } catch(e){}
-        }
-
-        function resetTableWidths() {
-            localStorage.removeItem('clinic_table_widths');
-            document.querySelectorAll('#mashyTableElement th, #wissamTableElement th').forEach(th => th.style.width = '');
-            playChirpSound();
-        }
 
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
@@ -1572,15 +1532,15 @@
 
         function cleanSearchText(str) { return normalizeArabicText(str); }
 
+        // تم ضبط السحب والإفلات ليتم فقط من خلال الأيقونة (بدون تأثير على الحجم أو الجسم)
         function enableHandleDrag(handleEl, cardEl, type, index) {
             handleEl.setAttribute('draggable', 'true');
-            handleEl.onmousedown = () => { cardEl.setAttribute('draggable', 'true'); };
-            handleEl.onmouseup = () => { cardEl.removeAttribute('draggable'); };
-
-            cardEl.ondragstart = (e) => {
+            
+            handleEl.ondragstart = (e) => {
                 draggedType = type;
                 draggedIndex = index;
                 e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', index);
             };
 
             cardEl.ondragover = (e) => {
@@ -1595,7 +1555,6 @@
             cardEl.ondrop = (e) => {
                 e.preventDefault();
                 cardEl.classList.remove('drag-over-card');
-                cardEl.removeAttribute('draggable');
 
                 if (draggedType !== type || draggedIndex === null || draggedIndex === index) return;
 
@@ -1618,8 +1577,7 @@
                 draggedIndex = null;
             };
 
-            cardEl.ondragend = () => {
-                cardEl.removeAttribute('draggable');
+            handleEl.ondragend = () => {
                 cardEl.classList.remove('drag-over-card');
                 draggedType = null;
                 draggedIndex = null;
@@ -1880,7 +1838,8 @@
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") {
-                        mediaHtml = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
+                        // تم إصلاح زر فتح ملف الـ PDF ليعمل في نافذة جديدة مباشرة بدون أي مشاكل
+                        mediaHtml = `<a href="${item.media}" target="_blank" rel="noopener noreferrer" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
                     } else {
                         mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
                     }
@@ -1935,7 +1894,7 @@
                         const base64Pdf = e.target.result;
                         document.getElementById('alertMediaBase64').value = base64Pdf; 
                         document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${base64Pdf}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
+                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${base64Pdf}" target="_blank" rel="noopener noreferrer" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
                         document.getElementById('mediaPreviewContainer').style.display = 'block';
                     };
                     reader.readAsDataURL(file);
@@ -1979,7 +1938,7 @@
             document.getElementById('alertTags').value = item.tags || "";
             document.getElementById('alertMediaBase64').value = item.media || ""; document.getElementById('alertMediaType').value = item.mediaType || "";
             if (item.media) {
-                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
+                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<a href="${item.media}" target="_blank" rel="noopener noreferrer" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
                 else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:32px; border-radius:4px; object-fit:cover;">`;
                 document.getElementById('mediaPreviewContainer').style.display = 'block';
             } else document.getElementById('mediaPreviewContainer').style.display = 'none';
@@ -2543,7 +2502,7 @@
             saveSearchFiltersState();
         }
 
-        // بحث شامل ولحظي 100% بدون أي تأخير أو انتظار
+        // تم جعل البحث الشامل فوري ولحظي 100% بدون أي تأخير أو استجابة بطيئة
         function handleSmartGlobalSearch(query) {
             let rawQ = query.trim();
             if (!rawQ) {
