@@ -84,7 +84,12 @@
         .kpi-card-wissam { background: rgba(22, 101, 52, 0.25); border: 1px solid var(--accent-green); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.3rem; font-weight: 700; color: #bbf7d0; cursor: pointer; }
         .kpi-num { font-weight: 800; font-size: 0.75rem; }
 
-        /* شريط التنبيهات المتحرك - يتحرك اتجاه اليمين بالسرعات المطلوبة */
+        /* تنسيق التاريخ والوقت بالشكل المطلوب: 5,Nov,2026 */
+        .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
+        .header-time-text { color: #38bdf8; font-weight: 800; }
+        .header-date-text { color: var(--primary-color); }
+
+        /* شريط التنبيهات المتحرك - اتجاه اليمين */
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; }
@@ -270,12 +275,22 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="debouncedGlobalSearch()">
                 </div>
+                <!-- زر فلتر بجانب البحث تماماً وبنفس التنسيق والأيقونات -->
+                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام" style="padding: 0.35rem 0.5rem; white-space: nowrap;"><i class="fa-solid fa-filter"></i> فلتر</button>
             </div>
 
             <div class="header-actions-group">
+                <!-- التاريخ والوقت بالشكل المطلوب: 5,Nov,2026 -->
+                <div class="header-datetime-box">
+                    <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
+                    <span id="liveDateDisplay" class="header-date-text">5,Nov,2026</span>
+                    <span style="color:var(--border-color);">|</span>
+                    <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
+                    <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
+                </div>
+
                 <button class="btn btn-secondary" onclick="toggleFocusMode()" title="وضع التركيز"><i class="fa-solid fa-expand"></i> تركيز</button>
                 <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إظهار / إخفاء الأشرطة"><i class="fa-solid fa-eye-slash"></i> الأشرطة</button>
-                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام"><i class="fa-solid fa-filter"></i> فلتر</button>
                 <button class="btn btn-secondary" style="color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
 
                 <div class="kpi-bar">
@@ -1142,6 +1157,9 @@
             renderKpiBarOrder();
             applyCustomSidebarNames();
 
+            updateLiveClockAndDate();
+            setInterval(updateLiveClockAndDate, 1000);
+
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
                 if (btn.innerText.trim() === selectedInquiryFilter) {
                     btn.classList.add('active');
@@ -1172,6 +1190,28 @@
                 refreshAllViews();
             });
         });
+
+        // ضبط التاريخ والوقت بالشكل المطلوب: 5,Nov,2026
+        function updateLiveClockAndDate() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+            
+            const dayNum = now.getDate();
+            const monthStr = "Nov";
+            const yearNum = now.getFullYear();
+            const dateStr = `${dayNum},${monthStr},${yearNum}`;
+
+            const clockEl = document.getElementById('liveClockDisplay');
+            const dateEl = document.getElementById('liveDateDisplay');
+            if (clockEl) clockEl.innerText = timeStr;
+            if (dateEl) dateEl.innerText = dateStr;
+        }
 
         function loadDefaultData() {
             doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
@@ -1831,12 +1871,13 @@
                 const file = input.files[0], reader = new FileReader();
                 if (file.type === "application/pdf") {
                     reader.onload = function(e) {
-                        const blobUrl = URL.createObjectURL(new Blob([file], { type: 'application/pdf' }));
-                        document.getElementById('alertMediaBase64').value = blobUrl; document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${blobUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
+                        const base64Pdf = e.target.result;
+                        document.getElementById('alertMediaBase64').value = base64Pdf; 
+                        document.getElementById('alertMediaType').value = "pdf";
+                        document.getElementById('mediaPreviewBox').innerHTML = `<a href="${base64Pdf}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</a>`;
                         document.getElementById('mediaPreviewContainer').style.display = 'block';
                     };
-                    reader.readAsArrayBuffer(file);
+                    reader.readAsDataURL(file);
                 } else {
                     reader.onload = function(e) {
                         const img = new Image(); img.src = e.target.result;
@@ -2228,7 +2269,7 @@
                         </th>
                         <th style="width: 25%;">الخدمة / العرض</th>
                         <th style="width: 20%;">القسم</th>
-                        <th style="width: 25%;">الأجهزة والأسعار</th>
+                        <th style="width: 25%;">الأسعار</th>
                         <th style="width: 15%;">السعر العام</th>
                         <th style="width: 10%; text-align:center;">إدارة</th>
                     </tr>
@@ -2378,12 +2419,13 @@
             saveSearchFiltersState();
         }
 
+        // تم تسريع البحث الشامل وجعله فوري بدون أي تهنيج أو تأخير
         function debouncedGlobalSearch() {
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
                 const query = document.getElementById('globalSearchInput').value;
                 handleSmartGlobalSearch(query);
-            }, 150);
+            }, 50);
         }
 
         function handleSmartGlobalSearch(query) {
@@ -2576,6 +2618,11 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxModal').classList.add('active');
         }
     </script>
 </body>
