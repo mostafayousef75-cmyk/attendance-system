@@ -1017,13 +1017,10 @@
     </div>
 
     <script>
-        // إعدادات ربط سحابة Supabase الخاصة بك
+        // إعدادات ربط سحابة Supabase 
         const SUPABASE_URL = "https://xwsaolkszmsmntduibhf.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_qF9r3P4xB7ul5bNNStnV5g_KPXyRfmi";
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-        
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const SUPABASE_ANON_KEY = "sb_publishable_qF9r3P4xB7ul5bNNStnV5g_KPXyRfmi";
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function playChirpSound() {
             try {
@@ -1090,48 +1087,29 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         }
 
         // دالة جلب البيانات من Supabase عند فتح الصفحة
-async function fetchFromSupabase() {
-    try {
-        const { data, error } = await _supabase.from('clinic_data').select('*').limit(1);
-        if (data && data.length > 0 && data[0].data) {
-            const payload = data[0].data;
-            doctorsData = payload.doctorsData || [];
-            fridaySchedules = payload.fridaySchedules || [];
-            alertsData = payload.alertsData || [];
-            coordinatorsData = payload.coordinatorsData || [];
-            deptServicesData = payload.deptServicesData || [];
-            deptNotesData = payload.deptNotesData ? payload.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
-            offersData = payload.offersData || [];
-            inquiriesData = payload.inquiriesData || [];
-            
-            saveToLocalStorageCache();
-            refreshAllViews();
+        async function fetchFromSupabase() {
+            try {
+                const { data, error } = await _supabase.from('clinic_data').select('*').limit(1);
+                if (data && data.length > 0 && data[0].data) {
+                    const payload = data[0].data;
+                    doctorsData = payload.doctorsData || [];
+                    fridaySchedules = payload.fridaySchedules || [];
+                    alertsData = payload.alertsData || [];
+                    coordinatorsData = payload.coordinatorsData || [];
+                    deptServicesData = payload.deptServicesData || [];
+                    deptNotesData = payload.deptNotesData ? payload.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
+                    offersData = payload.offersData || [];
+                    inquiriesData = payload.inquiriesData || [];
+                    
+                    saveToLocalStorageCache();
+                    refreshAllViews();
+                }
+                updateCloudBadge(true);
+            } catch (err) {
+                console.error("Supabase Connection Error:", err.message);
+                updateCloudBadge(false);
+            }
         }
-    } catch (err) {
-        console.error("Supabase Connection Error:", err.message);
-    }
-}
-
-// دالة الحفظ المحدثة لترسل البيانات لـ Supabase فوراً
-async function syncToCloud() {
-    saveToLocalStorageCache();
-    const { data, error } = await _supabase
-        .from('clinic_data')
-        .upsert({ 
-            id: 1, 
-            data: { 
-                doctorsData, 
-                fridaySchedules, 
-                alertsData, 
-                coordinatorsData, 
-                deptServicesData, 
-                deptNotesData, 
-                offersData, 
-                inquiriesData 
-            } 
-        });
-    if (error) console.error("خطأ في الحفظ بالسحابة:", error);
-}
 
         function updateCloudBadge(isConnected) {
             const badge = document.getElementById('cloudStatusBadge');
@@ -1153,12 +1131,13 @@ async function syncToCloud() {
             syncTimeout = setTimeout(async () => {
                 try {
                     const fullPayload = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                    const { data } = await _supabase.from('clinic_data').select('id').limit(1);
-                    if (data && data.length > 0) {
-                        await _supabase.from('clinic_data').update({ data: fullPayload }).eq('id', data[0].id);
-                    } else {
-                        await _supabase.from('clinic_data').insert([{ data: fullPayload }]);
-                    }
+                    const { error } = await _supabase
+                        .from('clinic_data')
+                        .upsert({ 
+                            id: 1, 
+                            data: fullPayload 
+                        });
+                    if (error) throw error;
                     updateCloudBadge(true);
                 } catch (err) {
                     console.error("Supabase Sync Error:", err.message);
@@ -1225,7 +1204,7 @@ async function syncToCloud() {
                 refreshAllViews();
             }
 
-            // ثم الربط الفوري وجلب البيانات المحدثة سحابياً
+            // ثم جلب البيانات المحدثة سحابياً
             await fetchFromSupabase();
         });
 
