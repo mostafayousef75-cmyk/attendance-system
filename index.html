@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - Supabase (محدث وسريع)</title>
+    <title>لوحة الكول سنتر والمنسقين - متصل بسحابة Supabase</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Supabase JS SDK v2 -->
+    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -236,7 +236,7 @@
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
             <span class="cloud-dot"></span>
-            <span>متصل بالسحابة (Supabase)</span>
+            <span>متصل بسحابة Supabase</span>
         </div>
 
         <div class="theme-box">
@@ -1017,10 +1017,12 @@
     </div>
 
     <script>
-        // إعدادات ربط سحابة Supabase 
+        // إعدادات اتصال Supabase
         const SUPABASE_URL = "https://xwsaolkszmsmntduibhf.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_qF9r3P4xB7ul5bNNStnV5g_KPXyRfmi";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function playChirpSound() {
             try {
@@ -1059,10 +1061,9 @@
         
         let currentGlobalSearchResults = [];
 
-        // نظام التخزين المؤقت المحلي للسرعة (Caching)
         function loadFromLocalStorageCache() {
             try {
-                const cached = localStorage.getItem('supabase_clinic_full_cache');
+                const cached = localStorage.getItem('clinic_data_cache_supabase');
                 if (cached) {
                     const data = JSON.parse(cached);
                     doctorsData = data.doctorsData || [];
@@ -1082,68 +1083,8 @@
         function saveToLocalStorageCache() {
             try {
                 const data = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                localStorage.setItem('supabase_clinic_full_cache', JSON.stringify(data));
+                localStorage.setItem('clinic_data_cache_supabase', JSON.stringify(data));
             } catch(e){}
-        }
-
-        // دالة جلب البيانات من Supabase عند فتح الصفحة
-        async function fetchFromSupabase() {
-            try {
-                const { data, error } = await _supabase.from('clinic_data').select('*').limit(1);
-                if (data && data.length > 0 && data[0].data) {
-                    const payload = data[0].data;
-                    doctorsData = payload.doctorsData || [];
-                    fridaySchedules = payload.fridaySchedules || [];
-                    alertsData = payload.alertsData || [];
-                    coordinatorsData = payload.coordinatorsData || [];
-                    deptServicesData = payload.deptServicesData || [];
-                    deptNotesData = payload.deptNotesData ? payload.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : [];
-                    offersData = payload.offersData || [];
-                    inquiriesData = payload.inquiriesData || [];
-                    
-                    saveToLocalStorageCache();
-                    refreshAllViews();
-                }
-                updateCloudBadge(true);
-            } catch (err) {
-                console.error("Supabase Connection Error:", err.message);
-                updateCloudBadge(false);
-            }
-        }
-
-        function updateCloudBadge(isConnected) {
-            const badge = document.getElementById('cloudStatusBadge');
-            if (!badge) return;
-            if (isConnected) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة (Supabase)</span>`;
-            } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل (وضع أوفلاين)</span>`;
-            }
-        }
-
-        // حفظ ومزامنة البيانات مع Supabase
-        let syncTimeout = null;
-        function syncToCloud() {
-            saveToLocalStorageCache();
-            refreshAllViews();
-            
-            if (syncTimeout) clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(async () => {
-                try {
-                    const fullPayload = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                    const { error } = await _supabase
-                        .from('clinic_data')
-                        .upsert({ 
-                            id: 1, 
-                            data: fullPayload 
-                        });
-                    if (error) throw error;
-                    updateCloudBadge(true);
-                } catch (err) {
-                    console.error("Supabase Sync Error:", err.message);
-                    updateCloudBadge(false);
-                }
-            }, 500);
         }
 
         function normalizeArabicText(str) {
@@ -1196,17 +1137,74 @@
                 }
             });
 
-            // تحميل سريع أولاً من التخزين المحلي
             if (loadFromLocalStorageCache()) {
-                refreshAllViews();
-            } else {
-                loadDefaultData();
                 refreshAllViews();
             }
 
-            // ثم جلب البيانات المحدثة سحابياً
+            // جلب البيانات من سحابة Supabase
             await fetchFromSupabase();
         });
+
+        async function fetchFromSupabase() {
+            const badge = document.getElementById('cloudStatusBadge');
+            try {
+                // نستخدم جدول اسمه clinic_data أو أي جدول موحد نخزن فيه الـ JSON الكامل
+                const { data, error } = await _supabase
+                    .from('clinic_settings')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (error) {
+                    // إذا لم يكن الجدول موجوداً، نقوم بإنشائه محلياً وافتراضياً
+                    if (!loadFromLocalStorageCache()) {
+                        loadDefaultData();
+                    }
+                    badge.innerHTML = `<span class="cloud-dot" style="background-color:#f59e0b; box-shadow:0 0 8px #f59e0b;"></span><span>وضع الأرشفة المحلية (تأكد من إنشاء جدول clinic_settings في Supabase)</span>`;
+                    return;
+                }
+
+                if (data && data.payload) {
+                    const parsed = data.payload;
+                    doctorsData = parsed.doctorsData || [];
+                    fridaySchedules = parsed.fridaySchedules || [];
+                    alertsData = parsed.alertsData || [];
+                    coordinatorsData = parsed.coordinatorsData || [];
+                    deptServicesData = parsed.deptServicesData || [];
+                    deptNotesData = parsed.deptNotesData || [];
+                    offersData = parsed.offersData || [];
+                    inquiriesData = parsed.inquiriesData || [];
+                    saveToLocalStorageCache();
+                    refreshAllViews();
+                    badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بسحابة Supabase</span>`;
+                }
+            } catch(e) {
+                console.error("Supabase fetch error:", e);
+                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل (يعمل من الذاكرة المحلية)</span>`;
+            }
+        }
+
+        let syncTimeout = null;
+        function syncToCloud() {
+            saveToLocalStorageCache();
+            if (syncTimeout) clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(async () => {
+                const payloadData = { 
+                    doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData 
+                };
+                try {
+                    const { error } = await _supabase
+                        .from('clinic_settings')
+                        .upsert({ id: 1, payload: payloadData, updated_at: new Date() });
+                    
+                    if (error) {
+                        console.error("Supabase save error:", error.message);
+                    }
+                } catch(e) {
+                    console.error("Sync exception:", e);
+                }
+            }, 600);
+        }
 
         function updateLiveClockAndDate() {
             const now = new Date();
@@ -2357,7 +2355,6 @@
             saveSearchFiltersState();
         }
 
-        // تحسين أداء البحث الشامل الفوري
         let globalSearchTimeout = null;
         function handleSmartGlobalSearch(query) {
             if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
