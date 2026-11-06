@@ -269,7 +269,7 @@
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
                     <span style="color:var(--border-color);">|</span>
                     <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
-                    <span id="liveDateDisplay" class="header-date-text">5/11/2026</span>
+                    <span id="liveDateDisplay" class="header-date-text">6,Nov,2026</span>
                 </div>
 
                 <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إظهار / إخفاء الأشرطة"><i class="fa-solid fa-eye-slash"></i> الأشرطة</button>
@@ -1201,6 +1201,7 @@
             loadAllAppData();
         });
 
+        // تنسيق التاريخ المطلوب حصرياً: 6,Nov,2026
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1209,7 +1210,13 @@
             const ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12 || 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
-            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            
+            const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const dayNum = now.getDate();
+            const monthName = monthsShort[now.getMonth()];
+            const yearNum = now.getFullYear();
+            
+            const dateStr = `${dayNum},${monthName},${yearNum}`;
             
             const clockEl = document.getElementById('liveClockDisplay');
             const dateEl = document.getElementById('liveDateDisplay');
@@ -1306,6 +1313,10 @@
             let states = {};
             document.querySelectorAll('.search-cat-chk').forEach(chk => { states[chk.value] = chk.checked; });
             localStorage.setItem('search_filters_states', JSON.stringify(states));
+            const globalSearchVal = document.getElementById('globalSearchInput').value;
+            if (globalSearchVal && globalSearchVal.trim() !== "") {
+                handleSmartGlobalSearch(globalSearchVal);
+            }
         }
 
         function loadSearchFiltersState() {
@@ -2320,6 +2331,7 @@
             saveSearchFiltersState();
         }
 
+        // تحسين دالة البحث الشامل مع استخدام مهلة Debounce بـ 300ms لسرعة واستقرار وسلاسة الكتابة
         let globalSearchTimeout = null;
         function handleSmartGlobalSearch(query) {
             if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
@@ -2343,81 +2355,103 @@
                 resultsList.innerHTML = "";
                 currentGlobalSearchResults = [];
 
+                // قراءة الفلاتر النشطة من الواجهة
+                let activeFilters = {};
+                document.querySelectorAll('.search-cat-chk').forEach(chk => { activeFilters[chk.value] = chk.checked; });
+
                 const isMatch = (text) => {
                     if (!normQ) return true;
                     if (!text) return false;
                     return normalizeArabicText(text).includes(normQ);
                 };
 
-                doctorsData.forEach(d => {
-                    if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.notes) || isMatch(d.tags)) {
-                        let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
-                        currentGlobalSearchResults.push({
-                            id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
-                            subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
-                            copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
-                        });
-                    }
-                });
+                // 1. الأطباء
+                if (activeFilters['doctors'] !== false) {
+                    doctorsData.forEach(d => {
+                        if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.notes) || isMatch(d.tags)) {
+                            let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
+                            currentGlobalSearchResults.push({
+                                id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
+                                subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
+                                copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
+                            });
+                        }
+                    });
+                }
 
-                offersData.forEach(o => {
-                    const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
-                    if (isMatch(combinedOfferText)) {
-                        let priceSummary = o.price ? "السعر: " + o.price : "";
-                        currentGlobalSearchResults.push({
-                            id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
-                            subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
-                            source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
-                        });
-                    }
-                });
+                // 2. العروض والأسعار
+                if (activeFilters['offers'] !== false) {
+                    offersData.forEach(o => {
+                        const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
+                        if (isMatch(combinedOfferText)) {
+                            let priceSummary = o.price ? "السعر: " + o.price : "";
+                            currentGlobalSearchResults.push({
+                                id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
+                                subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
+                                source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
+                            });
+                        }
+                    });
+                }
 
-                alertsData.forEach(a => {
-                    if (isMatch(a.content) || isMatch(a.tags)) {
-                        currentGlobalSearchResults.push({
-                            id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
-                            copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
-                        });
-                    }
-                });
+                // 3. التنبيهات
+                if (activeFilters['alerts'] !== false) {
+                    alertsData.forEach(a => {
+                        if (isMatch(a.content) || isMatch(a.tags)) {
+                            currentGlobalSearchResults.push({
+                                id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
+                                copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
+                            });
+                        }
+                    });
+                }
 
-                inquiriesData.forEach(i => {
-                    if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
-                        currentGlobalSearchResults.push({
-                            id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
-                            copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
-                            source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
-                        });
-                    }
-                });
+                // 4. الاستفسارات
+                if (activeFilters['inquiries'] !== false) {
+                    inquiriesData.forEach(i => {
+                        if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
+                            currentGlobalSearchResults.push({
+                                id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
+                                copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
+                                source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
+                            });
+                        }
+                    });
+                }
 
-                deptServicesData.forEach(s => {
-                    if (isMatch(s.name) || isMatch(s.tags)) {
-                        currentGlobalSearchResults.push({
-                            id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
-                            copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
-                        });
-                    }
-                });
+                // 5. الأقسام والخدمات
+                if (activeFilters['services'] !== false) {
+                    deptServicesData.forEach(s => {
+                        if (isMatch(s.name) || isMatch(s.tags)) {
+                            currentGlobalSearchResults.push({
+                                id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
+                                copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
+                            });
+                        }
+                    });
 
-                deptNotesData.forEach((n, idx) => {
-                    if (isMatch(n.text) || isMatch(n.tags)) {
-                        currentGlobalSearchResults.push({
-                            id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
-                            copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
-                        });
-                    }
-                });
+                    deptNotesData.forEach((n, idx) => {
+                        if (isMatch(n.text) || isMatch(n.tags)) {
+                            currentGlobalSearchResults.push({
+                                id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
+                                copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
+                            });
+                        }
+                    });
+                }
 
-                coordinatorsData.forEach(c => {
-                    let rulesText = c.rules ? c.rules.join(' ') : '';
-                    if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
-                        currentGlobalSearchResults.push({
-                            id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
-                            copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
-                        });
-                    }
-                });
+                // 6. دليل المنسقين
+                if (activeFilters['coordinators'] !== false) {
+                    coordinatorsData.forEach(c => {
+                        let rulesText = c.rules ? c.rules.join(' ') : '';
+                        if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
+                            currentGlobalSearchResults.push({
+                                id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
+                                copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
+                            });
+                        }
+                    });
+                }
 
                 if (currentGlobalSearchResults.length === 0) {
                     resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
@@ -2443,7 +2477,7 @@
                         </div>`;
                 });
                 updateSelectedCountDisplay();
-            }, 50);
+            }, 300);
         }
 
         function handleSearchCheckboxChange(resId, chk) {
