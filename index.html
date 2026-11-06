@@ -2357,10 +2357,405 @@
 
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput');
-            const search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const search = searchInput ? normalizeArabicText(searchInput.value) : "";
             const tableEl = document.getElementById('offersTableElement');
             if (!tableEl) return;
 
             let filteredOffers = (selectedOfferTab === '⭐ كل العروض والأسعار') ? 
-                offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search)) : 
-                offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o
+                offersData.filter(o => !search || (o._searchKey && o._searchKey.includes(search))) : 
+                offersData.filter(o => o.category === selectedOfferTab && (!search || (o._searchKey && o._searchKey.includes(search))));
+            
+            const allFilteredIds = filteredOffers.map(o => o.id);
+            const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
+
+            let rowsHTML = "";
+            filteredOffers.forEach(item => {
+                const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
+                const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
+                
+                let devicesDisplay = "";
+                if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
+                if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
+                if (!devicesDisplay) devicesDisplay = "-";
+
+                const isHighlighted = (item.id === highlightOfferId) ? 'highlight-pulse' : '';
+
+                rowsHTML += `
+                    <tr id="offer_row_${item.id}" class="${isHighlighted}">
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
+                        </td>
+                        <td>
+                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
+                        </td>
+                        <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
+                        <td>${devicesDisplay}</td>
+                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+
+            tableEl.innerHTML = `
+                <thead>
+                    <tr>
+                        <th style="width: 36px; text-align:center;">
+                            <input type="checkbox" id="selectAllOffersChk" ${isAllChecked ? 'checked' : ''} onchange="toggleSelectAllOffers(this)" title="تحديد / إلغاء تحديد الكل">
+                        </th>
+                        <th style="width: 25%;">الخدمة / العرض</th>
+                        <th style="width: 20%;">القسم</th>
+                        <th style="width: 25%;">الأسعار</th>
+                        <th style="width: 15%;">السعر العام</th>
+                        <th style="width: 10%; text-align:center;">إدارة</th>
+                    </tr>
+                </thead>
+                <tbody>${rowsHTML}</tbody>`;
+
+            updateFloatingOffersWindow();
+        }
+
+        function populateOfferCategoryDropdown(selectedCat = "") {
+            const selectEl = document.getElementById('offCategory');
+            if (!selectEl) return;
+            const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            let html = "";
+            cats.forEach(c => { html += `<option value="${c}" ${c === selectedCat ? 'selected' : ''}>${c}</option>`; });
+            html += `<option value="أخرى" ${!cats.includes(selectedCat) && selectedCat ? 'selected' : ''}>+ قسم جديد (أخرى)</option>`;
+            selectEl.innerHTML = html;
+            checkCustomCategory(selectEl.value);
+        }
+
+        function openOfferModal() {
+            document.getElementById('offerId').value = ""; document.getElementById('offName').value = "";
+            document.getElementById('offDevice1').value = ""; document.getElementById('offPrice1').value = "";
+            document.getElementById('offDevice2').value = ""; document.getElementById('offPrice2').value = "";
+            document.getElementById('offPrice').value = ""; document.getElementById('offNotes').value = "";
+            document.getElementById('offIsPinned').checked = false; 
+            let defaultCat = (selectedOfferTab && selectedOfferTab !== '⭐ كل العروض والأسعار') ? selectedOfferTab : (offersData[0]?.category || "عروض اسنان");
+            populateOfferCategoryDropdown(defaultCat);
+            document.getElementById('offerModal').classList.add('active');
+        }
+
+        function saveOffer() {
+            const id = document.getElementById('offerId').value;
+            let cat = document.getElementById('offCategory').value;
+            if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
+            if (!cat) return alert("حدد أو أدخل اسم القسم!");
+
+            const obj = {
+                id: id ? parseInt(id) : Date.now(), category: cat, name: document.getElementById('offName').value,
+                device1: document.getElementById('offDevice1').value.trim(), price1: document.getElementById('offPrice1').value.trim(),
+                device2: document.getElementById('offDevice2').value.trim(), price2: document.getElementById('offPrice2').value.trim(),
+                price: document.getElementById('offPrice').value.trim(), notes: document.getElementById('offNotes').value.trim(),
+                isPinned: document.getElementById('offIsPinned').checked
+            };
+            if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
+            if (id) offersData[offersData.findIndex(o => o.id == id)] = obj; else offersData.push(obj);
+            syncToCloud(); renderOffersTabs(); renderOffers(); closeModal('offerModal'); playChirpSound();
+        }
+
+        function editOffer(id) {
+            const item = offersData.find(o => o.id === id); if (!item) return;
+            document.getElementById('offerId').value = item.id; document.getElementById('offName').value = item.name;
+            document.getElementById('offDevice1').value = item.device1 || ""; document.getElementById('offPrice1').value = item.price1 || "";
+            document.getElementById('offDevice2').value = item.device2 || ""; document.getElementById('offPrice2').value = item.price2 || "";
+            document.getElementById('offPrice').value = item.price || ""; document.getElementById('offNotes').value = item.notes || "";
+            document.getElementById('offIsPinned').checked = !!item.isPinned;
+            populateOfferCategoryDropdown(item.category);
+            document.getElementById('offerModal').classList.add('active');
+        }
+
+        function deleteOffer(id) {
+            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); renderOffersTabs(); renderOffers(); playChirpSound(); }
+        }
+
+        function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        function filterInquiryCategory(cat, btn) {
+            selectedInquiryFilter = cat;
+            localStorage.setItem('selectedInquiryFilter', cat);
+            document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderInquiries();
+        }
+
+        function renderInquiries(highlightId = null) {
+            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return;
+            
+            const filtered = inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i._searchKey && i._searchKey.includes(search))));
+
+            let gridHTML = "";
+            filtered.forEach((item) => {
+                let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
+
+                gridHTML += `
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}">
+                        <h3>
+                            <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
+                            <div style="display:flex; gap:3px; align-items:center;">
+                                <button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + '${item.question}' + '\\nإجابة: ' + '${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p>
+                        ${tagsHtml}
+                        <span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span>
+                    </div>`;
+            });
+            grid.innerHTML = gridHTML;
+        }
+
+        function openInquiryModal() {
+            document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
+            document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
+            document.getElementById('inqCategory').value = "الليزر";
+            document.getElementById('inqColor').value = "card-darkblue"; document.getElementById('inqCustomCatBox').style.display = "none";
+            document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function saveInquiry() {
+            const id = document.getElementById('inquiryId').value;
+            let cat = document.getElementById('inqCategory').value;
+            if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
+            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
+            if (!obj.question) return;
+            if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
+            syncToCloud(); renderInquiries(); closeModal('inquiryModal'); playChirpSound();
+        }
+
+        function editInquiry(id) {
+            const item = inquiriesData.find(i => i.id === id); if (!item) return;
+            document.getElementById('inquiryId').value = item.id; document.getElementById('inqQuestion').value = item.question;
+            document.getElementById('inqAnswer').value = item.answer; document.getElementById('inqTags').value = item.tags || "";
+            document.getElementById('inqCategory').value = item.category || "الليزر";
+            document.getElementById('inqColor').value = item.color || "card-darkblue"; document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function deleteInquiry(id) {
+            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); playChirpSound(); }
+        }
+
+        function toggleAllSearchCats(status) {
+            document.querySelectorAll('.search-cat-chk').forEach(c => c.checked = status);
+            saveSearchFiltersState();
+        }
+
+        let globalSearchTimeout = null;
+        function handleSmartGlobalSearch(query) {
+            if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                let rawQ = query.trim();
+                if (!rawQ) {
+                    document.getElementById('globalSearchResultsSection').classList.remove('active');
+                    const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                    document.getElementById(activeTab + '-section').classList.add('active');
+                    currentGlobalSearchResults = [];
+                    selectedGlobalSearchIds = [];
+                    return;
+                }
+
+                let normQ = normalizeArabicText(rawQ);
+                const resultsSection = document.getElementById('globalSearchResultsSection');
+                const resultsList = document.getElementById('globalSearchResultsList');
+                
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                resultsSection.classList.add('active');
+                currentGlobalSearchResults = [];
+
+                let activeFilters = {};
+                document.querySelectorAll('.search-cat-chk').forEach(chk => { activeFilters[chk.value] = chk.checked; });
+
+                const isMatch = (key) => key && key.includes(normQ);
+
+                if (activeFilters['doctors'] !== false) {
+                    doctorsData.forEach(d => {
+                        if (isMatch(d._searchKey)) {
+                            let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
+                            currentGlobalSearchResults.push({
+                                id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
+                                subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
+                                copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (activeFilters['offers'] !== false) {
+                    offersData.forEach(o => {
+                        if (isMatch(o._searchKey)) {
+                            let priceSummary = o.price ? "السعر: " + o.price : "";
+                            currentGlobalSearchResults.push({
+                                id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
+                                subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
+                                source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
+                            });
+                        }
+                    });
+                }
+
+                if (activeFilters['alerts'] !== false) {
+                    alertsData.forEach(a => {
+                        if (isMatch(a._searchKey)) {
+                            currentGlobalSearchResults.push({
+                                id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
+                                copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (activeFilters['inquiries'] !== false) {
+                    inquiriesData.forEach(i => {
+                        if (isMatch(i._searchKey)) {
+                            currentGlobalSearchResults.push({
+                                id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
+                                copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
+                                source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (activeFilters['services'] !== false) {
+                    deptServicesData.forEach(s => {
+                        if (isMatch(s._searchKey)) {
+                            currentGlobalSearchResults.push({
+                                id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
+                                copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
+                            });
+                        }
+                    });
+
+                    deptNotesData.forEach((n, idx) => {
+                        if (isMatch(n._searchKey)) {
+                            currentGlobalSearchResults.push({
+                                id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
+                                copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
+                            });
+                        }
+                    });
+                }
+
+                if (activeFilters['coordinators'] !== false) {
+                    coordinatorsData.forEach(c => {
+                        if (isMatch(c._searchKey)) {
+                            let rulesText = c.rules ? c.rules.join(' ') : '';
+                            currentGlobalSearchResults.push({
+                                id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
+                                copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (currentGlobalSearchResults.length === 0) {
+                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
+                    return;
+                }
+
+                let resultsHTML = "";
+                currentGlobalSearchResults.forEach((res) => {
+                    const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
+                    resultsHTML += `
+                        <div class="search-result-card">
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                                <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                                <div>
+                                    <span class="source-badge">${res.source}</span>
+                                    <h4>${res.title}</h4>
+                                    <p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:0.25rem;">
+                                <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'")}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                            </div>
+                        </div>`;
+                });
+                resultsList.innerHTML = resultsHTML;
+                updateSelectedCountDisplay();
+            }, 300);
+        }
+
+        function handleSearchCheckboxChange(resId, chk) {
+            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
+            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
+            updateSelectedCountDisplay();
+        }
+
+        function toggleSelectAllGlobalSearch(masterChk) {
+            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
+            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
+            updateSelectedCountDisplay();
+        }
+
+        function updateSelectedCountDisplay() {
+            const countSpan = document.getElementById('selectedSearchCountNum');
+            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
+        }
+
+        function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
+            let blocks = [];
+            currentGlobalSearchResults.forEach(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults || currentGlobalSearchResults.length === 0) return alert("لا توجد نتائج بحث حالية لنسخها!");
+            let blocks = currentGlobalSearchResults.map(r => r.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ جميع نتائج البحث دفعة واحدة!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
+            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
