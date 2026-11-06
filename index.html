@@ -3,426 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - نظام السحابة المحدث</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <title id="appDocumentTitle">لوحة التحكم وإدارة العيادات</title>
+    <!-- FontAwesome & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
-    <!-- Firebase SDK (v8 Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
         :root {
-            --font-family: 'Tajawal', sans-serif;
-            --bg-base: #121214;
-            --bg-surface: #1a1a1e;
-            --bg-card: #242429;
-            --bg-sidebar: #161619;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --border-color: #3f3f46;
-            --primary-color: #f59e0b;
-            --accent-blue: #2563eb;
+            --primary-color: #38bdf8;
+            --primary-hover: #0284c7;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
             --accent-green: #22c55e;
-            --danger-color: #dc2626;
-            --radius-md: 6px;
-            --radius-lg: 10px;
+            --danger-color: #ef4444;
         }
 
-        body.theme-darkblue { --bg-base: #060913; --bg-surface: #0c1222; --bg-card: #111a30; --bg-sidebar: #080d1a; --text-main: #ffffff; --text-muted: #94a3b8; --border-color: #1e293b; --primary-color: #3b82f6; }
-        body.theme-gray { --bg-base: #121214; --bg-surface: #1a1a1e; --bg-card: #242429; --bg-sidebar: #161619; --text-main: #f4f4f5; --text-muted: #a1a1aa; --border-color: #3f3f46; --primary-color: #f59e0b; --accent-green: #22c55e; }
-        body.theme-light { --bg-base: #f1f5f9; --bg-surface: #ffffff; --bg-card: #f8fafc; --bg-sidebar: #ffffff; --text-main: #0f172a; --text-muted: #475569; --border-color: #cbd5e1; --primary-color: #2563eb; }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
-        html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
-
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.2s ease, padding 0.2s ease; position: relative; }
-        .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
-        .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select, .sidebar.collapsed .sidebar-edit-target-btn span { display: none !important; }
-        .sidebar.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
-        .sidebar.collapsed .sidebar-cloud-status { justify-content: center; padding: 0.4rem 0; }
-
-        .brand-title { font-size: 1.05rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between; }
-        .json-tools { display: flex; gap: 0.3rem; margin-bottom: 0.5rem; }
-
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; flex: 1; overflow-y: auto; }
-        .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
-        .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
-        
-        .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; transition: all 0.3s ease; }
-        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; transition: all 0.3s ease; }
-
-        .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.2rem; }
-        .theme-box-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
-        .theme-select { width: 100%; padding: 0.35rem; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; font-size: 0.75rem; }
-        
-        .sidebar-edit-target-btn { background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; padding: 0.3rem 0.4rem; border-radius: var(--radius-md); font-size: 0.68rem; display: inline-flex; align-items: center; gap: 0.2rem; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
-        .sidebar-edit-target-btn:hover { color: var(--primary-color); border-color: var(--primary-color); }
-
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        .top-header { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.4rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; flex-shrink: 0; }
-        
-        .search-container { position: relative; flex: 1; min-width: 260px; max-width: 420px; display: flex; gap: 0.3rem; align-items: center; }
-        .search-input-box { position: relative; flex: 1; display: flex; align-items: center; }
-        .search-input-box input { width: 100%; padding: 0.35rem 2.4rem 0.35rem 0.8rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.15); }
-        .search-input-box .fa-magnifying-glass { position: absolute; right: 0.6rem; color: var(--primary-color); font-size: 0.78rem; }
-
-        .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.25rem 0.5rem; border-radius: 6px; display: none; align-items: center; gap: 0.6rem; font-size: 0.7rem; flex-wrap: wrap; margin: 0.2rem 0.5rem; }
-        .search-filters-bar.show { display: flex; }
-        .search-filter-chk { display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
-        .search-filter-chk input { accent-color: var(--primary-color); width: 12px; height: 12px; cursor: pointer; }
-
-        .header-actions-group { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
-        .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
-        .header-time-text { color: #38bdf8; font-weight: 800; }
-        .header-date-text { color: var(--primary-color); font-weight: 800; }
-
-        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
-        .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; }
-        
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollRight 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
-        .ticker-track.paused { animation-play-state: paused !important; }
-
-        @keyframes smoothTickerScrollRight {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
+        body.theme-gray {
+            --primary-color: #38bdf8;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
         }
 
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
-        .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
+        body.theme-dark {
+            --primary-color: #818cf8;
+            --bg-main: #090d16;
+            --bg-card: #111827;
+            --bg-sidebar: #090d16;
+            --text-main: #f3f4f6;
+            --text-muted: #6b7280;
+            --border-color: #1f2937;
+        }
 
-        .ticker-speed-controls { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
-        .speed-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; cursor: pointer; }
-        .speed-btn.active { background: var(--primary-color); color: #000; border-color: var(--primary-color); }
+        body.theme-light {
+            --primary-color: #0284c7;
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-sidebar: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+        }
 
-        .shift-scratchpad-box { background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: 0 0 var(--radius-lg) var(--radius-lg); padding: 0.45rem; box-shadow: 0 6px 18px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 0.3rem; margin-bottom: 0.4rem; flex-shrink: 0; }
-        .shift-scratchpad-box.show { display: flex; }
-        .scratchpad-header { padding-bottom: 0.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; font-size: 0.82rem; }
+
+        /* Sidebar Styles */
+        aside { width: 220px; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.2s ease; z-index: 100; flex-shrink: 0; }
+        aside.collapsed { width: 60px; }
+        aside.collapsed .nav-text, aside.collapsed .brand-text, aside.collapsed .extra-info { display: none; }
+        aside.collapsed .nav-link { justify-content: center; padding: 0.5rem; }
         
-        .scratchpad-3grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
-        .scratchpad-col { display: flex; flex-direction: column; gap: 0.15rem; }
-        .scratchpad-col-title { font-size: 0.65rem; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 0.25rem; background: var(--bg-card); padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid var(--border-color); }
-        .scratchpad-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.35rem; font-size: 0.72rem; resize: vertical; min-height: 85px; outline: none; font-weight: 600; }
-        .scratchpad-textarea:focus { border-color: var(--primary-color); }
+        .sidebar-header { padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .brand-box { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--primary-color); font-size: 0.95rem; }
+        
+        .nav-links { flex: 1; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; overflow-y: auto; }
+        .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.75rem; color: var(--text-muted); text-decoration: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.15s; }
+        .nav-link:hover, .nav-link.active { background: var(--bg-card); color: var(--primary-color); }
 
-        .content-area { flex: 1; padding: 0.4rem; overflow-y: auto; position: relative; }
+        /* Main Content Layout */
+        main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
+        
+        /* Top Navigation & Status Bar */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0.4rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+        .search-global-box { flex: 1; max-width: 450px; position: relative; }
+        .search-global-box input { width: 100%; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.35rem 2rem 0.35rem 0.6rem; border-radius: 6px; font-size: 0.8rem; }
+        .search-global-box i { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid var(--border-color); }
+        .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+        /* Content Area & Sections */
+        .content-body { flex: 1; padding: 0.75rem; overflow-y: auto; position: relative; }
         .page-section { display: none; }
         .page-section.active { display: block; }
 
-        .search-result-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .source-badge { background: rgba(245, 158, 11, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.08rem 0.35rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; }
+        /* Buttons & Forms */
+        .btn { padding: 0.3rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; transition: 0.15s; }
+        .btn-green { background: var(--accent-green); color: #fff; }
+        .btn-green:hover { opacity: 0.9; }
+        .btn-blue { background: var(--primary-color); color: #fff; }
+        .btn-danger { background: var(--danger-color); color: #fff; }
+        .btn-secondary { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); }
+        .form-control { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.35rem; border-radius: 4px; font-size: 0.75rem; width: 100%; }
 
-        .page-local-search { margin-bottom: 0.25rem; position: relative; }
-        .page-local-search input { width: 100%; padding: 0.2rem 1.6rem 0.2rem 0.4rem; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.7rem; }
-        .page-local-search i { position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.75rem; }
+        /* Tables & Responsive Containers */
+        .table-responsive { width: 100%; overflow-x: auto; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-color); margin-top: 0.4rem; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.75rem; }
+        th, td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--border-color); }
+        th { background: rgba(0,0,0,0.15); color: var(--primary-color); font-weight: 700; }
+        tr:hover { background: rgba(255,255,255,0.02); }
 
-        .btn { background-color: var(--primary-color); color: #000; font-weight: 700; border: none; padding: 0.2rem 0.45rem; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; }
-        .btn:active { transform: scale(0.97); }
-        .btn-green { background-color: var(--accent-green); color: #fff; }
-        .btn-blue { background-color: var(--accent-blue); color: #fff; }
-        .btn-danger { background-color: var(--danger-color); color: #fff; }
-        .btn-secondary { background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+        /* Custom Cards & Ticker */
+        .ticker-bar-container { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0.25rem 0.75rem; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+        .ticker-track { display: inline-flex; gap: 1.5rem; animation: smoothTickerScrollRight 40s linear infinite; }
+        .ticker-track.paused { animation-play-state: paused; }
+        @keyframes smoothTickerScrollRight { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-card-item { background: var(--bg-main); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; }
 
-        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; align-items: start; }
-        .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.35rem; display: flex; flex-direction: column; width: 100%; }
-        .branch-title { font-size: 0.78rem; font-weight: 700; padding-bottom: 0.2rem; margin-bottom: 0.25rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
-
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.68rem; table-layout: fixed; }
-        th, td { padding: 0.3rem 0.25rem; border-bottom: 1px solid var(--border-color); text-align: right; line-height: 1.25; vertical-align: middle; }
-        th { background-color: var(--bg-card); color: var(--text-muted); font-weight: 700; font-size: 0.7rem; }
-
-        .doc-name-box { font-weight: 800; font-size: 0.75rem; color: var(--text-main); display: block; word-break: break-word; }
-        .doc-nat-badge { font-weight: 600; font-size: 0.62rem; color: #38bdf8; display: block; margin-top: 2px; }
-        .doc-spec-box { width: 100%; word-wrap: break-word; white-space: pre-line; font-weight: 600; color: var(--text-main); }
-
-        .highlight-pulse { animation: pulseGlow 1.5s infinite; }
-        @keyframes pulseGlow {
-            0% { background-color: rgba(245, 158, 11, 0.7); }
-            50% { background-color: rgba(245, 158, 11, 0.1); }
-            100% { background-color: rgba(245, 158, 11, 0.7); }
-        }
-
-        .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
-        .alert-card-item-compact { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem 0.45rem; display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; font-size: 0.7rem; position: relative; }
-        .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
-        .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
-
-        .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.35rem; align-items: start; }
-        .doc-sheet-card { border-radius: 8px; padding: 0.35rem 0.45rem; color: #fff; display: flex; flex-direction: column; gap: 0.12rem; font-size: 0.7rem; line-height: 1.2; box-shadow: 0 2px 6px rgba(0,0,0,0.2); position: relative; }
-        .doc-sheet-card h3 { font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.12rem; margin-bottom: 0.08rem; display: flex; align-items: center; justify-content: space-between; }
-
-        .card-teal { background-color: #0d47a1; }
-        .card-maroon { background-color: #7f1d1d; }
-        .card-red { background-color: #b71c1c; }
-        .card-darkblue { background-color: #1a237e; }
-        .card-gold { background-color: #d97706; }
-        .card-green { background-color: #166534; }
-
-        .offers-tabs { display: flex; gap: 0.25rem; margin-bottom: 0.35rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.15rem; overflow-x: auto; align-items: center; flex-wrap: wrap; position: relative; z-index: 50; }
-        .offer-tab-btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.72rem; transition: background 0.2s, color 0.2s; }
-        .offer-tab-btn:hover { border-color: var(--primary-color); }
-        .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
-
-        .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.4rem; }
-        .price-badge { background-color: rgba(37, 99, 235, 0.25); color: var(--primary-color); padding: 0.12rem 0.45rem; border-radius: 6px; font-weight: 800; font-size: 0.78rem; display: inline-block; }
-        .tag-joint { background: linear-gradient(45deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
-        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.06rem 0.2rem; border-radius: 4px; font-size: 0.55rem; display: inline-block; margin-top: 2px; }
-
-        .actions-col-group { display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
-        .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 0.68rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 20px; transition: filter 0.15s; }
-        .action-icon-btn.btn-copy-ic { color: var(--accent-green); background: rgba(34, 197, 94, 0.15); }
-        .action-icon-btn.btn-edit-ic { color: #38bdf8; background: rgba(56, 189, 248, 0.15); }
-        .action-icon-btn.btn-del-ic { color: var(--danger-color); background: rgba(220, 38, 38, 0.15); }
-        .action-icon-btn:hover { filter: brightness(1.2); }
-
-        .floating-offers-window { position: fixed; bottom: 20px; left: 20px; width: 310px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 6px 20px rgba(0,0,0,0.6); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
-        .floating-offers-window.active { display: flex; }
-        .floating-offers-header { background: var(--bg-card); padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.7rem; }
-        .floating-offers-body { padding: 0.35rem; display: flex; flex-direction: column; gap: 0.25rem; }
-        .floating-textarea { width: 100%; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem; font-size: 0.68rem; resize: vertical; height: 110px; outline: none; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 100000; padding: 0.8rem; }
+        .doc-sheet-card { background: var(--bg-card); border-radius: 6px; padding: 0.6rem; border: 1px solid var(--border-color); margin-bottom: 0.4rem; }
+        .doc-sheet-card h3 { font-size: 0.8rem; color: var(--primary-color); margin-bottom: 0.25rem; display: flex; justify-content: space-between; }
+        
+        .tag-badge { background: rgba(56, 189, 248, 0.15); color: var(--primary-color); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.62rem; display: inline-block; }
+        .tag-joint { background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.62rem; font-weight: bold; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
-        .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 480px; max-height: 90vh; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; }
-        .form-control { width: 100%; padding: 0.25rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.7rem; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 480px; border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; max-height: 90vh; overflow-y: auto; }
 
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.25rem; }
-        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem; margin-top: 0.15rem; display: none; }
+        .page-local-search { margin-bottom: 0.4rem; position: relative; }
+        .page-local-search input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.3rem 2rem 0.3rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+        .page-local-search i { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .days-checklist { display: none; grid-template-columns: 1fr 1fr; gap: 0.2rem; margin-top: 0.25rem; }
         .days-checklist.show { display: grid; }
-        .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.15rem; font-size: 0.7rem; cursor: pointer; }
-        .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
+        .days-section-box { border: 1px solid var(--border-color); padding: 0.35rem; border-radius: 4px; background: var(--bg-main); margin-top: 0.25rem; }
 
-        @media (max-width: 768px) {
-            html, body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); }
-            .main-wrapper { height: auto; overflow: visible; }
-            .split-grid { grid-template-columns: 1fr; }
-            .alerts-2col-grid { grid-template-columns: 1fr; }
-            .scratchpad-3grid { grid-template-columns: 1fr; }
-            .top-header { flex-direction: column; align-items: stretch; }
-            .search-container { max-width: 100%; width: 100%; }
-        }
+        .actions-col-group { display: flex; gap: 0.2rem; justify-content: center; }
+        .action-icon-btn { background: none; border: none; cursor: pointer; padding: 0.2rem; font-size: 0.75rem; border-radius: 3px; }
+        .btn-copy-ic { color: var(--primary-color); }
+        .btn-edit-ic { color: var(--accent-green); }
+        .btn-del-ic { color: var(--danger-color); }
+
+        .highlight-pulse { animation: pulseBg 2s infinite; }
+        @keyframes pulseBg { 0%, 100% { background: rgba(56, 189, 248, 0.1); } 50% { background: rgba(56, 189, 248, 0.3); } }
+
+        /* Floating Selection Window */
+        .floating-offers-window { position: fixed; bottom: 15px; left: 15px; background: var(--bg-card); border: 1px solid var(--primary-color); border-radius: 8px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: none; flex-direction: column; z-index: 900; }
+        .floating-offers-window.active { display: flex; }
+        .floating-offers-header { background: rgba(56, 189, 248, 0.1); padding: 0.35rem 0.6rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; font-weight: bold; }
+        .floating-offers-body { padding: 0.4rem; }
+        .floating-textarea { width: 100%; height: 90px; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); font-size: 0.68rem; padding: 0.3rem; border-radius: 4px; resize: none; }
+
+        .offers-tabs { display: flex; gap: 0.25rem; overflow-x: auto; padding-bottom: 0.3rem; margin-bottom: 0.3rem; }
+        .offer-tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
+        .offer-tab-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: bold; }
+
+        .branch-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.4rem; margin-bottom: 0.4rem; }
+        .branch-title { font-weight: bold; color: var(--primary-color); margin-bottom: 0.3rem; font-size: 0.8rem; display: flex; justify-content: space-between; }
+        .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.4rem; }
+        .alerts-2col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+        .alert-card-item-compact { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.4rem; border-radius: 6px; display: flex; justify-content: space-between; gap: 0.4rem; align-items: flex-start; }
+        .alert-thumb-side { width: 45px; height: 45px; object-fit: cover; border-radius: 4px; cursor: pointer; }
+        .pdf-file-badge { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.65rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem; }
+
+        .search-filters-bar { display: none; background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.35rem 0.6rem; border-radius: 6px; margin-bottom: 0.4rem; gap: 0.6rem; flex-wrap: wrap; align-items: center; font-size: 0.7rem; }
+        .search-filters-bar.show { display: flex; }
+        
+        .shift-scratchpad-panel { display: none; position: absolute; top: 45px; left: 10px; width: 300px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 850; padding: 0.5rem; }
+        .shift-scratchpad-panel.show { display: flex; flex-direction: column; gap: 0.35rem; }
+
+        .search-result-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.45rem; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; }
+        .source-badge { font-size: 0.6rem; padding: 0.05rem 0.25rem; border-radius: 3px; background: var(--bg-main); color: var(--primary-color); border: 1px solid var(--border-color); }
     </style>
 </head>
 <body class="theme-gray">
 
-    <aside class="sidebar" id="appSidebar">
-        <div class="brand-title">
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-                <i class="fa-solid fa-headset"></i>
-                <span class="brand-text" id="brandTitleText">لوحة الكول سنتر</span>
+    <!-- القائمة الجانبية -->
+    <aside id="appSidebar">
+        <div class="sidebar-header">
+            <div class="brand-box">
+                <i class="fa-solid fa-hospital-user"></i>
+                <span class="brand-text" id="brandTitleText">عيادات ماجستي</span>
             </div>
-            <i class="fa-solid fa-angles-right" style="cursor:pointer; font-size:0.8rem;" onclick="toggleSidebar()" title="إخفاء / إظهار القائمة"></i>
+            <i class="fa-solid fa-bars" style="cursor:pointer; color:var(--text-muted);" onclick="toggleSidebar()"></i>
         </div>
-
-        <div class="json-tools">
-            <button class="btn btn-secondary" style="flex:1; font-size:0.6rem; padding:0.18rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير</button>
-            <button class="btn btn-secondary" style="flex:1; font-size:0.6rem; padding:0.18rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد</button>
-            <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
-        </div>
-
-        <ul class="nav-links" id="sidebarNavLinksList">
-            <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
-            <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
-            <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
-            <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
-        </ul>
-        
-        <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
-            <span class="cloud-dot" id="cloudDotElem"></span>
-            <span id="cloudTextElem">جاري الاتصال بالسحابة...</span>
-        </div>
-
-        <div class="theme-box">
-            <div class="theme-box-row">
-                <label style="font-size: 0.68rem; color: var(--text-muted);"><i class="fa-solid fa-palette"></i> السيم</label>
-                <button class="sidebar-edit-target-btn" onclick="openRenameSidebarModal()" title="تعديل مسميات القائمة"><i class="fa-solid fa-pen"></i> تعديل</button>
+        <div class="nav-links" id="sidebarNavLinksList">
+            <div class="nav-link active" data-tab="schedule" onclick="switchTab('schedule', this)">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span class="nav-text" data-nav-key="schedule">مواعيد الأطباء</span>
             </div>
-            <select class="theme-select" onchange="changeTheme(this.value)">
-                <option value="theme-darkblue">أزرق غامق (Dark Blue)</option>
-                <option value="theme-gray">رصاصي فحمي (Charcoal Gray)</option>
-                <option value="theme-light">مضيء فاتح (Light Theme)</option>
-            </select>
+            <div class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span class="nav-text" data-nav-key="alerts">التنبيهات والإشعارات</span>
+            </div>
+            <div class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)">
+                <i class="fa-solid fa-clinic-medical"></i>
+                <span class="nav-text" data-nav-key="depts-docs">الأقسام والأطباء</span>
+            </div>
+            <div class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)">
+                <i class="fa-solid fa-user-gear"></i>
+                <span class="nav-text" data-nav-key="coordinators">دليل المنسقين</span>
+            </div>
+            <div class="nav-link" data-tab="offers" onclick="switchTab('offers', this)">
+                <i class="fa-solid fa-tags"></i>
+                <span class="nav-text" data-nav-key="offers">العروض والأسعار</span>
+            </div>
+            <div class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)">
+                <i class="fa-solid fa-circle-question"></i>
+                <span class="nav-text" data-nav-key="inquiries">دليل الاستفسارات</span>
+            </div>
+        </div>
+        <div class="extra-info" style="padding: 0.5rem; border-top: 1px solid var(--border-color); display:flex; flex-direction:column; gap:0.25rem;">
+            <button class="btn btn-secondary" style="width:100%; font-size:0.65rem;" onclick="openRenameSidebarModal()"><i class="fa-solid fa-pen"></i> تعديل المسميات</button>
+            <div style="display:flex; justify-content:space-between; gap:0.2rem;">
+                <button class="btn btn-secondary" style="flex:1; font-size:0.6rem;" onclick="exportJSON()"><i class="fa-solid fa-download"></i> تصدير</button>
+                <button class="btn btn-secondary" style="flex:1; font-size:0.6rem;" onclick="triggerImportJSON()"><i class="fa-solid fa-upload"></i> استيراد</button>
+                <input type="file" id="jsonFileInput" style="display:none" accept=".json" onchange="importJSON(this)">
+            </div>
         </div>
     </aside>
 
-    <main class="main-wrapper">
-        <header class="top-header">
-            <div class="search-container">
-                <div class="search-input-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع بكل الأقسام والوسوم..." oninput="handleSmartGlobalSearch(this.value)">
-                </div>
-                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="فلتر الأقسام" style="padding: 0.35rem 0.5rem; white-space: nowrap;"><i class="fa-solid fa-filter"></i> فلتر</button>
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <!-- الهيدر العلوي -->
+        <header>
+            <div class="search-global-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع في كل النظام (أطباء، عروض، تنبيهات...)" oninput="handleSmartGlobalSearch(this.value)">
             </div>
-
-            <div class="header-actions-group">
-                <div class="header-datetime-box">
-                    <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
-                    <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
-                    <span style="color:var(--border-color);">|</span>
-                    <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
-                    <span id="liveDateDisplay" class="header-date-text">6,Nov,2026</span>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+                <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="تخصيص البحث"><i class="fa-solid fa-sliders"></i></button>
+                <button class="btn btn-secondary" onclick="toggleShiftScratchpad()" title="مسودة الشيفت"><i class="fa-solid fa-note-sticky"></i></button>
+                <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إخفاء/إظهار الشريط العلوي"><i class="fa-solid fa-eye"></i></button>
+                <div class="status-badge" id="cloudStatusBadge">
+                    <span class="dot" id="cloudDotElem"></span>
+                    <span id="cloudTextElem">جاري الاتصال...</span>
                 </div>
-
-                <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إظهار / إخفاء الأشرطة"><i class="fa-solid fa-eye-slash"></i> الأشرطة</button>
-                <button class="btn btn-secondary" style="color:var(--primary-color); border-color:var(--primary-color);" onclick="toggleShiftScratchpad()" title="سجل الشيفت"><i class="fa-solid fa-clipboard-list"></i> الشيفت 📝</button>
             </div>
         </header>
 
+        <!-- شريط الفلاتر الذكية السريعة -->
         <div class="search-filters-bar" id="searchFiltersBarContainer">
-            <span style="font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-filter"></i> تصفية الأقسام (الفلتر اليدوي):</span>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="doctors" checked onchange="saveSearchFiltersState()"> الأطباء</label>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="offers" checked onchange="saveSearchFiltersState()"> العروض والأسعار</label>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="alerts" checked onchange="saveSearchFiltersState()"> التنبيهات</label>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="inquiries" checked onchange="saveSearchFiltersState()"> الاستفسارات</label>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="services" checked onchange="saveSearchFiltersState()"> الأقسام والخدمات</label>
-            <label class="search-filter-chk"><input type="checkbox" class="search-cat-chk" value="coordinators" checked onchange="saveSearchFiltersState()"> المنسقين</label>
-            <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem; margin-right:auto;" onclick="toggleAllSearchCats(true)">تحديد الكل</button>
-            <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
+            <strong style="color:var(--primary-color);">تحديد نطاق البحث:</strong>
+            <label><input type="checkbox" class="search-cat-chk" value="doctors" checked onchange="saveSearchFiltersState()"> الأطباء</label>
+            <label><input type="checkbox" class="search-cat-chk" value="offers" checked onchange="saveSearchFiltersState()"> العروض والأسعار</label>
+            <label><input type="checkbox" class="search-cat-chk" value="alerts" checked onchange="saveSearchFiltersState()"> التنبيهات</label>
+            <label><input type="checkbox" class="search-cat-chk" value="inquiries" checked onchange="saveSearchFiltersState()"> الاستفسارات</label>
+            <label><input type="checkbox" class="search-cat-chk" value="services" checked onchange="saveSearchFiltersState()"> الخدمات والأجهزة</label>
+            <label><input type="checkbox" class="search-cat-chk" value="coordinators" checked onchange="saveSearchFiltersState()"> المنسقين</label>
+            <div style="margin-right:auto; display:flex; gap:0.2rem;">
+                <button class="btn btn-secondary" style="font-size:0.6rem; padding:0.1rem 0.3rem;" onclick="toggleAllSearchCats(true)">تحديد الكل</button>
+                <button class="btn btn-secondary" style="font-size:0.6rem; padding:0.1rem 0.3rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
+            </div>
         </div>
 
-        <div class="professional-ticker-bar" id="professionalTickerBarContainer">
-            <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
-                <button class="btn btn-blue" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار"><i class="fa-solid fa-bolt" style="color:#fde047;"></i> أحدث</button>
-                <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <div class="ticker-speed-controls">
-                    <button class="speed-btn" onclick="setTickerSpeed(0.1, this)" title="بطيء جداً (0.1x)">0.1x</button>
-                    <button class="speed-btn active" onclick="setTickerSpeed(0.25, this)" title="ربع سرعة (0.25x)">0.25x</button>
-                    <button class="speed-btn" onclick="setTickerSpeed(0.5, this)" title="نصف سرعة (0.5x)">0.5x</button>
-                </div>
+        <!-- مسودة الشيفت السريعة -->
+        <div class="shift-scratchpad-panel" id="shiftScratchpadContainer">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.25rem;">
+                <strong style="font-size:0.75rem; color:var(--primary-color);"><i class="fa-solid fa-pen-to-square"></i> مسودة ملاحظات الشيفت</strong>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleShiftScratchpad()"></i>
             </div>
+            <textarea id="shiftScratchpadText1" class="form-control" rows="2" placeholder="ملاحظات العيادة الأولى..." oninput="saveShiftScratchpad()"></textarea>
+            <textarea id="shiftScratchpadText2" class="form-control" rows="2" placeholder="ملاحظات العيادة الثانية..." oninput="saveShiftScratchpad()"></textarea>
+            <textarea id="shiftScratchpadText3" class="form-control" rows="2" placeholder="ملاحظات حجز المنسقين..." oninput="saveShiftScratchpad()"></textarea>
+            <button class="btn btn-danger" style="font-size:0.62rem; padding:0.15rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الكل</button>
+        </div>
+
+        <!-- الشريط الإخباري التفاعلي -->
+        <div class="ticker-bar-container" id="professionalTickerBarContainer">
+            <div style="display:flex; align-items:center; gap:0.3rem; margin-left:0.5rem; font-weight:bold; color:var(--primary-color); font-size:0.7rem;">
+                <i class="fa-solid fa-bullhorn"></i> آخر التنبيهات:
+            </div>
+            <div style="flex:1; overflow:hidden;">
+                <div class="ticker-track" id="tickerTrackContainer" onmouseenter="tickerTrackContainer.classList.add('paused')" onmouseleave="if(!tickerIsPaused) tickerTrackContainer.classList.remove('paused')"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.2rem; margin-right:0.5rem;">
+                <button class="btn btn-secondary" id="tickerTogglePlayBtn" style="padding:0.1rem 0.3rem; font-size:0.6rem;" onclick="toggleTickerPlayState()"><i class="fa-solid fa-pause"></i> إيقاف</button>
+                <span style="font-size:0.6rem; color:var(--text-muted);">السرعة:</span>
+                <button class="btn btn-secondary speed-btn" style="padding:0.1rem 0.2rem; font-size:0.58rem;" onclick="setTickerSpeed(0.15, this)">0.5x</button>
+                <button class="btn btn-secondary speed-btn active" style="padding:0.1rem 0.2rem; font-size:0.58rem;" onclick="setTickerSpeed(0.25, this)">1x</button>
+                <button class="btn btn-secondary speed-btn" style="padding:0.1rem 0.2rem; font-size:0.58rem;" onclick="setTickerSpeed(0.5, this)">2x</button>
+            </div>
+        </div>
+
+        <!-- منطقة الأقسام والمحتوى -->
+        <div class="content-body">
             
-            <div class="ticker-wrapper-outer">
-                <div class="ticker-container" id="tickerContainerBox">
-                    <div class="ticker-track" id="tickerTrackContainer"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="shift-scratchpad-box" id="shiftScratchpadContainer">
-            <div class="scratchpad-header">
-                <span style="font-size:0.72rem; font-weight:800; color:var(--primary-color);"><i class="fa-solid fa-clipboard-list"></i> سجل الشيفت والطوارئ (مقسم 3 صفحات) 📝</span>
-                <div style="display:flex; gap:0.3rem;">
-                    <button class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="clearShiftScratchpad()"><i class="fa-solid fa-trash"></i> مسح الكل</button>
-                    <button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="toggleShiftScratchpad()"><i class="fa-solid fa-xmark"></i> إخفاء</button>
-                </div>
-            </div>
-            <div class="scratchpad-3grid">
-                <div class="scratchpad-col">
-                    <span class="scratchpad-col-title"><i class="fa-solid fa-pen-to-square"></i> الصفحة 1 (اليمين)</span>
-                    <textarea id="shiftScratchpadText1" class="scratchpad-textarea" placeholder="أكتب ملاحظات أو تحويلات الحجز 1..." oninput="saveShiftScratchpad()"></textarea>
-                </div>
-                <div class="scratchpad-col">
-                    <span class="scratchpad-col-title"><i class="fa-solid fa-pen-to-square"></i> الصفحة 2 (الوسط)</span>
-                    <textarea id="shiftScratchpadText2" class="scratchpad-textarea" placeholder="أكتب أسماء أو حالات المتابعة 2..." oninput="saveShiftScratchpad()"></textarea>
-                </div>
-                <div class="scratchpad-col">
-                    <span class="scratchpad-col-title"><i class="fa-solid fa-pen-to-square"></i> الصفحة 3 (اليسار)</span>
-                    <textarea id="shiftScratchpadText3" class="scratchpad-textarea" placeholder="أكتب ملاحظات أو أرقام الهواتف 3..." oninput="saveShiftScratchpad()"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="content-area">
+            <!-- قسم نتائج البحث الشامل -->
             <section id="globalSearchResultsSection" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; background:var(--bg-card); padding:0.3rem 0.5rem; border-radius:6px; border:1px solid var(--border-color); flex-wrap:wrap; gap:0.3rem;">
-                    <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-                        <h2><i class="fa-solid fa-search"></i> نتائج البحث الشامل والوسوم</h2>
-                        <button class="btn btn-green" style="padding:0.12rem 0.35rem; font-size:0.62rem;" onclick="copyAllGlobalSearchResults()"><i class="fa-solid fa-copy"></i> نسخ كل النتائج دفعة واحدة</button>
-                        <button class="btn btn-blue" style="padding:0.12rem 0.35rem; font-size:0.62rem;" onclick="copySelectedGlobalSearchResults()"><i class="fa-solid fa-check-double"></i> نسخ المحددة فقط (<span id="selectedSearchCountNum">0</span>)</button>
-                    </div>
-                    <div style="display:flex; gap:0.3rem; align-items:center;">
-                        <label style="font-size:0.68rem; display:inline-flex; align-items:center; gap:0.2rem; cursor:pointer;"><input type="checkbox" id="selectAllSearchMasterChk" onchange="toggleSelectAllGlobalSearch(this)" style="width:13px; height:13px; accent-color:var(--primary-color);"> تحديد الكل</label>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <h2><i class="fa-solid fa-list-check"></i> نتائج البحث الشامل (<span id="selectedSearchCountNum">0</span> حددت)</h2>
+                    <div style="display:flex; gap:0.25rem;">
+                        <button class="btn btn-green" onclick="copySelectedGlobalSearchResults()"><i class="fa-solid fa-copy"></i> نسخ المحددة</button>
+                        <button class="btn btn-blue" onclick="copyAllGlobalSearchResults()"><i class="fa-solid fa-copy"></i> نسخ الكل</button>
                         <button class="btn btn-secondary" onclick="clearGlobalSearch()"><i class="fa-solid fa-xmark"></i> إغلاق البحث</button>
                     </div>
+                </div>
+                <div style="margin-bottom:0.4rem; font-size:0.7rem; color:var(--text-muted); display:flex; gap:0.5rem; align-items:center;">
+                    <label><input type="checkbox" id="selectAllGlobalSearchChk" onchange="toggleSelectAllGlobalSearch(this)"> تحديد كافة النتائج الظاهرة</label>
                 </div>
                 <div id="globalSearchResultsList"></div>
             </section>
 
             <!-- 1. مواعيد الأطباء -->
-            <section id="schedule-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
-                    <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
-                    <div style="display:flex; gap:0.2rem;">
-                        <button class="btn btn-blue" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-check"></i> مناوبات الجمعة</button>
-                        <button class="btn" onclick="openDoctorModal()"><i class="fa-solid fa-plus"></i> إضافة طبيب</button>
+            <section id="schedule-section" class="page-section active">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.3rem;">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <h2>جدول مواعيد الأطباء التفصيلي</h2>
+                        <span style="font-size:0.7rem; background:var(--bg-card); padding:0.15rem 0.4rem; border-radius:4px; border:1px solid var(--border-color); color:var(--primary-color);">
+                            اليوم: <strong id="todayDayName">...</strong> | <span id="liveClockDisplay">--:--:--</span> | <span id="liveDateDisplay">--/--/----</span>
+                        </span>
+                    </div>
+                    <div style="display:flex; gap:0.25rem;">
+                        <button class="btn btn-secondary" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-week"></i> مناوبات الجمعة</button>
+                        <select id="specialtyFilter" class="form-control" style="width:130px; font-size:0.7rem;" onchange="renderDoctors()"></select>
+                        <button class="btn btn-green" onclick="openDoctorModal()"><i class="fa-solid fa-user-plus"></i> إضافة طبيب</button>
                     </div>
                 </div>
 
-                <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.2rem 0.35rem; border-radius:6px; margin-bottom:0.25rem; display:flex; flex-direction:column; gap:0.12rem; font-size:0.68rem;">
-                    <div style="display:flex; gap:0.6rem; border-bottom:1px solid var(--border-color); padding-bottom:0.12rem; flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (معشي):</strong> <span id="fridayDocMashy" style="font-weight:700;">-</span></span>
-                        <span><i class="fa-solid fa-user-clock" style="color:var(--primary-color);"></i> <strong style="color:var(--primary-color);">مناوبة الجمعة (الوسام):</strong> <span id="fridayDocWissam" style="font-weight:700;">-</span></span>
+                <div class="page-local-search">
+                    <i class="fa-solid fa-filter"></i>
+                    <input type="text" id="docSearchInput" placeholder="بحث باسم الطبيب، التخصص، الجنسية أو الوسوم..." oninput="renderDoctors()">
+                </div>
+
+                <!-- فرع معشي -->
+                <div class="branch-box">
+                    <div class="branch-title">
+                        <span><i class="fa-solid fa-hospital"></i> فرع معشي (<span id="countMashy">0</span>)</span>
+                        <span style="font-size:0.68rem; font-weight:normal; color:var(--text-muted);">أطباء اليوم: <strong id="todayDocsMashy" style="color:var(--accent-green);">...</strong> | مناوب الجمعة: <strong id="fridayDocMashy" style="color:#f59e0b;">...</strong></span>
                     </div>
-                    <div style="display:flex; gap:0.6rem; color:var(--primary-color); flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-user-check"></i> <strong>المتواجدين اليوم (<span id="todayDayName">اليوم</span>) - معشي:</strong> <span id="todayDocsMashy" style="color:var(--text-main);">-</span></span>
-                        <span><i class="fa-solid fa-user-check"></i> <strong>الوسام:</strong> <span id="todayDocsWissam" style="color:var(--text-main);">-</span></span>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 22%;">الطبيب والجنسية</th>
+                                    <th style="width: 14%;">التخصص</th>
+                                    <th style="width: 10%;">الكشف</th>
+                                    <th style="width: 24%;">فرع معشي والمواعيد</th>
+                                    <th style="width: 20%;">الملاحظات والوسوم</th>
+                                    <th style="width: 10%; text-align:center;">إدارة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mashyTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:0.25rem; margin-bottom:0.25rem; align-items:center;">
-                    <div class="page-local-search" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-filter"></i>
-                        <input type="text" id="docSearchInput" placeholder="بحث سريع في الأطباء أو الوسوم..." oninput="renderDoctors()">
+                <!-- فرع الوسام -->
+                <div class="branch-box">
+                    <div class="branch-title">
+                        <span><i class="fa-solid fa-hospital-user"></i> فرع الوسام (<span id="countWissam">0</span>)</span>
+                        <span style="font-size:0.68rem; font-weight:normal; color:var(--text-muted);">أطباء اليوم: <strong id="todayDocsWissam" style="color:var(--accent-green);">...</strong> | مناوب الجمعة: <strong id="fridayDocWissam" style="color:#f59e0b;">...</strong></span>
                     </div>
-                    <div style="width: 150px;">
-                        <select id="specialtyFilter" class="form-control" onchange="renderDoctors()">
-                            <option value="">جميع التخصصات</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="split-grid">
-                    <div class="branch-box">
-                        <div class="branch-title">
-                            <span style="color: #f59e0b;"><i class="fa-solid fa-clinic-medical"></i> أطباء فرع معشي</span>
-                            <span style="font-size:0.6rem; color:var(--text-muted);" id="countMashy">0 أطباء</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="mashyTableElement">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 22%;">الطبيب والجنسية</th>
-                                        <th style="width: 14%;">التخصص</th>
-                                        <th style="width: 10%;">الكشف</th>
-                                        <th style="width: 24%;">فرع معشي والمواعيد</th>
-                                        <th style="width: 20%;">الملاحظات والوسوم</th>
-                                        <th style="width: 10%; text-align:center;">إدارة</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="mashyTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="branch-box">
-                        <div class="branch-title">
-                            <span style="color: #f59e0b;"><i class="fa-solid fa-hospital-user"></i> أطباء فرع الوسام</span>
-                            <span style="font-size:0.6rem; color:var(--text-muted);" id="countWissam">0 أطباء</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="wissamTableElement">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 22%;">الطبيب والجنسية</th>
-                                        <th style="width: 14%;">التخصص</th>
-                                        <th style="width: 10%;">الكشف</th>
-                                        <th style="width: 24%;">فرع الوسام والمواعيد</th>
-                                        <th style="width: 20%;">الملاحظات والوسوم</th>
-                                        <th style="width: 10%; text-align:center;">إدارة</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="wissamTableBody"></tbody>
-                            </table>
-                        </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 22%;">الطبيب والجنسية</th>
+                                    <th style="width: 14%;">التخصص</th>
+                                    <th style="width: 10%;">الكشف</th>
+                                    <th style="width: 24%;">فرع الوسام والمواعيد</th>
+                                    <th style="width: 20%;">الملاحظات والوسوم</th>
+                                    <th style="width: 10%; text-align:center;">إدارة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wissamTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -1014,7 +952,7 @@
     </div>
 
     <div class="modal-overlay" id="lightboxModal" onclick="closeModal('lightboxModal')">
-        <img id="lightboxImg" class="lightbox-img" src="">
+        <img id="lightboxImg" class="lightbox-img" src="" style="max-width:90vw; max-height:90vh; border-radius:8px;">
     </div>
 
     <script>
@@ -1039,7 +977,6 @@
             } catch(e){}
         }
 
-        // مراقبة حالة الاتصال بالانترنت والسحابة مع تغيير لون الايقونة والسحابة عند انقطاع الإنترنت
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
             const dot = document.getElementById('cloudDotElem');
@@ -1071,7 +1008,43 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        
+
+        function normalizeArabicText(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase().replace(/[\u064b-\u0652]/g, '').replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
+        }
+
+        function prepareAllSearchKeys() {
+            doctorsData.forEach(d => {
+                d._searchKey = normalizeArabicText((d.name || '') + ' ' + (d.specialty || '') + ' ' + (d.notes || '') + ' ' + (d.tags || '') + ' ' + (d.nationality || ''));
+            });
+
+            offersData.forEach(o => {
+                o._searchKey = normalizeArabicText((o.name || '') + ' ' + (o.category || '') + ' ' + (o.price || '') + ' ' + (o.notes || '') + ' ' + (o.device1 || '') + ' ' + (o.price1 || '') + ' ' + (o.device2 || '') + ' ' + (o.price2 || ''));
+            });
+
+            alertsData.forEach(a => {
+                a._searchKey = normalizeArabicText((a.content || '') + ' ' + (a.tags || ''));
+            });
+
+            inquiriesData.forEach(i => {
+                i._searchKey = normalizeArabicText((i.question || '') + ' ' + (i.answer || '') + ' ' + (i.tags || '') + ' ' + (i.category || ''));
+            });
+
+            deptServicesData.forEach(s => {
+                s._searchKey = normalizeArabicText((s.name || '') + ' ' + (s.tags || '') + ' ' + (s.branch || '') + ' ' + (s.type || ''));
+            });
+
+            deptNotesData.forEach(n => {
+                n._searchKey = normalizeArabicText((n.text || '') + ' ' + (n.tags || ''));
+            });
+
+            coordinatorsData.forEach(c => {
+                const rulesText = c.rules ? c.rules.join(' ') : '';
+                c._searchKey = normalizeArabicText((c.name || '') + ' ' + rulesText + ' ' + (c.tags || ''));
+            });
+        }
+
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
         let selectedOfferIds = [];
@@ -1082,17 +1055,18 @@
         let tickerIsPaused = false;
         let currentGlobalSearchResults = [];
 
-        // تحميل البيانات: محلياً أولاً لضمان عدم ضياع أي شيء عند الـ Refresh، ثم سحابياً في الخلفية
         function loadAllAppData() {
             let localSaved = localStorage.getItem('clinic_master_data_v2');
             if (localSaved) {
                 try {
                     let parsed = JSON.parse(localSaved);
                     assignDataToVariables(parsed);
+                    prepareAllSearchKeys();
                     refreshAllViews();
                 } catch(e) {}
             } else {
                 loadDefaultData();
+                prepareAllSearchKeys();
                 refreshAllViews();
             }
 
@@ -1100,6 +1074,7 @@
                 const cloudData = snapshot.val();
                 if (cloudData) {
                     assignDataToVariables(cloudData);
+                    prepareAllSearchKeys();
                     saveDataLocally(cloudData);
                     refreshAllViews();
                 }
@@ -1125,6 +1100,7 @@
 
         let syncTimer = null;
         function syncToCloud() {
+            prepareAllSearchKeys();
             const bundleData = {
                 doctorsData,
                 fridaySchedules,
@@ -1136,10 +1112,8 @@
                 inquiriesData
             };
 
-            // 1. الحفظ المحلي الفوري (لا يضيع أي شيء عند عمل Refresh)
             saveDataLocally(bundleData);
 
-            // 2. المزامنة السحابية الفورية في الخلفية
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
                 db.ref('clinicMasterData').set(bundleData).then(() => {
@@ -1201,7 +1175,6 @@
             loadAllAppData();
         });
 
-        // تنسيق التاريخ المطلوب حصرياً: 6,Nov,2026
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1242,11 +1215,6 @@
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
-        function normalizeArabicText(str) {
-            if (!str) return "";
-            return str.toString().toLowerCase().replace(/[\u064b-\u0652]/g, '').replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
-        }
-        function cleanSearchText(str) { return normalizeArabicText(str); }
 
         function toggleTopBarsVisibility() {
             topBarsVisible = !topBarsVisible;
@@ -1438,7 +1406,7 @@
         }
 
         function renderDoctors(highlightId = null) {
-            const searchInput = document.getElementById('docSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const searchInput = document.getElementById('docSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
             const selectedSpecialty = document.getElementById('specialtyFilter').value;
             const specDropdown = document.getElementById('specialtyFilter'), currentSpecVal = specDropdown.value;
             const uniqueSpecialties = [...new Set(doctorsData.map(d => d.specialty).filter(Boolean))];
@@ -1446,9 +1414,8 @@
 
             const mashyBody = document.getElementById('mashyTableBody'), wissamBody = document.getElementById('wissamTableBody');
             if(!mashyBody || !wissamBody) return;
-            mashyBody.innerHTML = ""; wissamBody.innerHTML = "";
+            
             let countM = 0, countW = 0;
-
             const todayStr = new Date().toISOString().split('T')[0];
             const upcomingFridays = fridaySchedules.filter(f => f.date >= todayStr);
             let mashyFridays = upcomingFridays.filter(f => f.branch === "معشي").map(f => `<span>${f.doc}</span> (${f.date})`);
@@ -1461,17 +1428,18 @@
 
             let todayMashyDocs = [], todayWissamDocs = [];
             const mashyList = doctorsData.filter(d => {
-                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.notes).includes(search) || cleanSearchText(d.tags).includes(search);
+                const matchSearch = !search || (d._searchKey && d._searchKey.includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
             });
 
             const wissamList = doctorsData.filter(d => {
-                const matchSearch = !search || cleanSearchText(d.name).includes(search) || cleanSearchText(d.specialty).includes(search) || cleanSearchText(d.notes).includes(search) || cleanSearchText(d.tags).includes(search);
+                const matchSearch = !search || (d._searchKey && d._searchKey.includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
                 return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
             });
 
+            let mashyHTML = "";
             mashyList.forEach((doc) => {
                 const mashyDays = doc.mashyDays || doc.days || [];
                 if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
@@ -1487,31 +1455,28 @@
                     formattedDocName = "د. " + formattedDocName;
                 }
 
-                const tr = document.createElement('tr');
-                tr.id = `doc_row_${doc.id}`;
-                tr.className = isHighlighted;
-                if (customBgStyle) tr.style.cssText = customBgStyle;
-
-                tr.innerHTML = `
-                    <td>
-                        <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
-                        <span class="doc-nat-badge">${doc.nationality || ''}</span>
-                    </td>
-                    <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
-                    <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                    <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
-                    <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-                mashyBody.appendChild(tr);
+                mashyHTML += `
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
+                        <td>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
+                        <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
+                        <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
+                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
                 countM++;
             });
 
+            let wissamHTML = "";
             wissamList.forEach((doc) => {
                 const wissamDays = doc.wissamDays || [];
                 if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
@@ -1527,30 +1492,29 @@
                     formattedDocName = "د. " + formattedDocName;
                 }
 
-                const tr = document.createElement('tr');
-                tr.id = `doc_row_${doc.id}`;
-                tr.className = isHighlighted;
-                if (customBgStyle) tr.style.cssText = customBgStyle;
-
-                tr.innerHTML = `
-                    <td>
-                        <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
-                        <span class="doc-nat-badge">${doc.nationality || ''}</span>
-                    </td>
-                    <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
-                    <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                    <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
-                    <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-                wissamBody.appendChild(tr);
+                wissamHTML += `
+                    <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
+                        <td>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
+                            <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                        </td>
+                        <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
+                        <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
+                        <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
                 countW++;
             });
+
+            mashyBody.innerHTML = mashyHTML;
+            wissamBody.innerHTML = wissamHTML;
 
             document.getElementById('countMashy').innerText = countM + ' أطباء';
             document.getElementById('countWissam').innerText = countW + ' أطباء';
@@ -1660,10 +1624,10 @@
         }
 
         function renderAlerts(highlightId = null) {
-            const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
-            grid.innerHTML = ""; tickerTrack.innerHTML = "";
+            
             const sortedAlerts = [...alertsData].sort((a, b) => b.id - a.id);
             let alertCardsHtml = "";
             sortedAlerts.forEach(item => {
@@ -1672,7 +1636,8 @@
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
             applyTickerSpeed();
 
-            sortedAlerts.filter(a => !search || cleanSearchText(a.content).includes(search) || cleanSearchText(a.tags).includes(search)).forEach(item => {
+            let gridHTML = "";
+            sortedAlerts.filter(a => !search || (a._searchKey && a._searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
                 if (item.media) {
                     if (item.mediaType === "pdf") {
@@ -1683,7 +1648,7 @@
                 }
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
-                grid.innerHTML += `
+                gridHTML += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}">
                         <div style="flex:1;"><p>${item.content}</p>${tagsHtml}<span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         ${mediaHtml}
@@ -1693,6 +1658,7 @@
                         </div>
                     </div>`;
             });
+            grid.innerHTML = gridHTML;
         }
 
         function openPdfBlob(base64Data) {
@@ -1802,47 +1768,50 @@
         }
 
         function renderDeptsAndDocs(highlightServiceId = null) {
-            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
             const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
             if(bodies.some(b => !b)) return;
-            bodies.forEach(b => b.innerHTML = "");
+            
+            let htmlBuffers = ["", "", "", ""];
 
-            deptServicesData.filter(s => s.name && (!search || cleanSearchText(s.name).includes(search) || cleanSearchText(s.tags).includes(search))).forEach((item) => {
+            deptServicesData.filter(s => s.name && (!search || (s._searchKey && s._searchKey.includes(search)))).forEach((item) => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const tagsHtml = item.tags ? `<br><span class="tag-badge">🏷️ ${item.tags}</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
                 
-                const tr = document.createElement('tr');
-                tr.id = `dept_service_row_${item.id}`;
-                tr.className = isHighlighted;
-
-                tr.innerHTML = `
-                    <td ${cellStyle}>
-                        ${item.name} ${jointBadge} ${tagsHtml}
-                    </td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
+                const trHTML = `
+                    <tr id="dept_service_row_${item.id}" class="${isHighlighted}">
+                        <td ${cellStyle}>
+                            ${item.name} ${jointBadge} ${tagsHtml}
+                        </td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
 
                 if (item.branch === "معشي") {
-                    if (item.type === "derm") bodies[0].appendChild(tr); else bodies[1].appendChild(tr);
+                    if (item.type === "derm") htmlBuffers[0] += trHTML; else htmlBuffers[1] += trHTML;
                 } else {
-                    if (item.type === "derm") bodies[2].appendChild(tr); else bodies[3].appendChild(tr);
+                    if (item.type === "derm") htmlBuffers[2] += trHTML; else htmlBuffers[3] += trHTML;
                 }
             });
 
+            bodies.forEach((b, idx) => b.innerHTML = htmlBuffers[idx]);
+
             const notesContainer = document.getElementById('deptNotesContainer');
-            if(!notesContainer) return; notesContainer.innerHTML = "";
+            if(!notesContainer) return; 
+            let notesHTML = "";
             deptNotesData.forEach((noteObj, idx) => {
-                if (!search || cleanSearchText(noteObj.text).includes(search) || cleanSearchText(noteObj.tags).includes(search)) {
+                if (!search || (noteObj._searchKey && noteObj._searchKey.includes(search))) {
                     const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
-                    notesContainer.innerHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${tagsHtml}</div>`;
+                    notesHTML += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}"><h3><i class="fa-solid fa-note-sticky"></i> ملحوظة #${idx + 1}<div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${tagsHtml}</div>`;
                 }
             });
+            notesContainer.innerHTML = notesHTML;
         }
 
         function openDeptServiceModal() {
@@ -1912,35 +1881,30 @@
         }
 
         function renderCoordinators(highlightId = null) {
-            const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
+            const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return;
             
-            const filtered = coordinatorsData.filter(c => {
-                let rulesText = c.rules ? c.rules.join(' ') : '';
-                return !search || cleanSearchText(c.name).includes(search) || cleanSearchText(rulesText).includes(search) || cleanSearchText(c.tags).includes(search);
-            });
+            const filtered = coordinatorsData.filter(c => !search || (c._searchKey && c._searchKey.includes(search)));
 
+            let gridHTML = "";
             filtered.forEach((c) => {
-                let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
+                let rules = c.rules ? c.rules.map(r => `<p>• ${r}</p>`).join('') : '';
                 let tagsHtml = c.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${c.tags}</div>` : '';
 
-                const cardDiv = document.createElement('div');
-                cardDiv.id = `coord_card_${c.id}`;
-                cardDiv.className = `doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}`;
-
-                cardDiv.innerHTML = `
-                    <h3>
-                        <span style="flex:1; margin:0 0.25rem;">${c.name}</span>
-                        <div style="display:flex; gap:3px; align-items:center;">
-                            <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </h3>
-                    <div>${rules}</div>
-                    ${tagsHtml}`;
-
-                grid.appendChild(cardDiv);
+                gridHTML += `
+                    <div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}">
+                        <h3>
+                            <span style="flex:1; margin:0 0.25rem;">${c.name}</span>
+                            <div style="display:flex; gap:3px; align-items:center;">
+                                <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <div>${rules}</div>
+                        ${tagsHtml}
+                    </div>`;
             });
+            grid.innerHTML = gridHTML;
         }
 
         function openCoordinatorModal() {
@@ -1974,7 +1938,6 @@
         function renderOffersTabs() {
             const container = document.getElementById('offersTabsContainer');
             if (!container) return;
-            container.innerHTML = "";
 
             const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
             const totalCount = offersData.length;
@@ -2096,10 +2059,10 @@
 
         function toggleSelectAllOffers(masterCheckbox) {
             const searchInput = document.getElementById('offerSearchInput');
-            const search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const search = searchInput ? normalizeArabicText(searchInput.value) : "";
             let filteredOffers = (selectedOfferTab === '⭐ كل العروض والأسعار') ? 
-                offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search)) : 
-                offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search)));
+                offersData.filter(o => !search || (o._searchKey && o._searchKey.includes(search))) : 
+                offersData.filter(o => o.category === selectedOfferTab && (!search || (o._searchKey && o._searchKey.includes(search))));
 
             filteredOffers.forEach(item => {
                 if (masterCheckbox.checked) { if (!selectedOfferIds.includes(item.id)) selectedOfferIds.push(item.id); }
@@ -2138,16 +2101,49 @@
 
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput');
-            const search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const search = searchInput ? normalizeArabicText(searchInput.value) : "";
             const tableEl = document.getElementById('offersTableElement');
             if (!tableEl) return;
 
             let filteredOffers = (selectedOfferTab === '⭐ كل العروض والأسعار') ? 
-                offersData.filter(o => !search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search)) : 
-                offersData.filter(o => o.category === selectedOfferTab && (!search || cleanSearchText(o.name).includes(search) || cleanSearchText(o.price).includes(search) || cleanSearchText(o.notes).includes(search) || cleanSearchText(o.category).includes(search) || cleanSearchText(o.device1).includes(search) || cleanSearchText(o.device2).includes(search)));
+                offersData.filter(o => !search || (o._searchKey && o._searchKey.includes(search))) : 
+                offersData.filter(o => o.category === selectedOfferTab && (!search || (o._searchKey && o._searchKey.includes(search))));
             
             const allFilteredIds = filteredOffers.map(o => o.id);
             const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
+
+            let rowsHTML = "";
+            filteredOffers.forEach(item => {
+                const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
+                const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
+                
+                let devicesDisplay = "";
+                if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
+                if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
+                if (!devicesDisplay) devicesDisplay = "-";
+
+                const isHighlighted = (item.id === highlightOfferId) ? 'highlight-pulse' : '';
+
+                rowsHTML += `
+                    <tr id="offer_row_${item.id}" class="${isHighlighted}">
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
+                        </td>
+                        <td>
+                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
+                        </td>
+                        <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
+                        <td>${devicesDisplay}</td>
+                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
+                        <td style="text-align:center;">
+                            <div class="actions-col-group">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
 
             tableEl.innerHTML = `
                 <thead>
@@ -2162,42 +2158,7 @@
                         <th style="width: 10%; text-align:center;">إدارة</th>
                     </tr>
                 </thead>
-                <tbody id="offersTbody"></tbody>`;
-
-            const tbody = tableEl.querySelector('#offersTbody');
-
-            filteredOffers.forEach(item => {
-                const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
-                const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
-                
-                let devicesDisplay = "";
-                if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
-                if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
-                if (!devicesDisplay) devicesDisplay = "-";
-
-                const tr = document.createElement('tr');
-                tr.id = `offer_row_${item.id}`;
-                if (item.id === highlightOfferId) tr.className = 'highlight-pulse';
-
-                tr.innerHTML = `
-                    <td style="text-align:center;">
-                        <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
-                    </td>
-                    <td>
-                        ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
-                    </td>
-                    <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
-                    <td>${devicesDisplay}</td>
-                    <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
-                tbody.appendChild(tr);
-            });
+                <tbody>${rowsHTML}</tbody>`;
 
             updateFloatingOffersWindow();
         }
@@ -2267,33 +2228,31 @@
         }
 
         function renderInquiries(highlightId = null) {
-            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
+            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? normalizeArabicText(searchInput.value) : "";
+            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return;
             
-            const filtered = inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || cleanSearchText(i.question).includes(search) || cleanSearchText(i.answer).includes(search) || cleanSearchText(i.tags).includes(search)));
+            const filtered = inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i._searchKey && i._searchKey.includes(search))));
 
+            let gridHTML = "";
             filtered.forEach((item) => {
                 let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
 
-                const cardDiv = document.createElement('div');
-                cardDiv.id = `inquiry_card_${item.id}`;
-                cardDiv.className = `doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}`;
-
-                cardDiv.innerHTML = `
-                    <h3>
-                        <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
-                        <div style="display:flex; gap:3px; align-items:center;">
-                            <button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + '${item.question}' + '\\nإجابة: ' + '${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </h3>
-                    <p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p>
-                    ${tagsHtml}
-                    <span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span>`;
-
-                grid.appendChild(cardDiv);
+                gridHTML += `
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}">
+                        <h3>
+                            <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
+                            <div style="display:flex; gap:3px; align-items:center;">
+                                <button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + '${item.question}' + '\\nإجابة: ' + '${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p>
+                        ${tagsHtml}
+                        <span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span>
+                    </div>`;
             });
+            grid.innerHTML = gridHTML;
         }
 
         function openInquiryModal() {
@@ -2331,7 +2290,6 @@
             saveSearchFiltersState();
         }
 
-        // تحسين دالة البحث الشامل مع استخدام مهلة Debounce بـ 300ms لسرعة واستقرار وسلاسة الكتابة
         let globalSearchTimeout = null;
         function handleSmartGlobalSearch(query) {
             if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
@@ -2352,23 +2310,17 @@
                 
                 document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
                 resultsSection.classList.add('active');
-                resultsList.innerHTML = "";
                 currentGlobalSearchResults = [];
 
-                // قراءة الفلاتر النشطة من الواجهة
                 let activeFilters = {};
                 document.querySelectorAll('.search-cat-chk').forEach(chk => { activeFilters[chk.value] = chk.checked; });
 
-                const isMatch = (text) => {
-                    if (!normQ) return true;
-                    if (!text) return false;
-                    return normalizeArabicText(text).includes(normQ);
-                };
+                const isMatch = (key) => key && key.includes(normQ);
 
                 // 1. الأطباء
                 if (activeFilters['doctors'] !== false) {
                     doctorsData.forEach(d => {
-                        if (isMatch(d.name) || isMatch(d.specialty) || isMatch(d.notes) || isMatch(d.tags)) {
+                        if (isMatch(d._searchKey)) {
                             let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
                             currentGlobalSearchResults.push({
                                 id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
@@ -2382,8 +2334,7 @@
                 // 2. العروض والأسعار
                 if (activeFilters['offers'] !== false) {
                     offersData.forEach(o => {
-                        const combinedOfferText = (o.name || '') + " " + (o.category || '') + " " + (o.price || '') + " " + (o.notes || '') + " " + (o.device1 || '') + " " + (o.price1 || '') + " " + (o.device2 || '') + " " + (o.price2 || '');
-                        if (isMatch(combinedOfferText)) {
+                        if (isMatch(o._searchKey)) {
                             let priceSummary = o.price ? "السعر: " + o.price : "";
                             currentGlobalSearchResults.push({
                                 id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
@@ -2397,7 +2348,7 @@
                 // 3. التنبيهات
                 if (activeFilters['alerts'] !== false) {
                     alertsData.forEach(a => {
-                        if (isMatch(a.content) || isMatch(a.tags)) {
+                        if (isMatch(a._searchKey)) {
                             currentGlobalSearchResults.push({
                                 id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
                                 copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
@@ -2409,7 +2360,7 @@
                 // 4. الاستفسارات
                 if (activeFilters['inquiries'] !== false) {
                     inquiriesData.forEach(i => {
-                        if (isMatch(i.question) || isMatch(i.answer) || isMatch(i.tags)) {
+                        if (isMatch(i._searchKey)) {
                             currentGlobalSearchResults.push({
                                 id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
                                 copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
@@ -2422,7 +2373,7 @@
                 // 5. الأقسام والخدمات
                 if (activeFilters['services'] !== false) {
                     deptServicesData.forEach(s => {
-                        if (isMatch(s.name) || isMatch(s.tags)) {
+                        if (isMatch(s._searchKey)) {
                             currentGlobalSearchResults.push({
                                 id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
                                 copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
@@ -2431,7 +2382,7 @@
                     });
 
                     deptNotesData.forEach((n, idx) => {
-                        if (isMatch(n.text) || isMatch(n.tags)) {
+                        if (isMatch(n._searchKey)) {
                             currentGlobalSearchResults.push({
                                 id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
                                 copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
@@ -2443,8 +2394,8 @@
                 // 6. دليل المنسقين
                 if (activeFilters['coordinators'] !== false) {
                     coordinatorsData.forEach(c => {
-                        let rulesText = c.rules ? c.rules.join(' ') : '';
-                        if (isMatch(c.name) || isMatch(rulesText) || isMatch(c.tags)) {
+                        if (isMatch(c._searchKey)) {
+                            let rulesText = c.rules ? c.rules.join(' ') : '';
                             currentGlobalSearchResults.push({
                                 id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
                                 copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
@@ -2458,9 +2409,10 @@
                     return;
                 }
 
+                let resultsHTML = "";
                 currentGlobalSearchResults.forEach((res) => {
                     const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
-                    resultsList.innerHTML += `
+                    resultsHTML += `
                         <div class="search-result-card">
                             <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
                                 <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
@@ -2476,6 +2428,7 @@
                             </div>
                         </div>`;
                 });
+                resultsList.innerHTML = resultsHTML;
                 updateSelectedCountDisplay();
             }, 300);
         }
