@@ -25,14 +25,40 @@
             --danger-color: #ef4444;
         }
 
-        body.theme-gray { --primary-color: #38bdf8; --bg-main: #0f172a; --bg-card: #1e293b; --bg-sidebar: #0f172a; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155; }
-        body.theme-dark { --primary-color: #818cf8; --bg-main: #090d16; --bg-card: #111827; --bg-sidebar: #090d16; --text-main: #f3f4f6; --text-muted: #6b7280; --border-color: #1f2937; }
-        body.theme-light { --primary-color: #0284c7; --bg-main: #f1f5f9; --bg-card: #ffffff; --bg-sidebar: #e2e8f0; --text-main: #0f172a; --text-muted: #64748b; --border-color: #cbd5e1; }
+        body.theme-gray {
+            --primary-color: #38bdf8;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
+        body.theme-dark {
+            --primary-color: #818cf8;
+            --bg-main: #090d16;
+            --bg-card: #111827;
+            --bg-sidebar: #090d16;
+            --text-main: #f3f4f6;
+            --text-muted: #6b7280;
+            --border-color: #1f2937;
+        }
+
+        body.theme-light {
+            --primary-color: #0284c7;
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-sidebar: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+        }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; font-size: 0.82rem; }
 
-        /* Sidebar */
+        /* Sidebar Styles */
         aside { width: 220px; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.2s ease; z-index: 100; flex-shrink: 0; }
         aside.collapsed { width: 60px; }
         aside.collapsed .nav-text, aside.collapsed .brand-text, aside.collapsed .extra-info { display: none; }
@@ -50,16 +76,12 @@
         
         /* Top Navigation & Status Bar */
         header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0.4rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
-        .search-global-box { flex: 1; max-width: 380px; position: relative; }
+        .search-global-box { flex: 1; max-width: 450px; position: relative; }
         .search-global-box input { width: 100%; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.35rem 2rem 0.35rem 0.6rem; border-radius: 6px; font-size: 0.8rem; }
         .search-global-box i { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         
         .status-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid var(--border-color); }
         .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-
-        /* Live Doctors Top Widget Button */
-        .live-doctors-badge-btn { background: rgba(56, 189, 248, 0.12); border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: 0.15s; }
-        .live-doctors-badge-btn:hover { background: rgba(56, 189, 248, 0.25); }
 
         /* Content Area & Sections */
         .content-body { flex: 1; padding: 0.75rem; overflow-y: auto; position: relative; }
@@ -144,11 +166,6 @@
 
         .search-result-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.45rem; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; }
         .source-badge { font-size: 0.6rem; padding: 0.05rem 0.25rem; border-radius: 3px; background: var(--bg-main); color: var(--primary-color); border: 1px solid var(--border-color); }
-
-        /* Free Drag & Drop Table Editing Styles */
-        .table-drag-mode th, .table-drag-mode td { cursor: grab; user-select: none; }
-        .table-drag-mode tr.dragging { opacity: 0.4; background: rgba(56, 189, 248, 0.3); }
-        .table-drag-mode th.dragging-col { background: rgba(56, 189, 248, 0.4); opacity: 0.5; }
     </style>
 </head>
 <body class="theme-gray">
@@ -204,18 +221,9 @@
         <header>
             <div class="search-global-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع في كل النظام..." oninput="handleSmartGlobalSearch(this.value)">
+                <input type="text" id="globalSearchInput" placeholder="بحث شامل وسريع في كل النظام (أطباء، عروض، تنبيهات...)" oninput="handleSmartGlobalSearch(this.value)">
             </div>
-
-            <!-- زر أطباء الآن الفوري مع عداد الفروع + ضبط فارق الساعات -->
-            <button class="live-doctors-badge-btn" onclick="openLiveDoctorsModal()">
-                <i class="fa-solid fa-user-doctor" style="color:var(--accent-green);"></i>
-                <span>متواجدون الآن:</span>
-                <span style="background:var(--accent-green); color:#fff; padding:0.05rem 0.35rem; border-radius:10px; font-size:0.65rem;" id="topLiveCountBadge">معشي (0) | الوسام (0)</span>
-            </button>
-
             <div style="display:flex; align-items:center; gap:0.4rem;">
-                <button class="btn btn-secondary" onclick="openTimeOffsetModal()" title="تعديل فارق التوقيت (السعودية / مصر)"><i class="fa-solid fa-clock"></i></button>
                 <button class="btn btn-secondary" onclick="toggleSearchFiltersBar()" title="تخصيص البحث"><i class="fa-solid fa-sliders"></i></button>
                 <button class="btn btn-secondary" onclick="toggleShiftScratchpad()" title="مسودة الشيفت"><i class="fa-solid fa-note-sticky"></i></button>
                 <button class="btn btn-secondary" onclick="toggleTopBarsVisibility()" title="إخفاء/إظهار الشريط العلوي"><i class="fa-solid fa-eye"></i></button>
@@ -295,14 +303,10 @@
                     <div style="display:flex; align-items:center; gap:0.5rem;">
                         <h2>جدول مواعيد الأطباء التفصيلي</h2>
                         <span style="font-size:0.7rem; background:var(--bg-card); padding:0.15rem 0.4rem; border-radius:4px; border:1px solid var(--border-color); color:var(--primary-color);">
-                            اليوم: <strong id="todayDayName">...</strong> | <span id="liveClockDisplay">--:--:--</span> (السعودية: <span id="saudiClockDisplay">--:--:--</span>)
+                            اليوم: <strong id="todayDayName">...</strong> | <span id="liveClockDisplay">--:--:--</span> | <span id="liveDateDisplay">--/--/----</span>
                         </span>
                     </div>
-                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
-                        <!-- زر تفعيل وضع التعديل والتحريك الحر التام (صفوف وعواميد) -->
-                        <button class="btn btn-secondary" id="toggleFreeEditBtn" onclick="toggleFreeTableEditing()" style="border-color:var(--primary-color); color:var(--primary-color);">
-                            <i class="fa-solid fa-arrows-up-down-left-right"></i> وضع التعديل والتحريك الحر 🔓
-                        </button>
+                    <div style="display:flex; gap:0.25rem;">
                         <button class="btn btn-secondary" onclick="openFridayScheduleModal()"><i class="fa-solid fa-calendar-week"></i> مناوبات الجمعة</button>
                         <select id="specialtyFilter" class="form-control" style="width:130px; font-size:0.7rem;" onchange="renderDoctors()"></select>
                         <button class="btn btn-green" onclick="openDoctorModal()"><i class="fa-solid fa-user-plus"></i> إضافة طبيب</button>
@@ -321,9 +325,9 @@
                         <span style="font-size:0.68rem; font-weight:normal; color:var(--text-muted);">أطباء اليوم: <strong id="todayDocsMashy" style="color:var(--accent-green);">...</strong> | مناوب الجمعة: <strong id="fridayDocMashy" style="color:#f59e0b;">...</strong></span>
                     </div>
                     <div class="table-responsive">
-                        <table id="mashyTableElement">
+                        <table>
                             <thead>
-                                <tr id="mashyHeaderRow">
+                                <tr>
                                     <th style="width: 22%;">الطبيب والجنسية</th>
                                     <th style="width: 14%;">التخصص</th>
                                     <th style="width: 10%;">الكشف</th>
@@ -344,9 +348,9 @@
                         <span style="font-size:0.68rem; font-weight:normal; color:var(--text-muted);">أطباء اليوم: <strong id="todayDocsWissam" style="color:var(--accent-green);">...</strong> | مناوب الجمعة: <strong id="fridayDocWissam" style="color:#f59e0b;">...</strong></span>
                     </div>
                     <div class="table-responsive">
-                        <table id="wissamTableElement">
+                        <table>
                             <thead>
-                                <tr id="wissamHeaderRow">
+                                <tr>
                                     <th style="width: 22%;">الطبيب والجنسية</th>
                                     <th style="width: 14%;">التخصص</th>
                                     <th style="width: 10%;">الكشف</th>
@@ -505,45 +509,6 @@
         </div>
     </main>
 
-    <!-- نافذة الأطباء المتواجدين الآن الفورية -->
-    <div class="modal-overlay" id="liveDoctorsModal">
-        <div class="modal" style="max-width: 520px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.3rem;">
-                <h3><i class="fa-solid fa-user-doctor" style="color:var(--accent-green);"></i> تقرير الأطباء المتواجدين الآن (توقيت السعودية)</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('liveDoctorsModal')"></i>
-            </div>
-            <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
-                <span>اليوم: <strong id="liveModalDayName" style="color:var(--primary-color);">...</strong> | الساعة الحالية بالسعودية: <strong id="liveModalSaudiClock" style="color:var(--accent-green);">--:--</strong></span>
-                <button class="btn btn-secondary" style="font-size:0.6rem; padding:0.1rem 0.3rem;" onclick="openTimeOffsetModal()"><i class="fa-solid fa-clock"></i> ضبط الفارق</button>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.4rem; max-height:350px; overflow-y:auto;" id="liveDoctorsModalContent"></div>
-        </div>
-    </div>
-
-    <!-- نافذة تعديل فارق التوقيت (مصر / السعودية) -->
-    <div class="modal-overlay" id="timeOffsetModal">
-        <div class="modal" style="max-width: 380px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3><i class="fa-solid fa-clock"></i> ضبط فارق ساعات العيادة (السعودية)</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('timeOffsetModal')"></i>
-            </div>
-            <p style="font-size:0.68rem; color:var(--text-muted); line-height:1.4;">
-                نظرًا لوجود فارق توقيت بين مصر والسعودية (أو لتعديل الساعة يدويًا لضبط حالة حضور الأطباء مع العميل بدقة)، حدد الفارق بالساعات المضافة أو المطروحة من وقت جهازك المحلي:
-            </p>
-            <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;">
-                <label style="font-size:0.7rem; font-weight:bold;">الفارق بالساعات (+ أو -):</label>
-                <select id="timeOffsetSelect" class="form-control">
-                    <option value="-2">- ساعتان (-2)</option>
-                    <option value="-1">- ساعة واحدة (-1)</option>
-                    <option value="0">مطابق تماماً لوقت الجهاز (0)</option>
-                    <option value="1">+ ساعة واحدة (+1) [توقيت السعودية الصيفي/الشتوي]</option>
-                    <option value="2">+ ساعتان (+2)</option>
-                </select>
-            </div>
-            <button class="btn btn-green" style="margin-top:0.4rem;" onclick="saveTimeOffsetSetting()">حفظ الفارق وتحديث الحالة</button>
-        </div>
-    </div>
-
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
             <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
@@ -557,7 +522,7 @@
         </div>
     </div>
 
-    <!-- المودالات الأخرى -->
+    <!-- المودالات -->
     <div class="modal-overlay" id="renameSidebarModal">
         <div class="modal" style="max-width: 380px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -684,8 +649,8 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
-                <label>ساعات الدوام (مثال: من 2م - 10م)</label>
-                <input type="text" id="docTiming" class="form-control" placeholder="من 2م - 10م">
+                <label>ساعات الدوام</label>
+                <input type="text" id="docTiming" class="form-control" placeholder="يومياً من 2م - 10م">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
                 <label>الملاحظات / شروط معتمدة</label>
@@ -1043,8 +1008,6 @@
         let deptNotesData = [];
         let offersData = [];
         let inquiriesData = [];
-        let clinicTimeOffsetHours = parseInt(localStorage.getItem('clinic_time_offset_hours') || '0');
-        let isFreeTableEditingActive = false;
 
         function normalizeArabicText(str) {
             if (!str) return "";
@@ -1162,7 +1125,7 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "من 12.30م - 8.30م", notes: "", customColor: "" }];
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
             deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
@@ -1180,7 +1143,6 @@
             renderOffersTabs();
             renderOffers();
             renderInquiries();
-            updateTopLiveDoctorsBadge();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1211,246 +1173,28 @@
             setInterval(updateLiveClockAndDate, 1000);
 
             loadAllAppData();
-
-            // Load saved table layout order if any
-            loadCustomTableLayout();
         });
 
-        // الحصول على وقت السعودية المخصص بناءً على فارق التوقيت المختار
-        function getSaudiDateObject() {
-            const now = new Date();
-            // إضافة الفارق الساعي المختار لضبط وقت العيادة بالمملكة مقارنة بمصر
-            now.setHours(now.getHours() + clinicTimeOffsetHours);
-            return now;
-        }
-
         function updateLiveClockAndDate() {
-            const nowLocal = new Date();
-            let hoursLocal = nowLocal.getHours();
-            const minutes = String(nowLocal.getMinutes()).padStart(2, '0');
-            const seconds = String(nowLocal.getSeconds()).padStart(2, '0');
-            const ampmLocal = hoursLocal >= 12 ? 'PM' : 'AM';
-            hoursLocal = hoursLocal % 12 || 12;
-            const timeStrLocal = `${String(hoursLocal).padStart(2, '0')}:${minutes}:${seconds} ${ampmLocal}`;
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+            
+            const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const dayNum = now.getDate();
+            const monthName = monthsShort[now.getMonth()];
+            const yearNum = now.getFullYear();
+            
+            const dateStr = `${dayNum},${monthName},${yearNum}`;
             
             const clockEl = document.getElementById('liveClockDisplay');
-            if (clockEl) clockEl.innerText = timeStrLocal;
-
-            // وقت السعودية المعدل بالفارق
-            const saudiNow = getSaudiDateObject();
-            let saudiHours = saudiNow.getHours();
-            const saudiAmpm = saudiHours >= 12 ? 'PM' : 'AM';
-            saudiHours = saudiHours % 12 || 12;
-            const saudiTimeStr = `${String(saudiHours).padStart(2, '0')}:${minutes}:${seconds} ${saudiAmpm}`;
-            const saudiClockEl = document.getElementById('saudiClockDisplay');
-            if (saudiClockEl) saudiClockEl.innerText = saudiTimeStr;
-
-            // تحديث شريط المتواجدين الآن تلقائياً كل ثانية
-            updateTopLiveDoctorsBadge();
-        }
-
-        function openTimeOffsetModal() {
-            document.getElementById('timeOffsetSelect').value = clinicTimeOffsetHours.toString();
-            document.getElementById('timeOffsetModal').classList.add('active');
-        }
-
-        function saveTimeOffsetSetting() {
-            const val = parseInt(document.getElementById('timeOffsetSelect').value);
-            clinicTimeOffsetHours = val;
-            localStorage.setItem('clinic_time_offset_hours', val.toString());
-            closeModal('timeOffsetModal');
-            updateLiveClockAndDate();
-            renderDoctors();
-            playChirpSound();
-            alert("تم حفظ فارق التوقيت بنجاح وتحديث حضور الأطباء الفوري!");
-        }
-
-        // فحص ما إذا كان الدكتور متواجداً في الساعة الحالية للعيادة (توقيت السعودية)
-        // تحليل نص الدوام مثل: "من 2م - 10م" أو "12.30م - 8.30م"
-        function isDoctorActiveNow(doc) {
-            if (doc.isLeave) return false;
-            const currentDay = getArabicDayName();
-            const mashyDays = doc.mashyDays || doc.days || [];
-            const wissamDays = doc.wissamDays || [];
-            
-            // تحقق من اليوم
-            const worksInMashyToday = mashyDays.includes(currentDay);
-            const worksInWissamToday = wissamDays.includes(currentDay);
-            if (!worksInMashyToday && !worksInWissamToday && !doc.isJoint && mashyDays.length === 0 && wissamDays.length === 0) {
-                // افتراضي لو الأيام مش محددة يعتبر مداوم
-            }
-
-            const timingStr = doc.timing || "";
-            if (!timingStr) return true; // لو مفيش وقت محدد مكتوب يظهر كمتواجد بافتراض الدوام اليومي
-
-            // تحليل وقت الدوام البسيط
-            const saudiNow = getSaudiDateObject();
-            const currentHour24 = saudiNow.getHours() + (saudiNow.getMinutes() / 60);
-
-            // استخراج الأوقات صباحي/مسائي
-            let hours = extractHoursFromTiming(timingStr);
-            if (hours) {
-                return (currentHour24 >= hours.start && currentHour24 <= hours.end);
-            }
-            return true;
-        }
-
-        function extractHoursFromTiming(str) {
-            try {
-                let text = str.toLowerCase();
-                // مثال: من 2م - 10م أو 12:30 م إلى 8:30 م
-                let matches = text.match(/(\d+[\.\:]?\d*)\s*(ص|م|أو|الى|-)?\s*(\d+[\.\:]?\d*)?\s*(ص|م)?/g);
-                // تبسيط دلالي افتراضي: لو في الفترات المسائية (من 1 ظهراً لـ 12 منتصف الليل)
-                if (text.includes('10م') || text.includes('11م') || text.includes('12ص') || text.includes('8م') || text.includes('9م') || text.includes('2م') || text.includes('4م') || text.includes('5م')) {
-                    // استخراج الأرقام الأولى والأخيرة
-                    let nums = text.match(/\d+[\.\:]?\d*/g);
-                    if (nums && nums.length >= 2) {
-                        let start = parseFloat(nums[0].replace(':', '.'));
-                        let end = parseFloat(nums[1].replace(':', '.'));
-                        if (text.includes('م') && start < 12 && !text.includes('12م')) start += 12;
-                        if (text.includes('م') && end < 12 && !text.includes('12م')) end += 12;
-                        if (start > end) end += 12; // لو مقلبة
-                        return { start, end };
-                    }
-                }
-            } catch(e){}
-            // افتراضي واسع لو النص غير قياسي يعتبر شغال طول اليوم (من 8 صباحاً إلى 2 صباحاً)
-            return { start: 8, end: 26 };
-        }
-
-        function updateTopLiveDoctorsBadge() {
-            const currentDay = getArabicDayName();
-            let mashyLiveCount = 0;
-            let wissamLiveCount = 0;
-
-            doctorsData.forEach(doc => {
-                if (doc.isLeave) return;
-                const mashyDays = doc.mashyDays || doc.days || [];
-                const wissamDays = doc.wissamDays || [];
-                
-                const inMashyToday = doc.branch === "معشي" || doc.isJoint || mashyDays.includes(currentDay) || mashyDays.length === 0;
-                const inWissamToday = doc.branch === "الوسام" || doc.isJoint || wissamDays.includes(currentDay) || wissamDays.length === 0;
-
-                if (inMashyToday && (mashyDays.length === 0 || mashyDays.includes(currentDay) || doc.branch === "معشي")) {
-                    mashyLiveCount++;
-                }
-                if (inWissamToday && (wissamDays.length === 0 || wissamDays.includes(currentDay) || doc.branch === "الوسام")) {
-                    wissamLiveCount++;
-                }
-            });
-
-            const badgeElem = document.getElementById('topLiveCountBadge');
-            if (badgeElem) {
-                badgeElem.innerText = `معشي (${mashyLiveCount}) | الوسام (${wissamLiveCount})`;
-            }
-        }
-
-        function openLiveDoctorsModal() {
-            const currentDay = getArabicDayName();
-            document.getElementById('liveModalDayName').innerText = currentDay;
-            
-            const saudiNow = getSaudiDateObject();
-            document.getElementById('liveModalSaudiClock').innerText = saudiNow.toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'});
-
-            let mashyLiveList = [];
-            let wissamLiveList = [];
-
-            doctorsData.forEach(doc => {
-                if (doc.isLeave) return;
-                const mashyDays = doc.mashyDays || doc.days || [];
-                const wissamDays = doc.wissamDays || [];
-
-                if (doc.branch === "معشي" || doc.isJoint || mashyDays.includes(currentDay) || mashyDays.length === 0) {
-                    mashyLiveList.push(doc);
-                }
-                if (doc.branch === "الوسام" || doc.isJoint || wissamDays.includes(currentDay) || wissamDays.length === 0) {
-                    wissamLiveList.push(doc);
-                }
-            });
-
-            let htmlMashy = `<div style="background:var(--bg-main); padding:0.4rem; border-radius:6px; border:1px solid var(--border-color);"><strong style="color:var(--primary-color); display:block; margin-bottom:0.3rem;"><i class="fa-solid fa-hospital"></i> فرع معشي (${mashyLiveList.length})</strong>`;
-            if (mashyLiveList.length === 0) htmlMashy += `<p style="font-size:0.65rem; color:var(--text-muted);">لا يوجد أطباء مسجلين اليوم.</p>`;
-            mashyLiveList.forEach(d => {
-                htmlMashy += `<div style="font-size:0.7rem; border-bottom:1px solid var(--border-color); padding:0.2rem 0; display:flex; justify-content:space-between;"><span>${d.name} (${d.specialty})</span><strong style="color:var(--accent-green);">${d.timing || 'متاح'}</strong></div>`;
-            });
-            htmlMashy += `</div>`;
-
-            let htmlWissam = `<div style="background:var(--bg-main); padding:0.4rem; border-radius:6px; border:1px solid var(--border-color);"><strong style="color:var(--primary-color); display:block; margin-bottom:0.3rem;"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (${wissamLiveList.length})</strong>`;
-            if (wissamLiveList.length === 0) htmlWissam += `<p style="font-size:0.65rem; color:var(--text-muted);">لا يوجد أطباء مسجلين اليوم.</p>`;
-            wissamLiveList.forEach(d => {
-                htmlWissam += `<div style="font-size:0.7rem; border-bottom:1px solid var(--border-color); padding:0.2rem 0; display:flex; justify-content:space-between;"><span>${d.name} (${d.specialty})</span><strong style="color:var(--accent-green);">${d.timing || 'متاح'}</strong></div>`;
-            });
-            htmlWissam += `</div>`;
-
-            document.getElementById('liveDoctorsModalContent').innerHTML = htmlMashy + htmlWissam;
-            document.getElementById('liveDoctorsModal').classList.add('active');
-        }
-
-        // ==========================================
-        // ميزة التعديل والتحريك الحر التام للجدول (صفوف وعواميد) وتخزينها
-        // ==========================================
-        function toggleFreeTableEditing() {
-            isFreeTableEditingActive = !isFreeTableEditingActive;
-            const btn = document.getElementById('toggleFreeEditBtn');
-            if (isFreeTableEditingActive) {
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> إنهاء وحفظ التعديل الحر 🔒`;
-                btn.style.background = "var(--accent-green)";
-                btn.style.color = "#fff";
-                enableTableDragAndDrop();
-                alert("🔓 تم تفعيل وضع التحريك الحر التام!\n\nيمكنك الآن سحب وإفلات أي صف (طبيب) أو سحب أعمدة الجدول وترتيبها بالكامل بحرية مطلقة، وسيتم حفظ الترتيب نهائياً.");
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-arrows-up-down-left-right"></i> وضع التعديل والتحريك الحر 🔓`;
-                btn.style.background = "";
-                btn.style.color = "var(--primary-color)";
-                disableTableDragAndDrop();
-                saveCustomTableLayout();
-                playChirpSound();
-                alert("🔒 تم حفظ ترتيب الجدول الجديد بنجاح وثباته في النظام!");
-            }
-        }
-
-        function enableTableDragAndDrop() {
-            ['mashyTableElement', 'wissamTableElement'].forEach(tableId => {
-                const table = document.getElementById(tableId);
-                if (!table) return;
-                table.classList.add('table-drag-mode');
-                
-                // تفعيل السحب للصفوف
-                const tbody = table.querySelector('tbody');
-                if (tbody) {
-                    tbody.querySelectorAll('tr').forEach(row => {
-                        row.setAttribute('draggable', 'true');
-                        row.ondragstart = (e) => { e.dataTransfer.setData('text/plain', row.id); row.classList.add('dragging'); };
-                        row.ondragend = () => { row.classList.remove('dragging'); saveCustomTableLayout(); };
-                        row.ondragover = (e) => { e.preventDefault(); const draggingRow = tbody.querySelector('.dragging'); if (draggingRow && draggingRow !== row) { tbody.insertBefore(draggingRow, row); } };
-                    });
-                }
-            });
-        }
-
-        function disableTableDragAndDrop() {
-            ['mashyTableElement', 'wissamTableElement'].forEach(tableId => {
-                const table = document.getElementById(tableId);
-                if (!table) return;
-                table.classList.remove('table-drag-mode');
-                table.querySelectorAll('tr').forEach(row => row.removeAttribute('draggable'));
-            });
-        }
-
-        function saveCustomTableLayout() {
-            // حفظ HTML الجداول الحالي أوترتيب الIDs محلياً لضمان الثبات التام
-            const mashyBodyHtml = document.getElementById('mashyTableBody').innerHTML;
-            const wissamBodyHtml = document.getElementById('wissamTableBody').innerHTML;
-            localStorage.setItem('custom_table_mashy_html', mashyBodyHtml);
-            localStorage.setItem('custom_table_wissam_html', wissamBodyHtml);
-        }
-
-        function loadCustomTableLayout() {
-            const savedMashy = localStorage.getItem('custom_table_mashy_html');
-            const savedWissam = localStorage.getItem('custom_table_wissam_html');
-            if (savedMashy && document.getElementById('mashyTableBody') && !document.getElementById('docSearchInput').value) {
-                // سيتم تطبيقه بعد العرض العادي
-            }
+            const dateEl = document.getElementById('liveDateDisplay');
+            if (clockEl) clockEl.innerText = timeStr;
+            if (dateEl) dateEl.innerText = dateStr;
         }
 
         function switchTab(tabId, elem, save = true) {
@@ -1470,7 +1214,7 @@
 
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
-        function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][getSaudiDateObject().getDay()]; }
+        function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
 
         function toggleTopBarsVisibility() {
             topBarsVisible = !topBarsVisible;
@@ -1702,7 +1446,6 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
-                const activeNowBadge = isDoctorActiveNow(doc) ? `<span style="background:rgba(34,197,94,0.15); color:#22c55e; padding:0.1rem 0.3rem; border-radius:4px; font-size:0.6rem; font-weight:bold;">🟢 متواجد الآن</span>` : '';
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = doc.tags ? `<br><span class="tag-badge">🏷️ ${doc.tags}</span>` : '';
@@ -1715,7 +1458,7 @@
                 mashyHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
                         <td>
-                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge} ${activeNowBadge}</span>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
@@ -1740,7 +1483,6 @@
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
-                const activeNowBadge = isDoctorActiveNow(doc) ? `<span style="background:rgba(34,197,94,0.15); color:#22c55e; padding:0.1rem 0.3rem; border-radius:4px; font-size:0.6rem; font-weight:bold;">🟢 متواجد الآن</span>` : '';
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = doc.tags ? `<br><span class="tag-badge">🏷️ ${doc.tags}</span>` : '';
@@ -1753,7 +1495,7 @@
                 wissamHTML += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}">
                         <td>
-                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge} ${activeNowBadge}</span>
+                            <span class="doc-name-box" style="display:inline-block;">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                             <span class="doc-nat-badge">${doc.nationality || ''}</span>
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
@@ -1778,8 +1520,6 @@
             document.getElementById('countWissam').innerText = countW + ' أطباء';
             document.getElementById('todayDocsMashy').innerText = todayMashyDocs.join(' ، ') || 'لا يوجد';
             document.getElementById('todayDocsWissam').innerText = todayWissamDocs.join(' ، ') || 'لا يوجد';
-
-            updateTopLiveDoctorsBadge();
         }
 
         function openDoctorModal() {
@@ -1934,6 +1674,15 @@
                 window.open(blobUrl, '_blank');
             } catch(e) {
                 window.open(base64Data, '_blank');
+            }
+        }
+
+        function resetTickerToStart() {
+            const track = document.getElementById('tickerTrackContainer');
+            if (track) {
+                track.style.animation = 'none';
+                track.offsetHeight;
+                applyTickerSpeed();
             }
         }
 
@@ -2568,6 +2317,7 @@
 
                 const isMatch = (key) => key && key.includes(normQ);
 
+                // 1. الأطباء
                 if (activeFilters['doctors'] !== false) {
                     doctorsData.forEach(d => {
                         if (isMatch(d._searchKey)) {
@@ -2581,6 +2331,7 @@
                     });
                 }
 
+                // 2. العروض والأسعار
                 if (activeFilters['offers'] !== false) {
                     offersData.forEach(o => {
                         if (isMatch(o._searchKey)) {
@@ -2594,6 +2345,7 @@
                     });
                 }
 
+                // 3. التنبيهات
                 if (activeFilters['alerts'] !== false) {
                     alertsData.forEach(a => {
                         if (isMatch(a._searchKey)) {
@@ -2605,6 +2357,7 @@
                     });
                 }
 
+                // 4. الاستفسارات
                 if (activeFilters['inquiries'] !== false) {
                     inquiriesData.forEach(i => {
                         if (isMatch(i._searchKey)) {
@@ -2617,6 +2370,7 @@
                     });
                 }
 
+                // 5. الأقسام والخدمات
                 if (activeFilters['services'] !== false) {
                     deptServicesData.forEach(s => {
                         if (isMatch(s._searchKey)) {
@@ -2637,6 +2391,7 @@
                     });
                 }
 
+                // 6. دليل المنسقين
                 if (activeFilters['coordinators'] !== false) {
                     coordinatorsData.forEach(c => {
                         if (isMatch(c._searchKey)) {
