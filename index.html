@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - نظام محلي أولاً (Local-First)</title>
+    <title>لوحة الكول سنتر والمنسقين - نظام السحابة المحدث</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -51,8 +51,8 @@
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
         
-        .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
+        .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; transition: all 0.3s ease; }
 
         .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.2rem; }
         .theme-box-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
@@ -236,8 +236,8 @@
         </ul>
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
-            <span class="cloud-dot"></span>
-            <span>متصل بالسحابة (محلي أولاً)</span>
+            <span class="cloud-dot" id="cloudDotElem"></span>
+            <span id="cloudTextElem">جاري الاتصال بالسحابة...</span>
         </div>
 
         <div class="theme-box">
@@ -1039,12 +1039,27 @@
             } catch(e){}
         }
 
+        // مراقبة حالة الاتصال بالانترنت والسحابة مع تغيير لون الايقونة والسحابة عند انقطاع الإنترنت
         db.ref('.info/connected').on('value', function(snap) {
             const badge = document.getElementById('cloudStatusBadge');
+            const dot = document.getElementById('cloudDotElem');
+            const textElem = document.getElementById('cloudTextElem');
+            if (!badge || !dot || !textElem) return;
+
             if (snap.val() === true) {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#22c55e; box-shadow:0 0 10px #22c55e;"></span><span>متصل بالسحابة (مزامنة خلفية صامتة)</span>`;
+                badge.style.background = "rgba(22, 163, 74, 0.12)";
+                badge.style.borderColor = "#22c55e";
+                badge.style.color = "#22c55e";
+                dot.style.backgroundColor = "#22c55e";
+                dot.style.boxShadow = "0 0 10px #22c55e";
+                textElem.innerText = "متصل بالسحابة (مزامنة فورية)";
             } else {
-                badge.innerHTML = `<span class="cloud-dot" style="background-color:#dc2626; box-shadow:0 0 8px #dc2626;"></span><span style="color:#ef4444;">غير متصل بالإنترنت (يعمل محلياً بكفاءة)</span>`;
+                badge.style.background = "rgba(220, 38, 38, 0.15)";
+                badge.style.borderColor = "#dc2626";
+                badge.style.color = "#ef4444";
+                dot.style.backgroundColor = "#dc2626";
+                dot.style.boxShadow = "0 0 10px #dc2626";
+                textElem.innerText = "غير متصل بالإنترنت (يعمل محلياً بكفاءة)";
             }
         });
 
@@ -1065,47 +1080,95 @@
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '0.25');
         let tickerIsPaused = false;
-        
         let currentGlobalSearchResults = [];
 
-        function loadFromLocalStorageCache() {
-            try {
-                const cached = localStorage.getItem('clinic_data_cache_fb');
-                if (cached) {
-                    const data = JSON.parse(cached);
-                    doctorsData = data.doctorsData || [];
-                    fridaySchedules = data.fridaySchedules || [];
-                    alertsData = data.alertsData || [];
-                    coordinatorsData = data.coordinatorsData || [];
-                    deptServicesData = data.deptServicesData || [];
-                    deptNotesData = data.deptNotesData || [];
-                    offersData = data.offersData || [];
-                    inquiriesData = data.inquiriesData || [];
-                    return true;
+        // تحميل البيانات: محلياً أولاً لضمان عدم ضياع أي شيء عند الـ Refresh، ثم سحابياً في الخلفية
+        function loadAllAppData() {
+            let localSaved = localStorage.getItem('clinic_master_data_v2');
+            if (localSaved) {
+                try {
+                    let parsed = JSON.parse(localSaved);
+                    assignDataToVariables(parsed);
+                    refreshAllViews();
+                } catch(e) {}
+            } else {
+                loadDefaultData();
+                refreshAllViews();
+            }
+
+            db.ref('clinicMasterData').once('value').then((snapshot) => {
+                const cloudData = snapshot.val();
+                if (cloudData) {
+                    assignDataToVariables(cloudData);
+                    saveDataLocally(cloudData);
+                    refreshAllViews();
                 }
-            } catch(e){}
-            return false;
+            }).catch(err => console.log("Cloud sync waiting..."));
         }
 
-        function saveToLocalStorageCache() {
+        function assignDataToVariables(data) {
+            if (data.doctorsData) doctorsData = data.doctorsData;
+            if (data.fridaySchedules) fridaySchedules = data.fridaySchedules;
+            if (data.alertsData) alertsData = data.alertsData;
+            if (data.coordinatorsData) coordinatorsData = data.coordinatorsData;
+            if (data.deptServicesData) deptServicesData = data.deptServicesData;
+            if (data.deptNotesData) deptNotesData = data.deptNotesData;
+            if (data.offersData) offersData = data.offersData;
+            if (data.inquiriesData) inquiriesData = data.inquiriesData;
+        }
+
+        function saveDataLocally(data) {
             try {
-                const data = { doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData };
-                localStorage.setItem('clinic_data_cache_fb', JSON.stringify(data));
+                localStorage.setItem('clinic_master_data_v2', JSON.stringify(data));
             } catch(e){}
         }
 
-        function normalizeArabicText(str) {
-            if (!str) return "";
-            return str.toString()
-                .toLowerCase()
-                .replace(/[\u064b-\u0652]/g, '')
-                .replace(/[إأآا]/g, 'ا')
-                .replace(/ة/g, 'ه')
-                .replace(/ى/g, 'ي')
-                .replace(/ؤ/g, 'ء')
-                .replace(/ئ/g, 'ء')
-                .replace(/\s+/g, ' ')
-                .trim();
+        let syncTimer = null;
+        function syncToCloud() {
+            const bundleData = {
+                doctorsData,
+                fridaySchedules,
+                alertsData,
+                coordinatorsData,
+                deptServicesData,
+                deptNotesData,
+                offersData,
+                inquiriesData
+            };
+
+            // 1. الحفظ المحلي الفوري (لا يضيع أي شيء عند عمل Refresh)
+            saveDataLocally(bundleData);
+
+            // 2. المزامنة السحابية الفورية في الخلفية
+            if (syncTimer) clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => {
+                db.ref('clinicMasterData').set(bundleData).then(() => {
+                    console.log("تمت المزامنة السحابية بنجاح");
+                }).catch(err => {
+                    console.error("فشل الرفع السحابي:", err);
+                });
+            }, 300);
+        }
+
+        function loadDefaultData() {
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
+            fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
+            deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
+            inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", tags: "رتوش، ليزر", color: "card-darkblue" }];
+            offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "عرض نوفمبر. عروض", tags: "عروض، أسنان", isPinned: true }];
+            syncToCloud();
+        }
+
+        function refreshAllViews() {
+            renderDoctors();
+            renderFridayScheduleTable();
+            renderAlerts();
+            renderDeptsAndDocs();
+            renderCoordinators();
+            renderOffersTabs();
+            renderOffers();
+            renderInquiries();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1119,8 +1182,7 @@
             document.getElementById('shiftScratchpadText2').value = localStorage.getItem('shift_scratchpad_2') || '';
             document.getElementById('shiftScratchpadText3').value = localStorage.getItem('shift_scratchpad_3') || '';
 
-            const isShiftScratchpadOpen = localStorage.getItem('shift_scratchpad_open') === 'true';
-            if (isShiftScratchpadOpen) {
+            if (localStorage.getItem('shift_scratchpad_open') === 'true') {
                 document.getElementById('shiftScratchpadContainer').classList.add('show');
             }
 
@@ -1136,40 +1198,7 @@
             updateLiveClockAndDate();
             setInterval(updateLiveClockAndDate, 1000);
 
-            document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(btn => {
-                if (btn.innerText.trim() === selectedInquiryFilter) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
-            // 1. التشغيل المحلي الفوري (Local-First) بلا انتظار
-            if (loadFromLocalStorageCache()) {
-                refreshAllViews();
-            } else {
-                loadDefaultData();
-                refreshAllViews();
-            }
-
-            // 2. مزامنة صامتة في الخلفية لجلب أحدث التحديثات من السحابة دون تعطيل الواجهة
-            db.ref('clinicData').once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    doctorsData = data.doctorsData || doctorsData;
-                    fridaySchedules = data.fridaySchedules || fridaySchedules;
-                    alertsData = data.alertsData || alertsData;
-                    coordinatorsData = data.coordinatorsData || coordinatorsData;
-                    deptServicesData = data.deptServicesData || deptServicesData;
-                    deptNotesData = data.deptNotesData ? data.deptNotesData.map(n => typeof n === 'string' ? { text: n, color: 'card-gold' } : n) : deptNotesData;
-                    offersData = data.offersData || offersData;
-                    inquiriesData = data.inquiriesData || inquiriesData;
-                    saveToLocalStorageCache();
-                    refreshAllViews();
-                }
-            }).catch((error) => {
-                console.error("Background sync fallback:", error);
-            });
+            loadAllAppData();
         });
 
         function updateLiveClockAndDate() {
@@ -1178,41 +1207,39 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
+            hours = hours % 12 || 12;
             const timeStr = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
             
-            const dayNum = String(now.getDate()).padStart(2, '0');
-            const monthNum = String(now.getMonth() + 1).padStart(2, '0');
-            const yearNum = now.getFullYear();
-            const dateStr = `${dayNum}/${monthNum}/${yearNum}`;
-
             const clockEl = document.getElementById('liveClockDisplay');
             const dateEl = document.getElementById('liveDateDisplay');
             if (clockEl) clockEl.innerText = timeStr;
             if (dateEl) dateEl.innerText = dateStr;
         }
 
-        function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
-            fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
-            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
-            deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
-            inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", tags: "رتوش، ليزر", color: "card-darkblue" }];
-            offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "عرض نوفمبر. عروض", tags: "عروض، أسنان", isPinned: true }];
-            saveToLocalStorageCache();
+        function switchTab(tabId, elem, save = true) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            const targetSec = document.getElementById(tabId + '-section');
+            if (targetSec) targetSec.classList.add('active');
+            if (elem) elem.classList.add('active');
+            if (save) localStorage.setItem('activeTab', tabId);
         }
 
-        function refreshAllViews() {
-            renderDoctors();
-            renderFridayScheduleTable();
-            renderAlerts();
-            renderDeptsAndDocs();
-            renderCoordinators();
-            renderOffersTabs();
-            renderOffers();
-            renderInquiries();
+        function changeTheme(themeName) {
+            document.body.className = themeName;
+            localStorage.setItem('appTheme', themeName);
         }
+
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+        function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
+        function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
+        function normalizeArabicText(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase().replace(/[\u064b-\u0652]/g, '').replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
+        }
+        function cleanSearchText(str) { return normalizeArabicText(str); }
 
         function toggleTopBarsVisibility() {
             topBarsVisible = !topBarsVisible;
@@ -1222,8 +1249,7 @@
 
         function applyTopBarsVisibilityState(isVisible) {
             const tickerBar = document.getElementById('professionalTickerBarContainer');
-            const displayVal = isVisible ? 'flex' : 'none';
-            if (tickerBar) tickerBar.style.display = displayVal;
+            if (tickerBar) tickerBar.style.display = isVisible ? 'flex' : 'none';
         }
 
         function openRenameSidebarModal() {
@@ -1318,41 +1344,6 @@
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        let syncTimeout = null;
-        function syncToCloud() {
-            // الحفظ الفوري محلياً لضمان السرعة المطلقة
-            saveToLocalStorageCache();
-            
-            // الرفع الصامت للسحابة في الخلفية بتأخير زمني بسيط لتجنب أي ضغط أو بطء
-            if (syncTimeout) clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(() => {
-                db.ref('clinicData').set({ 
-                    doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData
-                }).catch(err => console.log("Background sync pending..."));
-            }, 1000);
-        }
-
-        function switchTab(tabId, elem, save = true) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            document.querySelectorAll('.page-section').forEach(s => { if(s.id !== 'globalSearchResultsSection') s.classList.remove('active'); });
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            const targetSec = document.getElementById(tabId + '-section');
-            if (targetSec) targetSec.classList.add('active');
-            if (elem) elem.classList.add('active');
-            if (save) localStorage.setItem('activeTab', tabId);
-        }
-
-        function changeTheme(themeName) {
-            document.body.className = themeName;
-            localStorage.setItem('appTheme', themeName);
-            const selectEl = document.querySelector('.theme-select');
-            if(selectEl) selectEl.value = themeName;
-        }
-
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
-
-        function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
-
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", 'backup_' + Date.now() + '.json');
@@ -1418,8 +1409,6 @@
             });
         }
 
-        function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
-        
         function copyTextToClipboard(text, msg = "تم النسخ بنجاح!") {
             navigator.clipboard.writeText(text).then(() => { alert(`📋 ${msg}\n\n${text}`); });
         }
@@ -1436,8 +1425,6 @@
             if (scheduleLines.length > 0) clientText += `\nأيام الدوام:\n` + scheduleLines.join('\n');
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
-
-        function cleanSearchText(str) { return normalizeArabicText(str); }
 
         function renderDoctors(highlightId = null) {
             const searchInput = document.getElementById('docSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
@@ -1704,9 +1691,7 @@
                 let bstr = atob(arr[1]);
                 let n = bstr.length;
                 let u8arr = new Uint8Array(n);
-                while(n--) {
-                    u8arr[n] = bstr.charCodeAt(n);
-                }
+                while(n--) { u8arr[n] = bstr.charCodeAt(n); }
                 let blob = new Blob([u8arr], {type: mime});
                 let blobUrl = URL.createObjectURL(blob);
                 window.open(blobUrl, '_blank');
