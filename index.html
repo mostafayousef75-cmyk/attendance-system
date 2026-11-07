@@ -169,7 +169,6 @@
         .offer-tab-btn:hover { border-color: var(--primary-color); }
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
-        /* شبكة العروض - عمودين أو مربعات متناسقة */
         .offers-grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; margin-bottom: 0.4rem; }
         .offers-grid-container.single-column { grid-template-columns: 1fr; }
         
@@ -181,7 +180,6 @@
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.04rem 0.18rem; border-radius: 4px; font-size: 0.52rem; display: inline-block; margin-top: 2px; }
 
-        /* ترتيب أزرار الإدارة فوق بعضها بشكل عمودي */
         .actions-col-group { display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
         .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 0.68rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 20px; transition: filter 0.15s; }
         .action-icon-btn.btn-copy-ic { color: var(--accent-green); background: rgba(34, 197, 94, 0.15); }
@@ -192,7 +190,8 @@
         .drag-handle { cursor: grab; color: var(--text-muted); font-size: 0.75rem; padding: 2px 4px; display: inline-flex; align-items: center; justify-content: center; user-select: none; }
         .drag-handle:active { cursor: grabbing; }
 
-        .floating-offers-window { position: fixed; bottom: 20px; left: 20px; width: 310px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 6px 20px rgba(0,0,0,0.6); z-index: 9999; display: none; flex-direction: column; overflow: hidden; }
+        /* سلة العروض المتحركة والثابتة */
+        .floating-offers-window { position: fixed; bottom: 20px; left: 20px; width: 310px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 6px 20px rgba(0,0,0,0.6); z-index: 999999; display: none; flex-direction: column; overflow: hidden; }
         .floating-offers-window.active { display: flex; }
         .floating-offers-header { background: var(--bg-card); padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.7rem; }
         .floating-offers-body { padding: 0.35rem; display: flex; flex-direction: column; gap: 0.25rem; }
@@ -527,12 +526,11 @@
                 <div class="coordinators-grid" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
             </section>
 
-            <!-- 5. العروض والأسعار (تم تصميمها كشبكة مترابطة مع زر طريقة العرض) -->
+            <!-- 5. العروض والأسعار -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.25rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
                     <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
-                        <!-- زر تغيير طريقة العرض مع حفظ الاختيار -->
                         <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="toggleOffersViewMode()" id="offersViewModeBtn" title="تغيير طريقة العرض (عمودين أو عمود واحد)">
                             <i class="fa-solid fa-table-cells"></i> <span id="offersViewModeText">عرض عمود واحد</span>
                         </button>
@@ -590,6 +588,7 @@
         </div>
     </main>
 
+    <!-- سلة العروض المتحركة والثابتة -->
     <div class="floating-offers-window" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
             <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
@@ -1161,7 +1160,6 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // حالة طريقة عرض العروض (افتراضي عمودين)
         let offersGridSingleColumn = JSON.parse(localStorage.getItem('offers_grid_single_column') || 'false');
 
         function toggleOffersViewMode() {
