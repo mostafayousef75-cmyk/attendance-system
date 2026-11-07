@@ -77,7 +77,7 @@
 
         .header-actions-group { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
-        .header-time-text { color: #ffffff !important; font-weight: 800; } /* تفعيل اللون الأبيض للساعة بالهيدر */
+        .header-time-text { color: #ffffff !important; font-weight: 800; }
         .header-date-text { color: var(--primary-color); font-weight: 800; }
 
         .kpi-bar { display: flex; gap: 0.35rem; align-items: center; }
@@ -170,8 +170,6 @@
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.4rem; }
-        
-        /* تعديل تصميم السعر العام لجعل اللون أزرق أنيق مع كتابة باللون الأبيض */
         .price-badge { background-color: #2563eb; color: #ffffff; padding: 0.18rem 0.55rem; border-radius: 6px; font-weight: 800; font-size: 0.78rem; display: inline-block; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
         
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
@@ -195,13 +193,13 @@
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 100000; padding: 0.8rem; }
         .modal-overlay.active { display: flex; }
-        .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 480px; max-height: 90vh; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; }
+        .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; }
         .form-control { width: 100%; padding: 0.25rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.7rem; }
 
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.25rem; }
-        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem; margin-top: 0.15rem; display: none; }
-        .days-checklist.show { display: grid; }
-        .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.15rem; font-size: 0.7rem; cursor: pointer; }
+        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem; }
+        .day-config-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; font-size: 0.68rem; padding: 0.2rem 0; border-bottom: 1px dashed var(--border-color); }
+        .day-config-row:last-child { border-bottom: none; }
+        
         .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
 
         @media (max-width: 768px) {
@@ -617,7 +615,7 @@
         </div>
     </div>
 
-    <!-- مودال المتواجدين الآن بالفحص الذكي لساعات الدوام -->
+    <!-- مودال المتواجدين الآن بالفحص الذكي الدقيق لساعات اليوم -->
     <div class="modal-overlay" id="activeDoctorsModal">
         <div class="modal" style="max-width: 780px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -663,9 +661,9 @@
         </div>
     </div>
 
-    <!-- مودال الأطباء المحدث مع استبدال مربع النص لقوائم اختيار دوام (من - إلى) -->
+    <!-- مودال الأطباء المحدث مع تحديد ساعات دوام مخصصة لكل يوم على حدة -->
     <div class="modal-overlay" id="doctorModal">
-        <div class="modal">
+        <div class="modal" style="max-width: 540px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 id="docModalTitle">إضافة / تعديل موعد طبيب</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('doctorModal')"></i>
@@ -721,52 +719,15 @@
                 <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / غير متواجد</label>
             </div>
 
+            <!-- جدول تحديد الأيام وساعات الدوام المخصصة لكل يوم -->
             <div class="days-section-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('mashyDaysBox')">
-                    <label style="font-weight:700; color:var(--primary-color); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> أيام دوام معشي</label>
-                    <i class="fa-solid fa-chevron-down" style="color:var(--primary-color); font-size:0.65rem;"></i>
-                </div>
-                <div class="days-checklist" id="mashyDaysBox">
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="السبت"> السبت</label>
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأحد"> الأحد</label>
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الإثنين"> الإثنين</label>
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الثلاثاء"> الثلاثاء</label>
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأربعاء"> الأربعاء</label>
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الخميس"> الخميس</label>
-                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الجمعة"> الجمعة</label>
-                </div>
+                <label style="font-weight:700; color:var(--primary-color); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-calendar-days"></i> أيام وساعات الدوام المخصصة لكل يوم</label>
+                <div style="display:flex; flex-direction:column; gap:0.2rem;" id="daysConfigContainer"></div>
             </div>
 
-            <div class="days-section-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('wissamDaysBox')">
-                    <label style="font-weight:700; color:var(--accent-green); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> أيام دوام الوسام</label>
-                    <i class="fa-solid fa-chevron-down" style="color:var(--accent-green); font-size:0.65rem;"></i>
-                </div>
-                <div class="days-checklist" id="wissamDaysBox">
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="السبت"> السبت</label>
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأحد"> الأحد</label>
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الإثنين"> الإثنين</label>
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الثلاثاء"> الثلاثاء</label>
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأربعاء"> الأربعاء</label>
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الخميس"> الخميس</label>
-                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الجمعة"> الجمعة</label>
-                </div>
-            </div>
-
-            <!-- ساعات الدوام المحدثة بقوائم اختيار دقيقة -->
-            <div style="display:flex; flex-direction:column; gap:0.2rem; background:var(--bg-card); padding:0.35rem; border-radius:6px; border:1px solid var(--border-color);">
-                <label style="font-weight:700; color:var(--primary-color);"><i class="fa-solid fa-clock"></i> ساعات الدوام المعتمدة</label>
-                <div style="display:flex; gap:0.3rem; align-items:center;">
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">من:</span>
-                        <select id="docStartHourSelect" class="form-control" onchange="updateDocTimingTextFromSelects()"></select>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">إلى:</span>
-                        <select id="docEndHourSelect" class="form-control" onchange="updateDocTimingTextFromSelects()"></select>
-                    </div>
-                </div>
-                <input type="text" id="docTiming" class="form-control" placeholder="أو اكتب النص مخصصاً..." style="margin-top:0.2rem;">
+            <div style="display:flex; flex-direction:column; gap:0.12rem;">
+                <label>نص الساعات العام (للعرض بالجدول)</label>
+                <input type="text" id="docTiming" class="form-control" placeholder="مثال: من 1م - 9م">
             </div>
 
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
@@ -1137,12 +1098,11 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        function populateHourSelectOptions() {
-            const startSelect = document.getElementById('docStartHourSelect');
-            const endSelect = document.getElementById('docEndHourSelect');
-            if (!startSelect || !endSelect) return;
+        const WEEK_DAYS = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 
+        function getHoursOptionsHtml() {
             let times = [
+                { val: "off", text: "إجازة (غير متواجد)" },
                 { val: "24", text: "24 ساعة (طوال اليوم)" },
                 { val: "0", text: "12:00 صباحاً (منتصف الليل)" },
                 { val: "0.5", text: "12:30 صباحاً" },
@@ -1193,24 +1153,36 @@
                 { val: "23", text: "11:00 مساءً" },
                 { val: "23.5", text: "11:30 مساءً" }
             ];
-
             let html = "";
             times.forEach(t => { html += `<option value="${t.val}">${t.text}</option>`; });
-            startSelect.innerHTML = html;
-            endSelect.innerHTML = html;
+            return html;
         }
 
-        function updateDocTimingTextFromSelects() {
-            const startVal = document.getElementById('docStartHourSelect').value;
-            const endVal = document.getElementById('docEndHourSelect').value;
-            const startOpt = document.getElementById('docStartHourSelect').options[document.getElementById('docStartHourSelect').selectedIndex];
-            const endOpt = document.getElementById('docEndHourSelect').options[document.getElementById('docEndHourSelect').selectedIndex];
+        function buildDaysConfigUI(daySchedules = {}) {
+            const container = document.getElementById('daysConfigContainer');
+            if (!container) return;
+            let html = "";
+            WEEK_DAYS.forEach(day => {
+                let conf = daySchedules[day] || { active: true, start: "13", end: "21" }; // الافتراضي من 1م لـ 9م
+                html += `
+                    <div class="day-config-row" data-day="${day}">
+                        <label style="width: 60px; font-weight:700;"><input type="checkbox" class="day-active-chk" ${conf.active ? 'checked' : ''} onchange="toggleDayConfigInputs(this)"> ${day}</label>
+                        <select class="form-control day-start-sel" style="font-size:0.62rem; padding:0.15rem;" ${!conf.active ? 'disabled' : ''}>
+                            ${getHoursOptionsHtml().replace(`value="${conf.start}"`, `value="${conf.start}" selected`)}
+                        </select>
+                        <span style="font-size:0.6rem; color:var(--text-muted);">إلى</span>
+                        <select class="form-control day-end-sel" style="font-size:0.62rem; padding:0.15rem;" ${!conf.active ? 'disabled' : ''}>
+                            ${getHoursOptionsHtml().replace(`value="${conf.end}"`, `value="${conf.end}" selected`)}
+                        </select>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
 
-            if (startVal === "24" || endVal === "24") {
-                document.getElementById('docTiming').value = "24 ساعة (طوال اليوم)";
-            } else if (startOpt && endOpt) {
-                document.getElementById('docTiming').value = `من ${startOpt.text} - إلى ${endOpt.text}`;
-            }
+        function toggleDayConfigInputs(chk) {
+            const row = chk.closest('.day-config-row');
+            const selects = row.querySelectorAll('select');
+            selects.forEach(s => s.disabled = !chk.checked);
         }
 
         function buildPreNormalizedSearchKeys() {
@@ -1239,7 +1211,7 @@
         }
 
         function loadAllAppData() {
-            let localSaved = localStorage.getItem('clinic_master_data_v2');
+            let localSaved = localStorage.getItem('clinic_master_data_v3');
             if (localSaved) {
                 try {
                     let parsed = JSON.parse(localSaved);
@@ -1253,7 +1225,7 @@
                 refreshAllViews();
             }
 
-            db.ref('clinicMasterData').once('value').then((snapshot) => {
+            db.ref('clinicMasterDataV3').once('value').then((snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData) {
                     assignDataToVariables(cloudData);
@@ -1277,7 +1249,7 @@
 
         function saveDataLocally(data) {
             try {
-                localStorage.setItem('clinic_master_data_v2', JSON.stringify(data));
+                localStorage.setItem('clinic_master_data_v3', JSON.stringify(data));
             } catch(e){}
         }
 
@@ -1298,7 +1270,7 @@
 
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
-                db.ref('clinicMasterData').set(bundleData).then(() => {
+                db.ref('clinicMasterDataV3').set(bundleData).then(() => {
                     console.log("تمت المزامنة السحابية بنجاح");
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
@@ -1307,7 +1279,10 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "من 12:30 مساءً - إلى 8:30 مساءً", notes: "", customColor: "" }];
+            let defaultSchedules = {};
+            WEEK_DAYS.forEach(d => { defaultSchedules[d] = { active: true, start: "13", end: "21" }; });
+
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, daySchedules: defaultSchedules, timing: "من 1م - إلى 9م", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
             deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
@@ -1345,7 +1320,6 @@
 
             applyTopBarsVisibilityState(topBarsVisible);
             loadTableWidths();
-            populateHourSelectOptions();
 
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
@@ -1360,7 +1334,6 @@
             loadAllAppData();
         });
 
-        // تنسيق التاريخ بالنقاط بدون أسماء أشهر إنجليزية
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1390,8 +1363,6 @@
             const minutes = now.getMinutes();
             const seconds = now.getSeconds();
             
-            modalCurrentTimeObj = { hours, minutes, seconds };
-
             const ampm = hours >= 12 ? 'PM' : 'AM';
             let displayHours = hours % 12;
             displayHours = displayHours ? displayHours : 12;
@@ -1433,9 +1404,15 @@
                 modalClockInterval = null;
             }
         }
-        function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
-        function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
-        
+
+        function getArabicDayName() { return WEEK_DAYS[new Date().getDay() === 6 ? 0 : new Date().getDay() + 1] || "السبت"; } // ضمان مطابقة أيام الأسبوع
+        // بدقة أكثر بناء على الفهرس الفعلي
+        function getExactArabicDayName() {
+            const jsDay = new Date().getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+            const map = { 6: "السبت", 0: "الأحد", 1: "الإثنين", 2: "الثلاثاء", 3: "الأربعاء", 4: "الخميس", 5: "الجمعة" };
+            return map[jsDay] || "السبت";
+        }
+
         function normalizeArabicText(str) {
             if (!str) return "";
             return str.toString().toLowerCase().replace(/[\u064b-\u0652]/g, '').replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
@@ -1687,44 +1664,23 @@
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
-            const mashyDays = doc.mashyDays || doc.days || [], wissamDays = doc.wissamDays || [];
-            let scheduleLines = [];
-            if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
-            if (wissamDays.length > 0) scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
             let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\nالساعات والدوام: ${doc.timing || ''}`;
             if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
-            if (scheduleLines.length > 0) clientText += `\nأيام الدوام:\n` + scheduleLines.join('\n');
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
-        // تحليلات الساعات بالدقيقة وتدعم الفترات المسائية والصباحية بدقة
-        function parseTimingAndCheckActive(timingStr, currentHour24) {
-            if (!timingStr) return true;
-            let norm = timingStr.toLowerCase();
-            if (norm.includes('24 ساعة') || norm.includes('طوال اليوم')) return true;
+        // فحص دقيق لدوام اليوم الحالي بناءً على الساعات المخصصة لكل يوم (AM / PM مطابقة تامة)
+        function checkDoctorActiveForToday(doc, currentDay, currentHour24) {
+            if (doc.isLeave) return false;
+            if (!doc.daySchedules) return true; // دعم قديم
+            let dayConf = doc.daySchedules[currentDay];
+            if (!dayConf || !dayConf.active || dayConf.start === "off") return false;
+            if (dayConf.start === "24" || dayConf.end === "24") return true;
 
-            let matches = norm.match(/(\d+[\.,]?\d*)\s*(صباحا|مساء|ص|م|am|pm)?/g);
-            if (!matches || matches.length < 2) return true;
+            let start = parseFloat(dayConf.start);
+            let end = parseFloat(dayConf.end);
 
-            let parseNumTo24 = (valStr) => {
-                let parts = valStr.match(/(\d+[\.,]?\d*)\s*(صباحا|مساء|ص|م|am|pm)?/);
-                if (!parts) return null;
-                let num = parseFloat(parts[1].replace(',', '.'));
-                let period = parts[2] ? parts[2].trim() : '';
-                if (period.includes('مساء') || period.includes('م') || period === 'pm') {
-                    if (num < 12) num += 12;
-                } else if (period.includes('صباحا') || period.includes('ص') || period === 'am') {
-                    if (num === 12) num = 0;
-                } else {
-                    if (num >= 1 && num <= 6) num += 12;
-                }
-                return num;
-            };
-
-            let start = parseNumTo24(matches[0]);
-            let end = parseNumTo24(matches[1]);
-
-            if (start === null || end === null) return true;
+            if (isNaN(start) || isNaN(end)) return true;
 
             if (start <= end) {
                 return currentHour24 >= start && currentHour24 <= end;
@@ -1740,20 +1696,15 @@
         }
 
         function updateActiveDoctorsKPI() {
-            const currentDay = getArabicDayName();
+            const currentDay = getExactArabicDayName();
             const currentHour24 = getModifiedTimeHour24();
             
             let todayMashyCount = 0, todayWissamCount = 0;
             doctorsData.forEach(d => {
-                if (d.isLeave) return;
-                const mashyDays = d.mashyDays || d.days || [];
-                const wissamDays = d.wissamDays || [];
-                
-                let isMashyDay = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
-                let isWissamDay = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
-
-                if (isMashyDay && parseTimingAndCheckActive(d.timing, currentHour24)) todayMashyCount++;
-                if (isWissamDay && parseTimingAndCheckActive(d.timing, currentHour24)) todayWissamCount++;
+                if (checkDoctorActiveForToday(d, currentDay, currentHour24)) {
+                    if (d.branch === "معشي" || d.isJoint) todayMashyCount++;
+                    if (d.branch === "الوسام" || d.isJoint) todayWissamCount++;
+                }
             });
             const summaryEl = document.getElementById('kpiActiveSummary');
             if (summaryEl) summaryEl.innerText = `(معشي: ${todayMashyCount} | الوسام: ${todayWissamCount})`;
@@ -1761,24 +1712,17 @@
 
         function openActiveDoctorsUnifiedModal() {
             document.getElementById('timezoneOffsetSelect').value = timezoneOffsetHours.toString();
-            const currentDay = getArabicDayName();
+            const currentDay = getExactArabicDayName();
             const currentHour24 = getModifiedTimeHour24();
             
             let mashyActive = [], wissamActive = [];
             const sortedDoctors = [...doctorsData];
 
             sortedDoctors.forEach(d => {
-                if (d.isLeave) return;
-                const mashyDays = d.mashyDays || d.days || [];
-                const wissamDays = d.wissamDays || [];
-                
-                let isMashyDay = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
-                let isWissamDay = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
-
-                let isActiveNow = parseTimingAndCheckActive(d.timing, currentHour24);
-
-                if (isMashyDay && isActiveNow) mashyActive.push(d);
-                if (isWissamDay && isActiveNow) wissamActive.push(d);
+                if (checkDoctorActiveForToday(d, currentDay, currentHour24)) {
+                    if (d.branch === "معشي" || d.isJoint) mashyActive.push(d);
+                    if (d.branch === "الوسام" || d.isJoint) wissamActive.push(d);
+                }
             });
 
             const mashyContainer = document.getElementById('activeMashyListContainer');
@@ -1787,7 +1731,7 @@
 
             let mashyHtml = "";
             if (mashyActive.length === 0) {
-                mashyHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (في هذه الساعة المعدلة) بفرع معشي.</div>`;
+                mashyHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (${currentDay}) بفرع معشي.</div>`;
             } else {
                 mashyActive.forEach(doc => {
                     mashyHtml += `
@@ -1803,7 +1747,7 @@
 
             let wissamHtml = "";
             if (wissamActive.length === 0) {
-                wissamHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (في هذه الساعة المعدلة) بفرع الوسام.</div>`;
+                wissamHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (${currentDay}) بفرع الوسام.</div>`;
             } else {
                 wissamActive.forEach(doc => {
                     wissamHtml += `
@@ -1823,7 +1767,6 @@
             modalClockInterval = setInterval(updateModalLiveClock, 1000);
         }
 
-        // إصلاح خاصية التثبيت 📌 لتظهر في أعلى جدول الأطباء فوراً
         function getSortedDoctorsList() {
             return [...doctorsData].sort((a, b) => {
                 if (a.isPinned && !b.isPinned) return -1;
@@ -1850,7 +1793,7 @@
 
             document.getElementById('fridayDocMashy').innerHTML = mashyFridays.length > 0 ? mashyFridays.join(' ، ') : '<span>لم يُحدد</span>';
             document.getElementById('fridayDocWissam').innerHTML = wissamFridays.length > 0 ? wissamFridays.join(' ، ') : '<span>لم يُحدد</span>';
-            const currentDay = getArabicDayName();
+            const currentDay = getExactArabicDayName();
             document.getElementById('todayDayName').innerText = currentDay;
 
             let todayMashyDocs = [], todayWissamDocs = [];
@@ -1859,19 +1802,20 @@
             const mashyList = sortedDoctors.filter(d => {
                 const matchSearch = !search || (d.searchKey && d.searchKey.includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
+                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint);
             });
 
             const wissamList = sortedDoctors.filter(d => {
                 const matchSearch = !search || (d.searchKey && d.searchKey.includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
+                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint);
             });
 
             let mashyHtmlBuffer = "";
             mashyList.forEach((doc) => {
-                const mashyDays = doc.mashyDays || doc.days || [];
-                if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
+                if (!doc.isLeave && doc.daySchedules && doc.daySchedules[currentDay] && doc.daySchedules[currentDay].active) {
+                    todayMashyDocs.push(doc.name);
+                }
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
@@ -1897,7 +1841,7 @@
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div></td>
                         <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
                         <td style="text-align:center;">
                             <div class="actions-col-group">
@@ -1913,8 +1857,9 @@
 
             let wissamHtmlBuffer = "";
             wissamList.forEach((doc) => {
-                const wissamDays = doc.wissamDays || [];
-                if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
+                if (!doc.isLeave && doc.daySchedules && doc.daySchedules[currentDay] && doc.daySchedules[currentDay].active) {
+                    todayWissamDocs.push(doc.name);
+                }
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
@@ -1940,7 +1885,7 @@
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div></td>
                         <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
                         <td style="text-align:center;">
                             <div class="actions-col-group">
@@ -1969,22 +1914,31 @@
             document.getElementById('docCustomColor').value = ""; 
             document.getElementById('docIsJoint').checked = false; document.getElementById('docIsPinned').checked = false; 
             document.getElementById('docIsLeave').checked = false;
-            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
-            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = false);
-            document.getElementById('mashyDaysBox').classList.remove('show'); document.getElementById('wissamDaysBox').classList.remove('show');
-            document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; document.getElementById('doctorModal').classList.add('active');
+            
+            let defaultSchedules = {};
+            WEEK_DAYS.forEach(d => { defaultSchedules[d] = { active: true, start: "13", end: "21" }; });
+            buildDaysConfigUI(defaultSchedules);
+
+            document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; 
+            document.getElementById('doctorModal').classList.add('active');
         }
 
         function saveDoctor() {
             const id = document.getElementById('docId').value;
-            const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
-            const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
-            const isLeaveVal = document.getElementById('docIsLeave').checked;
             let docNameVal = document.getElementById('docName').value.trim();
 
             if (docNameVal && !docNameVal.startsWith("د.") && !docNameVal.startsWith("الدكتور")) {
                 docNameVal = "د. " + docNameVal;
             }
+
+            let daySchedules = {};
+            document.querySelectorAll('.day-config-row').forEach(row => {
+                const day = row.getAttribute('data-day');
+                const active = row.querySelector('.day-active-chk').checked;
+                const start = row.querySelector('.day-start-sel').value;
+                const end = row.querySelector('.day-end-sel').value;
+                daySchedules[day] = { active, start, end };
+            });
 
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
@@ -1996,8 +1950,8 @@
                 customColor: document.getElementById('docCustomColor').value,
                 isJoint: document.getElementById('docIsJoint').checked,
                 isPinned: document.getElementById('docIsPinned').checked,
-                isLeave: isLeaveVal,
-                mashyDays, wissamDays,
+                isLeave: document.getElementById('docIsLeave').checked,
+                daySchedules,
                 timing: document.getElementById('docTiming').value,
                 notes: document.getElementById('docNotes').value,
                 tags: document.getElementById('docTags').value.trim()
@@ -2016,9 +1970,14 @@
             document.getElementById('docFee').value = doc.fee || ""; document.getElementById('docBranch').value = doc.branch;
             document.getElementById('docCustomColor').value = doc.customColor || ""; document.getElementById('docIsJoint').checked = !!doc.isJoint;
             document.getElementById('docIsPinned').checked = !!doc.isPinned; document.getElementById('docIsLeave').checked = !!doc.isLeave;
-            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : false);
-            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false);
-            document.getElementById('docTiming').value = doc.timing; document.getElementById('docNotes').value = doc.notes || "";
+            
+            let schedules = doc.daySchedules || {};
+            if (Object.keys(schedules).length === 0) {
+                WEEK_DAYS.forEach(d => { schedules[d] = { active: true, start: "13", end: "21" }; });
+            }
+            buildDaysConfigUI(schedules);
+
+            document.getElementById('docTiming').value = doc.timing || ""; document.getElementById('docNotes').value = doc.notes || "";
             document.getElementById('docTags').value = doc.tags || "";
             document.getElementById('doctorModal').classList.add('active');
         }
@@ -2544,7 +2503,6 @@
             updateFloatingOffersWindow(); 
         }
 
-        // إصلاح ترتيب العروض وتطبيق التثبيت 📌 في أعلى قائمة العروض
         function getSortedOffersList() {
             return [...offersData].sort((a, b) => {
                 if (a.isPinned && !b.isPinned) return -1;
@@ -2746,7 +2704,6 @@
             triggerFilterChange();
         }
 
-        // سحب وإفلات قوي وسلس من الأيقونة فقط
         let draggedItemInfo = null;
 
         function dragStartRow(e, id, type) {
@@ -2754,9 +2711,7 @@
             e.dataTransfer.effectAllowed = 'move';
         }
 
-        document.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
+        document.addEventListener('dragover', (e) => { e.preventDefault(); });
 
         document.addEventListener('drop', (e) => {
             e.preventDefault();
