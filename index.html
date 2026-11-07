@@ -1233,14 +1233,14 @@
         }
 
         function assignDataToVariables(data) {
-            if (data.doctorsData) doctorsData = data.doctorsData;
+            if (data.doctorsData && data.doctorsData.length > 0) doctorsData = data.doctorsData;
             if (data.fridaySchedules) fridaySchedules = data.fridaySchedules;
-            if (data.alertsData) alertsData = data.alertsData;
-            if (data.coordinatorsData) coordinatorsData = data.coordinatorsData;
-            if (data.deptServicesData) deptServicesData = data.deptServicesData;
-            if (data.deptNotesData) deptNotesData = data.deptNotesData;
-            if (data.offersData) offersData = data.offersData;
-            if (data.inquiriesData) inquiriesData = data.inquiriesData;
+            if (data.alertsData && data.alertsData.length > 0) alertsData = data.alertsData;
+            if (data.coordinatorsData && data.coordinatorsData.length > 0) coordinatorsData = data.coordinatorsData;
+            if (data.deptServicesData && data.deptServicesData.length > 0) deptServicesData = data.deptServicesData;
+            if (data.deptNotesData && data.deptNotesData.length > 0) deptNotesData = data.deptNotesData;
+            if (data.offersData && data.offersData.length > 0) offersData = data.offersData;
+            if (data.inquiriesData && data.inquiriesData.length > 0) inquiriesData = data.inquiriesData;
         }
 
         function saveDataLocally(data) {
@@ -1676,10 +1676,9 @@
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
-        // دالة فحص دقيقة وموثوقة لدوام اليوم والساعة الحالية
         function checkDoctorActiveForToday(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
-            if (!doc.daySchedules) return true; // للتوافق العكسي مع البيانات القديمة
+            if (!doc.daySchedules) return true;
 
             let dayConf = doc.daySchedules[currentDay];
             if (!dayConf || !dayConf.active || dayConf.start === "off") return false;
@@ -1692,7 +1691,6 @@
             if (start <= end) {
                 return currentHour24 >= start && currentHour24 <= end;
             } else {
-                // دوام يمتد بعد منتصف الليل
                 return currentHour24 >= start || currentHour24 <= end;
             }
         }
@@ -3025,6 +3023,7 @@
         }
 
         function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsData')?classList.remove('active');
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
             setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
