@@ -54,8 +54,16 @@
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
         
-        .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(22, 163, 74, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        /* مؤشر حالة الحفظ والمزامنة السحابية */
+        .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(34, 197, 94, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .sidebar-cloud-status.saving { background: rgba(234, 179, 8, 0.15) !important; border-color: var(--primary-color) !important; color: var(--primary-color) !important; }
+        .sidebar-cloud-status.error { background: rgba(220, 38, 38, 0.15) !important; border-color: var(--danger-color) !important; color: #ef4444 !important; }
+        
         .cloud-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; transition: all 0.3s ease; }
+        .sidebar-cloud-status.saving .cloud-dot { background-color: var(--primary-color); box-shadow: 0 0 6px var(--primary-color); animation: pulseDot 0.8s infinite alternate; }
+        .sidebar-cloud-status.error .cloud-dot { background-color: var(--danger-color); box-shadow: 0 0 6px var(--danger-color); }
+
+        @keyframes pulseDot { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .theme-box { padding-top: 0.4rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.2rem; }
         .theme-box-row { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
@@ -93,10 +101,7 @@
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollRight 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
-        @keyframes smoothTickerScrollRight {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-        }
+        @keyframes smoothTickerScrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
@@ -247,7 +252,8 @@
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
-        <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال السحابي">
+        <!-- شريط حالة الحفظ والمزامنة السحابية الذكي -->
+        <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال والحفظ بالسحابة">
             <span class="cloud-dot" id="cloudDotElem"></span>
             <span id="cloudTextElem">جاري الاتصال بالسحابة...</span>
         </div>
@@ -281,7 +287,7 @@
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
                     <span style="color:var(--border-color);">|</span>
                     <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
-                    <span id="liveDateDisplay" class="header-date-text">7.11.2026</span>
+                    <span id="liveDateDisplay" class="header-date-text">8.11.2026</span>
                 </div>
 
                 <div class="kpi-bar">
@@ -1104,26 +1110,34 @@
             } catch(e){}
         }
 
-        db.ref('.info/connected').on('value', function(snap) {
+        // تحديث حالة الشاشة بصرياً (مؤشر ذكي جداً)
+        function setCloudStatusUI(status, message) {
             const badge = document.getElementById('cloudStatusBadge');
             const dot = document.getElementById('cloudDotElem');
             const textElem = document.getElementById('cloudTextElem');
             if (!badge || !dot || !textElem) return;
 
-            if (snap.val() === true) {
-                badge.style.background = "rgba(22, 163, 74, 0.12)";
+            badge.className = "sidebar-cloud-status " + (status === 'saving' ? 'saving' : status === 'error' ? 'error' : '');
+            
+            if (status === 'saving') {
+                textElem.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${message || "جاري الحفظ والرفع..."}`;
+            } else if (status === 'error') {
+                textElem.innerText = message || "خطأ في الاتصال!";
+            } else {
+                textElem.innerText = message || "تم الحفظ ومزامنته بالسحابة ✓";
+                badge.style.background = "rgba(34, 197, 94, 0.12)";
                 badge.style.borderColor = "#22c55e";
                 badge.style.color = "#22c55e";
                 dot.style.backgroundColor = "#22c55e";
                 dot.style.boxShadow = "0 0 10px #22c55e";
-                textElem.innerText = "متصل بالسحابة (مزامنة فورية)";
+            }
+        }
+
+        db.ref('.info/connected').on('value', function(snap) {
+            if (snap.val() === true) {
+                setCloudStatusUI('connected', "متصل بالسحابة (مزامنة فورية)");
             } else {
-                badge.style.background = "rgba(220, 38, 38, 0.15)";
-                badge.style.borderColor = "#dc2626";
-                badge.style.color = "#ef4444";
-                dot.style.backgroundColor = "#dc2626";
-                dot.style.boxShadow = "0 0 10px #dc2626";
-                textElem.innerText = "غير متصل بالإنترنت (يعمل محلياً بكفاءة)";
+                setCloudStatusUI('error', "غير متصل بالسحابة (يعمل محلياً)");
             }
         });
 
@@ -1306,7 +1320,7 @@
                 refreshAllViews();
             }
 
-            // الاستماع للتغيرات من السحابة دون الكتابة الفوقية إذا كانت هناك تعديلات محلية حديثة
+            // المزامنة الحية بدون الكتابة الفوقية لتعديلاتك
             db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData && !window.isLocallySaving) {
@@ -1314,6 +1328,7 @@
                     saveDataLocally(cloudData);
                     buildPreNormalizedSearchKeys();
                     refreshAllViews();
+                    setCloudStatusUI('connected', "متصل بالسحابة (تم تحديث البيانات من جهاز آخر ✓)");
                 }
             });
         }
@@ -1338,9 +1353,12 @@
         let syncTimer = null;
         window.isLocallySaving = false;
 
+        // دالة حفظ محلي فورية + رفع سحابي قوي
         function syncToCloud() {
             window.isLocallySaving = true;
+            setCloudStatusUI('saving', "جاري الحفظ والرفع لجميع الكول سنتر...");
             buildPreNormalizedSearchKeys();
+            
             const bundleData = {
                 doctorsData,
                 fridaySchedules,
@@ -1352,20 +1370,22 @@
                 inquiriesData
             };
             
-            // حفظ فوري ومحلي لضمان عدم الاختفاء أبداً
+            // 1. تثبيت البيانات محلياً وبشكل فوري في جهازك حتى لو اتعمل ريفرش فوراً
             saveDataLocally(bundleData);
             refreshAllViews();
 
+            // 2. المزامنة بالسحابة بدون أي مسح للبيانات
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
                 db.ref('clinicMasterData').set(bundleData).then(() => {
-                    console.log("تمت المزامنة السحابية بنجاح");
-                    setTimeout(() => { window.isLocallySaving = false; }, 1000);
+                    setCloudStatusUI('connected', "تم الحفظ ومزامنته بالسحابة ✓");
+                    setTimeout(() => { window.isLocallySaving = false; }, 800);
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
+                    setCloudStatusUI('error', "تم الحفظ محلياً (تعذر الرفع للسحابة!)");
                     window.isLocallySaving = false;
                 });
-            }, 1000);
+            }, 300);
         }
 
         function loadDefaultData() {
@@ -2195,7 +2215,7 @@
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
 
             if (id) { doctorsData[doctorsData.findIndex(d => d.id == id)] = docObj; } else { doctorsData.push(docObj); }
-            syncToCloud(); renderDoctors(); closeModal('doctorModal'); playChirpSound();
+            syncToCloud(); closeModal('doctorModal'); playChirpSound();
         }
 
         function editDoctor(id) {
@@ -2236,7 +2256,7 @@
         }
 
         function deleteDoctor(id) {
-            if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); renderDoctors(); playChirpSound(); }
+            if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function setTickerSpeed(mult, btnEl) {
@@ -2402,7 +2422,7 @@
             if (!content) return alert("أدخل نص التنبيه!");
             const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, media, mediaType, time: new Date().toLocaleString('en-US') };
             if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
-            syncToCloud(); renderAlerts(); closeModal('alertModal'); playChirpSound();
+            syncToCloud(); closeModal('alertModal'); playChirpSound();
         }
 
         function editAlert(id) {
@@ -2420,7 +2440,7 @@
         }
 
         function deleteAlert(id) {
-            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); renderAlerts(); playChirpSound(); }
+            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function renderDeptsAndDocs(highlightServiceId = null) {
@@ -2513,7 +2533,7 @@
             };
             if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
             if (id) deptServicesData[deptServicesData.findIndex(s => s.id == id)] = rowObj; else deptServicesData.push(rowObj);
-            syncToCloud(); renderDeptsAndDocs(); closeModal('deptServiceModal'); playChirpSound();
+            syncToCloud(); closeModal('deptServiceModal'); playChirpSound();
         }
 
         function editDeptService(id) {
@@ -2527,7 +2547,7 @@
         }
 
         function deleteDeptService(id) {
-            if (confirm("حذف؟")) { deptServicesData = deptServicesData.filter(s => s.id !== id); syncToCloud(); renderDeptsAndDocs(); playChirpSound(); }
+            if (confirm("حذف؟")) { deptServicesData = deptServicesData.filter(s => s.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function openDeptNoteModal() {
@@ -2543,7 +2563,7 @@
             if (!text) return;
             const noteObj = { text, tags, color };
             if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
-            syncToCloud(); renderDeptsAndDocs(); closeModal('deptNoteModal'); playChirpSound();
+            syncToCloud(); closeModal('deptNoteModal'); playChirpSound();
         }
 
         function editDeptNote(idx) {
@@ -2554,7 +2574,7 @@
         }
 
         function deleteDeptNote(idx) {
-            if (confirm("حذف؟")) { deptNotesData.splice(idx, 1); syncToCloud(); renderDeptsAndDocs(); playChirpSound(); }
+            if (confirm("حذف؟")) { deptNotesData.splice(idx, 1); syncToCloud(); playChirpSound(); }
         }
 
         function renderCoordinators(highlightId = null) {
@@ -2598,7 +2618,7 @@
             const id = document.getElementById('coordId').value, rules = document.getElementById('coordRules').value.split('\n').filter(r => r.trim() !== "");
             const obj = { id: id ? parseInt(id) : Date.now(), name: document.getElementById('coordName').value, color: document.getElementById('coordColor').value, rules, tags: document.getElementById('coordTags').value.trim() };
             if (id) coordinatorsData[coordinatorsData.findIndex(c => c.id == id)] = obj; else coordinatorsData.push(obj);
-            syncToCloud(); renderCoordinators(); closeModal('coordModal'); playChirpSound();
+            syncToCloud(); closeModal('coordModal'); playChirpSound();
         }
 
         function editCoordinator(id) {
@@ -2611,7 +2631,7 @@
         }
 
         function deleteCoordinator(id) {
-            if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); renderCoordinators(); playChirpSound(); }
+            if (confirm("حذف؟")) { coordinatorsData = coordinatorsData.filter(c => c.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function checkCustomCategory(val) { document.getElementById('customCategoryBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -2650,7 +2670,7 @@
             if (!targetCat) return alert("اختر القسم المستهدف!");
 
             offersData.forEach(o => { if (selectedOfferIds.includes(o.id)) o.category = targetCat; });
-            syncToCloud(); renderOffersTabs(); renderOffers(); playChirpSound();
+            syncToCloud(); playChirpSound();
             alert("تم نقل العروض المحددة إلى قسم \"" + targetCat + "\" بنجاح!");
         }
 
@@ -2696,7 +2716,7 @@
                 localStorage.setItem('selectedOfferTab', trimmedName);
             }
 
-            syncToCloud(); renderOffersTabs(); renderOffers(); openManageCategoriesModal(); playChirpSound();
+            syncToCloud(); openManageCategoriesModal(); playChirpSound();
             alert("تم تغيير اسم القسم إلى \"" + trimmedName + "\" بنجاح!");
         }
 
@@ -2707,7 +2727,7 @@
                     selectedOfferTab = "⭐ كل العروض والأسعار";
                     localStorage.setItem('selectedOfferTab', selectedOfferTab);
                 }
-                syncToCloud(); renderOffersTabs(); renderOffers(); openManageCategoriesModal(); playChirpSound();
+                syncToCloud(); openManageCategoriesModal(); playChirpSound();
             }
         }
 
@@ -2881,7 +2901,7 @@
             };
             if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
             if (id) offersData[offersData.findIndex(o => o.id == id)] = obj; else offersData.push(obj);
-            syncToCloud(); renderOffersTabs(); renderOffers(); closeModal('offerModal'); playChirpSound();
+            syncToCloud(); closeModal('offerModal'); playChirpSound();
         }
 
         function editOffer(id) {
@@ -2896,7 +2916,7 @@
         }
 
         function deleteOffer(id) {
-            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); renderOffersTabs(); renderOffers(); playChirpSound(); }
+            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
@@ -2952,7 +2972,7 @@
             const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
             if (!obj.question) return;
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
-            syncToCloud(); renderInquiries(); closeModal('inquiryModal'); playChirpSound();
+            syncToCloud(); closeModal('inquiryModal'); playChirpSound();
         }
 
         function editInquiry(id) {
@@ -2964,7 +2984,7 @@
         }
 
         function deleteInquiry(id) {
-            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiries(); playChirpSound(); }
+            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function toggleAllSearchCats(status) {
@@ -3036,7 +3056,7 @@
                 } else {
                     alertsData.push(movedItem);
                 }
-                syncToCloud(); renderAlerts(); playChirpSound();
+                syncToCloud(); playChirpSound();
             } 
             else if (type === 'service') {
                 const tr = e.target.closest('tr');
@@ -3052,7 +3072,7 @@
                 } else {
                     deptServicesData.push(movedItem);
                 }
-                syncToCloud(); renderDeptsAndDocs(); playChirpSound();
+                syncToCloud(); playChirpSound();
             } 
             else if (type === 'note') {
                 const card = e.target.closest('.doc-sheet-card');
@@ -3066,7 +3086,7 @@
                 } else {
                     deptNotesData.push(movedItem);
                 }
-                syncToCloud(); renderDeptsAndDocs(); playChirpSound();
+                syncToCloud(); playChirpSound();
             } 
             else if (type === 'coordinator') {
                 const card = e.target.closest('.doc-sheet-card');
@@ -3082,7 +3102,7 @@
                 } else {
                     coordinatorsData.push(movedItem);
                 }
-                syncToCloud(); renderCoordinators(); playChirpSound();
+                syncToCloud(); playChirpSound();
             } 
             else if (type === 'offer') {
                 const card = e.target.closest('.offer-grid-card');
@@ -3098,7 +3118,7 @@
                 } else {
                     offersData.push(movedItem);
                 }
-                syncToCloud(); renderOffers(); playChirpSound();
+                syncToCloud(); playChirpSound();
             } 
             else if (type === 'inquiry') {
                 const card = e.target.closest('.doc-sheet-card');
@@ -3114,7 +3134,7 @@
                 } else {
                     inquiriesData.push(movedItem);
                 }
-                syncToCloud(); renderInquiries(); playChirpSound();
+                syncToCloud(); playChirpSound();
             }
 
             draggedItemInfo = null;
