@@ -1294,7 +1294,7 @@
                 refreshAllViews();
             }
 
-            db.ref('clinicData').once('value').then((snapshot) => {
+            db.ref('clinicMasterData').once('value').then((snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData) {
                     assignDataToVariables(cloudData);
@@ -1339,7 +1339,7 @@
 
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
-                db.ref('clinicData').set(bundleData).then(() => {
+                db.ref('clinicMasterData').set(bundleData).then(() => {
                     console.log("تمت المزامنة السحابية بنجاح");
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
@@ -1801,18 +1801,24 @@
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
 
+            const now = new Date();
+            let currentTotalMinutes = (now.getHours() + timezoneOffsetHours) * 60 + now.getMinutes();
+            currentTotalMinutes = (currentTotalMinutes + 24 * 60) % (24 * 60);
+
             let checkShiftActive = (daysArr, startVal, endVal) => {
                 if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
                     if (startVal === "24" || endVal === "24") return true;
-                    if (startVal === "" || endVal === "") return true;
-                    let start = parseFloat(startVal);
-                    let end = parseFloat(endVal);
-                    if (isNaN(start) || isNaN(end)) return true;
+                    if (startVal === "" || endVal === "" || startVal === undefined || endVal === undefined) return false;
 
-                    if (start <= end) {
-                        return currentHour24 >= start && currentHour24 <= end;
+                    let startMin = parseFloat(startVal) * 60;
+                    let endMin = parseFloat(endVal) * 60;
+
+                    if (isNaN(startMin) || isNaN(endMin)) return false;
+
+                    if (startMin <= endMin) {
+                        return currentTotalMinutes >= startMin && currentTotalMinutes <= endMin;
                     } else {
-                        return currentHour24 >= start || currentHour24 <= end;
+                        return currentTotalMinutes >= startMin || currentTotalMinutes <= endMin;
                     }
                 }
                 return false;
