@@ -77,7 +77,7 @@
 
         .header-actions-group { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
-        .header-time-text { color: #ffffff !important; font-weight: 800; }
+        .header-time-text { color: #38bdf8; font-weight: 800; }
         .header-date-text { color: var(--primary-color); font-weight: 800; }
 
         .kpi-bar { display: flex; gap: 0.35rem; align-items: center; }
@@ -170,8 +170,7 @@
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
         .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.4rem; }
-        .price-badge { background-color: #2563eb; color: #ffffff; padding: 0.18rem 0.55rem; border-radius: 6px; font-weight: 800; font-size: 0.78rem; display: inline-block; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
-        
+        .price-badge { background-color: rgba(234, 179, 8, 0.2); color: var(--primary-color); padding: 0.12rem 0.45rem; border-radius: 6px; font-weight: 800; font-size: 0.78rem; display: inline-block; }
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.06rem 0.2rem; border-radius: 4px; font-size: 0.55rem; display: inline-block; margin-top: 2px; }
 
@@ -196,8 +195,9 @@
         .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 480px; max-height: 90vh; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; }
         .form-control { width: 100%; padding: 0.25rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.7rem; }
 
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem; }
-        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem; margin-top: 0.15rem; }
+        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.25rem; }
+        .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem; margin-top: 0.15rem; display: none; }
+        .days-checklist.show { display: grid; }
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.15rem; font-size: 0.7rem; cursor: pointer; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
 
@@ -268,7 +268,7 @@
 
             <div class="header-actions-group">
                 <div class="header-datetime-box">
-                    <i class="fa-solid fa-clock" style="color:#ffffff;"></i>
+                    <i class="fa-solid fa-clock" style="color:#38bdf8;"></i>
                     <span id="liveClockDisplay" class="header-time-text">12:00:00 PM</span>
                     <span style="color:var(--border-color);">|</span>
                     <i class="fa-solid fa-calendar" style="color:var(--primary-color);"></i>
@@ -637,6 +637,7 @@
                 </div>
             </div>
 
+            <!-- مقسم جزئين جنباً إلى جنب (اليمين معشي، الشمال الوسام) وبنفس ترتيب الأطباء بدقة -->
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:0.4rem; max-height: 340px; overflow-y:auto;">
                 <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:0.35rem; display:flex; flex-direction:column; gap:0.3rem;">
                     <div style="font-weight:800; color:#38bdf8; font-size:0.75rem; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem;"><i class="fa-solid fa-clinic-medical"></i> فرع معشي</div>
@@ -660,7 +661,6 @@
         </div>
     </div>
 
-    <!-- مودال الأطباء المحدث بنظام الفترات المتعددة والاختيارات الكاملة بدون نص حر -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -688,23 +688,13 @@
                     <input type="text" id="docFee" class="form-control" placeholder="75 ريال">
                 </div>
             </div>
-            <div style="display:flex; gap:0.25rem;">
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.12rem;">
-                    <label>الفرع الرئيسي</label>
-                    <select id="docBranch" class="form-control">
-                        <option value="معشي">فرع معشي</option>
-                        <option value="الوسام">فرع الوسام</option>
-                    </select>
-                </div>
-                <div style="flex:1; display:flex; flex-direction:column; gap:0.12rem;">
-                    <label style="color:var(--primary-color);">عدد الفترات (الشفتات)</label>
-                    <select id="docShiftsCount" class="form-control" onchange="toggleShiftsConfigurationUI()">
-                        <option value="1">فترة واحدة (شفت واحد)</option>
-                        <option value="2">فترتان (شفتان)</option>
-                    </select>
-                </div>
+            <div style="display:flex; flex-direction:column; gap:0.12rem;">
+                <label>الفرع الرئيسي</label>
+                <select id="docBranch" class="form-control">
+                    <option value="معشي">فرع معشي</option>
+                    <option value="الوسام">فرع الوسام</option>
+                </select>
             </div>
-
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون الصف:</label>
                 <select id="docCustomColor" class="form-control">
@@ -728,54 +718,42 @@
                 <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / غير متواجد</label>
             </div>
 
-            <!-- الفترة الأولى -->
             <div class="days-section-box">
-                <label style="font-weight:700; color:var(--primary-color); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> تفاصيل الفترة الأولى:</label>
-                <div class="days-checklist">
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="السبت"> السبت</label>
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="الأحد"> الأحد</label>
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="الإثنين"> الإثنين</label>
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="الثلاثاء"> الثلاثاء</label>
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="الأربعاء"> الأربعاء</label>
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="الخميس"> الخميس</label>
-                    <label class="day-row"><input type="checkbox" class="shift1-days" value="الجمعة"> الجمعة</label>
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('mashyDaysBox')">
+                    <label style="font-weight:700; color:var(--primary-color); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> أيام دوام معشي</label>
+                    <i class="fa-solid fa-chevron-down" style="color:var(--primary-color); font-size:0.65rem;"></i>
                 </div>
-                <div style="display:flex; gap:0.3rem; align-items:center; margin-top:0.3rem;">
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">من:</span>
-                        <select id="shift1Start" class="form-control"></select>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">إلى:</span>
-                        <select id="shift1End" class="form-control"></select>
-                    </div>
+                <div class="days-checklist" id="mashyDaysBox">
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="السبت"> السبت</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأحد"> الأحد</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الإثنين"> الإثنين</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الثلاثاء"> الثلاثاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الأربعاء"> الأربعاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الخميس"> الخميس</label>
+                    <label class="day-row"><input type="checkbox" class="doc-mashy-chk" value="الجمعة"> الجمعة</label>
                 </div>
             </div>
 
-            <!-- الفترة الثانية (تظهر فقط عند اختيار فترتين) -->
-            <div class="days-section-box" id="shift2ContainerBox" style="display:none;">
-                <label style="font-weight:700; color:var(--accent-blue); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> تفاصيل الفترة الثانية:</label>
-                <div class="days-checklist">
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="السبت"> السبت</label>
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="الأحد"> الأحد</label>
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="الإثنين"> الإثنين</label>
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="الثلاثاء"> الثلاثاء</label>
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="الأربعاء"> الأربعاء</label>
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="الخميس"> الخميس</label>
-                    <label class="day-row"><input type="checkbox" class="shift2-days" value="الجمعة"> الجمعة</label>
+            <div class="days-section-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDaysChecklist('wissamDaysBox')">
+                    <label style="font-weight:700; color:var(--accent-green); cursor:pointer;"><i class="fa-solid fa-calendar-days"></i> أيام دوام الوسام</label>
+                    <i class="fa-solid fa-chevron-down" style="color:var(--accent-green); font-size:0.65rem;"></i>
                 </div>
-                <div style="display:flex; gap:0.3rem; align-items:center; margin-top:0.3rem;">
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">من:</span>
-                        <select id="shift2Start" class="form-control"></select>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">إلى:</span>
-                        <select id="shift2End" class="form-control"></select>
-                    </div>
+                <div class="days-checklist" id="wissamDaysBox">
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="السبت"> السبت</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأحد"> الأحد</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الإثنين"> الإثنين</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الثلاثاء"> الثلاثاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الأربعاء"> الأربعاء</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الخميس"> الخميس</label>
+                    <label class="day-row"><input type="checkbox" class="doc-wissam-chk" value="الجمعة"> الجمعة</label>
                 </div>
             </div>
 
+            <div style="display:flex; flex-direction:column; gap:0.12rem;">
+                <label>ساعات الدوام (مثال: من 2م - 10م)</label>
+                <input type="text" id="docTiming" class="form-control" placeholder="من 2م - 10م">
+            </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
                 <label>الملاحظات / شروط معتمدة</label>
                 <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات داخلية..."></textarea>
@@ -1144,77 +1122,6 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        function populateHourSelectOptions() {
-            const selects = [
-                document.getElementById('shift1Start'),
-                document.getElementById('shift1End'),
-                document.getElementById('shift2Start'),
-                document.getElementById('shift2End')
-            ];
-            
-            let times = [
-                { val: "24", text: "24 ساعة (طوال اليوم)" },
-                { val: "0", text: "12:00 صباحاً (منتصف الليل)" },
-                { val: "0.5", text: "12:30 صباحاً" },
-                { val: "1", text: "1:00 صباحاً" },
-                { val: "1.5", text: "1:30 صباحاً" },
-                { val: "2", text: "2:00 صباحاً" },
-                { val: "2.5", text: "2:30 صباحاً" },
-                { val: "3", text: "3:00 صباحاً" },
-                { val: "3.5", text: "3:30 صباحاً" },
-                { val: "4", text: "4:00 صباحاً" },
-                { val: "4.5", text: "4:30 صباحاً" },
-                { val: "5", text: "5:00 صباحاً" },
-                { val: "5.5", text: "5:30 صباحاً" },
-                { val: "6", text: "6:00 صباحاً" },
-                { val: "6.5", text: "6:30 صباحاً" },
-                { val: "7", text: "7:00 صباحاً" },
-                { val: "7.5", text: "7:30 صباحاً" },
-                { val: "8", text: "8:00 صباحاً" },
-                { val: "8.5", text: "8:30 صباحاً" },
-                { val: "9", text: "9:00 صباحاً" },
-                { val: "9.5", text: "9:30 صباحاً" },
-                { val: "10", text: "10:00 صباحاً" },
-                { val: "10.5", text: "10:30 صباحاً" },
-                { val: "11", text: "11:00 صباحاً" },
-                { val: "11.5", text: "11:30 صباحاً" },
-                { val: "12", text: "12:00 ظهراً" },
-                { val: "12.5", text: "12:30 ظهراً" },
-                { val: "13", text: "1:00 مساءً" },
-                { val: "13.5", text: "1:30 مساءً" },
-                { val: "14", text: "2:00 مساءً" },
-                { val: "14.5", text: "2:30 مساءً" },
-                { val: "15", text: "3:00 مساءً" },
-                { val: "15.5", text: "3:30 مساءً" },
-                { val: "16", text: "4:00 مساءً" },
-                { val: "16.5", text: "4:30 مساءً" },
-                { val: "17", text: "5:00 مساءً" },
-                { val: "17.5", text: "5:30 مساءً" },
-                { val: "18", text: "6:00 مساءً" },
-                { val: "18.5", text: "6:30 مساءً" },
-                { val: "19", text: "7:00 مساءً" },
-                { val: "19.5", text: "7:30 مساءً" },
-                { val: "20", text: "8:00 مساءً" },
-                { val: "20.5", text: "8:30 مساءً" },
-                { val: "21", text: "9:00 مساءً" },
-                { val: "21.5", text: "9:30 مساءً" },
-                { val: "22", text: "10:00 مساءً" },
-                { val: "22.5", text: "10:30 مساءً" },
-                { val: "23", text: "11:00 مساءً" },
-                { val: "23.5", text: "11:30 مساءً" }
-            ];
-
-            let html = "";
-            times.forEach(t => { html += `<option value="${t.val}">${t.text}</option>`; });
-            selects.forEach(sel => { if(sel) sel.innerHTML = html; });
-        }
-
-        function toggleShiftsConfigurationUI() {
-            const count = document.getElementById('docShiftsCount').value;
-            const shift2Box = document.getElementById('shift2ContainerBox');
-            if (shift2Box) shift2Box.style.display = (count === "2") ? "block" : "none";
-        }
-
         function buildPreNormalizedSearchKeys() {
             doctorsData.forEach(d => {
                 d.searchKey = normalizeArabicText(`${d.name} ${d.nationality} ${d.specialty} ${d.fee} ${d.timing} ${d.notes} ${d.tags} ${d.branch}`);
@@ -1241,7 +1148,7 @@
         }
 
         function loadAllAppData() {
-            let localSaved = localStorage.getItem('clinic_master_data_v3');
+            let localSaved = localStorage.getItem('clinic_master_data_v2');
             if (localSaved) {
                 try {
                     let parsed = JSON.parse(localSaved);
@@ -1279,7 +1186,7 @@
 
         function saveDataLocally(data) {
             try {
-                localStorage.setItem('clinic_master_data_v3', JSON.stringify(data));
+                localStorage.setItem('clinic_master_data_v2', JSON.stringify(data));
             } catch(e){}
         }
 
@@ -1309,7 +1216,7 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shift1Start: "12.5", shift1End: "20.5", shift2Days: [], shift2Start: "", shift2End: "", timing: "من 12:30 مساءً - إلى 8:30 مساءً", notes: "", customColor: "" }];
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, mashyDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], wissamDays: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], timing: "يومياً من 12.30م - 8.30م", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
             deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
@@ -1347,7 +1254,6 @@
 
             applyTopBarsVisibilityState(topBarsVisible);
             loadTableWidths();
-            populateHourSelectOptions();
 
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
@@ -1362,6 +1268,7 @@
             loadAllAppData();
         });
 
+        // تنسيق التاريخ المطلوب بدقة (مثال: 7.11.2026) بدون أسماء أشهر إنجليزية
         function updateLiveClockAndDate() {
             const now = new Date();
             let hours = now.getHours();
@@ -1434,6 +1341,7 @@
                 modalClockInterval = null;
             }
         }
+        function toggleDaysChecklist(boxId) { document.getElementById(boxId).classList.toggle('show'); }
         function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
         
         function normalizeArabicText(str) {
@@ -1637,7 +1545,7 @@
                         syncToCloud();
                         refreshAllViews();
                         playChirpSound(); 
-                        alert("تم استيراد وحفظ البيانات بنجاح!");
+                        alert("تم استيراد وحفظ البيانات بنجاح على السحابة بشكل دائم!");
                     } catch (err) { alert("ملف غير صالح!"); }
                 };
                 reader.readAsText(input.files[0]);
@@ -1684,95 +1592,73 @@
             navigator.clipboard.writeText(text).then(() => { alert(`📋 ${msg}\n\n${text}`); });
         }
 
-        function getLabelTextFromSelect(selectId, val) {
-            const sel = document.getElementById(selectId);
-            if (!sel) return val;
-            for (let opt of sel.options) {
-                if (opt.value === String(val)) return opt.text;
-            }
-            return val;
-        }
-
-        function generateDoctorTimingFormatted(doc) {
-            let lines = [];
-            let s1Days = doc.shift1Days || [];
-            let s1StartText = getLabelTextFromSelect('shift1Start', doc.shift1Start);
-            let s1EndText = getLabelTextFromSelect('shift1End', doc.shift1End);
-            
-            if (s1StartText && s1EndText) {
-                let dayStr = s1Days.length > 0 ? `(${s1Days.join('، ')})` : "(طوال الأسبوع)";
-                lines.push(`الفترة الأولى ${dayStr}: من ${s1StartText} - إلى ${s1EndText}`);
-            }
-
-            if (doc.shiftsCount === "2") {
-                let s2Days = doc.shift2Days || [];
-                let s2StartText = getLabelTextFromSelect('shift2Start', doc.shift2Start);
-                let s2EndText = getLabelTextFromSelect('shift2End', doc.shift2End);
-                if (s2StartText && s2EndText) {
-                    let dayStr2 = s2Days.length > 0 ? `(${s2Days.join('، ')})` : "(طوال الأسبوع)";
-                    lines.push(`الفترة الثانية ${dayStr2}: من ${s2StartText} - إلى ${s2EndText}`);
-                }
-            }
-            return lines.join(' \n ');
-        }
-
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
-            let formattedTiming = generateDoctorTimingFormatted(doc);
-            let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\nمواعيد الدوام:\n${formattedTiming}`;
+            const mashyDays = doc.mashyDays || doc.days || [], wissamDays = doc.wissamDays || [];
+            let scheduleLines = [];
+            if (mashyDays.length > 0) scheduleLines.push(`• فرع معشي: ${mashyDays.join('، ')}`);
+            if (wissamDays.length > 0) scheduleLines.push(`• فرع الوسام: ${wissamDays.join('، ')}`);
+            let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\nالساعات والدوام: ${doc.timing || ''}`;
             if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
+            if (scheduleLines.length > 0) clientText += `\nأيام الدوام:\n` + scheduleLines.join('\n');
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
-        function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
-            if (doc.isLeave) return false;
+        // تحليل دقيق لترجمات مواعيد العمل ومعرفة هل الطبيب مناوب في الساعة الحالية أم لا
+        function parseTimingAndCheckActive(timingStr, currentHour24) {
+            if (!timingStr) return true; // لو لم يُكتب وقت يعتبر متاحاً افتراضياً
+            let norm = timingStr.toLowerCase();
+            if (norm.includes('24 ساعة') || norm.includes('طوال اليوم') || norm.includes('يوميا')) return true;
 
-            let checkShiftActive = (daysArr, startVal, endVal) => {
-                if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
-                    if (startVal === "24" || endVal === "24") return true;
-                    if (startVal === "" || endVal === "") return true;
-                    let start = parseFloat(startVal);
-                    let end = parseFloat(endVal);
-                    if (isNaN(start) || isNaN(end)) return true;
+            // استخراج الأرقام وكلمات ص/م
+            let matches = norm.match(/(\d+[\.,]?\d*)\s*(ص|م|am|pm)?/g);
+            if (!matches || matches.length < 2) return true;
 
-                    if (start <= end) {
-                        return currentHour24 >= start && currentHour24 <= end;
-                    } else {
-                        return currentHour24 >= start || currentHour24 <= end;
-                    }
+            let parseNumTo24 = (valStr) => {
+                let parts = valStr.match(/(\d+[\.,]?\d*)\s*(ص|م|am|pm)?/);
+                if (!parts) return null;
+                let num = parseFloat(parts[1].replace(',', '.'));
+                let period = parts[2] ? parts[2].trim() : '';
+                if (period.includes('م') || period === 'pm') {
+                    if (num < 12) num += 12;
+                } else if (period.includes('ص') || period === 'am') {
+                    if (num === 12) num = 0;
+                } else {
+                    // افتراض ذكي: لو الرقم أقل من 8 غالبا مسائي في العيادات
+                    if (num >= 1 && num <= 6) num += 12;
                 }
-                return false;
+                return num;
             };
 
-            let activeInShift1 = checkShiftActive(doc.shift1Days, doc.shift1Start, doc.shift1End);
-            let activeInShift2 = false;
-            if (doc.shiftsCount === "2") {
-                activeInShift2 = checkShiftActive(doc.shift2Days, doc.shift2Start, doc.shift2End);
+            let start = parseNumTo24(matches[0]);
+            let end = parseNumTo24(matches[1]);
+
+            if (start === null || end === null) return true;
+
+            if (start <= end) {
+                return currentHour24 >= start && currentHour24 <= end;
+            } else {
+                // دوام ليلي يمتد بعد منتصف الليل
+                return currentHour24 >= start || currentHour24 <= end;
             }
-
-            return activeInShift1 || activeInShift2;
-        }
-
-        function getModifiedTimeHour24() {
-            const now = new Date();
-            let hours = now.getHours() + timezoneOffsetHours;
-            return (hours + 24) % 24;
         }
 
         function updateActiveDoctorsKPI() {
             const currentDay = getArabicDayName();
-            const currentHour24 = getModifiedTimeHour24();
+            const currentHour24 = modalCurrentTimeObj ? modalCurrentTimeObj.hours : new Date().getHours();
             
             let todayMashyCount = 0, todayWissamCount = 0;
             doctorsData.forEach(d => {
-                let isMashyBranch = (d.branch === "معشي" || d.isJoint);
-                let isWissamBranch = (d.branch === "الوسام" || d.isJoint);
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                
+                let isMashyDay = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                let isWissamDay = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
 
-                if (checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
-                    if (isMashyBranch) todayMashyCount++;
-                    if (isWissamBranch) todayWissamCount++;
-                }
+                if (isMashyDay && parseTimingAndCheckActive(d.timing, currentHour24)) todayMashyCount++;
+                if (isWissamDay && parseTimingAndCheckActive(d.timing, currentHour24)) todayWissamCount++;
             });
             const summaryEl = document.getElementById('kpiActiveSummary');
             if (summaryEl) summaryEl.innerText = `(معشي: ${todayMashyCount} | الوسام: ${todayWissamCount})`;
@@ -1781,21 +1667,23 @@
         function openActiveDoctorsUnifiedModal() {
             document.getElementById('timezoneOffsetSelect').value = timezoneOffsetHours.toString();
             const currentDay = getArabicDayName();
-            const currentHour24 = getModifiedTimeHour24();
+            const currentHour24 = modalCurrentTimeObj ? modalCurrentTimeObj.hours : new Date().getHours();
             
             let mashyActive = [], wissamActive = [];
             const sortedDoctors = [...doctorsData];
 
             sortedDoctors.forEach(d => {
-                let isMashyBranch = (d.branch === "معشي" || d.isJoint);
-                let isWissamBranch = (d.branch === "الوسام" || d.isJoint);
+                if (d.isLeave) return;
+                const mashyDays = d.mashyDays || d.days || [];
+                const wissamDays = d.wissamDays || [];
+                
+                let isMashyDay = (d.branch === "معشي" || d.isJoint || mashyDays.includes(currentDay));
+                let isWissamDay = (d.branch === "الوسام" || d.isJoint || wissamDays.includes(currentDay));
 
-                let isActiveNow = checkDocActiveForTimeAndDay(d, currentDay, currentHour24);
+                let isActiveNow = parseTimingAndCheckActive(d.timing, currentHour24);
 
-                if (isActiveNow) {
-                    if (isMashyBranch) mashyActive.push(d);
-                    if (isWissamBranch) wissamActive.push(d);
-                }
+                if (isMashyDay && isActiveNow) mashyActive.push(d);
+                if (isWissamDay && isActiveNow) wissamActive.push(d);
             });
 
             const mashyContainer = document.getElementById('activeMashyListContainer');
@@ -1804,14 +1692,13 @@
 
             let mashyHtml = "";
             if (mashyActive.length === 0) {
-                mashyHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (في هذه الساعة المعدلة) بفرع معشي.</div>`;
+                mashyHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (في هذه الساعة) بفرع معشي.</div>`;
             } else {
                 mashyActive.forEach(doc => {
-                    let timingSummary = generateDoctorTimingFormatted(doc).replace(/\n/g, ' | ');
                     mashyHtml += `
                         <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty} (${timingSummary})</span>
+                                <strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty} (${doc.timing || ''})</span>
                             </div>
                             <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.58rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})">عرض</button>
                         </div>`;
@@ -1821,14 +1708,13 @@
 
             let wissamHtml = "";
             if (wissamActive.length === 0) {
-                wissamHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (في هذه الساعة المعدلة) بفرع الوسام.</div>`;
+                wissamHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً (في هذه الساعة) بفرع الوسام.</div>`;
             } else {
                 wissamActive.forEach(doc => {
-                    let timingSummary = generateDoctorTimingFormatted(doc).replace(/\n/g, ' | ');
                     wissamHtml += `
                         <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty} (${timingSummary})</span>
+                                <strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty} (${doc.timing || ''})</span>
                             </div>
                             <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.58rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})">عرض</button>
                         </div>`;
@@ -1840,14 +1726,6 @@
             updateModalLiveClock();
             if (modalClockInterval) clearInterval(modalClockInterval);
             modalClockInterval = setInterval(updateModalLiveClock, 1000);
-        }
-
-        function getSortedDoctorsList() {
-            return [...doctorsData].sort((a, b) => {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return 0;
-            });
         }
 
         function renderDoctors(highlightId = null) {
@@ -1872,25 +1750,24 @@
             document.getElementById('todayDayName').innerText = currentDay;
 
             let todayMashyDocs = [], todayWissamDocs = [];
-            const sortedDoctors = getSortedDoctorsList();
+            const sortedDoctors = [...doctorsData];
 
             const mashyList = sortedDoctors.filter(d => {
                 const matchSearch = !search || (d.searchKey && d.searchKey.includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint);
+                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint || (d.mashyDays||d.days||[]).length > 0);
             });
 
             const wissamList = sortedDoctors.filter(d => {
                 const matchSearch = !search || (d.searchKey && d.searchKey.includes(search));
                 const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint);
+                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint || (d.wissamDays||[]).length > 0);
             });
 
             let mashyHtmlBuffer = "";
             mashyList.forEach((doc) => {
-                let isActiveToday = checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24());
-                if (isActiveToday) todayMashyDocs.push(doc.name);
-
+                const mashyDays = doc.mashyDays || doc.days || [];
+                if (!doc.isLeave && mashyDays.includes(currentDay)) todayMashyDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
@@ -1902,8 +1779,6 @@
                 if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) {
                     formattedDocName = "د. " + formattedDocName;
                 }
-
-                let timingFormatted = generateDoctorTimingFormatted(doc);
 
                 mashyHtmlBuffer += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" data-id="${doc.id}">
@@ -1918,7 +1793,7 @@
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.65rem; font-weight:700; white-space:pre-line;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${timingFormatted}</div></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">معشي: ${mashyDays.join('، ') || 'طوال الأسبوع'}</div></td>
                         <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
                         <td style="text-align:center;">
                             <div class="actions-col-group">
@@ -1934,9 +1809,8 @@
 
             let wissamHtmlBuffer = "";
             wissamList.forEach((doc) => {
-                let isActiveToday = checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24());
-                if (isActiveToday) todayWissamDocs.push(doc.name);
-
+                const wissamDays = doc.wissamDays || [];
+                if (!doc.isLeave && wissamDays.includes(currentDay)) todayWissamDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
@@ -1948,8 +1822,6 @@
                 if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) {
                     formattedDocName = "د. " + formattedDocName;
                 }
-
-                let timingFormatted = generateDoctorTimingFormatted(doc);
 
                 wissamHtmlBuffer += `
                     <tr id="doc_row_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" data-id="${doc.id}">
@@ -1964,7 +1836,7 @@
                         </td>
                         <td><div class="doc-spec-box">${doc.specialty ? doc.specialty.replace('/', '/\n') : ''}</div></td>
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
-                        <td><div style="font-size:0.65rem; font-weight:700; white-space:pre-line;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${timingFormatted}</div></td>
+                        <td><div style="font-size:0.65rem; font-weight:700;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${doc.timing || ''}</div><div style="font-size:0.6rem; color:var(--text-muted);">الوسام: ${wissamDays.join('، ') || 'طوال الأسبوع'}</div></td>
                         <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div>${tagsHtml}</td>
                         <td style="text-align:center;">
                             <div class="actions-col-group">
@@ -1988,37 +1860,24 @@
         function openDoctorModal() {
             document.getElementById('docId').value = ""; document.getElementById('docName').value = "";
             document.getElementById('docNationality').value = ""; document.getElementById('docSpecialty').value = "";
-            document.getElementById('docFee').value = ""; document.getElementById('docNotes').value = "";
-            document.getElementById('docTags').value = ""; document.getElementById('docCustomColor').value = ""; 
-            document.getElementById('docBranch').value = "معشي";
-            document.getElementById('docShiftsCount').value = "1";
-            toggleShiftsConfigurationUI();
-            
+            document.getElementById('docFee').value = ""; document.getElementById('docTiming').value = "";
+            document.getElementById('docNotes').value = ""; document.getElementById('docTags').value = "";
+            document.getElementById('docCustomColor').value = ""; 
             document.getElementById('docIsJoint').checked = false; document.getElementById('docIsPinned').checked = false; 
             document.getElementById('docIsLeave').checked = false;
-            
-            document.querySelectorAll('.shift1-days').forEach(c => c.checked = false);
-            document.querySelectorAll('.shift2-days').forEach(c => c.checked = false);
-            document.getElementById('shift1Start').value = "12"; document.getElementById('shift1End').value = "20";
-            document.getElementById('shift2Start').value = "16"; document.getElementById('shift2End').value = "22";
-
-            document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; 
-            document.getElementById('doctorModal').classList.add('active');
+            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = false);
+            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = false);
+            document.getElementById('mashyDaysBox').classList.remove('show'); document.getElementById('wissamDaysBox').classList.remove('show');
+            document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; document.getElementById('doctorModal').classList.add('active');
         }
 
         function saveDoctor() {
             const id = document.getElementById('docId').value;
-            const shiftsCount = document.getElementById('docShiftsCount').value;
-            
-            const shift1Days = Array.from(document.querySelectorAll('.shift1-days:checked')).map(c => c.value);
-            const shift1Start = document.getElementById('shift1Start').value;
-            const shift1End = document.getElementById('shift1End').value;
-
-            const shift2Days = shiftsCount === "2" ? Array.from(document.querySelectorAll('.shift2-days:checked')).map(c => c.value) : [];
-            const shift2Start = shiftsCount === "2" ? document.getElementById('shift2Start').value : "";
-            const shift2End = shiftsCount === "2" ? document.getElementById('shift2End').value : "";
-
+            const mashyDays = Array.from(document.querySelectorAll('.doc-mashy-chk:checked')).map(c => c.value);
+            const wissamDays = Array.from(document.querySelectorAll('.doc-wissam-chk:checked')).map(c => c.value);
+            const isLeaveVal = document.getElementById('docIsLeave').checked;
             let docNameVal = document.getElementById('docName').value.trim();
+
             if (docNameVal && !docNameVal.startsWith("د.") && !docNameVal.startsWith("الدكتور")) {
                 docNameVal = "د. " + docNameVal;
             }
@@ -2030,13 +1889,12 @@
                 specialty: document.getElementById('docSpecialty').value,
                 fee: document.getElementById('docFee').value,
                 branch: document.getElementById('docBranch').value,
-                shiftsCount,
-                shift1Days, shift1Start, shift1End,
-                shift2Days, shift2Start, shift2End,
                 customColor: document.getElementById('docCustomColor').value,
                 isJoint: document.getElementById('docIsJoint').checked,
                 isPinned: document.getElementById('docIsPinned').checked,
-                isLeave: document.getElementById('docIsLeave').checked,
+                isLeave: isLeaveVal,
+                mashyDays, wissamDays,
+                timing: document.getElementById('docTiming').value,
                 notes: document.getElementById('docNotes').value,
                 tags: document.getElementById('docTags').value.trim()
             };
@@ -2049,31 +1907,14 @@
         function editDoctor(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
-            document.getElementById('docId').value = doc.id; 
-            document.getElementById('docName').value = doc.name;
-            document.getElementById('docNationality').value = doc.nationality || ""; 
-            document.getElementById('docSpecialty').value = doc.specialty;
-            document.getElementById('docFee').value = doc.fee || ""; 
-            document.getElementById('docBranch').value = doc.branch || "معشي";
-            document.getElementById('docShiftsCount').value = doc.shiftsCount || "1";
-            toggleShiftsConfigurationUI();
-
-            document.getElementById('docCustomColor').value = doc.customColor || ""; 
-            document.getElementById('docIsJoint').checked = !!doc.isJoint;
-            document.getElementById('docIsPinned').checked = !!doc.isPinned; 
-            document.getElementById('docIsLeave').checked = !!doc.isLeave;
-            
-            document.querySelectorAll('.shift1-days').forEach(c => c.checked = doc.shift1Days ? doc.shift1Days.includes(c.value) : false);
-            if (doc.shift1Start) document.getElementById('shift1Start').value = doc.shift1Start;
-            if (doc.shift1End) document.getElementById('shift1End').value = doc.shift1End;
-
-            if (doc.shiftsCount === "2") {
-                document.querySelectorAll('.shift2-days').forEach(c => c.checked = doc.shift2Days ? doc.shift2Days.includes(c.value) : false);
-                if (doc.shift2Start) document.getElementById('shift2Start').value = doc.shift2Start;
-                if (doc.shift2End) document.getElementById('shift2End').value = doc.shift2End;
-            }
-
-            document.getElementById('docNotes').value = doc.notes || "";
+            document.getElementById('docId').value = doc.id; document.getElementById('docName').value = doc.name;
+            document.getElementById('docNationality').value = doc.nationality || ""; document.getElementById('docSpecialty').value = doc.specialty;
+            document.getElementById('docFee').value = doc.fee || ""; document.getElementById('docBranch').value = doc.branch;
+            document.getElementById('docCustomColor').value = doc.customColor || ""; document.getElementById('docIsJoint').checked = !!doc.isJoint;
+            document.getElementById('docIsPinned').checked = !!doc.isPinned; document.getElementById('docIsLeave').checked = !!doc.isLeave;
+            document.querySelectorAll('.doc-mashy-chk').forEach(c => c.checked = doc.mashyDays ? doc.mashyDays.includes(c.value) : false);
+            document.querySelectorAll('.doc-wissam-chk').forEach(c => c.checked = doc.wissamDays ? doc.wissamDays.includes(c.value) : false);
+            document.getElementById('docTiming').value = doc.timing; document.getElementById('docNotes').value = doc.notes || "";
             document.getElementById('docTags').value = doc.tags || "";
             document.getElementById('doctorModal').classList.add('active');
         }
@@ -2599,25 +2440,15 @@
             updateFloatingOffersWindow(); 
         }
 
-        function getSortedOffersList() {
-            return [...offersData].sort((a, b) => {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return 0;
-            });
-        }
-
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput');
             const search = searchInput ? cleanSearchText(searchInput.value) : "";
             const tableEl = document.getElementById('offersTableElement');
             if (!tableEl) return;
 
-            const sortedOffers = getSortedOffersList();
-
             let filteredOffers = (selectedOfferTab === '⭐ كل العروض والأسعار') ? 
-                sortedOffers.filter(o => !search || (o.searchKey && o.searchKey.includes(search))) : 
-                sortedOffers.filter(o => o.category === selectedOfferTab && (!search || (o.searchKey && o.searchKey.includes(search))));
+                offersData.filter(o => !search || (o.searchKey && o.searchKey.includes(search))) : 
+                offersData.filter(o => o.category === selectedOfferTab && (!search || (o.searchKey && o.searchKey.includes(search))));
             
             const allFilteredIds = filteredOffers.map(o => o.id);
             const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
@@ -2800,6 +2631,7 @@
             triggerFilterChange();
         }
 
+        // سحب وإفلات قوي وسلس يعمل حصرياً من الأيقونة الصغيرة فقط، وجسم الكروت متاح لتحديد النصوص تماماً
         let draggedItemInfo = null;
 
         function dragStartRow(e, id, type) {
@@ -2807,7 +2639,9 @@
             e.dataTransfer.effectAllowed = 'move';
         }
 
-        document.addEventListener('dragover', (e) => { e.preventDefault(); });
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
 
         document.addEventListener('drop', (e) => {
             e.preventDefault();
