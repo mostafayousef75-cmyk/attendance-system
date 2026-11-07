@@ -1798,24 +1798,21 @@
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
-        // [تعديل جذري ودقيق لفلترة المتواجدين الآن بدون أخطاء أوقات]
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
 
             let checkShiftActive = (daysArr, startVal, endVal) => {
                 if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
                     if (startVal === "24" || endVal === "24") return true;
-                    if (startVal === "" || endVal === "") return false;
+                    if (startVal === "" || endVal === "") return true;
                     let start = parseFloat(startVal);
                     let end = parseFloat(endVal);
-                    if (isNaN(start) || isNaN(end)) return false;
+                    if (isNaN(start) || isNaN(end)) return true;
 
-                    // تحويل دقيق للمقارنة الصارمة بالوقت الحالي
                     if (start <= end) {
-                        return currentHour24 >= start && currentHour24 < end;
+                        return currentHour24 >= start && currentHour24 <= end;
                     } else {
-                        // شفت يمتد لمنتصف الليل
-                        return currentHour24 >= start || currentHour24 < end;
+                        return currentHour24 >= start || currentHour24 <= end;
                     }
                 }
                 return false;
@@ -1833,9 +1830,7 @@
         function getModifiedTimeHour24() {
             const now = new Date();
             let hours = now.getHours() + timezoneOffsetHours;
-            const minutes = now.getMinutes();
-            const seconds = now.getSeconds();
-            return ((hours + 24) % 24) + (minutes / 60) + (seconds / 3600);
+            return (hours + 24) % 24;
         }
 
         function updateActiveDoctorsKPI() {
@@ -3157,4 +3152,108 @@
                 }
 
                 if (currentGlobalSearchResults.length === 0) {
-                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text
+                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة في الفلتر.</div>`;
+                    return;
+                }
+
+                let globalSearchBuffer = "";
+                currentGlobalSearchResults.forEach((res) => {
+                    const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
+                    globalSearchBuffer += `
+                        <div class="search-result-card">
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                                <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                                <div>
+                                    <span class="source-badge">${res.source}</span>
+                                    <h4>${res.title}</h4>
+                                    <p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:0.25rem;">
+                                <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'")}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                            </div>
+                        </div>`;
+                });
+                resultsList.innerHTML = globalSearchBuffer;
+                updateSelectedCountDisplay();
+            }, 30);
+        }
+
+        function handleSearchCheckboxChange(resId, chk) {
+            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
+            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
+            updateSelectedCountDisplay();
+        }
+
+        function toggleSelectAllGlobalSearch(masterChk) {
+            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
+            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
+            updateSelectedCountDisplay();
+        }
+
+        function updateSelectedCountDisplay() {
+            const countSpan = document.getElementById('selectedSearchCountNum');
+            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
+        }
+
+        function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
+            let blocks = [];
+            currentGlobalSearchResults.forEach(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults || currentGlobalSearchResults.length === 0) return alert("لا توجد نتائج بحث حالية لنسخها!");
+            let blocks = currentGlobalSearchResults.map(r => r.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ جميع نتائج البحث دفعة واحدة!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal');
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
+            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src, imgSrc;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
