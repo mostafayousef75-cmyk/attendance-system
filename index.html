@@ -175,7 +175,6 @@
         .offers-grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 0.4rem; }
         .offers-grid-container.single-column { grid-template-columns: 1fr; }
         
-        /* تنسيق محسن وراقي لبطاقات العروض والأقسام */
         .offer-grid-card { background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-card) 100%); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.5rem 0.65rem; display: flex; flex-direction: column; gap: 0.3rem; position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.25); transition: transform 0.15s, border-color 0.15s; }
         .offer-grid-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
         
@@ -457,7 +456,7 @@
                 <div class="alerts-2col-grid" id="alertsGridList" ondragover="event.preventDefault()" ondrop="dropRow(event, 'alert')"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (تنسيق محسن وراقي) -->
+            <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
@@ -673,7 +672,7 @@
         </div>
     </div>
 
-    <!-- موديول إضافة/تعديل الطبيب (نظام مرن لإضافة عدة فترات وكل فترة عدة شفتات) -->
+    <!-- موديول إضافة/تعديل الطبيب -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -741,7 +740,7 @@
                 <label for="docIsLeave" style="font-weight:700; color:#ef4444;">طبيب في إجازة / غير متواجد</label>
             </div>
 
-            <!-- الفترة الأولى مع دعم إضافة أكثر من شفت -->
+            <!-- الفترة الأولى -->
             <div class="days-section-box">
                 <label style="font-weight:700; color:var(--primary-color); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> الفترة الأولى (الأيام والشفتات):</label>
                 <div class="days-checklist">
@@ -754,7 +753,6 @@
                     <label class="day-row"><input type="checkbox" class="shift1-days" value="الجمعة"> الجمعة</label>
                 </div>
                 
-                <!-- حاوية الشفتات المتعددة للفترة الأولى -->
                 <div id="shift1ShiftsListContainer" style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.3rem;"></div>
                 <button class="btn btn-secondary" style="width:100%; margin-top:0.25rem; font-size:0.62rem; justify-content:center;" onclick="addShiftRow('shift1')"><i class="fa-solid fa-plus"></i> إضافة شفت جديد لهذه الفترة</button>
             </div>
@@ -772,7 +770,6 @@
                     <label class="day-row"><input type="checkbox" class="shift2-days" value="الجمعة"> الجمعة</label>
                 </div>
                 
-                <!-- حاوية الشفتات المتعددة للفترة الثانية -->
                 <div id="shift2ShiftsListContainer" style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.3rem;"></div>
                 <button class="btn btn-secondary" style="width:100%; margin-top:0.25rem; font-size:0.62rem; justify-content:center;" onclick="addShiftRow('shift2')"><i class="fa-solid fa-plus"></i> إضافة شفت جديد لهذه الفترة</button>
             </div>
@@ -1235,13 +1232,12 @@
             const container = document.getElementById(containerId);
             if (!container) return;
 
-            const shiftIndex = container.querySelectorAll('.shift-row-item').length + 1;
             const div = document.createElement('div');
             div.className = 'shift-row-item';
             div.style.cssText = "display:flex; gap:0.25rem; align-items:center; background:var(--bg-surface); padding:0.25rem; border-radius:6px; border:1px solid var(--border-color);";
             
             div.innerHTML = `
-                <span style="font-size:0.62rem; font-weight:700; color:var(--primary-color); min-width:45px;">الشفت ${shiftIndex}:</span>
+                <span style="font-size:0.62rem; font-weight:700; color:var(--primary-color); min-width:45px;">شفت:</span>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.05rem;">
                     <span style="font-size:0.55rem; color:var(--text-muted);">من:</span>
                     <select class="form-control shift-start-sel" style="font-size:0.62rem; padding:0.15rem;">${globalHoursOptionsHTML}</select>
@@ -1304,15 +1300,16 @@
                 refreshAllViews();
             }
 
-            db.ref('clinicMasterData').once('value').then((snapshot) => {
+            // الاستماع للتحديثات السحابية بدون مسح التعديلات المحلية الحالية
+            db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
-                if (cloudData) {
+                if (cloudData && !window.hasLocalUnsavedChanges) {
                     assignDataToVariables(cloudData);
                     saveDataLocally(cloudData);
                     buildPreNormalizedSearchKeys();
                     refreshAllViews();
                 }
-            }).catch(err => console.log("Cloud sync waiting..."));
+            });
         }
 
         function assignDataToVariables(data) {
@@ -1334,6 +1331,7 @@
 
         let syncTimer = null;
         function syncToCloud() {
+            window.hasLocalUnsavedChanges = true;
             buildPreNormalizedSearchKeys();
             const bundleData = {
                 doctorsData,
@@ -1351,6 +1349,7 @@
             syncTimer = setTimeout(() => {
                 db.ref('clinicMasterData').set(bundleData).then(() => {
                     console.log("تمت المزامنة السحابية بنجاح");
+                    window.hasLocalUnsavedChanges = false;
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
                 });
@@ -1358,7 +1357,7 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "الفترة الأولى (من السبت إلى الخميس): من 12:30 مساءً - إلى 8:30 مساءً", notes: "", customColor: "" }];
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
             deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
@@ -1781,11 +1780,8 @@
             }
         }
 
-        // تنسيق موحد ونظيف بدون تكرار الأيام في رسالة النسخ
         function generateDoctorTimingFormatted(doc) {
             let lines = [];
-            
-            // الفترة الأولى
             let s1Days = doc.shift1Days || [];
             let dayStr1 = formatDaysSmart(s1Days);
             let s1Shifts = doc.shifts1 || [];
@@ -1800,7 +1796,6 @@
                 });
             }
 
-            // الفترة الثانية إذا وجدت
             let countShifts = doc.shiftsCount || "1";
             if (countShifts === "2") {
                 let s2Days = doc.shift2Days || [];
@@ -1829,6 +1824,7 @@
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
+        // تم إصلاح منطق مطابقة الوقت والشفتات بدقة متناهية مع الساعة المعدلة
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
 
@@ -1839,7 +1835,7 @@
                         if (sh.start === "24" || sh.end === "24") return true;
                         let start = parseFloat(sh.start);
                         let end = parseFloat(sh.end);
-                        if (isNaN(start) || isNaN(end)) return true;
+                        if (isNaN(start) || isNaN(end)) continue;
                         if (start <= end) {
                             if (currentHour24 >= start && currentHour24 <= end) return true;
                         } else {
@@ -1852,7 +1848,8 @@
 
             let activeInShift1 = checkShiftsList(doc.shift1Days, doc.shifts1);
             let activeInShift2 = false;
-            if (doc.shiftsCount === "2") {
+            let countShifts = doc.shiftsCount || (doc.shift2Days && doc.shift2Days.length > 0 ? "2" : "1");
+            if (countShifts === "2") {
                 activeInShift2 = checkShiftsList(doc.shift2Days, doc.shifts2);
             }
 
@@ -1862,7 +1859,8 @@
         function getModifiedTimeHour24() {
             const now = new Date();
             let hours = now.getHours() + timezoneOffsetHours;
-            return (hours + 24) % 24;
+            let minutes = now.getMinutes() / 60;
+            return ((hours + 24) % 24) + minutes;
         }
 
         function updateActiveDoctorsKPI() {
@@ -2200,7 +2198,7 @@
             document.getElementById('docSpecialty').value = doc.specialty;
             document.getElementById('docFee').value = doc.fee || ""; 
             document.getElementById('docBranch').value = doc.branch || "معشي";
-            document.getElementById('docShiftsCount').value = doc.shiftsCount || "1";
+            document.getElementById('docShiftsCount').value = doc.shiftsCount || (doc.shift2Days && doc.shift2Days.length > 0 ? "2" : "1");
             toggleShiftsConfigurationUI();
 
             document.getElementById('docCustomColor').value = doc.customColor || ""; 
@@ -2215,7 +2213,7 @@
             let s1List = doc.shifts1 || (doc.shift1Start ? [{start: doc.shift1Start, end: doc.shift1End}, doc.shift1SubStart ? {start: doc.shift1SubStart, end: doc.shift1SubEnd} : null].filter(Boolean) : []);
             s1List.forEach(s => addShiftRow('shift1', s.start, s.end));
 
-            if (doc.shiftsCount === "2") {
+            if (document.getElementById('docShiftsCount').value === "2") {
                 document.querySelectorAll('.shift2-days').forEach(c => c.checked = doc.shift2Days ? doc.shift2Days.includes(c.value) : false);
                 const container2 = document.getElementById('shift2ShiftsListContainer');
                 container2.innerHTML = "";
