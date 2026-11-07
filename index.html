@@ -80,6 +80,11 @@
         .search-input-box input { width: 100%; padding: 0.35rem 2.4rem 0.35rem 0.8rem; background-color: var(--bg-card); border: 2px solid var(--primary-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(234, 179, 8, 0.15); }
         .search-input-box .fa-magnifying-glass { position: absolute; right: 0.6rem; color: var(--primary-color); font-size: 0.78rem; }
 
+        .search-filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.25rem 0.5rem; border-radius: 6px; display: none; align-items: center; gap: 0.6rem; font-size: 0.7rem; flex-wrap: wrap; margin: 0.2rem 0.5rem; }
+        .search-filters-bar.show { display: flex; }
+        .search-filter-chk { display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; font-weight: 600; color: var(--text-main); }
+        .search-filter-chk input { accent-color: var(--primary-color); width: 12px; height: 12px; cursor: pointer; }
+
         .header-actions-group { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
         .header-datetime-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; }
         .header-time-text { color: #ffffff !important; font-weight: 800; }
@@ -825,11 +830,11 @@
         </div>
     </div>
 
-    <!-- نموذج التنبيهات المحدث مع خيارات التعديل والحذف للصور والروابط -->
+    <!-- نموذج التنبيهات المحدث مع رفع الصور الفعلي Base64 ورابط PDF -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="alertModalTitle">إضافة أو تعديل تنبيه (صورة أو PDF)</h3>
+                <h3 id="alertModalTitle">إضافة تنبيه أو رابط PDF أو رفع صورة</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
             <input type="hidden" id="alertId">
@@ -842,22 +847,16 @@
                 <input type="text" id="alertTags" class="form-control" placeholder="مثال: تنبيه، عاجل، إداري">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر:</label>
-                    <button type="button" class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="clearPdfUrlField()"><i class="fa-solid fa-trash"></i> حذف الرابط</button>
-                </div>
+                <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر:</label>
                 <input type="text" id="alertPdfUrl" class="form-control" placeholder="https://... رابط ملف الـ PDF">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <label style="color:var(--primary-color); font-weight:700;">رفع أو استبدال صورة:</label>
-                    <button type="button" class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="clearUploadedImageField()"><i class="fa-solid fa-trash"></i> حذف الصورة</button>
-                </div>
+                <label style="color:var(--primary-color); font-weight:700;">رفع صورة من جهازك مباشرة:</label>
                 <input type="file" id="alertImgFile" class="form-control" accept="image/*" onchange="previewUploadedImage(this)">
                 <input type="hidden" id="alertImgBase64">
                 <div id="imgPreviewContainer" style="margin-top:0.2rem;"></div>
             </div>
-            <button class="btn btn-green" onclick="saveAlertSmart()">حفظ التعديلات ونشر التنبيه</button>
+            <button class="btn btn-green" onclick="saveAlertSmart()">نشر التنبيه بالوسائط الذكية</button>
         </div>
     </div>
 
@@ -1672,6 +1671,14 @@
             if (confirm("حذف؟")) { fridaySchedules = fridaySchedules.filter(f => f.id !== id); syncToCloud(); renderFridayScheduleTable(); renderDoctors(); playChirpSound(); }
         }
 
+        function renderFridayScheduleTable() {
+            const tbody = document.getElementById('fridayScheduleTableBody');
+            if(!tbody) return; tbody.innerHTML = "";
+            fridaySchedules.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => {
+                tbody.innerHTML += `<tr><td>${item.date}</td><td>${item.branch}</td><td><strong>${item.doc}</strong></td><td><button class="btn btn-secondary" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="editFridaySchedule(${item.id})"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-danger" style="padding:0.08rem 0.25rem; font-size:0.58rem;" onclick="deleteFridaySchedule(${item.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+        }
+
         function copyTextToClipboard(text, msg = "تم النسخ بنجاح!") {
             navigator.clipboard.writeText(text).then(() => { alert(`📋 ${msg}\n\n${text}`); });
         }
@@ -1710,6 +1717,7 @@
             }
         }
 
+        // التعديل المختصر الذكي لجدول المواعيد لسرعة الرد على العميل
         function generateDoctorTimingFormatted(doc) {
             let lines = [];
             let s1Days = doc.shift1Days || [];
@@ -2122,19 +2130,6 @@
             }
         }
 
-        // دوال الحذف السريع داخل مودال التعديل للصورة أو رابط الـ PDF
-        function clearPdfUrlField() {
-            document.getElementById('alertPdfUrl').value = "";
-            playChirpSound();
-        }
-
-        function clearUploadedImageField() {
-            document.getElementById('alertImgFile').value = "";
-            document.getElementById('alertImgBase64').value = "";
-            document.getElementById('imgPreviewContainer').innerHTML = "";
-            playChirpSound();
-        }
-
         function openAlertModal() {
             document.getElementById('alertId').value = ""; 
             document.getElementById('alertContent').value = "";
@@ -2143,7 +2138,6 @@
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = "";
             document.getElementById('imgPreviewContainer').innerHTML = "";
-            document.getElementById('alertModalTitle').innerText = "إضافة تنبيه أو رابط PDF أو صورة";
             document.getElementById('alertModal').classList.add('active');
         }
 
@@ -2160,7 +2154,7 @@
                 content, 
                 tags, 
                 pdfUrl, 
-                imgBase64: imgBase64, 
+                imgBase64: imgBase64 || document.getElementById('alertImgBase64').getAttribute('data-existing') || "", 
                 time: new Date().toLocaleString('en-US') 
             };
             
@@ -2180,18 +2174,18 @@
             document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = item.imgBase64 || "";
+            document.getElementById('alertImgBase64').setAttribute('data-existing', item.imgBase64 || "");
             
             if (item.imgBase64) {
                 document.getElementById('imgPreviewContainer').innerHTML = `<img src="${item.imgBase64}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);">`;
             } else {
                 document.getElementById('imgPreviewContainer').innerHTML = "";
             }
-            document.getElementById('alertModalTitle').innerText = "تعديل التنبيه (النص، الصورة، أو الرابط)";
             document.getElementById('alertModal').classList.add('active');
         }
 
         function deleteAlert(id) {
-            if (confirm("هل تريد حذف هذا التنبيه نهائياً؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
         }
 
         function renderDeptsAndDocs(highlightServiceId = null) {
