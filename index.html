@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline';">
     <title>لوحة الكول سنتر والمنسقين - نظام السحابة المحدث</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1279,16 +1280,14 @@
             });
         }
 
-        // === التعديل الجذري للسرعة على الموبايل (Offline-First) ===
         function loadAllAppData() {
-            // 1. قراءة البيانات محلياً فوراً وبسرعة البرق دون أي انتظار للشبكة
             let localSaved = localStorage.getItem('clinic_master_data_v3');
             if (localSaved) {
                 try {
                     let parsed = JSON.parse(localSaved);
                     assignDataToVariables(parsed);
                     buildPreNormalizedSearchKeys();
-                    refreshAllViews(); // عرض البيانات فوراً
+                    refreshAllViews();
                 } catch(e) {}
             } else {
                 loadDefaultData();
@@ -1296,7 +1295,6 @@
                 refreshAllViews();
             }
 
-            // 2. مزامنة السحابة في الخلفية بصمت التام
             db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData) {
