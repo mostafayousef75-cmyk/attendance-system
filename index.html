@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الكول سنتر والمنسقين - نظام السحابة المحدث</title>
+    <title>لوحة الكول سنتر والمنسقين - النظام الثابت المطور</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -54,7 +54,6 @@
         .nav-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-md); color: var(--text-muted); text-decoration: none; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .nav-link:hover, .nav-link.active { background-color: var(--bg-surface); color: var(--primary-color); border: 1px solid var(--border-color); font-weight: 700; }
         
-        /* مؤشر حالة الحفظ والمزامنة السحابية */
         .sidebar-cloud-status { display: flex; align-items: center; gap: 0.5rem; background: rgba(34, 197, 94, 0.12); border: 1px solid var(--accent-green); color: #22c55e; padding: 0.35rem 0.6rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; transition: all 0.3s ease; }
         .sidebar-cloud-status.saving { background: rgba(234, 179, 8, 0.15) !important; border-color: var(--primary-color) !important; color: var(--primary-color) !important; }
         .sidebar-cloud-status.error { background: rgba(220, 38, 38, 0.15) !important; border-color: var(--danger-color) !important; color: #ef4444 !important; }
@@ -252,10 +251,10 @@
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
-        <!-- شريط حالة الحفظ والمزامنة السحابية الذكي -->
-        <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الاتصال والحفظ بالسحابة">
+        <!-- مؤشر الحالة السحابية الفوري -->
+        <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الحفظ المحلي والسحابي">
             <span class="cloud-dot" id="cloudDotElem"></span>
-            <span id="cloudTextElem">جاري الاتصال بالسحابة...</span>
+            <span id="cloudTextElem">محفوظ محلياً (جاهز)</span>
         </div>
 
         <div class="theme-box">
@@ -453,7 +452,7 @@
             <section id="alerts-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
-                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / PDF</button>
+                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / رابط PDF</button>
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
@@ -535,7 +534,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.25rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
                     <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
-                        <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="toggleOffersViewMode()" id="offersViewModeBtn" title="تغيير طريقة العرض (عمودين أو عمود واحد)">
+                        <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="toggleOffersViewMode()" id="offersViewModeBtn" title="تغيير طريقة العرض">
                             <i class="fa-solid fa-table-cells"></i> <span id="offersViewModeText">عرض عمود واحد</span>
                         </button>
 
@@ -678,7 +677,6 @@
         </div>
     </div>
 
-    <!-- موديول إضافة/تعديل الطبيب -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -836,7 +834,7 @@
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="alertModalTitle">إضافة تنبيه أو ملف PDF</h3>
+                <h3 id="alertModalTitle">إضافة تنبيه أو رابط PDF</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
             <input type="hidden" id="alertId">
@@ -849,14 +847,8 @@
                 <input type="text" id="alertTags" class="form-control" placeholder="مثال: تنبيه، عاجل، إداري">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>إرفاق صورة أو PDF</label>
-                <input type="file" id="alertFileInput" class="form-control" accept="image/*,application/pdf" onchange="previewAndCompressMedia(this)">
-                <input type="hidden" id="alertMediaBase64">
-                <input type="hidden" id="alertMediaType">
-                <div id="mediaPreviewContainer" style="display:none; position:relative; margin-top:0.2rem;">
-                    <div id="mediaPreviewBox"></div>
-                    <button class="btn btn-danger" style="padding:0.08rem 0.2rem; position:absolute; top:4px; right:4px;" onclick="removeAlertMedia()"><i class="fa-solid fa-trash"></i></button>
-                </div>
+                <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر (سريع جداً بدون بطء):</label>
+                <input type="text" id="alertPdfUrl" class="form-control" placeholder="https://... أو رابط جوجل درايف للملف">
             </div>
             <button class="btn btn-green" onclick="saveAlert()">نشر التنبيه</button>
         </div>
@@ -1110,7 +1102,6 @@
             } catch(e){}
         }
 
-        // تحديث حالة الشاشة بصرياً (مؤشر ذكي جداً)
         function setCloudStatusUI(status, message) {
             const badge = document.getElementById('cloudStatusBadge');
             const dot = document.getElementById('cloudDotElem');
@@ -1120,11 +1111,11 @@
             badge.className = "sidebar-cloud-status " + (status === 'saving' ? 'saving' : status === 'error' ? 'error' : '');
             
             if (status === 'saving') {
-                textElem.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${message || "جاري الحفظ والرفع..."}`;
+                textElem.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${message || "جاري الحفظ..."}`;
             } else if (status === 'error') {
-                textElem.innerText = message || "خطأ في الاتصال!";
+                textElem.innerText = message || "خطأ اتصال سحابي!";
             } else {
-                textElem.innerText = message || "تم الحفظ ومزامنته بالسحابة ✓";
+                textElem.innerText = message || "محفوظ وثابت محلياً ✓";
                 badge.style.background = "rgba(34, 197, 94, 0.12)";
                 badge.style.borderColor = "#22c55e";
                 badge.style.color = "#22c55e";
@@ -1132,14 +1123,6 @@
                 dot.style.boxShadow = "0 0 10px #22c55e";
             }
         }
-
-        db.ref('.info/connected').on('value', function(snap) {
-            if (snap.val() === true) {
-                setCloudStatusUI('connected', "متصل بالسحابة (مزامنة فورية)");
-            } else {
-                setCloudStatusUI('error', "غير متصل بالسحابة (يعمل محلياً)");
-            }
-        });
 
         let doctorsData = [];
         let fridaySchedules = [];
@@ -1192,57 +1175,20 @@
 
         function populateHourSelectOptions() {
             let times = [
-                { val: "24", text: "24 ساعة (طوال اليوم)" },
-                { val: "0", text: "12:00 صباحاً (منتصف الليل)" },
-                { val: "0.5", text: "12:30 صباحاً" },
-                { val: "1", text: "1:00 صباحاً" },
-                { val: "1.5", text: "1:30 صباحاً" },
-                { val: "2", text: "2:00 صباحاً" },
-                { val: "2.5", text: "2:30 صباحاً" },
-                { val: "3", text: "3:00 صباحاً" },
-                { val: "3.5", text: "3:30 صباحاً" },
-                { val: "4", text: "4:00 صباحاً" },
-                { val: "4.5", text: "4:30 صباحاً" },
-                { val: "5", text: "5:00 صباحاً" },
-                { val: "5.5", text: "5:30 صباحاً" },
-                { val: "6", text: "6:00 صباحاً" },
-                { val: "6.5", text: "6:30 صباحاً" },
-                { val: "7", text: "7:00 صباحاً" },
-                { val: "7.5", text: "7:30 صباحاً" },
-                { val: "8", text: "8:00 صباحاً" },
-                { val: "8.5", text: "8:30 صباحاً" },
-                { val: "9", text: "9:00 صباحاً" },
-                { val: "9.5", text: "9:30 صباحاً" },
-                { val: "10", text: "10:00 صباحاً" },
-                { val: "10.5", text: "10:30 صباحاً" },
-                { val: "11", text: "11:00 صباحاً" },
-                { val: "11.5", text: "11:30 صباحاً" },
-                { val: "12", text: "12:00 ظهراً" },
-                { val: "12.5", text: "12:30 ظهراً" },
-                { val: "13", text: "1:00 مساءً" },
-                { val: "13.5", text: "1:30 مساءً" },
-                { val: "14", text: "2:00 مساءً" },
-                { val: "14.5", text: "2:30 مساءً" },
-                { val: "15", text: "3:00 مساءً" },
-                { val: "15.5", text: "3:30 مساءً" },
-                { val: "16", text: "4:00 مساءً" },
-                { val: "16.5", text: "4:30 مساءً" },
-                { val: "17", text: "5:00 مساءً" },
-                { val: "17.5", text: "5:30 مساءً" },
-                { val: "18", text: "6:00 مساءً" },
-                { val: "18.5", text: "6:30 مساءً" },
-                { val: "19", text: "7:00 مساءً" },
-                { val: "19.5", text: "7:30 مساءً" },
-                { val: "20", text: "8:00 مساءً" },
-                { val: "20.5", text: "8:30 مساءً" },
-                { val: "21", text: "9:00 مساءً" },
-                { val: "21.5", text: "9:30 مساءً" },
-                { val: "22", text: "10:00 مساءً" },
-                { val: "22.5", text: "10:30 مساءً" },
-                { val: "23", text: "11:00 مساءً" },
-                { val: "23.5", text: "11:30 مساءً" }
+                { val: "24", text: "24 ساعة (طوال اليوم)" }, { val: "0", text: "12:00 صباحاً" }, { val: "0.5", text: "12:30 صباحاً" },
+                { val: "1", text: "1:00 صباحاً" }, { val: "1.5", text: "1:30 صباحاً" }, { val: "2", text: "2:00 صباحاً" }, { val: "2.5", text: "2:30 صباحاً" },
+                { val: "3", text: "3:00 صباحاً" }, { val: "3.5", text: "3:30 صباحاً" }, { val: "4", text: "4:00 صباحاً" }, { val: "4.5", text: "4:30 صباحاً" },
+                { val: "5", text: "5:00 صباحاً" }, { val: "5.5", text: "5:30 صباحاً" }, { val: "6", text: "6:00 صباحاً" }, { val: "6.5", text: "6:30 صباحاً" },
+                { val: "7", text: "7:00 صباحاً" }, { val: "7.5", text: "7:30 صباحاً" }, { val: "8", text: "8:00 صباحاً" }, { val: "8.5", text: "8:30 صباحاً" },
+                { val: "9", text: "9:00 صباحاً" }, { val: "9.5", text: "9:30 صباحاً" }, { val: "10", text: "10:00 صباحاً" }, { val: "10.5", text: "10:30 صباحاً" },
+                { val: "11", text: "11:00 صباحاً" }, { val: "11.5", text: "11:30 صباحاً" }, { val: "12", text: "12:00 ظهراً" }, { val: "12.5", text: "12:30 ظهراً" },
+                { val: "13", text: "1:00 مساءً" }, { val: "13.5", text: "1:30 مساءً" }, { val: "14", text: "2:00 مساءً" }, { val: "14.5", text: "2:30 مساءً" },
+                { val: "15", text: "3:00 مساءً" }, { val: "15.5", text: "3:30 مساءً" }, { val: "16", text: "4:00 مساءً" }, { val: "16.5", text: "4:30 مساءً" },
+                { val: "17", text: "5:00 مساءً" }, { val: "17.5", text: "5:30 مساءً" }, { val: "18", text: "6:00 مساءً" }, { val: "18.5", text: "6:30 مساءً" },
+                { val: "19", text: "7:00 مساءً" }, { val: "19.5", text: "7:30 مساءً" }, { val: "20", text: "8:00 مساءً" }, { val: "20.5", text: "8:30 مساءً" },
+                { val: "21", text: "9:00 مساءً" }, { val: "21.5", text: "9:30 مساءً" }, { val: "22", text: "10:00 مساءً" }, { val: "22.5", text: "10:30 مساءً" },
+                { val: "23", text: "11:00 مساءً" }, { val: "23.5", text: "11:30 مساءً" }
             ];
-
             globalHoursOptionsHTML = "";
             times.forEach(t => { globalHoursOptionsHTML += `<option value="${t.val}">${t.text}</option>`; });
         }
@@ -1268,7 +1214,6 @@
                 </div>
                 <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.58rem; margin-top:0.8rem;" onclick="this.closest('.shift-row-item').remove()"><i class="fa-solid fa-trash"></i></button>
             `;
-            
             container.appendChild(div);
             div.querySelector('.shift-start-sel').value = startVal;
             div.querySelector('.shift-end-sel').value = endVal;
@@ -1281,24 +1226,12 @@
         }
 
         function buildPreNormalizedSearchKeys() {
-            doctorsData.forEach(d => {
-                d.searchKey = normalizeArabicText(`${d.name} ${d.nationality} ${d.specialty} ${d.fee} ${d.timing} ${d.notes} ${d.tags} ${d.branch}`);
-            });
-            offersData.forEach(o => {
-                o.searchKey = normalizeArabicText(`${o.name} ${o.category} ${o.price} ${o.device1} ${o.price1} ${o.device2} ${o.price2} ${o.notes} ${o.tags}`);
-            });
-            alertsData.forEach(a => {
-                a.searchKey = normalizeArabicText(`${a.content} ${a.tags} ${a.time}`);
-            });
-            inquiriesData.forEach(i => {
-                i.searchKey = normalizeArabicText(`${i.question} ${i.answer} ${i.category} ${i.tags}`);
-            });
-            deptServicesData.forEach(s => {
-                s.searchKey = normalizeArabicText(`${s.name} ${s.branch} ${s.type} ${s.tags}`);
-            });
-            deptNotesData.forEach(n => {
-                n.searchKey = normalizeArabicText(`${n.text} ${n.tags}`);
-            });
+            doctorsData.forEach(d => { d.searchKey = normalizeArabicText(`${d.name} ${d.nationality} ${d.specialty} ${d.fee} ${d.timing} ${d.notes} ${d.tags} ${d.branch}`); });
+            offersData.forEach(o => { o.searchKey = normalizeArabicText(`${o.name} ${o.category} ${o.price} ${o.device1} ${o.price1} ${o.device2} ${o.price2} ${o.notes} ${o.tags}`); });
+            alertsData.forEach(a => { a.searchKey = normalizeArabicText(`${a.content} ${a.tags} ${a.time}`); });
+            inquiriesData.forEach(i => { i.searchKey = normalizeArabicText(`${i.question} ${i.answer} ${i.category} ${i.tags}`); });
+            deptServicesData.forEach(s => { s.searchKey = normalizeArabicText(`${s.name} ${s.branch} ${s.type} ${s.tags}`); });
+            deptNotesData.forEach(n => { n.searchKey = normalizeArabicText(`${n.text} ${n.tags}`); });
             coordinatorsData.forEach(c => {
                 let rulesText = c.rules ? c.rules.join(' ') : '';
                 c.searchKey = normalizeArabicText(`${c.name} ${rulesText} ${c.tags}`);
@@ -1306,7 +1239,8 @@
         }
 
         function loadAllAppData() {
-            let localSaved = localStorage.getItem('clinic_master_data_v3');
+            // 1. الأولوية المطلقة للذاكرة المحلية لمنع فقدان البيانات تماماً عند الريفرش
+            let localSaved = localStorage.getItem('clinic_master_data_v4');
             if (localSaved) {
                 try {
                     let parsed = JSON.parse(localSaved);
@@ -1320,15 +1254,14 @@
                 refreshAllViews();
             }
 
-            // المزامنة الحية بدون الكتابة الفوقية لتعديلاتك
+            // 2. ربط الفايربيز بدون تداخل (يحدث فقط البيانات لو جاءت من جهاز آخر)
             db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
-                if (cloudData && !window.isLocallySaving) {
+                if (cloudData && !window.isJustSavedLocally) {
                     assignDataToVariables(cloudData);
                     saveDataLocally(cloudData);
                     buildPreNormalizedSearchKeys();
                     refreshAllViews();
-                    setCloudStatusUI('connected', "متصل بالسحابة (تم تحديث البيانات من جهاز آخر ✓)");
                 }
             });
         }
@@ -1346,46 +1279,35 @@
 
         function saveDataLocally(data) {
             try {
-                localStorage.setItem('clinic_master_data_v3', JSON.stringify(data));
+                localStorage.setItem('clinic_master_data_v4', JSON.stringify(data));
             } catch(e){}
         }
 
-        let syncTimer = null;
-        window.isLocallySaving = false;
+        window.isJustSavedLocally = false;
 
-        // دالة حفظ محلي فورية + رفع سحابي قوي
+        // الحفظ الفوري اللحظي 100% بدون أي تأخير
         function syncToCloud() {
-            window.isLocallySaving = true;
-            setCloudStatusUI('saving', "جاري الحفظ والرفع لجميع الكول سنتر...");
+            window.isJustSavedLocally = true;
+            setCloudStatusUI('saving', "جاري الحفظ المحلي السريع...");
             buildPreNormalizedSearchKeys();
             
             const bundleData = {
-                doctorsData,
-                fridaySchedules,
-                alertsData,
-                coordinatorsData,
-                deptServicesData,
-                deptNotesData,
-                offersData,
-                inquiriesData
+                doctorsData, fridaySchedules, alertsData, coordinatorsData,
+                deptServicesData, deptNotesData, offersData, inquiriesData
             };
             
-            // 1. تثبيت البيانات محلياً وبشكل فوري في جهازك حتى لو اتعمل ريفرش فوراً
+            // حفظ فوري محلي
             saveDataLocally(bundleData);
             refreshAllViews();
+            setCloudStatusUI('connected', "محفوظ وثابت محلياً ✓");
 
-            // 2. المزامنة بالسحابة بدون أي مسح للبيانات
-            if (syncTimer) clearTimeout(syncTimer);
-            syncTimer = setTimeout(() => {
-                db.ref('clinicMasterData').set(bundleData).then(() => {
-                    setCloudStatusUI('connected', "تم الحفظ ومزامنته بالسحابة ✓");
-                    setTimeout(() => { window.isLocallySaving = false; }, 800);
-                }).catch(err => {
-                    console.error("فشل الرفع السحابي:", err);
-                    setCloudStatusUI('error', "تم الحفظ محلياً (تعذر الرفع للسحابة!)");
-                    window.isLocallySaving = false;
-                });
-            }, 300);
+            // رفع سحابي في الخلفية بصمت تام
+            db.ref('clinicMasterData').set(bundleData).then(() => {
+                setTimeout(() => { window.isJustSavedLocally = false; }, 1000);
+            }).catch(err => {
+                console.error("خطأ رفع سحابي:", err);
+                window.isJustSavedLocally = false;
+            });
         }
 
         function loadDefaultData() {
@@ -1465,7 +1387,7 @@
             if (dateEl) dateEl.innerText = dateStr;
         }
 
-        let modalCurrentTimeObj = null;
+        let modalClockInterval = null;
 
         function updateModalLiveClock() {
             const now = new Date();
@@ -1474,8 +1396,6 @@
             const minutes = now.getMinutes();
             const seconds = now.getSeconds();
             
-            modalCurrentTimeObj = { hours, minutes, seconds };
-
             const ampm = hours >= 12 ? 'PM' : 'AM';
             let displayHours = hours % 12;
             displayHours = displayHours ? displayHours : 12;
@@ -1484,8 +1404,6 @@
             const modalClockEl = document.getElementById('modalLiveClock');
             if (modalClockEl) modalClockEl.innerText = timeStr;
         }
-
-        let modalClockInterval = null;
 
         function saveTimezoneOffsetSetting() {
             timezoneOffsetHours = parseInt(document.getElementById('timezoneOffsetSelect').value);
@@ -1767,18 +1685,14 @@
 
         function getTimeLabelText(val) {
             let timesMap = {
-                "24": "24 ساعة (طوال اليوم)", "0": "12:00 صباحاً (منتصف الليل)", "0.5": "12:30 صباحاً",
-                "1": "1:00 صباحاً", "1.5": "1:30 صباحاً", "2": "2:00 صباحاً", "2.5": "2:30 صباحاً",
-                "3": "3:00 صباحاً", "3.5": "3:30 صباحاً", "4": "4:00 صباحاً", "4.5": "4:30 صباحاً",
-                "5": "5:00 صباحاً", "5.5": "5:30 صباحاً", "6": "6:00 صباحاً", "6.5": "6:30 صباحاً",
-                "7": "7:00 صباحاً", "7.5": "7:30 صباحاً", "8": "8:00 صباحاً", "8.5": "8:30 صباحاً",
-                "9": "9:00 صباحاً", "9.5": "9:30 صباحاً", "10": "10:00 صباحاً", "10.5": "10:30 صباحاً",
-                "11": "11:00 صباحاً", "11.5": "11:30 صباحاً", "12": "12:00 ظهراً", "12.5": "12:30 ظهراً",
-                "13": "1:00 مساءً", "13.5": "1:30 مساءً", "14": "2:00 مساءً", "14.5": "2:30 مساءً",
-                "15": "3:00 مساءً", "15.5": "3:30 مساءً", "16": "4:00 مساءً", "16.5": "4:30 مساءً",
-                "17": "5:00 مساءً", "17.5": "5:30 مساءً", "18": "6:00 مساءً", "18.5": "6:30 مساءً",
-                "19": "7:00 مساءً", "19.5": "7:30 مساءً", "20": "8:00 مساءً", "20.5": "8:30 مساءً",
-                "21": "9:00 مساءً", "21.5": "9:30 مساءً", "22": "10:00 مساءً", "22.5": "10:30 مساءً",
+                "24": "24 ساعة (طوال اليوم)", "0": "12:00 صباحاً", "0.5": "12:30 صباحاً", "1": "1:00 صباحاً", "1.5": "1:30 صباحاً",
+                "2": "2:00 صباحاً", "2.5": "2:30 صباحاً", "3": "3:00 صباحاً", "3.5": "3:30 صباحاً", "4": "4:00 صباحاً", "4.5": "4:30 صباحاً",
+                "5": "5:00 صباحاً", "5.5": "5:30 صباحاً", "6": "6:00 صباحاً", "6.5": "6:30 صباحاً", "7": "7:00 صباحاً", "7.5": "7:30 صباحاً",
+                "8": "8:00 صباحاً", "8.5": "8:30 صباحاً", "9": "9:00 صباحاً", "9.5": "9:30 صباحاً", "10": "10:00 صباحاً", "10.5": "10:30 صباحاً",
+                "11": "11:00 صباحاً", "11.5": "11:30 صباحاً", "12": "12:00 ظهراً", "12.5": "12:30 ظهراً", "13": "1:00 مساءً", "13.5": "1:30 مساءً",
+                "14": "2:00 مساءً", "14.5": "2:30 مساءً", "15": "3:00 مساءً", "15.5": "3:30 مساءً", "16": "4:00 مساءً", "16.5": "4:30 مساءً",
+                "17": "5:00 مساءً", "17.5": "5:30 مساءً", "18": "6:00 مساءً", "18.5": "6:30 مساءً", "19": "7:00 مساءً", "19.5": "7:30 مساءً",
+                "20": "8:00 مساءً", "20.5": "8:30 مساءً", "21": "9:00 مساءً", "21.5": "9:30 مساءً", "22": "10:00 مساءً", "22.5": "10:30 مساءً",
                 "23": "11:00 مساءً", "23.5": "11:30 مساءً"
             };
             return timesMap[String(val)] || val;
@@ -1789,22 +1703,16 @@
         function formatDaysSmart(daysArray) {
             if (!daysArray || daysArray.length === 0) return "(طوال الأسبوع)";
             if (daysArray.length === 7) return "(طوال الأسبوع)";
-
             let presentIndices = daysArray.map(d => standardDaysSequence.indexOf(d)).filter(idx => idx !== -1).sort((a,b) => a - b);
             if (presentIndices.length === 0) return `(${daysArray.join('، ')})`;
 
             let isConsecutive = true;
             for (let i = 0; i < presentIndices.length - 1; i++) {
-                if (presentIndices[i+1] !== presentIndices[i] + 1) {
-                    isConsecutive = false;
-                    break;
-                }
+                if (presentIndices[i+1] !== presentIndices[i] + 1) { isConsecutive = false; break; }
             }
 
             if (isConsecutive && presentIndices.length >= 3) {
-                let firstDay = standardDaysSequence[presentIndices[0]];
-                let lastDay = standardDaysSequence[presentIndices[presentIndices.length - 1]];
-                return `(من ${firstDay} إلى ${lastDay})`;
+                return `(من ${standardDaysSequence[presentIndices[0]]} إلى ${standardDaysSequence[presentIndices[presentIndices.length - 1]]})`;
             } else {
                 return `(${daysArray.join('، ')})`;
             }
@@ -1856,7 +1764,6 @@
 
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
-
             let checkShiftsList = (daysArr, shiftsArr) => {
                 if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
                     if (!shiftsArr || shiftsArr.length === 0) return true;
@@ -1865,24 +1772,13 @@
                         let start = parseFloat(sh.start);
                         let end = parseFloat(sh.end);
                         if (isNaN(start) || isNaN(end)) continue;
-                        if (start <= end) {
-                            if (currentHour24 >= start && currentHour24 <= end) return true;
-                        } else {
-                            if (currentHour24 >= start || currentHour24 <= end) return true;
-                        }
+                        if (start <= end) { if (currentHour24 >= start && currentHour24 <= end) return true; }
+                        else { if (currentHour24 >= start || currentHour24 <= end) return true; }
                     }
                 }
                 return false;
             };
-
-            let activeInShift1 = checkShiftsList(doc.shift1Days, doc.shifts1);
-            let activeInShift2 = false;
-            let countShifts = doc.shiftsCount || (doc.shift2Days && doc.shift2Days.length > 0 ? "2" : "1");
-            if (countShifts === "2") {
-                activeInShift2 = checkShiftsList(doc.shift2Days, doc.shifts2);
-            }
-
-            return activeInShift1 || activeInShift2;
+            return checkShiftsList(doc.shift1Days, doc.shifts1) || ((doc.shiftsCount === "2") ? checkShiftsList(doc.shift2Days, doc.shifts2) : false);
         }
 
         function getModifiedTimeHour24() {
@@ -1895,15 +1791,13 @@
         function updateActiveDoctorsKPI() {
             const currentDay = getArabicDayName();
             const currentHour24 = getModifiedTimeHour24();
-            
             let todayMashyCount = 0, todayWissamCount = 0;
             doctorsData.forEach(d => {
-                let isMashyBranch = (d.branch === "معشي" || d.isJoint);
-                let isWissamBranch = (d.branch === "الوسام" || d.isJoint);
-
+                let isMashy = (d.branch === "معشي" || d.isJoint);
+                let isWissam = (d.branch === "الوسام" || d.isJoint);
                 if (checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
-                    if (isMashyBranch) todayMashyCount++;
-                    if (isWissamBranch) todayWissamCount++;
+                    if (isMashy) todayMashyCount++;
+                    if (isWissam) todayWissamCount++;
                 }
             });
             const summaryEl = document.getElementById('kpiActiveSummary');
@@ -1914,63 +1808,24 @@
             document.getElementById('timezoneOffsetSelect').value = timezoneOffsetHours.toString();
             const currentDay = getArabicDayName();
             const currentHour24 = getModifiedTimeHour24();
-            
             let mashyActive = [], wissamActive = [];
             
-            const sortedMashyDoctors = getSortedDoctorsListForBranch('معشي');
-            const sortedWissamDoctors = getSortedDoctorsListForBranch('الوسام');
-
-            sortedMashyDoctors.forEach(d => {
-                let isMashyBranch = (d.branch === "معشي" || d.isJoint);
-                if (isMashyBranch && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
-                    mashyActive.push(d);
-                }
+            getSortedDoctorsListForBranch('معشي').forEach(d => {
+                if ((d.branch === "معشي" || d.isJoint) && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) mashyActive.push(d);
             });
-
-            sortedWissamDoctors.forEach(d => {
-                let isWissamBranch = (d.branch === "الوسام" || d.isJoint);
-                if (isWissamBranch && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
-                    wissamActive.push(d);
-                }
+            getSortedDoctorsListForBranch('الوسام').forEach(d => {
+                if ((d.branch === "الوسام" || d.isJoint) && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) wissamActive.push(d);
             });
 
             const mashyContainer = document.getElementById('activeMashyListContainer');
             const wissamContainer = document.getElementById('activeWissamListContainer');
             if (!mashyContainer || !wissamContainer) return;
 
-            let mashyHtml = "";
-            if (mashyActive.length === 0) {
-                mashyHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً بفرع معشي.</div>`;
-            } else {
-                mashyActive.forEach(doc => {
-                    let timingSummary = generateDoctorTimingFormatted(doc).replace(/\n/g, ' | ');
-                    mashyHtml += `
-                        <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty} (${timingSummary})</span>
-                            </div>
-                            <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.58rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})">عرض</button>
-                        </div>`;
-                });
-            }
-            mashyContainer.innerHTML = mashyHtml;
+            mashyContainer.innerHTML = mashyActive.length === 0 ? `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً بمعشي.</div>` : 
+                mashyActive.map(doc => `<div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;"><div><strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty}</span></div><button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.58rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})">عرض</button></div>`).join('');
 
-            let wissamHtml = "";
-            if (wissamActive.length === 0) {
-                wissamHtml = `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً بفرع الوسام.</div>`;
-            } else {
-                wissamActive.forEach(doc => {
-                    let timingSummary = generateDoctorTimingFormatted(doc).replace(/\n/g, ' | ');
-                    wissamHtml += `
-                        <div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty} (${timingSummary})</span>
-                            </div>
-                            <button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.58rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})">عرض</button>
-                        </div>`;
-                });
-            }
-            wissamContainer.innerHTML = wissamHtml;
+            wissamContainer.innerHTML = wissamActive.length === 0 ? `<div style="font-size:0.68rem; color:var(--text-muted);">لا يوجد أطباء متواجدون حالياً بالوسام.</div>` : 
+                wissamActive.map(doc => `<div style="background:var(--bg-surface); border:1px solid var(--border-color); padding:0.3rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;"><div><strong style="color:var(--text-main);">${doc.name}</strong> <span style="font-size:0.62rem; color:var(--text-muted);">${doc.specialty}</span></div><button class="btn btn-green" style="padding:0.1rem 0.3rem; font-size:0.58rem;" onclick="jumpToSectionAndHighlightDoc(${doc.id})">عرض</button></div>`).join('');
 
             document.getElementById('activeDoctorsModal').classList.add('active');
             updateModalLiveClock();
@@ -1980,24 +1835,14 @@
 
         function getSortedDoctorsListForBranch(branchName) {
             let baseList = [...doctorsData];
-
-            baseList.sort((a, b) => {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return 0;
-            });
-
+            baseList.sort((a, b) => (a.isPinned && !b.isPinned) ? -1 : (!a.isPinned && b.isPinned) ? 1 : 0);
             let orderArr = (branchName === 'معشي') ? mashyCustomOrder : wissamCustomOrder;
             if (orderArr && orderArr.length > 0) {
                 baseList.sort((a, b) => {
                     if (a.isPinned && !b.isPinned) return -1;
                     if (!a.isPinned && b.isPinned) return 1;
-
-                    let idxA = orderArr.indexOf(a.id);
-                    let idxB = orderArr.indexOf(b.id);
-                    if (idxA === -1) idxA = 9999;
-                    if (idxB === -1) idxB = 9999;
-                    return idxA - idxB;
+                    let idxA = orderArr.indexOf(a.id), idxB = orderArr.indexOf(b.id);
+                    return (idxA === -1 ? 9999 : idxA) - (idxB === -1 ? 9999 : idxB);
                 });
             }
             return baseList;
@@ -2026,45 +1871,27 @@
 
             let todayMashyDocs = [], todayWissamDocs = [];
 
-            const mashySorted = getSortedDoctorsListForBranch('معشي');
-            const wissamSorted = getSortedDoctorsListForBranch('الوسام');
-
-            const mashyList = mashySorted.filter(d => {
-                const matchSearch = !search || (d.searchKey && d.searchKey.includes(search));
-                const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (d.branch === "معشي" || d.isJoint);
-            });
-
-            const wissamList = wissamSorted.filter(d => {
-                const matchSearch = !search || (d.searchKey && d.searchKey.includes(search));
-                const matchSpec = !selectedSpecialty || d.specialty === selectedSpecialty;
-                return matchSearch && matchSpec && (d.branch === "الوسام" || d.isJoint);
-            });
+            const mashyList = getSortedDoctorsListForBranch('معشي').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "معشي" || d.isJoint));
+            const wissamList = getSortedDoctorsListForBranch('الوسام').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "الوسام" || d.isJoint));
 
             let mashyHtmlBuffer = "";
             mashyList.forEach((doc) => {
-                let isActiveToday = checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24());
-                if (isActiveToday) todayMashyDocs.push(doc.name);
-
+                if (checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24())) todayMashyDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = doc.tags ? `<br><span class="tag-badge">🏷️ ${doc.tags}</span>` : '';
-
                 let formattedDocName = doc.name.trim();
-                if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) {
-                    formattedDocName = "د. " + formattedDocName;
-                }
-
+                if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) formattedDocName = "د. " + formattedDocName;
                 let timingFormatted = generateDoctorTimingFormatted(doc);
 
                 mashyHtmlBuffer += `
                     <tr id="doc_row_mashy_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" data-id="${doc.id}">
                         <td>
                             <div style="display:flex; align-items:flex-start; gap:0.25rem;">
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_mashy')" title="اضغط واسحب من هنا لترتيب الطبيب في فرع معشي"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_mashy')" title="اسحب لترتيب الطبيب"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <div style="flex:1;">
                                     <span class="doc-name-box">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                                     <span class="doc-nat-badge">${doc.nationality || ''}</span>
@@ -2089,28 +1916,22 @@
 
             let wissamHtmlBuffer = "";
             wissamList.forEach((doc) => {
-                let isActiveToday = checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24());
-                if (isActiveToday) todayWissamDocs.push(doc.name);
-
+                if (checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24())) todayWissamDocs.push(doc.name);
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = doc.tags ? `<br><span class="tag-badge">🏷️ ${doc.tags}</span>` : '';
-
                 let formattedDocName = doc.name.trim();
-                if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) {
-                    formattedDocName = "د. " + formattedDocName;
-                }
-
+                if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) formattedDocName = "د. " + formattedDocName;
                 let timingFormatted = generateDoctorTimingFormatted(doc);
 
                 wissamHtmlBuffer += `
                     <tr id="doc_row_wissam_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" data-id="${doc.id}">
                         <td>
                             <div style="display:flex; align-items:flex-start; gap:0.25rem;">
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_wissam')" title="اضغط واسحب من هنا لترتيب الطبيب في فرع الوسام"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_wissam')" title="اسحب لترتيب الطبيب"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <div style="flex:1;">
                                     <span class="doc-name-box">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                                     <span class="doc-nat-badge">${doc.nationality || ''}</span>
@@ -2145,23 +1966,15 @@
             document.getElementById('docNationality').value = ""; document.getElementById('docSpecialty').value = "";
             document.getElementById('docFee').value = ""; document.getElementById('docNotes').value = "";
             document.getElementById('docTags').value = ""; document.getElementById('docCustomColor').value = ""; 
-            document.getElementById('docBranch').value = "معشي";
-            document.getElementById('docShiftsCount').value = "1";
+            document.getElementById('docBranch').value = "معشي"; document.getElementById('docShiftsCount').value = "1";
             toggleShiftsConfigurationUI();
-            
-            document.getElementById('docIsJoint').checked = false; document.getElementById('docIsPinned').checked = false; 
-            document.getElementById('docIsLeave').checked = false;
-            
-            document.querySelectorAll('.shift1-days').forEach(c => c.checked = false);
-            document.querySelectorAll('.shift2-days').forEach(c => c.checked = false);
-            
+            document.getElementById('docIsJoint').checked = false; document.getElementById('docIsPinned').checked = false; document.getElementById('docIsLeave').checked = false;
+            document.querySelectorAll('.shift1-days, .shift2-days').forEach(c => c.checked = false);
             document.getElementById('shift1ShiftsListContainer').innerHTML = "";
             document.getElementById('shift2ShiftsListContainer').innerHTML = "";
-            
             addShiftRow('shift1', "9", "12");
             addShiftRow('shift1', "16.5", "21.5");
             addShiftRow('shift2', "10", "14");
-
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; 
             document.getElementById('doctorModal').classList.add('active');
         }
@@ -2169,47 +1982,30 @@
         function saveDoctor() {
             const id = document.getElementById('docId').value;
             const shiftsCount = document.getElementById('docShiftsCount').value;
-            
             const shift1Days = Array.from(document.querySelectorAll('.shift1-days:checked')).map(c => c.value);
             let shifts1 = [];
             document.querySelectorAll('#shift1ShiftsListContainer .shift-row-item').forEach(row => {
-                shifts1.push({
-                    start: row.querySelector('.shift-start-sel').value,
-                    end: row.querySelector('.shift-end-sel').value
-                });
+                shifts1.push({ start: row.querySelector('.shift-start-sel').value, end: row.querySelector('.shift-end-sel').value });
             });
-
             const shift2Days = (shiftsCount === "2") ? Array.from(document.querySelectorAll('.shift2-days:checked')).map(c => c.value) : [];
             let shifts2 = [];
             if (shiftsCount === "2") {
                 document.querySelectorAll('#shift2ShiftsListContainer .shift-row-item').forEach(row => {
-                    shifts2.push({
-                        start: row.querySelector('.shift-start-sel').value,
-                        end: row.querySelector('.shift-end-sel').value
-                    });
+                    shifts2.push({ start: row.querySelector('.shift-start-sel').value, end: row.querySelector('.shift-end-sel').value });
                 });
             }
 
             let docNameVal = document.getElementById('docName').value.trim();
-            if (docNameVal && !docNameVal.startsWith("د.") && !docNameVal.startsWith("الدكتور")) {
-                docNameVal = "د. " + docNameVal;
-            }
+            if (docNameVal && !docNameVal.startsWith("د.") && !docNameVal.startsWith("الدكتور")) docNameVal = "د. " + docNameVal;
 
             const docObj = {
                 id: id ? parseInt(id) : Date.now(),
-                name: docNameVal,
-                nationality: document.getElementById('docNationality').value,
-                specialty: document.getElementById('docSpecialty').value,
-                fee: document.getElementById('docFee').value,
-                branch: document.getElementById('docBranch').value,
-                shiftsCount,
-                shift1Days, shifts1,
-                shift2Days, shifts2,
-                customColor: document.getElementById('docCustomColor').value,
-                isJoint: document.getElementById('docIsJoint').checked,
-                isPinned: document.getElementById('docIsPinned').checked,
-                isLeave: document.getElementById('docIsLeave').checked,
-                notes: document.getElementById('docNotes').value,
+                name: docNameVal, nationality: document.getElementById('docNationality').value,
+                specialty: document.getElementById('docSpecialty').value, fee: document.getElementById('docFee').value,
+                branch: document.getElementById('docBranch').value, shiftsCount, shift1Days, shifts1,
+                shift2Days, shifts2, customColor: document.getElementById('docCustomColor').value,
+                isJoint: document.getElementById('docIsJoint').checked, isPinned: document.getElementById('docIsPinned').checked,
+                isLeave: document.getElementById('docIsLeave').checked, notes: document.getElementById('docNotes').value,
                 tags: document.getElementById('docTags').value.trim()
             };
             if (!docObj.name) return alert("أدخل اسم الطبيب!");
@@ -2219,37 +2015,27 @@
         }
 
         function editDoctor(id) {
-            const doc = doctorsData.find(d => d.id === id);
-            if (!doc) return;
-            document.getElementById('docId').value = doc.id; 
-            document.getElementById('docName').value = doc.name;
-            document.getElementById('docNationality').value = doc.nationality || ""; 
-            document.getElementById('docSpecialty').value = doc.specialty;
-            document.getElementById('docFee').value = doc.fee || ""; 
-            document.getElementById('docBranch').value = doc.branch || "معشي";
-            document.getElementById('docShiftsCount').value = doc.shiftsCount || (doc.shift2Days && doc.shift2Days.length > 0 ? "2" : "1");
+            const doc = doctorsData.find(d => d.id === id); if (!doc) return;
+            document.getElementById('docId').value = doc.id; document.getElementById('docName').value = doc.name;
+            document.getElementById('docNationality').value = doc.nationality || ""; document.getElementById('docSpecialty').value = doc.specialty;
+            document.getElementById('docFee').value = doc.fee || ""; document.getElementById('docBranch').value = doc.branch || "معشي";
+            document.getElementById('docShiftsCount').value = doc.shiftsCount || "1";
             toggleShiftsConfigurationUI();
-
             document.getElementById('docCustomColor').value = doc.customColor || ""; 
             document.getElementById('docIsJoint').checked = !!doc.isJoint;
-            document.getElementById('docIsPinned').checked = !!doc.isPinned; 
-            document.getElementById('docIsLeave').checked = !!doc.isLeave;
-            
+            document.getElementById('docIsPinned').checked = !!doc.isPinned; document.getElementById('docIsLeave').checked = !!doc.isLeave;
             document.querySelectorAll('.shift1-days').forEach(c => c.checked = doc.shift1Days ? doc.shift1Days.includes(c.value) : false);
             
             const container1 = document.getElementById('shift1ShiftsListContainer');
             container1.innerHTML = "";
-            let s1List = doc.shifts1 || (doc.shift1Start ? [{start: doc.shift1Start, end: doc.shift1End}, doc.shift1SubStart ? {start: doc.shift1SubStart, end: doc.shift1SubEnd} : null].filter(Boolean) : []);
-            s1List.forEach(s => addShiftRow('shift1', s.start, s.end));
+            (doc.shifts1 || []).forEach(s => addShiftRow('shift1', s.start, s.end));
 
             if (document.getElementById('docShiftsCount').value === "2") {
                 document.querySelectorAll('.shift2-days').forEach(c => c.checked = doc.shift2Days ? doc.shift2Days.includes(c.value) : false);
                 const container2 = document.getElementById('shift2ShiftsListContainer');
                 container2.innerHTML = "";
-                let s2List = doc.shifts2 || (doc.shift2Start ? [{start: doc.shift2Start, end: doc.shift2End}] : []);
-                s2List.forEach(s => addShiftRow('shift2', s.start, s.end));
+                (doc.shifts2 || []).forEach(s => addShiftRow('shift2', s.start, s.end));
             }
-
             document.getElementById('docNotes').value = doc.notes || "";
             document.getElementById('docTags').value = doc.tags || "";
             document.getElementById('doctorModal').classList.add('active');
@@ -2270,8 +2056,7 @@
         function applyTickerSpeed() {
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
-            let baseDuration = 40;
-            let calculatedDuration = baseDuration / tickerSpeedMultiplier;
+            let calculatedDuration = 40 / tickerSpeedMultiplier;
             track.style.animation = `smoothTickerScrollRight ${calculatedDuration}s linear infinite`;
             if (tickerIsPaused) track.classList.add('paused');
         }
@@ -2282,15 +2067,9 @@
             const btn = document.getElementById('tickerTogglePlayBtn');
             if (track) track.classList.toggle('paused', tickerIsPaused);
             if (btn) {
-                if (tickerIsPaused) {
-                    btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
-                    btn.style.color = 'var(--accent-green)';
-                    btn.style.borderColor = 'var(--accent-green)';
-                } else {
-                    btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                }
+                btn.innerHTML = tickerIsPaused ? `<i class="fa-solid fa-play"></i> تشغيل` : `<i class="fa-solid fa-pause"></i> إيقاف`;
+                btn.style.color = tickerIsPaused ? 'var(--accent-green)' : '';
+                btn.style.borderColor = tickerIsPaused ? 'var(--accent-green)' : '';
             }
         }
 
@@ -2299,32 +2078,26 @@
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
-            const sortedAlerts = [...alertsData];
             let alertCardsHtml = "";
-            sortedAlerts.forEach(item => {
+            alertsData.forEach(item => {
                 alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
             applyTickerSpeed();
 
             let alertsBuffer = "";
-            sortedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
+            alertsData.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
-                if (item.media) {
-                    if (item.mediaType === "pdf") {
-                        mediaHtml = `<button onclick="openPdfBlob('${item.media}')" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</button>`;
-                    } else {
-                        mediaHtml = `<img src="${item.media}" class="alert-thumb-side" onclick="openLightbox('${item.media}')">`;
-                    }
+                if (item.pdfUrl) {
+                    mediaHtml = `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
                 }
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
-                
                 const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 alertsBuffer += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" data-id="${item.id}">
-                        <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اضغط واسحب من هنا لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
+                        <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اسحب لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
                         <div style="flex:1;"><p>${item.content}</p>${tagsHtml}<span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         ${mediaHtml}
                         <div class="actions-col-group">
@@ -2337,29 +2110,9 @@
             grid.innerHTML = alertsBuffer;
         }
 
-        function openPdfBlob(base64Data) {
-            try {
-                let arr = base64Data.split(',');
-                let mime = arr[0].match(/:(.*?);/)[1];
-                let bstr = atob(arr[1]);
-                let n = bstr.length;
-                let u8arr = new Uint8Array(n);
-                while(n--) { u8arr[n] = bstr.charCodeAt(n); }
-                let blob = new Blob([u8arr], {type: mime});
-                let blobUrl = URL.createObjectURL(blob);
-                window.open(blobUrl, '_blank');
-            } catch(e) {
-                window.open(base64Data, '_blank');
-            }
-        }
-
         function resetTickerToStart() {
             const track = document.getElementById('tickerTrackContainer');
-            if (track) {
-                track.style.animation = 'none';
-                track.offsetHeight;
-                applyTickerSpeed();
-            }
+            if (track) { track.style.animation = 'none'; track.offsetHeight; applyTickerSpeed(); }
         }
 
         function jumpToAlertsTab(alertId) {
@@ -2374,68 +2127,25 @@
 
         function openAlertModal() {
             document.getElementById('alertId').value = ""; document.getElementById('alertContent').value = "";
-            document.getElementById('alertTags').value = "";
-            document.getElementById('alertMediaBase64').value = ""; document.getElementById('alertMediaType').value = "";
-            document.getElementById('alertFileInput').value = ""; document.getElementById('mediaPreviewContainer').style.display = 'none';
+            document.getElementById('alertTags').value = ""; document.getElementById('alertPdfUrl').value = "";
             document.getElementById('alertModal').classList.add('active');
-        }
-
-        function previewAndCompressMedia(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0], reader = new FileReader();
-                if (file.type === "application/pdf") {
-                    reader.onload = function(e) {
-                        const base64Pdf = e.target.result;
-                        document.getElementById('alertMediaBase64').value = base64Pdf; 
-                        document.getElementById('alertMediaType').value = "pdf";
-                        document.getElementById('mediaPreviewBox').innerHTML = `<button onclick="openPdfBlob('${base64Pdf}')" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</button>`;
-                        document.getElementById('mediaPreviewContainer').style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    reader.onload = function(e) {
-                        const img = new Image(); img.src = e.target.result;
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), maxW = 500, scale = maxW / img.width;
-                            canvas.width = (img.width > maxW) ? maxW : img.width; canvas.height = (img.width > maxW) ? img.height * scale : img.height;
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            const compressed = canvas.toDataURL('image/jpeg', 0.7);
-                            document.getElementById('alertMediaBase64').value = compressed; document.getElementById('alertMediaType').value = "image";
-                            document.getElementById('mediaPreviewBox').innerHTML = `<img src="${compressed}" style="height:32px; border-radius:4px; object-fit:cover;">`;
-                            document.getElementById('mediaPreviewContainer').style.display = 'block';
-                        };
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
-
-        function removeAlertMedia() {
-            document.getElementById('alertMediaBase64').value = ""; document.getElementById('alertMediaType').value = "";
-            document.getElementById('alertFileInput').value = ""; document.getElementById('mediaPreviewContainer').style.display = 'none';
         }
 
         function saveAlert() {
             const id = document.getElementById('alertId').value, content = document.getElementById('alertContent').value;
             const tags = document.getElementById('alertTags').value.trim();
-            const media = document.getElementById('alertMediaBase64').value, mediaType = document.getElementById('alertMediaType').value;
+            const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
             if (!content) return alert("أدخل نص التنبيه!");
-            const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, media, mediaType, time: new Date().toLocaleString('en-US') };
+            const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, pdfUrl, time: new Date().toLocaleString('en-US') };
             if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
             syncToCloud(); closeModal('alertModal'); playChirpSound();
         }
 
         function editAlert(id) {
-            const item = alertsData.find(a => a.id === id);
-            if (!item) return;
+            const item = alertsData.find(a => a.id === id); if (!item) return;
             document.getElementById('alertId').value = item.id; document.getElementById('alertContent').value = item.content;
             document.getElementById('alertTags').value = item.tags || "";
-            document.getElementById('alertMediaBase64').value = item.media || ""; document.getElementById('alertMediaType').value = item.mediaType || "";
-            if (item.media) {
-                if (item.mediaType === "pdf") document.getElementById('mediaPreviewBox').innerHTML = `<button onclick="openPdfBlob('${item.media}')" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> معاينة PDF</button>`;
-                else document.getElementById('mediaPreviewBox').innerHTML = `<img src="${item.media}" style="height:32px; border-radius:4px; object-fit:cover;">`;
-                document.getElementById('mediaPreviewContainer').style.display = 'block';
-            } else document.getElementById('mediaPreviewContainer').style.display = 'none';
+            document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
             document.getElementById('alertModal').classList.add('active');
         }
 
@@ -2454,7 +2164,6 @@
                 const tagsHtml = item.tags ? `<br><span class="tag-badge">🏷️ ${item.tags}</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
-                
                 const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 const tr = document.createElement('tr');
@@ -2465,7 +2174,7 @@
                 tr.innerHTML = `
                     <td ${cellStyle}>
                         <div style="display:flex; align-items:center; gap:0.25rem;">
-                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اضغط واسحب من هنا لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
                             <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
                         </div>
                     </td>
@@ -2495,7 +2204,7 @@
                     notesBuffer += `
                         <div class="doc-sheet-card ${noteObj.color || 'card-gold'}" data-id="${idx}">
                             <h3>
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اضغط واسحب من هنا لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span>
                                 <div class="actions-col-group" style="flex-direction:row;">
                                     <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
@@ -2514,21 +2223,17 @@
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = ""; document.getElementById('deptBranchSelect').value = "معشي";
             document.getElementById('deptCategorySelect').value = "derm"; document.getElementById('deptItemName').value = "";
-            document.getElementById('deptTags').value = "";
-            document.getElementById('deptCustomColor').value = ""; document.getElementById('deptIsJoint').checked = false; 
-            document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز";
+            document.getElementById('deptTags').value = ""; document.getElementById('deptCustomColor').value = ""; 
+            document.getElementById('deptIsJoint').checked = false; document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز";
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
         function saveDeptService() {
             const id = document.getElementById('deptRowId').value;
             const rowObj = {
-                id: id ? parseInt(id) : Date.now(),
-                branch: document.getElementById('deptBranchSelect').value,
-                type: document.getElementById('deptCategorySelect').value,
-                name: document.getElementById('deptItemName').value.trim(),
-                tags: document.getElementById('deptTags').value.trim(),
-                customColor: document.getElementById('deptCustomColor').value,
+                id: id ? parseInt(id) : Date.now(), branch: document.getElementById('deptBranchSelect').value,
+                type: document.getElementById('deptCategorySelect').value, name: document.getElementById('deptItemName').value.trim(),
+                tags: document.getElementById('deptTags').value.trim(), customColor: document.getElementById('deptCustomColor').value,
                 isJoint: document.getElementById('deptIsJoint').checked
             };
             if (!rowObj.name) return alert("أدخل اسم الخدمة أو الجهاز!");
@@ -2537,8 +2242,7 @@
         }
 
         function editDeptService(id) {
-            const item = deptServicesData.find(s => s.id === id);
-            if (!item) return;
+            const item = deptServicesData.find(s => s.id === id); if (!item) return;
             document.getElementById('deptRowId').value = item.id; document.getElementById('deptBranchSelect').value = item.branch || "معشي";
             document.getElementById('deptCategorySelect').value = item.type || "derm"; document.getElementById('deptItemName').value = item.name || "";
             document.getElementById('deptTags').value = item.tags || "";
@@ -2552,14 +2256,13 @@
 
         function openDeptNoteModal() {
             document.getElementById('noteIndex').value = ""; document.getElementById('deptNoteText').value = "";
-            document.getElementById('deptNoteTags').value = "";
-            document.getElementById('deptNoteColor').value = "card-gold"; document.getElementById('deptNoteModal').classList.add('active');
+            document.getElementById('deptNoteTags').value = ""; document.getElementById('deptNoteColor').value = "card-gold"; 
+            document.getElementById('deptNoteModal').classList.add('active');
         }
 
         function saveDeptNote() {
             const idx = document.getElementById('noteIndex').value, text = document.getElementById('deptNoteText').value.trim();
-            const tags = document.getElementById('deptNoteTags').value.trim();
-            const color = document.getElementById('deptNoteColor').value;
+            const tags = document.getElementById('deptNoteTags').value.trim(), color = document.getElementById('deptNoteColor').value;
             if (!text) return;
             const noteObj = { text, tags, color };
             if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
@@ -2582,18 +2285,15 @@
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
             
             let coordBuffer = "";
-            coordinatorsData.filter(c => {
-                return !search || (c.searchKey && c.searchKey.includes(search));
-            }).forEach((c) => {
+            coordinatorsData.filter(c => !search || (c.searchKey && c.searchKey.includes(search))).forEach((c) => {
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 let tagsHtml = c.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${c.tags}</div>` : '';
-                let copyFullText = c.name + "\n" + c.rules.join('\n');
-                let escapedCopyText = copyFullText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                let escapedCopyText = (c.name + "\n" + c.rules.join('\n')).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 coordBuffer += `
                     <div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}" data-id="${c.id}">
                         <h3>
-                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${c.id}, 'coordinator')" title="اضغط واسحب من هنا لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${c.id}, 'coordinator')" title="اسحب لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.25rem;">${c.name}</span>
                             <div class="actions-col-group" style="flex-direction:row;">
                                 <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedCopyText}', 'تم نسخ التعليمات:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
@@ -2640,17 +2340,12 @@
             const container = document.getElementById('offersTabsContainer');
             if (!container) return;
             container.innerHTML = "";
-
             const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            const totalCount = offersData.length;
-
-            let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار (${totalCount})</button>`;
-
+            let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار (${offersData.length})</button>`;
             cats.forEach(cat => {
                 const catCount = offersData.filter(o => o.category === cat).length;
                 tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat} (${catCount})</button>`;
             });
-
             container.innerHTML = tabsHtml;
             updateQuickMoveDropdown();
         }
@@ -2659,19 +2354,16 @@
             const sel = document.getElementById('quickMoveCatSelect');
             if (!sel) return;
             const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            let html = "";
-            cats.forEach(c => { html += `<option value="${c}">${c}</option>`; });
-            sel.innerHTML = html;
+            sel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
         }
 
         function quickMoveSelectedOffers() {
-            if (selectedOfferIds.length === 0) return alert("الرجاء تحديد عرض واحد على الأقل أولاً!");
+            if (selectedOfferIds.length === 0) return alert("اختر عرضاً واحداً على الأقل!");
             const targetCat = document.getElementById('quickMoveCatSelect').value;
-            if (!targetCat) return alert("اختر القسم المستهدف!");
-
+            if (!targetCat) return;
             offersData.forEach(o => { if (selectedOfferIds.includes(o.id)) o.category = targetCat; });
             syncToCloud(); playChirpSound();
-            alert("تم نقل العروض المحددة إلى قسم \"" + targetCat + "\" بنجاح!");
+            alert("تم نقل العروض إلى \"" + targetCat + "\" بنجاح!");
         }
 
         function filterOfferCategory(cat, btn) {
@@ -2686,64 +2378,33 @@
             const container = document.getElementById('manageCategoriesListContainer');
             if (!container) return;
             const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            container.innerHTML = "";
-
-            if (cats.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:1rem; color:var(--text-muted);">لا توجد أقسام مسجلة حالياً.</div>`;
-            } else {
-                cats.forEach(cat => {
-                    container.innerHTML += `
-                        <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                            <strong style="color:var(--primary-color);">${cat}</strong>
-                            <div style="display:flex; gap:0.2rem;">
-                                <button class="btn btn-secondary" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="editOfferCategory('${cat}')"><i class="fa-solid fa-pen"></i> تعديل</button>
-                                <button class="btn btn-danger" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="deleteOfferCategory('${cat}')"><i class="fa-solid fa-trash"></i> حذف</button>
-                            </div>
-                        </div>`;
-                });
-            }
+            container.innerHTML = cats.length === 0 ? `<div style="text-align:center; padding:1rem; color:var(--text-muted);">لا توجد أقسام.</div>` :
+                cats.map(cat => `<div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;"><strong style="color:var(--primary-color);">${cat}</strong><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="editOfferCategory('${cat}')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="deleteOfferCategory('${cat}')"><i class="fa-solid fa-trash"></i></button></div></div>`).join('');
             document.getElementById('manageCategoriesModal').classList.add('active');
         }
 
-        function editOfferCategory(oldCatName) {
-            const newName = prompt("تعديل اسم القسم \"" + oldCatName + "\" إلى الاسم الجديد:", oldCatName);
-            if (!newName || !newName.trim() || newName.trim() === oldCatName) return;
-            const trimmedName = newName.trim();
-            
-            offersData.forEach(o => { if (o.category === oldCatName) o.category = trimmedName; });
-            if (selectedOfferTab === oldCatName) {
-                selectedOfferTab = trimmedName;
-                localStorage.setItem('selectedOfferTab', trimmedName);
-            }
-
+        function editOfferCategory(oldCat) {
+            const newName = prompt("اسم القسم الجديد:", oldCat);
+            if (!newName || !newName.trim() || newName.trim() === oldCat) return;
+            const trimmed = newName.trim();
+            offersData.forEach(o => { if (o.category === oldCat) o.category = trimmed; });
+            if (selectedOfferTab === oldCat) { selectedOfferTab = trimmed; localStorage.setItem('selectedOfferTab', trimmed); }
             syncToCloud(); openManageCategoriesModal(); playChirpSound();
-            alert("تم تغيير اسم القسم إلى \"" + trimmedName + "\" بنجاح!");
         }
 
         function deleteOfferCategory(catName) {
-            if (confirm("هل أنت متأكد من حذف القسم \"" + catName + "\" وكل العروض الموجودة بداخله؟")) {
+            if (confirm("حذف القسم وعروضه؟")) {
                 offersData = offersData.filter(o => o.category !== catName);
-                if (selectedOfferTab === catName) {
-                    selectedOfferTab = "⭐ كل العروض والأسعار";
-                    localStorage.setItem('selectedOfferTab', selectedOfferTab);
-                }
+                if (selectedOfferTab === catName) { selectedOfferTab = "⭐ كل العروض والأسعار"; localStorage.setItem('selectedOfferTab', selectedOfferTab); }
                 syncToCloud(); openManageCategoriesModal(); playChirpSound();
             }
         }
 
         function formatOfferLineForClient(item) {
             let lines = [item.name];
-            if (item.device1 && item.device1.trim() !== "") {
-                let cleanDev1 = item.device1.replace(/جهاز\s*/g, '').trim();
-                lines.push(cleanDev1 + (item.price1 ? " بـ " + item.price1 : ""));
-            }
-            if (item.device2 && item.device2.trim() !== "") {
-                let cleanDev2 = item.device2.replace(/جهاز\s*/g, '').trim();
-                lines.push(cleanDev2 + (item.price2 ? " بـ " + item.price2 : ""));
-            }
-            if (item.price && item.price.trim() !== "") {
-                lines.push("السعر: " + item.price);
-            }
+            if (item.device1) lines.push(item.device1.replace(/جهاز\s*/g, '').trim() + (item.price1 ? " بـ " + item.price1 : ""));
+            if (item.device2) lines.push(item.device2.replace(/جهاز\s*/g, '').trim() + (item.price2 ? " بـ " + item.price2 : ""));
+            if (item.price) lines.push("السعر: " + item.price);
             return lines.join('\n');
         }
 
@@ -2759,33 +2420,24 @@
             updateFloatingOffersWindow();
         }
 
-        function toggleSelectAllOffers(masterCheckbox) {
-            const searchInput = document.getElementById('offerSearchInput');
-            const search = searchInput ? cleanSearchText(searchInput.value) : "";
-            let filteredOffers = (selectedOfferTab === '⭐ كل العروض والأسعار') ? 
-                offersData.filter(o => !search || (o.searchKey && o.searchKey.includes(search))) : 
-                offersData.filter(o => o.category === selectedOfferTab && (!search || (o.searchKey && o.searchKey.includes(search))));
-
-            filteredOffers.forEach(item => {
-                if (masterCheckbox.checked) { if (!selectedOfferIds.includes(item.id)) selectedOfferIds.push(item.id); }
+        function toggleSelectAllOffers(masterChk) {
+            const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+            let filtered = (selectedOfferTab === '⭐ كل العروض والأسعار') ? offersData.filter(o => !search || (o.searchKey && o.searchKey.includes(search))) : offersData.filter(o => o.category === selectedOfferTab && (!search || (o.searchKey && o.searchKey.includes(search))));
+            filtered.forEach(item => {
+                if (masterChk.checked) { if (!selectedOfferIds.includes(item.id)) selectedOfferIds.push(item.id); }
                 else { selectedOfferIds = selectedOfferIds.filter(id => id !== item.id); }
             });
             renderOffers();
         }
 
         function updateFloatingOffersWindow() {
-            const win = document.getElementById('floatingOffersWin');
-            const textarea = document.getElementById('floatingOffersTextarea');
+            const win = document.getElementById('floatingOffersWin'), textarea = document.getElementById('floatingOffersTextarea');
             const headerTitle = document.querySelector('#floatingOffersHeader span');
             if (!win || !textarea) return;
             if (selectedOfferIds.length === 0) { win.style.display = 'none'; textarea.value = ""; return; }
             win.style.display = 'flex';
             if (headerTitle) headerTitle.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة (${selectedOfferIds.length})`;
-            let blocks = [];
-            selectedOfferIds.forEach(id => {
-                const item = offersData.find(o => o.id === id);
-                if (item) blocks.push(formatOfferLineForClient(item));
-            });
+            let blocks = selectedOfferIds.map(id => { const item = offersData.find(o => o.id === id); return item ? formatOfferLineForClient(item) : ""; }).filter(Boolean);
             textarea.value = blocks.join('\n\n');
         }
 
@@ -2795,42 +2447,23 @@
             copyTextToClipboard(textarea.value, "تم نسخ العروض للعميل!");
         }
 
-        function clearMultiOffersSelection() { 
-            selectedOfferIds = []; 
-            document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); 
-            updateFloatingOffersWindow(); 
-        }
-
-        function getSortedOffersList() {
-            return [...offersData].sort((a, b) => {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return 0;
-            });
-        }
+        function clearMultiOffersSelection() { selectedOfferIds = []; document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); updateFloatingOffersWindow(); }
 
         function renderOffers(highlightOfferId = null) {
-            const searchInput = document.getElementById('offerSearchInput');
-            const search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const gridContainer = document.getElementById('offersGridContainerBox');
-            if (!gridContainer) return;
+            const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const gridContainer = document.getElementById('offersGridContainerBox'); if (!gridContainer) return;
 
-            const sortedOffers = getSortedOffersList();
-
-            let filteredOffers = (selectedOfferTab === '⭐ كل العروض والأسعار') ? 
-                sortedOffers.filter(o => !search || (o.searchKey && o.searchKey.includes(search))) : 
-                sortedOffers.filter(o => o.category === selectedOfferTab && (!search || (o.searchKey && o.searchKey.includes(search))));
+            let sorted = [...offersData].sort((a, b) => (a.isPinned && !b.isPinned) ? -1 : (!a.isPinned && b.isPinned) ? 1 : 0);
+            let filtered = (selectedOfferTab === '⭐ كل العروض والأسعار') ? sorted.filter(o => !search || (o.searchKey && o.searchKey.includes(search))) : sorted.filter(o => o.category === selectedOfferTab && (!search || (o.searchKey && o.searchKey.includes(search))));
             
-            const allFilteredIds = filteredOffers.map(o => o.id);
-            const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
+            const allIds = filtered.map(o => o.id);
             const masterChk = document.getElementById('selectAllOffersChk');
-            if (masterChk) masterChk.checked = isAllChecked;
+            if (masterChk) masterChk.checked = allIds.length > 0 && allIds.every(id => selectedOfferIds.includes(id));
 
             let offersBuffer = "";
-            filteredOffers.forEach(item => {
+            filtered.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
-                
                 let devicesDisplay = "";
                 if (item.device1) devicesDisplay += `<div style="font-size:0.65rem;">• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
                 if (item.device2) devicesDisplay += `<div style="font-size:0.65rem;">• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
@@ -2839,7 +2472,7 @@
                     <div id="offer_card_${item.id}" class="offer-grid-card ${item.id === highlightOfferId ? 'highlight-pulse' : ''}" data-id="${item.id}">
                         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.18rem;">
                             <div style="display:flex; align-items:center; gap:0.3rem;">
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" title="اضغط واسحب من هنا لتحريك العرض"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" title="اسحب لتحريك العرض"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)" style="width:13px; height:13px; accent-color:var(--primary-color);">
                                 <span style="font-size:0.6rem; color:var(--primary-color); font-weight:700;">${item.category}</span>
                             </div>
@@ -2849,15 +2482,9 @@
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
-                        <div>
-                            ${pinnedBadge}<strong style="font-size:0.75rem; color:var(--text-main);">${item.name}</strong>
-                            ${item.notes ? `<div style="margin-top:2px;"><span class="tag-badge">${item.notes}</span></div>` : ''}
-                        </div>
+                        <div>${pinnedBadge}<strong style="font-size:0.75rem; color:var(--text-main);">${item.name}</strong>${item.notes ? `<div style="margin-top:2px;"><span class="tag-badge">${item.notes}</span></div>` : ''}</div>
                         ${devicesDisplay ? `<div style="background:var(--bg-card); padding:0.25rem; border-radius:6px; border:1px solid var(--border-color);">${devicesDisplay}</div>` : ''}
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.1rem;">
-                            <span style="font-size:0.62rem; color:var(--text-muted);">السعر النهائي:</span>
-                            <span class="price-badge">${item.price ? item.price : 'حسب الأجهزة'}</span>
-                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.1rem;"><span style="font-size:0.62rem; color:var(--text-muted);">السعر النهائي:</span><span class="price-badge">${item.price ? item.price : 'حسب الأجهزة'}</span></div>
                     </div>`;
             });
             gridContainer.innerHTML = offersBuffer;
@@ -2865,13 +2492,9 @@
         }
 
         function populateOfferCategoryDropdown(selectedCat = "") {
-            const selectEl = document.getElementById('offCategory');
-            if (!selectEl) return;
+            const selectEl = document.getElementById('offCategory'); if (!selectEl) return;
             const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
-            let html = "";
-            cats.forEach(c => { html += `<option value="${c}" ${c === selectedCat ? 'selected' : ''}>${c}</option>`; });
-            html += `<option value="أخرى" ${!cats.includes(selectedCat) && selectedCat ? 'selected' : ''}>+ قسم جديد (أخرى)</option>`;
-            selectEl.innerHTML = html;
+            selectEl.innerHTML = cats.map(c => `<option value="${c}" ${c === selectedCat ? 'selected' : ''}>${c}</option>`).join('') + `<option value="أخرى" ${!cats.includes(selectedCat) && selectedCat ? 'selected' : ''}>+ قسم جديد (أخرى)</option>`;
             checkCustomCategory(selectEl.value);
         }
 
@@ -2890,8 +2513,7 @@
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
             if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
-            if (!cat) return alert("حدد أو أدخل اسم القسم!");
-
+            if (!cat) return alert("حدد القسم!");
             const obj = {
                 id: id ? parseInt(id) : Date.now(), category: cat, name: document.getElementById('offName').value,
                 device1: document.getElementById('offDevice1').value.trim(), price1: document.getElementById('offPrice1').value.trim(),
@@ -2899,7 +2521,7 @@
                 price: document.getElementById('offPrice').value.trim(), notes: document.getElementById('offNotes').value.trim(),
                 isPinned: document.getElementById('offIsPinned').checked
             };
-            if (!obj.name) return alert("أدخل اسم الخدمة أو العرض!");
+            if (!obj.name) return alert("أدخل اسم العرض!");
             if (id) offersData[offersData.findIndex(o => o.id == id)] = obj; else offersData.push(obj);
             syncToCloud(); closeModal('offerModal'); playChirpSound();
         }
@@ -2935,13 +2557,12 @@
             let inqBuffer = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
                 let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
-                let copyFullText = "سؤال: " + item.question + "\nإجابة: " + item.answer;
-                let escapedInqText = copyFullText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
                     <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}">
                         <h3>
-                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اضغط واسحب من هنا لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اسحب لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
                             <div class="actions-col-group" style="flex-direction:row;">
                                 <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedInqText}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
@@ -2960,8 +2581,8 @@
         function openInquiryModal() {
             document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
             document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
-            document.getElementById('inqCategory').value = "الليزر";
-            document.getElementById('inqColor').value = "card-darkblue"; document.getElementById('inqCustomCatBox').style.display = "none";
+            document.getElementById('inqCategory').value = "الليزر"; document.getElementById('inqColor').value = "card-darkblue"; 
+            document.getElementById('inqCustomCatBox').style.display = "none";
             document.getElementById('inquiryModal').classList.add('active');
         }
 
@@ -2993,11 +2614,7 @@
         }
 
         let draggedItemInfo = null;
-
-        function dragStartRow(e, id, type) {
-            draggedItemInfo = { id, type };
-            e.dataTransfer.effectAllowed = 'move';
-        }
+        function dragStartRow(e, id, type) { draggedItemInfo = { id, type }; e.dataTransfer.effectAllowed = 'move'; }
 
         function dropRow(e, containerType) {
             e.preventDefault();
@@ -3005,177 +2622,57 @@
             const { id: draggedId, type } = draggedItemInfo;
 
             if (type === 'doctor_mashy' && containerType === 'mashy') {
-                const tr = e.target.closest('tr');
                 let currentList = getSortedDoctorsListForBranch('معشي').filter(d => d.branch === "معشي" || d.isJoint).map(d => d.id);
-                let sourceIdx = currentList.indexOf(draggedId);
-                if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
-
-                if (tr && tr.getAttribute('data-id')) {
-                    let targetId = parseInt(tr.getAttribute('data-id'));
-                    let targetIdx = currentList.indexOf(targetId);
-                    if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId);
-                    else currentList.push(draggedId);
-                } else {
-                    currentList.push(draggedId);
-                }
-                mashyCustomOrder = currentList;
-                localStorage.setItem('mashy_custom_order', JSON.stringify(mashyCustomOrder));
-                renderDoctors();
-                playChirpSound();
-            } 
-            else if (type === 'doctor_wissam' && containerType === 'wissam') {
+                let sourceIdx = currentList.indexOf(draggedId); if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
                 const tr = e.target.closest('tr');
+                if (tr && tr.getAttribute('data-id')) {
+                    let targetIdx = currentList.indexOf(parseInt(tr.getAttribute('data-id')));
+                    if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId); else currentList.push(draggedId);
+                } else { currentList.push(draggedId); }
+                mashyCustomOrder = currentList; localStorage.setItem('mashy_custom_order', JSON.stringify(mashyCustomOrder));
+                renderDoctors(); playChirpSound();
+            } else if (type === 'doctor_wissam' && containerType === 'wissam') {
                 let currentList = getSortedDoctorsListForBranch('الوسام').filter(d => d.branch === "الوسام" || d.isJoint).map(d => d.id);
-                let sourceIdx = currentList.indexOf(draggedId);
-                if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
-
-                if (tr && tr.getAttribute('data-id')) {
-                    let targetId = parseInt(tr.getAttribute('data-id'));
-                    let targetIdx = currentList.indexOf(targetId);
-                    if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId);
-                    else currentList.push(draggedId);
-                } else {
-                    currentList.push(draggedId);
-                }
-                wissamCustomOrder = currentList;
-                localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
-                renderDoctors();
-                playChirpSound();
-            }
-            else if (type === 'alert') {
-                const card = e.target.closest('.alert-card-item-compact');
-                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
-                let sourceIndex = alertsData.findIndex(a => a.id === draggedId);
-                if (sourceIndex === -1) return;
-                let movedItem = alertsData.splice(sourceIndex, 1)[0];
-
-                if (targetId && targetId !== draggedId) {
-                    let targetIndex = alertsData.findIndex(a => a.id === targetId);
-                    if (targetIndex !== -1) alertsData.splice(targetIndex, 0, movedItem);
-                    else alertsData.push(movedItem);
-                } else {
-                    alertsData.push(movedItem);
-                }
-                syncToCloud(); playChirpSound();
-            } 
-            else if (type === 'service') {
+                let sourceIdx = currentList.indexOf(draggedId); if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
                 const tr = e.target.closest('tr');
-                let targetId = tr ? parseInt(tr.getAttribute('data-id')) : null;
-                let sourceIndex = deptServicesData.findIndex(s => s.id === draggedId);
-                if (sourceIndex === -1) return;
-                let movedItem = deptServicesData.splice(sourceIndex, 1)[0];
-
-                if (targetId && targetId !== draggedId) {
-                    let targetIndex = deptServicesData.findIndex(s => s.id === targetId);
-                    if (targetIndex !== -1) deptServicesData.splice(targetIndex, 0, movedItem);
-                    else deptServicesData.push(movedItem);
-                } else {
-                    deptServicesData.push(movedItem);
+                if (tr && tr.getAttribute('data-id')) {
+                    let targetIdx = currentList.indexOf(parseInt(tr.getAttribute('data-id')));
+                    if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId); else currentList.push(draggedId);
+                } else { currentList.push(draggedId); }
+                wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
+                renderDoctors(); playChirpSound();
+            } else {
+                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
+                if (listRef) {
+                    let sourceIndex = listRef.findIndex(x => x.id === draggedId);
+                    if (sourceIndex !== -1) {
+                        let moved = listRef.splice(sourceIndex, 1)[0];
+                        listRef.push(moved);
+                        syncToCloud(); playChirpSound();
+                    }
                 }
-                syncToCloud(); playChirpSound();
-            } 
-            else if (type === 'note') {
-                const card = e.target.closest('.doc-sheet-card');
-                let targetIdx = card ? parseInt(card.getAttribute('data-id')) : null;
-                let draggedIdx = parseInt(draggedId);
-                if (isNaN(draggedIdx)) return;
-                let movedItem = deptNotesData.splice(draggedIdx, 1)[0];
-
-                if (targetIdx !== null && !isNaN(targetIdx) && targetIdx !== draggedIdx) {
-                    deptNotesData.splice(targetIdx, 0, movedItem);
-                } else {
-                    deptNotesData.push(movedItem);
-                }
-                syncToCloud(); playChirpSound();
-            } 
-            else if (type === 'coordinator') {
-                const card = e.target.closest('.doc-sheet-card');
-                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
-                let sourceIndex = coordinatorsData.findIndex(c => c.id === draggedId);
-                if (sourceIndex === -1) return;
-                let movedItem = coordinatorsData.splice(sourceIndex, 1)[0];
-
-                if (targetId && targetId !== draggedId) {
-                    let targetIndex = coordinatorsData.findIndex(c => c.id === targetId);
-                    if (targetIndex !== -1) coordinatorsData.splice(targetIndex, 0, movedItem);
-                    else coordinatorsData.push(movedItem);
-                } else {
-                    coordinatorsData.push(movedItem);
-                }
-                syncToCloud(); playChirpSound();
-            } 
-            else if (type === 'offer') {
-                const card = e.target.closest('.offer-grid-card');
-                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
-                let sourceIndex = offersData.findIndex(o => o.id === draggedId);
-                if (sourceIndex === -1) return;
-                let movedItem = offersData.splice(sourceIndex, 1)[0];
-
-                if (targetId && targetId !== draggedId) {
-                    let targetIndex = offersData.findIndex(o => o.id === targetId);
-                    if (targetIndex !== -1) offersData.splice(targetIndex, 0, movedItem);
-                    else offersData.push(movedItem);
-                } else {
-                    offersData.push(movedItem);
-                }
-                syncToCloud(); playChirpSound();
-            } 
-            else if (type === 'inquiry') {
-                const card = e.target.closest('.doc-sheet-card');
-                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
-                let sourceIndex = inquiriesData.findIndex(i => i.id === draggedId);
-                if (sourceIndex === -1) return;
-                let movedItem = inquiriesData.splice(sourceIndex, 1)[0];
-
-                if (targetId && targetId !== draggedId) {
-                    let targetIndex = inquiriesData.findIndex(i => i.id === targetId);
-                    if (targetIndex !== -1) inquiriesData.splice(targetIndex, 0, movedItem);
-                    else inquiriesData.push(movedItem);
-                } else {
-                    inquiriesData.push(movedItem);
-                }
-                syncToCloud(); playChirpSound();
             }
-
             draggedItemInfo = null;
         }
 
         function initFloatingOffersDrag() {
-            const win = document.getElementById('floatingOffersWin');
-            const header = document.getElementById('floatingOffersHeader');
+            const win = document.getElementById('floatingOffersWin'), header = document.getElementById('floatingOffersHeader');
             if (!win || !header) return;
-
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
-
+            let isDragging = false, startX, startY, initialLeft, initialTop;
             header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                
+                isDragging = true; startX = e.clientX; startY = e.clientY;
                 const rect = win.getBoundingClientRect();
-                initialLeft = rect.left;
-                initialTop = rect.top;
-
-                win.style.right = 'auto';
-                win.style.bottom = 'auto';
-                win.style.left = initialLeft + 'px';
-                win.style.top = initialTop + 'px';
-
+                initialLeft = rect.left; initialTop = rect.top;
+                win.style.right = 'auto'; win.style.bottom = 'auto';
+                win.style.left = initialLeft + 'px'; win.style.top = initialTop + 'px';
                 e.preventDefault();
             });
-
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
-                let dx = e.clientX - startX;
-                let dy = e.clientY - startY;
-                win.style.left = (initialLeft + dx) + 'px';
-                win.style.top = (initialTop + dy) + 'px';
+                win.style.left = (initialLeft + (e.clientX - startX)) + 'px';
+                win.style.top = (initialTop + (e.clientY - startY)) + 'px';
             });
-
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
+            document.addEventListener('mouseup', () => { isDragging = false; });
         }
 
         let globalSearchTimeout = null;
@@ -3187,130 +2684,53 @@
                     document.getElementById('globalSearchResultsSection').classList.remove('active');
                     const activeTab = localStorage.getItem('activeTab') || 'schedule';
                     document.getElementById(activeTab + '-section').classList.add('active');
-                    currentGlobalSearchResults = [];
-                    selectedGlobalSearchIds = [];
+                    currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
                     return;
                 }
-
                 let normQ = normalizeArabicText(rawQ);
-                const resultsSection = document.getElementById('globalSearchResultsSection');
-                const resultsList = document.getElementById('globalSearchResultsList');
-                
+                const resultsSection = document.getElementById('globalSearchResultsSection'), resultsList = document.getElementById('globalSearchResultsList');
                 document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-                resultsSection.classList.add('active');
-                resultsList.innerHTML = "";
-                currentGlobalSearchResults = [];
-
+                resultsSection.classList.add('active'); resultsList.innerHTML = ""; currentGlobalSearchResults = [];
                 const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
 
                 if (enabledCats.includes('doctors')) {
                     doctorsData.forEach(d => {
                         if (d.searchKey && d.searchKey.includes(normQ)) {
-                            let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
-                            currentGlobalSearchResults.push({
-                                id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
-                                subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
-                                copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
-                            });
+                            currentGlobalSearchResults.push({ id: 'doc_' + d.id, title: `${d.name} (${d.specialty})`, subtitle: `الفرع: ${d.branch || 'مشترك'}`, copyText: `الطبيب: ${d.name}\nالتخصص: ${d.specialty}`, source: "الأطباء", action: `jumpToSectionAndHighlightDoc(${d.id})` });
                         }
                     });
                 }
-
                 if (enabledCats.includes('offers')) {
                     offersData.forEach(o => {
                         if (o.searchKey && o.searchKey.includes(normQ)) {
-                            let priceSummary = o.price ? "السعر: " + o.price : "";
-                            currentGlobalSearchResults.push({
-                                id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
-                                subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
-                                source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
-                            });
+                            currentGlobalSearchResults.push({ id: 'offer_' + o.id, title: o.name, subtitle: o.price ? `السعر: ${o.price}` : '', copyText: formatOfferLineForClient(o), source: `العروض (${o.category})`, action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')` });
                         }
                     });
                 }
-
                 if (enabledCats.includes('alerts')) {
                     alertsData.forEach(a => {
                         if (a.searchKey && a.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({
-                                id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
-                                copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
-                            });
-                        }
-                    });
-                }
-
-                if (enabledCats.includes('inquiries')) {
-                    inquiriesData.forEach(i => {
-                        if (i.searchKey && i.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({
-                                id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
-                                copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
-                                source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
-                            });
-                        }
-                    });
-                }
-
-                if (enabledCats.includes('services')) {
-                    deptServicesData.forEach(s => {
-                        if (s.searchKey && s.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({
-                                id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
-                                copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
-                            });
-                        }
-                    });
-
-                    deptNotesData.forEach((n, idx) => {
-                        if (n.searchKey && n.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({
-                                id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
-                                copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
-                            });
-                        }
-                    });
-                }
-
-                if (enabledCats.includes('coordinators')) {
-                    coordinatorsData.forEach(c => {
-                        if (c.searchKey && c.searchKey.includes(normQ)) {
-                            let rulesText = c.rules ? c.rules.join(' ') : '';
-                            currentGlobalSearchResults.push({
-                                id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
-                                copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
-                            });
+                            currentGlobalSearchResults.push({ id: 'alert_' + a.id, title: a.content, subtitle: a.time, copyText: a.content, source: "التنبيهات", action: `jumpToAlertsTab(${a.id})` });
                         }
                     });
                 }
 
                 if (currentGlobalSearchResults.length === 0) {
-                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة في الفلتر.</div>`;
+                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
                     return;
                 }
 
-                let globalSearchBuffer = "";
-                currentGlobalSearchResults.forEach((res) => {
-                    const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
-                    const escapedResCopy = res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
-
-                    globalSearchBuffer += `
-                        <div class="search-result-card">
-                            <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
-                                <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
-                                <div>
-                                    <span class="source-badge">${res.source}</span>
-                                    <h4>${res.title}</h4>
-                                    <p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:0.25rem;">
-                                <button class="btn btn-green" onclick="copyTextToClipboard('${escapedResCopy}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
-                                <button class="btn btn-blue" onclick="${res.action}">عرض</button>
-                            </div>
-                        </div>`;
-                });
-                resultsList.innerHTML = globalSearchBuffer;
+                resultsList.innerHTML = currentGlobalSearchResults.map(res => `
+                    <div class="search-result-card">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                            <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${selectedGlobalSearchIds.includes(res.id) ? 'checked' : ''} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                            <div><span class="source-badge">${res.source}</span><h4>${res.title}</h4><p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p></div>
+                        </div>
+                        <div style="display:flex; gap:0.25rem;">
+                            <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n')}', 'تم النسخ:')"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                        </div>
+                    </div>`).join('');
                 updateSelectedCountDisplay();
             }, 30);
         }
@@ -3333,16 +2753,14 @@
         }
 
         function copySelectedGlobalSearchResults() {
-            if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
-            let blocks = [];
-            currentGlobalSearchResults.forEach(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
-            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
+            if (selectedGlobalSearchIds.length === 0) return alert("حدد نتيجة واحدة على الأقل!");
+            let blocks = currentGlobalSearchResults.filter(res => selectedGlobalSearchIds.includes(res.id)).map(res => res.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم النسخ!");
         }
 
         function copyAllGlobalSearchResults() {
-            if (!currentGlobalSearchResults || currentGlobalSearchResults.length === 0) return alert("لا توجد نتائج بحث حالية لنسخها!");
-            let blocks = currentGlobalSearchResults.map(r => r.copyText);
-            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ جميع نتائج البحث دفعة واحدة!");
+            if (!currentGlobalSearchResults.length) return;
+            copyTextToClipboard(currentGlobalSearchResults.map(r => r.copyText).join('\n\n---\n\n'), "تم نسخ كل النتائج!");
         }
 
         function clearGlobalSearch() {
@@ -3354,8 +2772,7 @@
         }
 
         function jumpToSectionAndHighlightDoc(id) {
-            closeModal('activeDoctorsModal');
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            closeModal('activeDoctorsModal'); document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
             setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
@@ -3365,24 +2782,6 @@
             switchTab('offers', document.querySelectorAll('.nav-link')[4]);
             selectedOfferTab = cat; renderOffersTabs();
             setTimeout(() => { renderOffers(id); document.getElementById('offer_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightInquiry(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
-            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightCoordinator(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
-            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightService(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
-            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function openLightbox(imgSrc) {
