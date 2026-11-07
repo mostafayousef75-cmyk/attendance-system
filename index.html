@@ -38,6 +38,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
         html, body { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: row; direction: rtl; user-select: text !important; }
 
+        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+        * { scrollbar-width: none; }
+
         .sidebar { width: 240px; background-color: var(--bg-sidebar); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 0.8rem; flex-shrink: 0; height: 100vh; z-index: 100; transition: width 0.2s ease, padding 0.2s ease; position: relative; }
         .sidebar.collapsed { width: 65px; padding: 0.8rem 0.35rem; }
         .sidebar.collapsed .brand-text, .sidebar.collapsed .json-tools, .sidebar.collapsed .nav-link span, .sidebar.collapsed .sidebar-cloud-status span, .sidebar.collapsed .theme-box label, .sidebar.collapsed .theme-select, .sidebar.collapsed .sidebar-edit-target-btn span { display: none !important; }
@@ -169,13 +172,13 @@
         .offer-tab-btn:hover { border-color: var(--primary-color); }
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
-        .offers-grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; margin-bottom: 0.4rem; }
+        .offers-grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 0.4rem; }
         .offers-grid-container.single-column { grid-template-columns: 1fr; }
         
-        .offer-grid-card { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.45rem 0.55rem; display: flex; flex-direction: column; gap: 0.25rem; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .offer-grid-card:hover { border-color: var(--primary-color); }
+        .offer-grid-card { background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-card) 100%); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.5rem 0.65rem; display: flex; flex-direction: column; gap: 0.3rem; position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.25); transition: transform 0.15s, border-color 0.15s; }
+        .offer-grid-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
         
-        .price-badge { background-color: #2563eb; color: #ffffff; padding: 0.15rem 0.45rem; border-radius: 6px; font-weight: 800; font-size: 0.72rem; display: inline-block; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
+        .price-badge { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.75rem; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4); }
         
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.04rem 0.18rem; border-radius: 4px; font-size: 0.52rem; display: inline-block; margin-top: 2px; }
@@ -190,7 +193,6 @@
         .drag-handle { cursor: grab; color: var(--text-muted); font-size: 0.75rem; padding: 2px 4px; display: inline-flex; align-items: center; justify-content: center; user-select: none; }
         .drag-handle:active { cursor: grabbing; }
 
-        /* سلة العروض المتحركة والثابتة */
         .floating-offers-window { position: fixed; bottom: 20px; left: 20px; width: 310px; background: var(--bg-surface); border: 2px solid var(--primary-color); border-radius: var(--radius-lg); box-shadow: 0 6px 20px rgba(0,0,0,0.6); z-index: 999999; display: none; flex-direction: column; overflow: hidden; }
         .floating-offers-window.active { display: flex; }
         .floating-offers-header { background: var(--bg-card); padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid var(--border-color); color: var(--primary-color); font-weight: 700; font-size: 0.7rem; }
@@ -202,7 +204,7 @@
         .modal { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 480px; max-height: 90vh; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; }
         .form-control { width: 100%; padding: 0.25rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); outline: none; font-size: 0.7rem; }
 
-        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem; }
+        .days-section-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.3rem; margin-top: 0.3rem; }
         .days-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem; margin-top: 0.15rem; }
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.15rem; font-size: 0.7rem; cursor: pointer; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
@@ -467,22 +469,20 @@
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والخدمات والوسوم..." oninput="renderDeptsAndDocs()">
                 </div>
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.4rem;">
-                    <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;">
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
                         <div class="branch-box">
                             <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span></div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.35rem;">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.2rem; font-weight:700; color:#38bdf8; font-size:0.68rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع معشي - الجلدية</div>
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الجلدية</span><span>إدارة</span></div>
                                     <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.2rem; font-size:0.62rem;">الخدمة / الجهاز والوسوم</th><th style="width:55px; text-align:center; padding:0.2rem; font-size:0.62rem;">إدارة</th></tr></thead>
                                         <tbody id="mashyDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
                                     </table>
                                 </div>
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.2rem; font-weight:700; color:#38bdf8; font-size:0.68rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع معشي - الأسنان</div>
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الأسنان</span><span>إدارة</span></div>
                                     <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.2rem; font-size:0.62rem;">الخدمة / الجهاز والوسوم</th><th style="width:55px; text-align:center; padding:0.2rem; font-size:0.62rem;">إدارة</th></tr></thead>
                                         <tbody id="mashyDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
                                     </table>
                                 </div>
@@ -491,25 +491,23 @@
 
                         <div class="branch-box">
                             <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span></div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.35rem;">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.2rem; font-weight:700; color:#38bdf8; font-size:0.68rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع الوسام - الجلدية</div>
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الجلدية</span><span>إدارة</span></div>
                                     <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.2rem; font-size:0.62rem;">الخدمة / الجهاز والوسوم</th><th style="width:55px; text-align:center; padding:0.2rem; font-size:0.62rem;">إدارة</th></tr></thead>
                                         <tbody id="wissamDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
                                     </table>
                                 </div>
                                 <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.2rem; font-weight:700; color:#38bdf8; font-size:0.68rem; border-radius:4px 4px 0 0; border:1px solid var(--border-color);">فرع الوسام - الأسنان</div>
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الأسنان</span><span>إدارة</span></div>
                                     <table style="margin-top:0;">
-                                        <thead><tr><th style="padding:0.2rem; font-size:0.62rem;">الخدمة / الجهاز والوسوم</th><th style="width:55px; text-align:center; padding:0.2rem; font-size:0.62rem;">إدارة</th></tr></thead>
                                         <tbody id="wissamDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.3rem;" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
+                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.35rem;" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
                 </div>
             </section>
 
@@ -674,6 +672,7 @@
         </div>
     </div>
 
+    <!-- موديول إضافة/تعديل الطبيب -->
     <div class="modal-overlay" id="doctorModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -710,10 +709,10 @@
                     </select>
                 </div>
                 <div style="flex:1; display:flex; flex-direction:column; gap:0.12rem;">
-                    <label style="color:var(--primary-color);">عدد الفترات (الشفتات)</label>
+                    <label style="color:var(--primary-color);">عدد الفترات (مواسم الدوام)</label>
                     <select id="docShiftsCount" class="form-control" onchange="toggleShiftsConfigurationUI()">
-                        <option value="1">فترة واحدة (شفت واحد)</option>
-                        <option value="2">فترتان (شفتان)</option>
+                        <option value="1">فترة واحدة</option>
+                        <option value="2">فترتان (الأولى والثانية)</option>
                     </select>
                 </div>
             </div>
@@ -743,7 +742,7 @@
 
             <!-- الفترة الأولى -->
             <div class="days-section-box">
-                <label style="font-weight:700; color:var(--primary-color); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> تفاصيل الفترة الأولى:</label>
+                <label style="font-weight:700; color:var(--primary-color); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> الفترة الأولى (الأيام والشفتات):</label>
                 <div class="days-checklist">
                     <label class="day-row"><input type="checkbox" class="shift1-days" value="السبت"> السبت</label>
                     <label class="day-row"><input type="checkbox" class="shift1-days" value="الأحد"> الأحد</label>
@@ -753,21 +752,14 @@
                     <label class="day-row"><input type="checkbox" class="shift1-days" value="الخميس"> الخميس</label>
                     <label class="day-row"><input type="checkbox" class="shift1-days" value="الجمعة"> الجمعة</label>
                 </div>
-                <div style="display:flex; gap:0.3rem; align-items:center; margin-top:0.3rem;">
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">من:</span>
-                        <select id="shift1Start" class="form-control"></select>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">إلى:</span>
-                        <select id="shift1End" class="form-control"></select>
-                    </div>
-                </div>
+                
+                <div id="shift1ShiftsListContainer" style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.3rem;"></div>
+                <button class="btn btn-secondary" style="width:100%; margin-top:0.25rem; font-size:0.62rem; justify-content:center;" onclick="addShiftRow('shift1')"><i class="fa-solid fa-plus"></i> إضافة شفت جديد لهذه الفترة</button>
             </div>
 
             <!-- الفترة الثانية -->
             <div class="days-section-box" id="shift2ContainerBox" style="display:none;">
-                <label style="font-weight:700; color:var(--accent-blue); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> تفاصيل الفترة الثانية:</label>
+                <label style="font-weight:700; color:var(--accent-blue); display:block; margin-bottom:0.2rem;"><i class="fa-solid fa-clock"></i> الفترة الثانية (الأيام والشفتات):</label>
                 <div class="days-checklist">
                     <label class="day-row"><input type="checkbox" class="shift2-days" value="السبت"> السبت</label>
                     <label class="day-row"><input type="checkbox" class="shift2-days" value="الأحد"> الأحد</label>
@@ -777,19 +769,12 @@
                     <label class="day-row"><input type="checkbox" class="shift2-days" value="الخميس"> الخميس</label>
                     <label class="day-row"><input type="checkbox" class="shift2-days" value="الجمعة"> الجمعة</label>
                 </div>
-                <div style="display:flex; gap:0.3rem; align-items:center; margin-top:0.3rem;">
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">من:</span>
-                        <select id="shift2Start" class="form-control"></select>
-                    </div>
-                    <div style="flex:1; display:flex; flex-direction:column; gap:0.1rem;">
-                        <span style="font-size:0.62rem; color:var(--text-muted);">إلى:</span>
-                        <select id="shift2End" class="form-control"></select>
-                    </div>
-                </div>
+                
+                <div id="shift2ShiftsListContainer" style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.3rem;"></div>
+                <button class="btn btn-secondary" style="width:100%; margin-top:0.25rem; font-size:0.62rem; justify-content:center;" onclick="addShiftRow('shift2')"><i class="fa-solid fa-plus"></i> إضافة شفت جديد لهذه الفترة</button>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:0.12rem;">
+            <div style="display:flex; flex-direction:column; gap:0.12rem; margin-top:0.3rem;">
                 <label>الملاحظات / شروط معتمدة</label>
                 <textarea id="docNotes" class="form-control" rows="2" placeholder="ملاحظات داخلية..."></textarea>
             </div>
@@ -797,7 +782,7 @@
                 <label style="color:var(--primary-color); font-weight:700;">الوسوم (Tags)</label>
                 <input type="text" id="docTags" class="form-control" placeholder="مثال: أسنان، VIP، عروض">
             </div>
-            <button class="btn btn-green" onclick="saveDoctor()">حفظ البيانات</button>
+            <button class="btn btn-green" onclick="saveDoctor()" style="margin-top:0.2rem;">حفظ البيانات</button>
         </div>
     </div>
 
@@ -1183,14 +1168,9 @@
             }
         }
 
+        let globalHoursOptionsHTML = "";
+
         function populateHourSelectOptions() {
-            const selects = [
-                document.getElementById('shift1Start'),
-                document.getElementById('shift1End'),
-                document.getElementById('shift2Start'),
-                document.getElementById('shift2End')
-            ];
-            
             let times = [
                 { val: "24", text: "24 ساعة (طوال اليوم)" },
                 { val: "0", text: "12:00 صباحاً (منتصف الليل)" },
@@ -1243,9 +1223,35 @@
                 { val: "23.5", text: "11:30 مساءً" }
             ];
 
-            let html = "";
-            times.forEach(t => { html += `<option value="${t.val}">${t.text}</option>`; });
-            selects.forEach(sel => { if(sel) sel.innerHTML = html; });
+            globalHoursOptionsHTML = "";
+            times.forEach(t => { globalHoursOptionsHTML += `<option value="${t.val}">${t.text}</option>`; });
+        }
+
+        function addShiftRow(periodKey, startVal = "9", endVal = "12") {
+            const containerId = (periodKey === 'shift1') ? 'shift1ShiftsListContainer' : 'shift2ShiftsListContainer';
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const div = document.createElement('div');
+            div.className = 'shift-row-item';
+            div.style.cssText = "display:flex; gap:0.25rem; align-items:center; background:var(--bg-surface); padding:0.25rem; border-radius:6px; border:1px solid var(--border-color);";
+            
+            div.innerHTML = `
+                <span style="font-size:0.62rem; font-weight:700; color:var(--primary-color); min-width:45px;">شفت:</span>
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.05rem;">
+                    <span style="font-size:0.55rem; color:var(--text-muted);">من:</span>
+                    <select class="form-control shift-start-sel" style="font-size:0.62rem; padding:0.15rem;">${globalHoursOptionsHTML}</select>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:0.05rem;">
+                    <span style="font-size:0.55rem; color:var(--text-muted);">إلى:</span>
+                    <select class="form-control shift-end-sel" style="font-size:0.62rem; padding:0.15rem;">${globalHoursOptionsHTML}</select>
+                </div>
+                <button class="btn btn-danger" style="padding:0.1rem 0.25rem; font-size:0.58rem; margin-top:0.8rem;" onclick="this.closest('.shift-row-item').remove()"><i class="fa-solid fa-trash"></i></button>
+            `;
+            
+            container.appendChild(div);
+            div.querySelector('.shift-start-sel').value = startVal;
+            div.querySelector('.shift-end-sel').value = endVal;
         }
 
         function toggleShiftsConfigurationUI() {
@@ -1294,15 +1300,16 @@
                 refreshAllViews();
             }
 
-            db.ref('clinicMasterData').once('value').then((snapshot) => {
+            // الاستماع للتحديثات السحابية بدون مسح التعديلات المحلية الحالية
+            db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
-                if (cloudData) {
+                if (cloudData && !window.hasLocalUnsavedChanges) {
                     assignDataToVariables(cloudData);
                     saveDataLocally(cloudData);
                     buildPreNormalizedSearchKeys();
                     refreshAllViews();
                 }
-            }).catch(err => console.log("Cloud sync waiting..."));
+            });
         }
 
         function assignDataToVariables(data) {
@@ -1324,6 +1331,7 @@
 
         let syncTimer = null;
         function syncToCloud() {
+            window.hasLocalUnsavedChanges = true;
             buildPreNormalizedSearchKeys();
             const bundleData = {
                 doctorsData,
@@ -1341,6 +1349,7 @@
             syncTimer = setTimeout(() => {
                 db.ref('clinicMasterData').set(bundleData).then(() => {
                     console.log("تمت المزامنة السحابية بنجاح");
+                    window.hasLocalUnsavedChanges = false;
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
                 });
@@ -1348,7 +1357,7 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shift1Start: "12.5", shift1End: "20.5", shift2Days: [], shift2Start: "", shift2End: "", timing: "من 12:30 مساءً - إلى 8:30 مساءً", notes: "", customColor: "" }];
+            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
             deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
@@ -1377,6 +1386,7 @@
             if (isSidebarCollapsed) document.getElementById('appSidebar').classList.add('collapsed');
 
             applyOffersViewModeUI();
+            populateHourSelectOptions();
 
             document.getElementById('shiftScratchpadText1').value = localStorage.getItem('shift_scratchpad_1') || '';
             document.getElementById('shiftScratchpadText2').value = localStorage.getItem('shift_scratchpad_2') || '';
@@ -1388,7 +1398,6 @@
 
             applyTopBarsVisibilityState(topBarsVisible);
             loadTableWidths();
-            populateHourSelectOptions();
 
             const activeTab = localStorage.getItem('activeTab') || 'schedule';
             const targetNav = document.querySelector(`.nav-link[data-tab="${activeTab}"]`) || document.querySelector('.nav-link');
@@ -1401,8 +1410,6 @@
             setInterval(updateLiveClockAndDate, 1000);
 
             loadAllAppData();
-
-            // تفعيل سحب السلة المتحركة بكل حرية بالماوس
             initFloatingOffersDrag();
         });
 
@@ -1728,13 +1735,23 @@
             navigator.clipboard.writeText(text).then(() => { alert(`📋 ${msg}\n\n${text}`); });
         }
 
-        function getLabelTextFromSelect(selectId, val) {
-            const sel = document.getElementById(selectId);
-            if (!sel) return val;
-            for (let opt of sel.options) {
-                if (opt.value === String(val)) return opt.text;
-            }
-            return val;
+        function getTimeLabelText(val) {
+            let timesMap = {
+                "24": "24 ساعة (طوال اليوم)", "0": "12:00 صباحاً (منتصف الليل)", "0.5": "12:30 صباحاً",
+                "1": "1:00 صباحاً", "1.5": "1:30 صباحاً", "2": "2:00 صباحاً", "2.5": "2:30 صباحاً",
+                "3": "3:00 صباحاً", "3.5": "3:30 صباحاً", "4": "4:00 صباحاً", "4.5": "4:30 صباحاً",
+                "5": "5:00 صباحاً", "5.5": "5:30 صباحاً", "6": "6:00 صباحاً", "6.5": "6:30 صباحاً",
+                "7": "7:00 صباحاً", "7.5": "7:30 صباحاً", "8": "8:00 صباحاً", "8.5": "8:30 صباحاً",
+                "9": "9:00 صباحاً", "9.5": "9:30 صباحاً", "10": "10:00 صباحاً", "10.5": "10:30 صباحاً",
+                "11": "11:00 صباحاً", "11.5": "11:30 صباحاً", "12": "12:00 ظهراً", "12.5": "12:30 ظهراً",
+                "13": "1:00 مساءً", "13.5": "1:30 مساءً", "14": "2:00 مساءً", "14.5": "2:30 مساءً",
+                "15": "3:00 مساءً", "15.5": "3:30 مساءً", "16": "4:00 مساءً", "16.5": "4:30 مساءً",
+                "17": "5:00 مساءً", "17.5": "5:30 مساءً", "18": "6:00 مساءً", "18.5": "6:30 مساءً",
+                "19": "7:00 مساءً", "19.5": "7:30 مساءً", "20": "8:00 مساءً", "20.5": "8:30 مساءً",
+                "21": "9:00 مساءً", "21.5": "9:30 مساءً", "22": "10:00 مساءً", "22.5": "10:30 مساءً",
+                "23": "11:00 مساءً", "23.5": "11:30 مساءً"
+            };
+            return timesMap[String(val)] || val;
         }
 
         const standardDaysSequence = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
@@ -1766,30 +1783,36 @@
         function generateDoctorTimingFormatted(doc) {
             let lines = [];
             let s1Days = doc.shift1Days || [];
-            let s1StartText = getLabelTextFromSelect('shift1Start', doc.shift1Start);
-            let s1EndText = getLabelTextFromSelect('shift1End', doc.shift1End);
+            let dayStr1 = formatDaysSmart(s1Days);
+            let s1Shifts = doc.shifts1 || [];
             
-            let hasTwoShifts = (doc.shiftsCount === "2");
-
-            if (s1StartText && s1EndText) {
-                let dayStr = formatDaysSmart(s1Days);
-                if (hasTwoShifts) {
-                    lines.push(`الفترة الأولى ${dayStr}: من ${s1StartText} - إلى ${s1EndText}`);
-                } else {
-                    lines.push(`${dayStr}: من ${s1StartText} - إلى ${s1EndText}`);
-                }
+            if (s1Shifts.length > 0) {
+                lines.push(`الفترة الأولى ${dayStr1}:`);
+                s1Shifts.forEach((sh, idx) => {
+                    let startTxt = getTimeLabelText(sh.start);
+                    let endTxt = getTimeLabelText(sh.end);
+                    let shiftLabel = (s1Shifts.length > 1) ? `الشفت ${idx+1}` : `الشفت`;
+                    lines.push(`- ${shiftLabel}: من ${startTxt} - إلى ${endTxt}`);
+                });
             }
 
-            if (hasTwoShifts) {
+            let countShifts = doc.shiftsCount || "1";
+            if (countShifts === "2") {
                 let s2Days = doc.shift2Days || [];
-                let s2StartText = getLabelTextFromSelect('shift2Start', doc.shift2Start);
-                let s2EndText = getLabelTextFromSelect('shift2End', doc.shift2End);
-                if (s2StartText && s2EndText) {
-                    let dayStr2 = formatDaysSmart(s2Days);
-                    lines.push(`الفترة الثانية ${dayStr2}: من ${s2StartText} - إلى ${s2EndText}`);
+                let dayStr2 = formatDaysSmart(s2Days);
+                let s2Shifts = doc.shifts2 || [];
+                
+                if (s2Shifts.length > 0) {
+                    lines.push(`الفترة الثانية ${dayStr2}:`);
+                    s2Shifts.forEach((sh, idx) => {
+                        let startTxt = getTimeLabelText(sh.start);
+                        let endTxt = getTimeLabelText(sh.end);
+                        let shiftLabel = (s2Shifts.length > 1) ? `الشفت ${idx+1}` : `الشفت`;
+                        lines.push(`- ${shiftLabel}: من ${startTxt} - إلى ${endTxt}`);
+                    });
                 }
             }
-            return lines.join(' \n ');
+            return lines.join('\n');
         }
 
         function copyDoctorForClient(id) {
@@ -1801,30 +1824,33 @@
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
+        // تم إصلاح منطق مطابقة الوقت والشفتات بدقة متناهية مع الساعة المعدلة
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
 
-            let checkShiftActive = (daysArr, startVal, endVal) => {
+            let checkShiftsList = (daysArr, shiftsArr) => {
                 if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
-                    if (startVal === "24" || endVal === "24") return true;
-                    if (startVal === "" || endVal === "") return true;
-                    let start = parseFloat(startVal);
-                    let end = parseFloat(endVal);
-                    if (isNaN(start) || isNaN(end)) return true;
-
-                    if (start <= end) {
-                        return currentHour24 >= start && currentHour24 <= end;
-                    } else {
-                        return currentHour24 >= start || currentHour24 <= end;
+                    if (!shiftsArr || shiftsArr.length === 0) return true;
+                    for (let sh of shiftsArr) {
+                        if (sh.start === "24" || sh.end === "24") return true;
+                        let start = parseFloat(sh.start);
+                        let end = parseFloat(sh.end);
+                        if (isNaN(start) || isNaN(end)) continue;
+                        if (start <= end) {
+                            if (currentHour24 >= start && currentHour24 <= end) return true;
+                        } else {
+                            if (currentHour24 >= start || currentHour24 <= end) return true;
+                        }
                     }
                 }
                 return false;
             };
 
-            let activeInShift1 = checkShiftActive(doc.shift1Days, doc.shift1Start, doc.shift1End);
+            let activeInShift1 = checkShiftsList(doc.shift1Days, doc.shifts1);
             let activeInShift2 = false;
-            if (doc.shiftsCount === "2") {
-                activeInShift2 = checkShiftActive(doc.shift2Days, doc.shift2Start, doc.shift2End);
+            let countShifts = doc.shiftsCount || (doc.shift2Days && doc.shift2Days.length > 0 ? "2" : "1");
+            if (countShifts === "2") {
+                activeInShift2 = checkShiftsList(doc.shift2Days, doc.shifts2);
             }
 
             return activeInShift1 || activeInShift2;
@@ -1833,7 +1859,8 @@
         function getModifiedTimeHour24() {
             const now = new Date();
             let hours = now.getHours() + timezoneOffsetHours;
-            return (hours + 24) % 24;
+            let minutes = now.getMinutes() / 60;
+            return ((hours + 24) % 24) + minutes;
         }
 
         function updateActiveDoctorsKPI() {
@@ -1860,17 +1887,21 @@
             const currentHour24 = getModifiedTimeHour24();
             
             let mashyActive = [], wissamActive = [];
-            const sortedDoctors = [...doctorsData];
+            
+            const sortedMashyDoctors = getSortedDoctorsListForBranch('معشي');
+            const sortedWissamDoctors = getSortedDoctorsListForBranch('الوسام');
 
-            sortedDoctors.forEach(d => {
+            sortedMashyDoctors.forEach(d => {
                 let isMashyBranch = (d.branch === "معشي" || d.isJoint);
+                if (isMashyBranch && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
+                    mashyActive.push(d);
+                }
+            });
+
+            sortedWissamDoctors.forEach(d => {
                 let isWissamBranch = (d.branch === "الوسام" || d.isJoint);
-
-                let isActiveNow = checkDocActiveForTimeAndDay(d, currentDay, currentHour24);
-
-                if (isActiveNow) {
-                    if (isMashyBranch) mashyActive.push(d);
-                    if (isWissamBranch) wissamActive.push(d);
+                if (isWissamBranch && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
+                    wissamActive.push(d);
                 }
             });
 
@@ -1918,7 +1949,6 @@
             modalClockInterval = setInterval(updateModalLiveClock, 1000);
         }
 
-        // تم تعديل الدالة لضمان صعود الأطباء المثبتين (isPinned) إلى أعلى القائمة تماماً بدقة
         function getSortedDoctorsListForBranch(branchName) {
             let baseList = [...doctorsData];
 
@@ -2095,8 +2125,13 @@
             
             document.querySelectorAll('.shift1-days').forEach(c => c.checked = false);
             document.querySelectorAll('.shift2-days').forEach(c => c.checked = false);
-            document.getElementById('shift1Start').value = "12"; document.getElementById('shift1End').value = "20";
-            document.getElementById('shift2Start').value = "16"; document.getElementById('shift2End').value = "22";
+            
+            document.getElementById('shift1ShiftsListContainer').innerHTML = "";
+            document.getElementById('shift2ShiftsListContainer').innerHTML = "";
+            
+            addShiftRow('shift1', "9", "12");
+            addShiftRow('shift1', "16.5", "21.5");
+            addShiftRow('shift2', "10", "14");
 
             document.getElementById('docModalTitle').innerText = "إضافة موعد طبيب"; 
             document.getElementById('doctorModal').classList.add('active');
@@ -2107,12 +2142,24 @@
             const shiftsCount = document.getElementById('docShiftsCount').value;
             
             const shift1Days = Array.from(document.querySelectorAll('.shift1-days:checked')).map(c => c.value);
-            const shift1Start = document.getElementById('shift1Start').value;
-            const shift1End = document.getElementById('shift1End').value;
+            let shifts1 = [];
+            document.querySelectorAll('#shift1ShiftsListContainer .shift-row-item').forEach(row => {
+                shifts1.push({
+                    start: row.querySelector('.shift-start-sel').value,
+                    end: row.querySelector('.shift-end-sel').value
+                });
+            });
 
-            const shift2Days = shiftsCount === "2" ? Array.from(document.querySelectorAll('.shift2-days:checked')).map(c => c.value) : [];
-            const shift2Start = shiftsCount === "2" ? document.getElementById('shift2Start').value : "";
-            const shift2End = shiftsCount === "2" ? document.getElementById('shift2End').value : "";
+            const shift2Days = (shiftsCount === "2") ? Array.from(document.querySelectorAll('.shift2-days:checked')).map(c => c.value) : [];
+            let shifts2 = [];
+            if (shiftsCount === "2") {
+                document.querySelectorAll('#shift2ShiftsListContainer .shift-row-item').forEach(row => {
+                    shifts2.push({
+                        start: row.querySelector('.shift-start-sel').value,
+                        end: row.querySelector('.shift-end-sel').value
+                    });
+                });
+            }
 
             let docNameVal = document.getElementById('docName').value.trim();
             if (docNameVal && !docNameVal.startsWith("د.") && !docNameVal.startsWith("الدكتور")) {
@@ -2127,8 +2174,8 @@
                 fee: document.getElementById('docFee').value,
                 branch: document.getElementById('docBranch').value,
                 shiftsCount,
-                shift1Days, shift1Start, shift1End,
-                shift2Days, shift2Start, shift2End,
+                shift1Days, shifts1,
+                shift2Days, shifts2,
                 customColor: document.getElementById('docCustomColor').value,
                 isJoint: document.getElementById('docIsJoint').checked,
                 isPinned: document.getElementById('docIsPinned').checked,
@@ -2151,7 +2198,7 @@
             document.getElementById('docSpecialty').value = doc.specialty;
             document.getElementById('docFee').value = doc.fee || ""; 
             document.getElementById('docBranch').value = doc.branch || "معشي";
-            document.getElementById('docShiftsCount').value = doc.shiftsCount || "1";
+            document.getElementById('docShiftsCount').value = doc.shiftsCount || (doc.shift2Days && doc.shift2Days.length > 0 ? "2" : "1");
             toggleShiftsConfigurationUI();
 
             document.getElementById('docCustomColor').value = doc.customColor || ""; 
@@ -2160,13 +2207,18 @@
             document.getElementById('docIsLeave').checked = !!doc.isLeave;
             
             document.querySelectorAll('.shift1-days').forEach(c => c.checked = doc.shift1Days ? doc.shift1Days.includes(c.value) : false);
-            if (doc.shift1Start) document.getElementById('shift1Start').value = doc.shift1Start;
-            if (doc.shift1End) document.getElementById('shift1End').value = doc.shift1End;
+            
+            const container1 = document.getElementById('shift1ShiftsListContainer');
+            container1.innerHTML = "";
+            let s1List = doc.shifts1 || (doc.shift1Start ? [{start: doc.shift1Start, end: doc.shift1End}, doc.shift1SubStart ? {start: doc.shift1SubStart, end: doc.shift1SubEnd} : null].filter(Boolean) : []);
+            s1List.forEach(s => addShiftRow('shift1', s.start, s.end));
 
-            if (doc.shiftsCount === "2") {
+            if (document.getElementById('docShiftsCount').value === "2") {
                 document.querySelectorAll('.shift2-days').forEach(c => c.checked = doc.shift2Days ? doc.shift2Days.includes(c.value) : false);
-                if (doc.shift2Start) document.getElementById('shift2Start').value = doc.shift2Start;
-                if (doc.shift2End) document.getElementById('shift2End').value = doc.shift2End;
+                const container2 = document.getElementById('shift2ShiftsListContainer');
+                container2.innerHTML = "";
+                let s2List = doc.shifts2 || (doc.shift2Start ? [{start: doc.shift2Start, end: doc.shift2End}] : []);
+                s2List.forEach(s => addShiftRow('shift2', s.start, s.end));
             }
 
             document.getElementById('docNotes').value = doc.notes || "";
@@ -2238,13 +2290,16 @@
                 }
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
+                
+                const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
                 alertsBuffer += `
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" data-id="${item.id}">
                         <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اضغط واسحب من هنا لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
                         <div style="flex:1;"><p>${item.content}</p>${tagsHtml}<span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         ${mediaHtml}
                         <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${item.content.replace(/'/g, "\\'")}', 'تم نسخ التنبيه:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                         </div>
@@ -2371,6 +2426,8 @@
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
                 
+                const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
                 const tr = document.createElement('tr');
                 tr.id = `dept_service_row_${item.id}`;
                 tr.className = isHighlighted;
@@ -2383,13 +2440,13 @@
                             <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
                         </div>
                     </td>
-                    <td style="text-align:center;">
-                        <div class="actions-col-group">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${item.name.replace(/'/g, "\\'")}', 'تم نسخ الخدمة:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                    <td style="width:65px; text-align:center;">
+                        <div class="actions-col-group" style="flex-direction:row;">
+                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedSrvName}', 'تم نسخ الخدمة:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                    `;
+                    </td>`;
 
                 if (item.branch === "معشي") {
                     if (item.type === "derm") bodies[0].appendChild(tr); else bodies[1].appendChild(tr);
@@ -2404,13 +2461,15 @@
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
                     const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
+                    const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
                     notesBuffer += `
                         <div class="doc-sheet-card ${noteObj.color || 'card-gold'}" data-id="${idx}">
                             <h3>
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اضغط واسحب من هنا لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span>
                                 <div class="actions-col-group" style="flex-direction:row;">
-                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${noteObj.text.replace(/'/g, "\\'")}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
                                     <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
                                     <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
@@ -2500,6 +2559,7 @@
                 let rules = c.rules.map(r => `<p>• ${r}</p>`).join('');
                 let tagsHtml = c.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${c.tags}</div>` : '';
                 let copyFullText = c.name + "\n" + c.rules.join('\n');
+                let escapedCopyText = copyFullText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 coordBuffer += `
                     <div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}" data-id="${c.id}">
@@ -2507,7 +2567,7 @@
                             <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${c.id}, 'coordinator')" title="اضغط واسحب من هنا لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.25rem;">${c.name}</span>
                             <div class="actions-col-group" style="flex-direction:row;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${copyFullText.replace(/'/g, "\\'")}', 'تم نسخ التعليمات:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedCopyText}', 'تم نسخ التعليمات:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
                                 <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${c.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
                             </div>
@@ -2764,7 +2824,7 @@
                             ${pinnedBadge}<strong style="font-size:0.75rem; color:var(--text-main);">${item.name}</strong>
                             ${item.notes ? `<div style="margin-top:2px;"><span class="tag-badge">${item.notes}</span></div>` : ''}
                         </div>
-                        ${devicesDisplay ? `<div style="background:var(--bg-card); padding:0.2rem; border-radius:4px; border:1px solid var(--border-color);">${devicesDisplay}</div>` : ''}
+                        ${devicesDisplay ? `<div style="background:var(--bg-card); padding:0.25rem; border-radius:6px; border:1px solid var(--border-color);">${devicesDisplay}</div>` : ''}
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.1rem;">
                             <span style="font-size:0.62rem; color:var(--text-muted);">السعر النهائي:</span>
                             <span class="price-badge">${item.price ? item.price : 'حسب الأجهزة'}</span>
@@ -2847,6 +2907,7 @@
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
                 let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
                 let copyFullText = "سؤال: " + item.question + "\nإجابة: " + item.answer;
+                let escapedInqText = copyFullText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
                     <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}">
@@ -2854,7 +2915,7 @@
                             <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اضغط واسحب من هنا لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
                             <div class="actions-col-group" style="flex-direction:row;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${copyFullText.replace(/'/g, "\\'")}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedInqText}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
                                 <button class="action-icon-btn btn-edit-ic" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
                             </div>
@@ -3050,7 +3111,6 @@
             draggedItemInfo = null;
         }
 
-        // تفعيل سحب وإفلات سلة العروض المتحركة على الشاشة بحرية بالماوس
         function initFloatingOffersDrag() {
             const win = document.getElementById('floatingOffersWin');
             const header = document.getElementById('floatingOffersHeader');
@@ -3203,6 +3263,8 @@
                 let globalSearchBuffer = "";
                 currentGlobalSearchResults.forEach((res) => {
                     const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
+                    const escapedResCopy = res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
                     globalSearchBuffer += `
                         <div class="search-result-card">
                             <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
@@ -3214,7 +3276,7 @@
                                 </div>
                             </div>
                             <div style="display:flex; gap:0.25rem;">
-                                <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'")}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-green" onclick="copyTextToClipboard('${escapedResCopy}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
                                 <button class="btn btn-blue" onclick="${res.action}">عرض</button>
                             </div>
                         </div>`;
