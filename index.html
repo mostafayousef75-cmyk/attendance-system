@@ -355,7 +355,7 @@
             </section>
 
             <!-- 1. مواعيد الأطباء -->
-            <section id="schedule-section" class="page-section">
+            <section id="schedule-section" class="page-section active">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
                     <h2>جدول دوام الأطباء المقسم حسب الفروع</h2>
                     <div style="display:flex; gap:0.2rem;">
@@ -1300,7 +1300,6 @@
                 refreshAllViews();
             }
 
-            // الاستماع للتحديثات السحابية بدون مسح التعديلات المحلية الحالية
             db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData && !window.hasLocalUnsavedChanges) {
@@ -1348,7 +1347,6 @@
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
                 db.ref('clinicMasterData').set(bundleData).then(() => {
-                    console.log("تمت المزامنة السحابية بنجاح");
                     window.hasLocalUnsavedChanges = false;
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
@@ -1357,7 +1355,12 @@
         }
 
         function loadDefaultData() {
-            doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }];
+            doctorsData = [
+                { id: 1, name: "د. عبد الله اسبيناتي", nationality: "", specialty: "اخصائي تقويم اسنان", fee: "", branch: "معشي", tags: "أسنان، تقويم", isJoint: false, isLeave: false, isPinned: false, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "9", end: "21"}], shifts2: [], timing: "", notes: "", customColor: "" },
+                { id: 2, name: "د. محمود اللبان", nationality: "", specialty: "اخصائي تركيبات (الفترة الأولى (من السبت إلى الأربعاء) - الشفت: من 9:00 صباحاً - إلى 12:00 ظهراً)", fee: "", branch: "معشي", tags: "أسنان، تركيبات", isJoint: false, isLeave: false, isPinned: false, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء"], shifts1: [{start: "9", end: "12"}], shifts2: [], timing: "", notes: "", customColor: "" },
+                { id: 3, name: "د. انجي سلامي", nationality: "", specialty: "اخصائي جذور وعصب الاسنان", fee: "", branch: "معشي", tags: "أسنان، عصب", isJoint: false, isLeave: false, isPinned: false, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "9", end: "21"}], shifts2: [], timing: "", notes: "", customColor: "" },
+                { id: 4, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }
+            ];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
             deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
@@ -1824,13 +1827,13 @@
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
-        // تم تصحيح وظيفة الفحص والتحقق هنا لتتطابق بدقة تامة مع وقت اليوم ووقت الساعة المعدلة
+        // تم تصحيح منطق مقارنة الأوقات والشفتات بدقة فائقة
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
 
             let checkShiftsList = (daysArr, shiftsArr) => {
                 if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
-                    if (!shiftsArr || shiftsArr.length === 0) return false; // تم التصحيح لكي لا يعتبر الطبيب متواجداً إذا لم يكن هناك شفتات محددة بدقة
+                    if (!shiftsArr || shiftsArr.length === 0) return true;
                     for (let sh of shiftsArr) {
                         if (sh.start === "24" || sh.end === "24") return true;
                         let start = parseFloat(sh.start);
@@ -3015,4 +3018,351 @@
             }
             else if (type === 'alert') {
                 const card = e.target.closest('.alert-card-item-compact');
-                let targetId = card ? parseInt(card.getAttribute('data
+                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
+                let sourceIndex = alertsData.findIndex(a => a.id === draggedId);
+                if (sourceIndex === -1) return;
+                let movedItem = alertsData.splice(sourceIndex, 1)[0];
+
+                if (targetId && targetId !== draggedId) {
+                    let targetIndex = alertsData.findIndex(a => a.id === targetId);
+                    if (targetIndex !== -1) alertsData.splice(targetIndex, 0, movedItem);
+                    else alertsData.push(movedItem);
+                } else {
+                    alertsData.push(movedItem);
+                }
+                syncToCloud(); renderAlerts(); playChirpSound();
+            } 
+            else if (type === 'service') {
+                const tr = e.target.closest('tr');
+                let targetId = tr ? parseInt(tr.getAttribute('data-id')) : null;
+                let sourceIndex = deptServicesData.findIndex(s => s.id === draggedId);
+                if (sourceIndex === -1) return;
+                let movedItem = deptServicesData.splice(sourceIndex, 1)[0];
+
+                if (targetId && targetId !== draggedId) {
+                    let targetIndex = deptServicesData.findIndex(s => s.id === targetId);
+                    if (targetIndex !== -1) deptServicesData.splice(targetIndex, 0, movedItem);
+                    else deptServicesData.push(movedItem);
+                } else {
+                    deptServicesData.push(movedItem);
+                }
+                syncToCloud(); renderDeptsAndDocs(); playChirpSound();
+            } 
+            else if (type === 'note') {
+                const card = e.target.closest('.doc-sheet-card');
+                let targetIdx = card ? parseInt(card.getAttribute('data-id')) : null;
+                let draggedIdx = parseInt(draggedId);
+                if (isNaN(draggedIdx)) return;
+                let movedItem = deptNotesData.splice(draggedIdx, 1)[0];
+
+                if (targetIdx !== null && !isNaN(targetIdx) && targetIdx !== draggedIdx) {
+                    deptNotesData.splice(targetIdx, 0, movedItem);
+                } else {
+                    deptNotesData.push(movedItem);
+                }
+                syncToCloud(); renderDeptsAndDocs(); playChirpSound();
+            } 
+            else if (type === 'coordinator') {
+                const card = e.target.closest('.doc-sheet-card');
+                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
+                let sourceIndex = coordinatorsData.findIndex(c => c.id === draggedId);
+                if (sourceIndex === -1) return;
+                let movedItem = coordinatorsData.splice(sourceIndex, 1)[0];
+
+                if (targetId && targetId !== draggedId) {
+                    let targetIndex = coordinatorsData.findIndex(c => c.id === targetId);
+                    if (targetIndex !== -1) coordinatorsData.splice(targetIndex, 0, movedItem);
+                    else coordinatorsData.push(movedItem);
+                } else {
+                    coordinatorsData.push(movedItem);
+                }
+                syncToCloud(); renderCoordinators(); playChirpSound();
+            } 
+            else if (type === 'offer') {
+                const card = e.target.closest('.offer-grid-card');
+                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
+                let sourceIndex = offersData.findIndex(o => o.id === draggedId);
+                if (sourceIndex === -1) return;
+                let movedItem = offersData.splice(sourceIndex, 1)[0];
+
+                if (targetId && targetId !== draggedId) {
+                    let targetIndex = offersData.findIndex(o => o.id === targetId);
+                    if (targetIndex !== -1) offersData.splice(targetIndex, 0, movedItem);
+                    else offersData.push(movedItem);
+                } else {
+                    offersData.push(movedItem);
+                }
+                syncToCloud(); renderOffers(); playChirpSound();
+            } 
+            else if (type === 'inquiry') {
+                const card = e.target.closest('.doc-sheet-card');
+                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
+                let sourceIndex = inquiriesData.findIndex(i => i.id === draggedId);
+                if (sourceIndex === -1) return;
+                let movedItem = inquiriesData.splice(sourceIndex, 1)[0];
+
+                if (targetId && targetId !== draggedId) {
+                    let targetIndex = inquiriesData.findIndex(i => i.id === targetId);
+                    if (targetIndex !== -1) inquiriesData.splice(targetIndex, 0, movedItem);
+                    else inquiriesData.push(movedItem);
+                } else {
+                    inquiriesData.push(movedItem);
+                }
+                syncToCloud(); renderInquiries(); playChirpSound();
+            }
+
+            draggedItemInfo = null;
+        }
+
+        function initFloatingOffersDrag() {
+            const win = document.getElementById('floatingOffersWin');
+            const header = document.getElementById('floatingOffersHeader');
+            if (!win || !header) return;
+
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                const rect = win.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+
+                win.style.right = 'auto';
+                win.style.bottom = 'auto';
+                win.style.left = initialLeft + 'px';
+                win.style.top = initialTop + 'px';
+
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                let dx = e.clientX - startX;
+                let dy = e.clientY - startY;
+                win.style.left = (initialLeft + dx) + 'px';
+                win.style.top = (initialTop + dy) + 'px';
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+
+        let globalSearchTimeout = null;
+        function handleSmartGlobalSearch(query) {
+            if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                let rawQ = query.trim();
+                if (!rawQ) {
+                    document.getElementById('globalSearchResultsSection').classList.remove('active');
+                    const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                    document.getElementById(activeTab + '-section').classList.add('active');
+                    currentGlobalSearchResults = [];
+                    selectedGlobalSearchIds = [];
+                    return;
+                }
+
+                let normQ = normalizeArabicText(rawQ);
+                const resultsSection = document.getElementById('globalSearchResultsSection');
+                const resultsList = document.getElementById('globalSearchResultsList');
+                
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                resultsSection.classList.add('active');
+                resultsList.innerHTML = "";
+                currentGlobalSearchResults = [];
+
+                const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+
+                if (enabledCats.includes('doctors')) {
+                    doctorsData.forEach(d => {
+                        if (d.searchKey && d.searchKey.includes(normQ)) {
+                            let docTextForCopy = "الطبيب: " + d.name + " (" + (d.nationality || '') + ")\nالتخصص: " + d.specialty + "\nالكشفية: " + (d.fee || '75 ريال');
+                            currentGlobalSearchResults.push({
+                                id: 'doc_' + d.id, title: d.name + " (" + d.specialty + ")",
+                                subtitle: "الفرع: " + (d.branch || 'مشترك') + " | الوسوم: " + (d.tags || '-'),
+                                copyText: docTextForCopy, source: "الأطباء", action: "jumpToSectionAndHighlightDoc(" + d.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (enabledCats.includes('offers')) {
+                    offersData.forEach(o => {
+                        if (o.searchKey && o.searchKey.includes(normQ)) {
+                            let priceSummary = o.price ? "السعر: " + o.price : "";
+                            currentGlobalSearchResults.push({
+                                id: 'offer_' + o.id, title: o.name + " - " + priceSummary,
+                                subtitle: "شروط/ملحوظات: " + (o.notes || '-'), copyText: formatOfferLineForClient(o),
+                                source: "العروض والأسعار (" + o.category + ")", action: "jumpToSectionAndHighlightOffer(" + o.id + ", '" + o.category + "')"
+                            });
+                        }
+                    });
+                }
+
+                if (enabledCats.includes('alerts')) {
+                    alertsData.forEach(a => {
+                        if (a.searchKey && a.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({
+                                id: 'alert_' + a.id, title: a.content, subtitle: "الوسوم: " + (a.tags || '-') + " | " + a.time,
+                                copyText: a.content, source: "التنبيهات والإشعارات", action: "jumpToAlertsTab(" + a.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (enabledCats.includes('inquiries')) {
+                    inquiriesData.forEach(i => {
+                        if (i.searchKey && i.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({
+                                id: 'inq_' + i.id, title: i.question, subtitle: i.answer,
+                                copyText: "سؤال: " + i.question + "\nإجابة: " + i.answer,
+                                source: "دليل الاستفسارات (" + i.category + ")", action: "jumpToSectionAndHighlightInquiry(" + i.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (enabledCats.includes('services')) {
+                    deptServicesData.forEach(s => {
+                        if (s.searchKey && s.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({
+                                id: 'srv_' + s.id, title: s.name, subtitle: "القسم: " + s.type + " | الوسوم: " + (s.tags || '-'),
+                                copyText: s.name, source: "أقسام وفروع العيادات (" + s.branch + ")", action: "jumpToSectionAndHighlightService(" + s.id + ")"
+                            });
+                        }
+                    });
+
+                    deptNotesData.forEach((n, idx) => {
+                        if (n.searchKey && n.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({
+                                id: 'note_' + idx, title: n.text, subtitle: "ملحوظات الأقسام | الوسوم: " + (n.tags || '-'),
+                                copyText: n.text, source: "ملحوظات الأقسام", action: "switchTab('depts-docs', document.querySelectorAll('.nav-link')[2])"
+                            });
+                        }
+                    });
+                }
+
+                if (enabledCats.includes('coordinators')) {
+                    coordinatorsData.forEach(c => {
+                        if (c.searchKey && c.searchKey.includes(normQ)) {
+                            let rulesText = c.rules ? c.rules.join(' ') : '';
+                            currentGlobalSearchResults.push({
+                                id: 'coord_' + c.id, title: c.name, subtitle: "دليل المنسقين | الوسوم: " + (c.tags || '-'),
+                                copyText: c.name + "\n" + rulesText, source: "دليل المنسقين", action: "jumpToSectionAndHighlightCoordinator(" + c.id + ")"
+                            });
+                        }
+                    });
+                }
+
+                if (currentGlobalSearchResults.length === 0) {
+                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}" في الأقسام المحددة في الفلتر.</div>`;
+                    return;
+                }
+
+                let globalSearchBuffer = "";
+                currentGlobalSearchResults.forEach((res) => {
+                    const isChecked = selectedGlobalSearchIds.includes(res.id) ? 'checked' : '';
+                    const escapedResCopy = res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
+                    globalSearchBuffer += `
+                        <div class="search-result-card">
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                                <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${isChecked} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                                <div>
+                                    <span class="source-badge">${res.source}</span>
+                                    <h4>${res.title}</h4>
+                                    <p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:0.25rem;">
+                                <button class="btn btn-green" onclick="copyTextToClipboard('${escapedResCopy}', 'تم نسخ النتيجة:')"><i class="fa-solid fa-copy"></i></button>
+                                <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                            </div>
+                        </div>`;
+                });
+                resultsList.innerHTML = globalSearchBuffer;
+                updateSelectedCountDisplay();
+            }, 30);
+        }
+
+        function handleSearchCheckboxChange(resId, chk) {
+            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
+            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
+            updateSelectedCountDisplay();
+        }
+
+        function toggleSelectAllGlobalSearch(masterChk) {
+            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
+            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
+            updateSelectedCountDisplay();
+        }
+
+        function updateSelectedCountDisplay() {
+            const countSpan = document.getElementById('selectedSearchCountNum');
+            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
+        }
+
+        function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("الرجاء تحديد نتيجة بحث واحدة على الأقل أولاً!");
+            let blocks = [];
+            currentGlobalSearchResults.forEach(res => { if (selectedGlobalSearchIds.includes(res.id)) blocks.push(res.copyText); });
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ النتائج المحددة دفعة واحدة!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults || currentGlobalSearchResults.length === 0) return alert("لا توجد نتائج بحث حالية لنسخها!");
+            let blocks = currentGlobalSearchResults.map(r => r.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم نسخ جميع نتائج البحث دفعة واحدة!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal');
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
+            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
