@@ -251,7 +251,6 @@
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
-        <!-- مؤشر الحالة السحابية الفوري -->
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الحفظ المحلي والسحابي">
             <span class="cloud-dot" id="cloudDotElem"></span>
             <span id="cloudTextElem">محفوظ محلياً (جاهز)</span>
@@ -452,7 +451,7 @@
             <section id="alerts-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2><i class="fa-solid fa-bullhorn"></i> التنبيهات والإشعارات العامة</h2>
-                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / رابط PDF</button>
+                    <button class="btn btn-green" onclick="openAlertModal()"><i class="fa-solid fa-plus"></i> إضافة تنبيه / PDF / صورة</button>
                 </div>
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
@@ -831,10 +830,11 @@
         </div>
     </div>
 
+    <!-- نموذج التنبيهات المحدث مع دعم PDF والصور -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="alertModalTitle">إضافة تنبيه أو رابط PDF</h3>
+                <h3 id="alertModalTitle">إضافة تنبيه أو رابط PDF أو صورة</h3>
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('alertModal')"></i>
             </div>
             <input type="hidden" id="alertId">
@@ -847,10 +847,14 @@
                 <input type="text" id="alertTags" class="form-control" placeholder="مثال: تنبيه، عاجل، إداري">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر (سريع جداً بدون بطء):</label>
-                <input type="text" id="alertPdfUrl" class="form-control" placeholder="https://... أو رابط جوجل درايف للملف">
+                <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر (بدون بطء):</label>
+                <input type="text" id="alertPdfUrl" class="form-control" placeholder="https://... رابط ملف الـ PDF">
             </div>
-            <button class="btn btn-green" onclick="saveAlert()">نشر التنبيه</button>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label style="color:var(--primary-color); font-weight:700;">رابط الصورة (مع معاينة ذكية وتكبير):</label>
+                <input type="text" id="alertImgUrl" class="form-control" placeholder="https://... رابط الصورة المباشر">
+            </div>
+            <button class="btn btn-green" onclick="saveAlertSmart()">نشر التنبيه بالوسائط الذكية</button>
         </div>
     </div>
 
@@ -1075,7 +1079,6 @@
     </div>
 
     <script>
-        // إعدادات الفايربيز
         const firebaseConfig = { databaseURL: "https://majety-6ecf8-default-rtdb.europe-west1.firebasedatabase.app/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
@@ -1239,7 +1242,6 @@
         }
 
         function loadAllAppData() {
-            // 1. الأولوية المطلقة للذاكرة المحلية لمنع فقدان البيانات تماماً عند الريفرش
             let localSaved = localStorage.getItem('clinic_master_data_v4');
             if (localSaved) {
                 try {
@@ -1254,7 +1256,6 @@
                 refreshAllViews();
             }
 
-            // 2. ربط الفايربيز بدون تداخل (يحدث فقط البيانات لو جاءت من جهاز آخر)
             db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData && !window.isJustSavedLocally) {
@@ -1285,7 +1286,6 @@
 
         window.isJustSavedLocally = false;
 
-        // الحفظ الفوري اللحظي 100% بدون أي تأخير
         function syncToCloud() {
             window.isJustSavedLocally = true;
             setCloudStatusUI('saving', "جاري الحفظ المحلي السريع...");
@@ -1296,12 +1296,10 @@
                 deptServicesData, deptNotesData, offersData, inquiriesData
             };
             
-            // حفظ فوري محلي
             saveDataLocally(bundleData);
             refreshAllViews();
             setCloudStatusUI('connected', "محفوظ وثابت محلياً ✓");
 
-            // رفع سحابي في الخلفية بصمت تام
             db.ref('clinicMasterData').set(bundleData).then(() => {
                 setTimeout(() => { window.isJustSavedLocally = false; }, 1000);
             }).catch(err => {
@@ -2089,8 +2087,12 @@
             alertsData.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
                 if (item.pdfUrl) {
-                    mediaHtml = `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> فتح PDF</a>`;
+                    mediaHtml += `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> PDF</a> `;
                 }
+                if (item.imgUrl) {
+                    mediaHtml += `<img src="${item.imgUrl}" class="alert-thumb-side" onclick="openLightbox('${item.imgUrl}')" title="معاينة الصورة">`;
+                }
+
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
                 const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
@@ -2099,7 +2101,7 @@
                     <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" data-id="${item.id}">
                         <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اسحب لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
                         <div style="flex:1;"><p>${item.content}</p>${tagsHtml}<span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
-                        ${mediaHtml}
+                        <div style="display:flex; align-items:center; gap:0.2rem;">${mediaHtml}</div>
                         <div class="actions-col-group">
                             <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
@@ -2128,24 +2130,42 @@
         function openAlertModal() {
             document.getElementById('alertId').value = ""; document.getElementById('alertContent').value = "";
             document.getElementById('alertTags').value = ""; document.getElementById('alertPdfUrl').value = "";
+            document.getElementById('alertImgUrl').value = "";
             document.getElementById('alertModal').classList.add('active');
         }
 
-        function saveAlert() {
-            const id = document.getElementById('alertId').value, content = document.getElementById('alertContent').value;
+        function saveAlertSmart() {
+            const id = document.getElementById('alertId').value;
+            const content = document.getElementById('alertContent').value;
             const tags = document.getElementById('alertTags').value.trim();
             const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
+            const imgUrl = document.getElementById('alertImgUrl').value.trim();
             if (!content) return alert("أدخل نص التنبيه!");
-            const alertObj = { id: id ? parseInt(id) : Date.now(), content, tags, pdfUrl, time: new Date().toLocaleString('en-US') };
-            if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; else alertsData.push(alertObj);
-            syncToCloud(); closeModal('alertModal'); playChirpSound();
+            
+            const alertObj = { 
+                id: id ? parseInt(id) : Date.now(), 
+                content, 
+                tags, 
+                pdfUrl, 
+                imgUrl, 
+                time: new Date().toLocaleString('en-US') 
+            };
+            
+            if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; 
+            else alertsData.push(alertObj);
+            
+            syncToCloud(); 
+            closeModal('alertModal'); 
+            playChirpSound();
         }
 
         function editAlert(id) {
             const item = alertsData.find(a => a.id === id); if (!item) return;
-            document.getElementById('alertId').value = item.id; document.getElementById('alertContent').value = item.content;
+            document.getElementById('alertId').value = item.id; 
+            document.getElementById('alertContent').value = item.content;
             document.getElementById('alertTags').value = item.tags || "";
             document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
+            document.getElementById('alertImgUrl').value = item.imgUrl || "";
             document.getElementById('alertModal').classList.add('active');
         }
 
