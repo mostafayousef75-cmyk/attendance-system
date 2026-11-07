@@ -1306,9 +1306,10 @@
                 refreshAllViews();
             }
 
+            // الاستماع للتغيرات من السحابة دون الكتابة الفوقية إذا كانت هناك تعديلات محلية حديثة
             db.ref('clinicMasterData').on('value', (snapshot) => {
                 const cloudData = snapshot.val();
-                if (cloudData && !window.hasLocalUnsavedChanges) {
+                if (cloudData && !window.isLocallySaving) {
                     assignDataToVariables(cloudData);
                     saveDataLocally(cloudData);
                     buildPreNormalizedSearchKeys();
@@ -1335,8 +1336,10 @@
         }
 
         let syncTimer = null;
+        window.isLocallySaving = false;
+
         function syncToCloud() {
-            window.hasLocalUnsavedChanges = true;
+            window.isLocallySaving = true;
             buildPreNormalizedSearchKeys();
             const bundleData = {
                 doctorsData,
@@ -1348,17 +1351,21 @@
                 offersData,
                 inquiriesData
             };
+            
+            // حفظ فوري ومحلي لضمان عدم الاختفاء أبداً
             saveDataLocally(bundleData);
+            refreshAllViews();
 
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
                 db.ref('clinicMasterData').set(bundleData).then(() => {
                     console.log("تمت المزامنة السحابية بنجاح");
-                    window.hasLocalUnsavedChanges = false;
+                    setTimeout(() => { window.isLocallySaving = false; }, 1000);
                 }).catch(err => {
                     console.error("فشل الرفع السحابي:", err);
+                    window.isLocallySaving = false;
                 });
-            }, 300);
+            }, 1000);
         }
 
         function loadDefaultData() {
