@@ -169,13 +169,17 @@
         .offer-tab-btn:hover { border-color: var(--primary-color); }
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
-        .offers-table-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.4rem; }
-        .price-badge { background-color: #2563eb; color: #ffffff; padding: 0.18rem 0.55rem; border-radius: 6px; font-weight: 800; font-size: 0.78rem; display: inline-block; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
+        /* تصميم جديد لشبكة العروض لتوفير المساحة */
+        .offers-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.4rem; margin-bottom: 0.4rem; }
+        .offer-grid-card { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.45rem 0.55rem; display: flex; flex-direction: column; gap: 0.25rem; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .offer-grid-card:hover { border-color: var(--primary-color); }
+        
+        .price-badge { background-color: #2563eb; color: #ffffff; padding: 0.15rem 0.45rem; border-radius: 6px; font-weight: 800; font-size: 0.72rem; display: inline-block; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3); }
         
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
-        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.06rem 0.2rem; border-radius: 4px; font-size: 0.55rem; display: inline-block; margin-top: 2px; }
+        .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.04rem 0.18rem; border-radius: 4px; font-size: 0.52rem; display: inline-block; margin-top: 2px; }
 
-        .actions-col-group { display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
+        .actions-col-group { display: flex; gap: 3px; align-items: center; justify-content: flex-end; }
         .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 0.68rem; padding: 2px 5px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 20px; transition: filter 0.15s; }
         .action-icon-btn.btn-copy-ic { color: var(--accent-green); background: rgba(34, 197, 94, 0.15); }
         .action-icon-btn.btn-edit-ic { color: #38bdf8; background: rgba(56, 189, 248, 0.15); }
@@ -519,7 +523,7 @@
                 <div class="coordinators-grid" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
             </section>
 
-            <!-- 5. العروض والأسعار -->
+            <!-- 5. العروض والأسعار (تم تصميمها كشبكة مترابطة لتوفير المساحة) -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.25rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -541,11 +545,14 @@
 
                 <div class="offers-tabs" id="offersTabsContainer"></div>
 
-                <div class="offers-table-box">
-                    <div class="table-responsive">
-                        <table id="offersTableElement"></table>
-                    </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.3rem; background:var(--bg-surface); padding:0.25rem 0.5rem; border-radius:6px; border:1px solid var(--border-color);">
+                    <label style="font-size:0.68rem; font-weight:700; display:inline-flex; align-items:center; gap:0.3rem; cursor:pointer;">
+                        <input type="checkbox" id="selectAllOffersChk" onchange="toggleSelectAllOffers(this)" style="width:13px; height:13px; accent-color:var(--primary-color);"> تحديد الكل في هذا القسم
+                    </label>
+                    <span style="font-size:0.65rem; color:var(--text-muted);">اسحب من أيقونة المقبض (<i class="fa-solid fa-grip-vertical"></i>) لترتيب العروض</span>
                 </div>
+
+                <div class="offers-grid-container" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
             </section>
 
             <!-- 6. دليل الاستفسارات -->
@@ -1954,10 +1961,10 @@
                 let timingFormatted = generateDoctorTimingFormatted(doc);
 
                 mashyHtmlBuffer += `
-                    <tr id="doc_row_mashy_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_mashy')" data-id="${doc.id}">
+                    <tr id="doc_row_mashy_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" data-id="${doc.id}">
                         <td>
                             <div style="display:flex; align-items:flex-start; gap:0.25rem;">
-                                <span class="drag-handle" title="اسحب لترتيب الطبيب في فرع معشي"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_mashy')" title="اضغط واسحب من هنا لترتيب الطبيب في فرع معشي"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <div style="flex:1;">
                                     <span class="doc-name-box">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                                     <span class="doc-nat-badge">${doc.nationality || ''}</span>
@@ -2000,10 +2007,10 @@
                 let timingFormatted = generateDoctorTimingFormatted(doc);
 
                 wissamHtmlBuffer += `
-                    <tr id="doc_row_wissam_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_wissam')" data-id="${doc.id}">
+                    <tr id="doc_row_wissam_${doc.id}" class="${isHighlighted}" style="${customBgStyle}" data-id="${doc.id}">
                         <td>
                             <div style="display:flex; align-items:flex-start; gap:0.25rem;">
-                                <span class="drag-handle" title="اسحب لترتيب الطبيب في فرع الوسام"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${doc.id}, 'doctor_wissam')" title="اضغط واسحب من هنا لترتيب الطبيب في فرع الوسام"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <div style="flex:1;">
                                     <span class="doc-name-box">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                                     <span class="doc-nat-badge">${doc.nationality || ''}</span>
@@ -2191,8 +2198,8 @@
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:var(--primary-color); margin-top:2px;">🏷️ ${item.tags}</div>` : '';
                 alertsBuffer += `
-                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" data-id="${item.id}">
-                        <span class="drag-handle" title="اسحب لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
+                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" data-id="${item.id}">
+                        <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اضغط واسحب من هنا لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
                         <div style="flex:1;"><p>${item.content}</p>${tagsHtml}<span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         ${mediaHtml}
                         <div class="actions-col-group">
@@ -2326,13 +2333,11 @@
                 tr.id = `dept_service_row_${item.id}`;
                 tr.className = isHighlighted;
                 tr.setAttribute('data-id', item.id);
-                tr.setAttribute('draggable', 'true');
-                tr.setAttribute('ondragstart', `dragStartRow(event, ${item.id}, 'service')`);
 
                 tr.innerHTML = `
                     <td ${cellStyle}>
                         <div style="display:flex; align-items:center; gap:0.25rem;">
-                            <span class="drag-handle" title="اسحب لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اضغط واسحب من هنا لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
                             <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
                         </div>
                     </td>
@@ -2356,7 +2361,7 @@
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
                     const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
-                    notesBuffer += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" data-id="${idx}"><h3><span class="drag-handle" title="اسحب لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${tagsHtml}</div>`;
+                    notesBuffer += `<div class="doc-sheet-card ${noteObj.color || 'card-gold'}" data-id="${idx}"><h3><span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اضغط واسحب من هنا لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span><span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span><div style="display:flex; gap:3px; align-items:center;"><button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button><button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button></div></h3><p>${noteObj.text}</p>${tagsHtml}</div>`;
                 }
             });
             notesContainer.innerHTML = notesBuffer;
@@ -2440,9 +2445,9 @@
                 let tagsHtml = c.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${c.tags}</div>` : '';
 
                 coordBuffer += `
-                    <div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}" draggable="true" ondragstart="dragStartRow(event, ${c.id}, 'coordinator')" data-id="${c.id}">
+                    <div id="coord_card_${c.id}" class="doc-sheet-card ${c.color || 'card-teal'} ${c.id === highlightId ? 'highlight-pulse' : ''}" data-id="${c.id}">
                         <h3>
-                            <span class="drag-handle" title="اسحب لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${c.id}, 'coordinator')" title="اضغط واسحب من هنا لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.25rem;">${c.name}</span>
                             <div style="display:flex; gap:3px; align-items:center;">
                                 <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${c.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
@@ -2660,8 +2665,8 @@
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput');
             const search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const tableEl = document.getElementById('offersTableElement');
-            if (!tableEl) return;
+            const gridContainer = document.getElementById('offersGridContainerBox');
+            if (!gridContainer) return;
 
             const sortedOffers = getSortedOffersList();
 
@@ -2671,56 +2676,44 @@
             
             const allFilteredIds = filteredOffers.map(o => o.id);
             const isAllChecked = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedOfferIds.includes(id));
+            const masterChk = document.getElementById('selectAllOffersChk');
+            if (masterChk) masterChk.checked = isAllChecked;
 
-            tableEl.innerHTML = `
-                <thead>
-                    <tr>
-                        <th style="width: 36px; text-align:center;">
-                            <input type="checkbox" id="selectAllOffersChk" ${isAllChecked ? 'checked' : ''} onchange="toggleSelectAllOffers(this)" title="تحديد / إلغاء تحديد الكل">
-                        </th>
-                        <th style="width: 25%;">الخدمة / العرض</th>
-                        <th style="width: 20%;">القسم</th>
-                        <th style="width: 25%;">الأسعار</th>
-                        <th style="width: 15%;">السعر العام</th>
-                        <th style="width: 10%; text-align:center;">إدارة</th>
-                    </tr>
-                </thead>
-                <tbody id="offersTbody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></tbody>`;
-
-            const tbody = tableEl.querySelector('#offersTbody');
             let offersBuffer = "";
-
             filteredOffers.forEach(item => {
                 const isChecked = selectedOfferIds.includes(item.id) ? 'checked' : '';
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15;">📌</span> ` : '';
                 
                 let devicesDisplay = "";
-                if (item.device1) devicesDisplay += `<div>• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
-                if (item.device2) devicesDisplay += `<div>• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
-                if (!devicesDisplay) devicesDisplay = "-";
+                if (item.device1) devicesDisplay += `<div style="font-size:0.65rem;">• ${item.device1}: <strong style="color:var(--primary-color);">${item.price1 || ''}</strong></div>`;
+                if (item.device2) devicesDisplay += `<div style="font-size:0.65rem;">• ${item.device2}: <strong style="color:var(--primary-color);">${item.price2 || ''}</strong></div>`;
 
                 offersBuffer += `
-                    <tr id="offer_row_${item.id}" class="${item.id === highlightOfferId ? 'highlight-pulse' : ''}" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" data-id="${item.id}">
-                        <td style="text-align:center; display:flex; align-items:center; justify-content:center; gap:3px; padding-top:10px;">
-                            <span class="drag-handle" title="اسحب لتحريك العرض"><i class="fa-solid fa-grip-vertical"></i></span>
-                            <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)">
-                        </td>
-                        <td>
-                            ${pinnedBadge}<strong>${item.name}</strong> ${item.notes ? `<br><span class="tag-badge">${item.notes}</span>` : ''}
-                        </td>
-                        <td><span style="color:var(--primary-color); font-weight:700;">${item.category}</span></td>
-                        <td>${devicesDisplay}</td>
-                        <td><span class="price-badge">${item.price ? item.price : '-'}</span></td>
-                        <td style="text-align:center;">
+                    <div id="offer_card_${item.id}" class="offer-grid-card ${item.id === highlightOfferId ? 'highlight-pulse' : ''}" data-id="${item.id}">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.18rem;">
+                            <div style="display:flex; align-items:center; gap:0.3rem;">
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" title="اضغط واسحب من هنا لتحريك العرض"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)" style="width:13px; height:13px; accent-color:var(--primary-color);">
+                                <span style="font-size:0.6rem; color:var(--primary-color); font-weight:700;">${item.category}</span>
+                            </div>
                             <div class="actions-col-group">
                                 <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ"><i class="fa-solid fa-copy"></i></button>
                                 <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </div>
-                        </td>
-                    </tr>`;
+                        </div>
+                        <div>
+                            ${pinnedBadge}<strong style="font-size:0.75rem; color:var(--text-main);">${item.name}</strong>
+                            ${item.notes ? `<div style="margin-top:2px;"><span class="tag-badge">${item.notes}</span></div>` : ''}
+                        </div>
+                        ${devicesDisplay ? `<div style="background:var(--bg-card); padding:0.2rem; border-radius:4px; border:1px solid var(--border-color);">${devicesDisplay}</div>` : ''}
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.1rem;">
+                            <span style="font-size:0.62rem; color:var(--text-muted);">السعر النهائي:</span>
+                            <span class="price-badge">${item.price ? item.price : 'حسب الأجهزة'}</span>
+                        </div>
+                    </div>`;
             });
-            tbody.innerHTML = offersBuffer;
+            gridContainer.innerHTML = offersBuffer;
             updateFloatingOffersWindow();
         }
 
@@ -2797,9 +2790,9 @@
                 let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
 
                 inqBuffer += `
-                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" data-id="${item.id}">
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}">
                         <h3>
-                            <span class="drag-handle" title="اسحب لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اضغط واسحب من هنا لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                             <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
                             <div style="display:flex; gap:3px; align-items:center;">
                                 <button class="action-icon-btn" onclick="copyTextToClipboard('سؤال: ' + '${item.question}' + '\\nإجابة: ' + '${item.answer}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
@@ -2963,8 +2956,8 @@
                 syncToCloud(); renderCoordinators(); playChirpSound();
             } 
             else if (type === 'offer') {
-                const tr = e.target.closest('tr');
-                let targetId = tr ? parseInt(tr.getAttribute('data-id')) : null;
+                const card = e.target.closest('.offer-grid-card');
+                let targetId = card ? parseInt(card.getAttribute('data-id')) : null;
                 let sourceIndex = offersData.findIndex(o => o.id === draggedId);
                 if (sourceIndex === -1) return;
                 let movedItem = offersData.splice(sourceIndex, 1)[0];
@@ -3182,7 +3175,7 @@
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('offers', document.querySelectorAll('.nav-link')[4]);
             selectedOfferTab = cat; renderOffersTabs();
-            setTimeout(() => { renderOffers(id); document.getElementById('offer_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function jumpToSectionAndHighlightInquiry(id) {
