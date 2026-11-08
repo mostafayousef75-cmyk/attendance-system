@@ -92,7 +92,6 @@
 
         .kpi-bar { display: flex; gap: 0.35rem; align-items: center; }
         
-        /* تعديل تصميم المتواجدين الآن ليكون متناسقاً وشيكاً بالكامل */
         .kpi-card-unified { 
             background: linear-gradient(135deg, #1d4ed8, #2563eb); 
             border: 1px solid #60a5fa; 
@@ -176,12 +175,12 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
+        /* تعديل جوهري لمنع الفجوات نهائياً وضبط الارتفاع الحقيقي الفعلي للكروت */
         .coordinators-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
             gap: 0.4rem; 
-            align-items: flex-start !important; /* يجبر الحاوية على عدم مط الكروت المجاورة */
-            grid-auto-rows: max-content !important; /* كل صف ياخد ارتفاع أطول كارت فيه فقط دون تكبير الكروت القليلة */
+            align-items: start !important; 
         }
 
         .doc-sheet-card {
@@ -189,10 +188,10 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
-            height: fit-content !important; /* الكارت يأخذ ارتفاع النص المحتوى فقط */
-            min-height: 0 !important; /* إلغاء أي أدنى ارتفاع موروث */
+            height: auto !important; 
+            min-height: unset !important;
             max-height: max-content !important;
-            align-self: flex-start !important;
+            align-self: start !important;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
         .doc-sheet-card h3 { font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.12rem; margin-bottom: 0.08rem; display: flex; align-items: center; justify-content: space-between; }
@@ -275,12 +274,13 @@
             <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importJSON(this)">
         </div>
 
+        <!-- القائمة الجانبية مع تبديل دليل المنسقين والعروض والأسعار -->
         <ul class="nav-links" id="sidebarNavLinksList">
             <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
             <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
             <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
         </ul>
         
@@ -552,20 +552,7 @@
                 </div>
             </section>
 
-            <!-- 4. دليل المنسقين -->
-            <section id="coordinators-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                    <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
-                    <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
-                </div>
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين والوسوم..." oninput="renderCoordinators()">
-                </div>
-                <div class="coordinators-grid" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
-            </section>
-
-            <!-- 5. العروض والأسعار -->
+            <!-- 4. العروض والأسعار (تم تبديل مكانها) -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.25rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
@@ -599,6 +586,19 @@
                 </div>
 
                 <div class="offers-grid-container" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
+            </section>
+
+            <!-- 5. دليل المنسقين (تم تبديل مكانها) -->
+            <section id="coordinators-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                    <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
+                    <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
+                </div>
+                <div class="page-local-search">
+                    <i class="fa-solid fa-filter"></i>
+                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين والوسوم..." oninput="renderCoordinators()">
+                </div>
+                <div class="coordinators-grid" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
             </section>
 
             <!-- 6. دليل الاستفسارات -->
@@ -649,10 +649,10 @@
                 <input type="text" id="inputNav_alerts" class="form-control">
                 <label style="font-size:0.68rem;">الأقسام والأطباء:</label>
                 <input type="text" id="inputNav_depts-docs" class="form-control">
-                <label style="font-size:0.68rem;">دليل المنسقين:</label>
-                <input type="text" id="inputNav_coordinators" class="form-control">
                 <label style="font-size:0.68rem;">العروض والأسعار:</label>
                 <input type="text" id="inputNav_offers" class="form-control">
+                <label style="font-size:0.68rem;">دليل المنسقين:</label>
+                <input type="text" id="inputNav_coordinators" class="form-control">
                 <label style="font-size:0.68rem;">دليل الاستفسارات:</label>
                 <input type="text" id="inputNav_inquiries" class="form-control">
             </div>
@@ -1936,7 +1936,6 @@
             let countM = 0, countW = 0;
             const todayStr = new Date().toISOString().split('T')[0];
             
-            // فلترة وتصنيف مناوبات الجمعة القادمة فقط حسب التسلسل الزمني
             const sortedFridays = [...fridaySchedules].sort((a, b) => new Date(a.date) - new Date(b.date));
             const upcomingFridays = sortedFridays.filter(f => f.date >= todayStr);
             
@@ -2439,7 +2438,7 @@
                 let escapedText = (item.name + "\n" + detailsText).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 htmlBuffer += `
-                    <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem; height: fit-content !important; min-height: 0 !important; align-self: flex-start !important;">
+                    <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'}" data-id="${item.id}" style="padding: 0.4rem 0.5rem; gap: 0.25rem; height: auto !important; min-height: unset !important; max-height: max-content !important; align-self: start !important; flex: 0 0 auto !important;">
                         
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
@@ -2453,7 +2452,7 @@
                             </div>
                         </h3>
 
-                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: fit-content !important; min-height: 0 !important;">${detailsText.trim()}</div>
+                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.3rem 0.4rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: auto !important; min-height: unset !important; max-height: max-content !important;">${detailsText.trim()}</div>
 
                         ${tagsHtml}
 
@@ -2735,7 +2734,7 @@
                 let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
-                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem; height: auto !important; min-height: unset !important; align-self: start;">
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.4rem 0.5rem; gap: 0.25rem; height: auto !important; min-height: unset !important; max-height: max-content !important; align-self: start !important; flex: 0 0 auto !important;">
                         
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
@@ -2749,7 +2748,7 @@
                             </div>
                         </h3>
 
-                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: auto !important; min-height: unset !important;">${item.answer.trim()}</div>
+                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.3rem 0.4rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: auto !important; min-height: unset !important; max-height: max-content !important;">${item.answer.trim()}</div>
 
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.1rem;">
                             <span style="font-size: 0.58rem; color: #fde047; font-weight: 700;"><i class="fa-solid fa-folder-open"></i> ${item.category}</span>
@@ -2830,7 +2829,6 @@
                     let sourceIndex = listRef.findIndex(x => x.id === draggedId);
                     if (sourceIndex !== -1) {
                         let moved = listRef.splice(sourceIndex, 1)[0];
-                        // تحديد المكان المستهدف بدقة لو تم الإفلات فوق كارت تاني
                         const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card');
                         if (targetCard && targetCard.getAttribute('data-id')) {
                             let targetId = parseInt(targetCard.getAttribute('data-id'));
@@ -2845,7 +2843,6 @@
                         }
                         syncToCloud(); 
                         
-                        // إعادة رسم القسم المناسب بعد السحب والإفلات
                         if (type === 'inquiry') renderInquiries();
                         else if (type === 'offer') renderOffers();
                         else if (type === 'coordinator') renderCoordinators();
@@ -3009,7 +3006,7 @@
 
         function jumpToSectionAndHighlightOffer(id, cat) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            switchTab('offers', document.querySelectorAll('.nav-link')[3]);
             selectedOfferTab = cat; renderOffersTabs();
             setTimeout(() => { 
                 renderOffers(id); 
@@ -3042,7 +3039,7 @@
 
         function jumpToSectionAndHighlightCoordinator(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[4]);
             setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
