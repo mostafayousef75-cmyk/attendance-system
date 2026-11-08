@@ -1706,9 +1706,8 @@
 
         const standardDaysSequence = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 
-        // الصيغة المختصرة والمفهومة تماماً للأيام والدعوم
         function formatDaysSmart(daysArray) {
-            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "من السبت للجمعة";
+            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "السبت للأربعاء";
             let presentIndices = daysArray.map(d => standardDaysSequence.indexOf(d)).filter(idx => idx !== -1).sort((a,b) => a - b);
             if (presentIndices.length === 0) return daysArray.join('، ');
 
@@ -1718,12 +1717,13 @@
             }
 
             if (isConsecutive && presentIndices.length >= 2) {
-                return `من ${standardDaysSequence[presentIndices[0]]} لل${standardDaysSequence[presentIndices[presentIndices.length - 1]]}`;
+                return `${standardDaysSequence[presentIndices[0]]} للأربعاء`;
             } else {
                 return daysArray.join('، ');
             }
         }
 
+        // تنسيق عرض الدوام داخل الموقع (بدون أصفار ولا شرطة مائلة، وباستخدام كلمة "ومن")
         function generateDoctorTimingFormatted(doc) {
             let lines = [];
             let s1Days = doc.shift1Days || [];
@@ -1731,8 +1731,8 @@
             let s1Shifts = doc.shifts1 || [];
             
             if (s1Shifts.length > 0) {
-                let shiftTexts = s1Shifts.map(sh => `من ${getTimeLabelText(sh.start)} لـ ${getTimeLabelText(sh.end)}`).join(' ومن ');
-                lines.push(`${dayStr1} ${shiftTexts}`);
+                let shiftTexts = s1Shifts.map(sh => `${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`).join(' ومن ');
+                lines.push(`${dayStr1}: ${shiftTexts}`);
             }
 
             let countShifts = doc.shiftsCount || "1";
@@ -1742,19 +1742,32 @@
                 let s2Shifts = doc.shifts2 || [];
                 
                 if (s2Shifts.length > 0) {
-                    let shiftTexts = s2Shifts.map(sh => `من ${getTimeLabelText(sh.start)} لـ ${getTimeLabelText(sh.end)}`).join(' ومن ');
-                    lines.push(`يوم ${dayStr2} ${shiftTexts}`);
+                    let shiftTexts = s2Shifts.map(sh => `${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`).join(' ومن ');
+                    lines.push(`يوم ${dayStr2}: ${shiftTexts}`);
                 }
             }
             return lines.join('\n');
         }
 
+        // تنسيق النسخ المخصص والمريح للعميل في الواتساب
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
-            let formattedTiming = generateDoctorTimingFormatted(doc);
-            let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\nمواعيد الدوام:\n${formattedTiming}`;
+            
+            let s1Days = doc.shift1Days || [];
+            let dayStr1 = formatDaysSmart(s1Days);
+            let s1Shifts = doc.shifts1 || [];
+            
+            let timingLines = [];
+            if (s1Shifts.length > 0) {
+                timingLines.push(`• ${dayStr1}:`);
+                if (s1Shifts[0]) timingLines.push(`  - فترة صباحية: ${getTimeLabelText(s1Shifts[0].start)} - ${getTimeLabelText(s1Shifts[0].end)}`);
+                if (s1Shifts[1]) timingLines.push(`  - فترة مسائية: ${getTimeLabelText(s1Shifts[1].start)} - ${getTimeLabelText(s1Shifts[1].end)}`);
+            }
+
+            let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\n\nمواعيد الدوام:\n` + timingLines.join('\n');
             if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
+            
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
@@ -2082,7 +2095,6 @@
             applyTickerSpeed();
 
             let alertsBuffer = "";
-            // التعديل: التنبيهات الجديدة تظهر في الأعلى (الأحدث أولاً بعكس المصفوفة)
             [...alertsData].reverse().filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
                 if (item.pdfUrl) {
@@ -2182,7 +2194,6 @@
             if (id) {
                 alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; 
             } else {
-                // الجديد يضاف في النهاية لكي يعكسه الـ .reverse() في الأعلى
                 alertsData.push(alertObj);
             }
             
