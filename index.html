@@ -571,15 +571,7 @@
                     <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
                 </div>
                 
-                <div class="offers-tabs" id="inquiriesFilterTabs">
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الكل', this)">الكل</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأطباء وخدماتها', this)">الأطباء وخدماتها</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأجهزة', this)">الأجهزة</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأشعة والمختبر', this)">الأشعة والمختبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('أخرى', this)">أخرى</button>
-                </div>
+                <div class="offers-tabs" id="inquiriesFilterTabs"></div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
@@ -1333,6 +1325,7 @@
             renderCoordinators();
             renderOffersTabs();
             renderOffers();
+            renderInquiriesFilters();
             renderInquiries();
             updateActiveDoctorsKPI();
         }
@@ -1706,19 +1699,25 @@
         const standardDaysSequence = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 
         function formatDaysSmart(daysArray) {
-            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "السبت للأربعاء";
-            let presentIndices = daysArray.map(d => standardDaysSequence.indexOf(d)).filter(idx => idx !== -1).sort((a,b) => a - b);
-            if (presentIndices.length === 0) return daysArray.join('، ');
-
+            if (!daysArray || daysArray.length === 0) return "";
+            if (daysArray.length === 7) return "طوال أيام الأسبوع (السبت للجمعة)";
+            
+            let sorted = [...daysArray].sort((a, b) => standardDaysSequence.indexOf(a) - standardDaysSequence.indexOf(b));
+            
+            // فحص هل هي متتالية تماماً
             let isConsecutive = true;
-            for (let i = 0; i < presentIndices.length - 1; i++) {
-                if (presentIndices[i+1] !== presentIndices[i] + 1) { isConsecutive = false; break; }
+            let firstIdx = standardDaysSequence.indexOf(sorted[0]);
+            for (let i = 0; i < sorted.length; i++) {
+                if (standardDaysSequence.indexOf(sorted[i]) !== firstIdx + i) {
+                    isConsecutive = false;
+                    break;
+                }
             }
 
-            if (isConsecutive && presentIndices.length >= 2) {
-                return `${standardDaysSequence[presentIndices[0]]} للأربعاء`;
+            if (isConsecutive && sorted.length >= 2) {
+                return `${sorted[0]} إلى ${sorted[sorted.length - 1]}`;
             } else {
-                return daysArray.join('، ');
+                return sorted.join('، ');
             }
         }
 
@@ -1730,7 +1729,7 @@
             
             if (s1Shifts.length > 0) {
                 let shiftTexts = s1Shifts.map(sh => `${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`).join(' ومن ');
-                lines.push(`${dayStr1}: ${shiftTexts}`);
+                lines.push(dayStr1 ? `${dayStr1}: ${shiftTexts}` : shiftTexts);
             }
 
             let countShifts = doc.shiftsCount || "1";
@@ -1741,20 +1740,18 @@
                 
                 if (s2Shifts.length > 0) {
                     let shiftTexts = s2Shifts.map(sh => `${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`).join(' ومن ');
-                    lines.push(`يوم ${dayStr2}: ${shiftTexts}`);
+                    lines.push(dayStr2 ? `يوم ${dayStr2}: ${shiftTexts}` : shiftTexts);
                 }
             }
             return lines.join('\n');
         }
 
-        // دالة نسخ بيانات الدكتور للعميل (تدعم فترتين وتصنيف صباحي/مسائي سليم)
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
             
             let timingLines = [];
             
-            // الفترة الأولى
             let s1Days = doc.shift1Days || [];
             let dayStr1 = formatDaysSmart(s1Days);
             let s1Shifts = doc.shifts1 || [];
@@ -1767,7 +1764,6 @@
                 });
             }
 
-            // الفترة الثانية (لو موجودة مثل يوم الخميس)
             if (doc.shiftsCount === "2") {
                 let s2Days = doc.shift2Days || [];
                 let dayStr2 = formatDaysSmart(s2Days);
@@ -2634,6 +2630,24 @@
         }
 
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        
+        function renderInquiriesFilters() {
+            const container = document.getElementById('inquiriesFilterTabs');
+            if (!container) return;
+            
+            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر", "أخرى"];
+            const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
+            const allCategories = ["الكل", ...staticCategories, ...customCategories];
+
+            let html = "";
+            allCategories.forEach(cat => {
+                let count = cat === "الكل" ? inquiriesData.length : inquiriesData.filter(i => i.category === cat).length;
+                let activeClass = (selectedInquiryFilter === cat) ? "active" : "";
+                html += `<button class="offer-tab-btn ${activeClass}" onclick="filterInquiryCategory('${cat}', this)">${cat} (${count})</button>`;
+            });
+            container.innerHTML = html;
+        }
+
         function filterInquiryCategory(cat, btn) {
             selectedInquiryFilter = cat;
             localStorage.setItem('selectedInquiryFilter', cat);
@@ -2643,6 +2657,7 @@
         }
 
         function renderInquiries(highlightId = null) {
+            renderInquiriesFilters();
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             
