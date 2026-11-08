@@ -830,7 +830,7 @@
         </div>
     </div>
 
-    <!-- نموذج التنبيهات المحدث مع رفع الصور الفعلي Base64 ورابط PDF -->
+    <!-- نموذج التنبيهات المحدث مع خيار حذف الوسائط المرفوعة -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -847,11 +847,17 @@
                 <input type="text" id="alertTags" class="form-control" placeholder="مثال: تنبيه، عاجل، إداري">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر:</label>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label style="color:var(--primary-color); font-weight:700;">رابط ملف PDF مباشر:</label>
+                    <button type="button" class="btn btn-danger" style="padding:0.05rem 0.2rem; font-size:0.55rem;" onclick="clearAlertPdf()"><i class="fa-solid fa-xmark"></i> حذف الرابط</button>
+                </div>
                 <input type="text" id="alertPdfUrl" class="form-control" placeholder="https://... رابط ملف الـ PDF">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label style="color:var(--primary-color); font-weight:700;">رفع صورة من جهازك مباشرة:</label>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label style="color:var(--primary-color); font-weight:700;">رفع صورة من جهازك مباشرة:</label>
+                    <button type="button" class="btn btn-danger" style="padding:0.05rem 0.2rem; font-size:0.55rem;" onclick="clearAlertImage()"><i class="fa-solid fa-xmark"></i> حذف الصوره المرفوعة</button>
+                </div>
                 <input type="file" id="alertImgFile" class="form-control" accept="image/*" onchange="previewUploadedImage(this)">
                 <input type="hidden" id="alertImgBase64">
                 <div id="imgPreviewContainer" style="margin-top:0.2rem;"></div>
@@ -1180,19 +1186,19 @@
 
         function populateHourSelectOptions() {
             let times = [
-                { val: "24", text: "24 ساعة (طوال اليوم)" }, { val: "0", text: "12:00 صباحاً" }, { val: "0.5", text: "12:30 صباحاً" },
-                { val: "1", text: "1:00 صباحاً" }, { val: "1.5", text: "1:30 صباحاً" }, { val: "2", text: "2:00 صباحاً" }, { val: "2.5", text: "2:30 صباحاً" },
-                { val: "3", text: "3:00 صباحاً" }, { val: "3.5", text: "3:30 صباحاً" }, { val: "4", text: "4:00 صباحاً" }, { val: "4.5", text: "4:30 صباحاً" },
-                { val: "5", text: "5:00 صباحاً" }, { val: "5.5", text: "5:30 صباحاً" }, { val: "6", text: "6:00 صباحاً" }, { val: "6.5", text: "6:30 صباحاً" },
-                { val: "7", text: "7:00 صباحاً" }, { val: "7.5", text: "7:30 صباحاً" }, { val: "8", text: "8:00 صباحاً" }, { val: "8.5", text: "8:30 صباحاً" },
-                { val: "9", text: "9:00 صباحاً" }, { val: "9.5", text: "9:30 صباحاً" }, { val: "10", text: "10:00 صباحاً" }, { val: "10.5", text: "10:30 صباحاً" },
-                { val: "11", text: "11:00 صباحاً" }, { val: "11.5", text: "11:30 صباحاً" }, { val: "12", text: "12:00 ظهراً" }, { val: "12.5", text: "12:30 ظهراً" },
-                { val: "13", text: "1:00 مساءً" }, { val: "13.5", text: "1:30 مساءً" }, { val: "14", text: "2:00 مساءً" }, { val: "14.5", text: "2:30 مساءً" },
-                { val: "15", text: "3:00 مساءً" }, { val: "15.5", text: "3:30 مساءً" }, { val: "16", text: "4:00 مساءً" }, { val: "16.5", text: "4:30 مساءً" },
-                { val: "17", text: "5:00 مساءً" }, { val: "17.5", text: "5:30 مساءً" }, { val: "18", text: "6:00 مساءً" }, { val: "18.5", text: "6:30 مساءً" },
-                { val: "19", text: "7:00 مساءً" }, { val: "19.5", text: "7:30 مساءً" }, { val: "20", text: "8:00 مساءً" }, { val: "20.5", text: "8:30 مساءً" },
-                { val: "21", text: "9:00 مساءً" }, { val: "21.5", text: "9:30 مساءً" }, { val: "22", text: "10:00 مساءً" }, { val: "22.5", text: "10:30 مساءً" },
-                { val: "23", text: "11:00 مساءً" }, { val: "23.5", text: "11:30 مساءً" }
+                { val: "24", text: "24 ساعة (طوال اليوم)" }, { val: "0", text: "12:00 ص" }, { val: "0.5", text: "12:30 ص" },
+                { val: "1", text: "1:00 ص" }, { val: "1.5", text: "1:30 ص" }, { val: "2", text: "2:00 ص" }, { val: "2.5", text: "2:30 ص" },
+                { val: "3", text: "3:00 ص" }, { val: "3.5", text: "3:30 ص" }, { val: "4", text: "4:00 ص" }, { val: "4.5", text: "4:30 ص" },
+                { val: "5", text: "5:00 ص" }, { val: "5.5", text: "5:30 ص" }, { val: "6", text: "6:00 ص" }, { val: "6.5", text: "6:30 ص" },
+                { val: "7", text: "7:00 ص" }, { val: "7.5", text: "7:30 ص" }, { val: "8", text: "8:00 ص" }, { val: "8.5", text: "8:30 ص" },
+                { val: "9", text: "9ص" }, { val: "9.5", text: "9:30ص" }, { val: "10", text: "10ص" }, { val: "10.5", text: "10:30ص" },
+                { val: "11", text: "11ص" }, { val: "11.5", text: "11:30ص" }, { val: "12", text: "12م" }, { val: "12.5", text: "12:30م" },
+                { val: "13", text: "1م" }, { val: "13.5", text: "1:30م" }, { val: "14", text: "2م" }, { val: "14.5", text: "2:30م" },
+                { val: "15", text: "3م" }, { val: "15.5", text: "3:30م" }, { val: "16", text: "4م" }, { val: "16.5", text: "4:30م" },
+                { val: "17", text: "5م" }, { val: "17.5", text: "5:30م" }, { val: "18", text: "6م" }, { val: "18.5", text: "6:30م" },
+                { val: "19", text: "7م" }, { val: "19.5", text: "7:30م" }, { val: "20", text: "8م" }, { val: "20.5", text: "8:30م" },
+                { val: "21", text: "9م" }, { val: "21.5", text: "9:30م" }, { val: "22", text: "10م" }, { val: "22.5", text: "10:30م" },
+                { val: "23", text: "11م" }, { val: "23.5", text: "11:30م" }
             ];
             globalHoursOptionsHTML = "";
             times.forEach(t => { globalHoursOptionsHTML += `<option value="${t.val}">${t.text}</option>`; });
@@ -1688,36 +1694,36 @@
                 "24": "24 ساعة", "0": "12:00 ص", "0.5": "12:30 ص", "1": "1:00 ص", "1.5": "1:30 ص",
                 "2": "2:00 ص", "2.5": "2:30 ص", "3": "3:00 ص", "3.5": "3:30 ص", "4": "4:00 ص", "4.5": "4:30 ص",
                 "5": "5:00 ص", "5.5": "5:30 ص", "6": "6:00 ص", "6.5": "6:30 ص", "7": "7:00 ص", "7.5": "7:30 ص",
-                "8": "8:00 ص", "8.5": "8:30 ص", "9": "9:00 ص", "9.5": "9:30 ص", "10": "10:00 ص", "10.5": "10:30 ص",
-                "11": "11:00 ص", "11.5": "11:30 ص", "12": "12:00 م", "12.5": "12:30 م", "13": "1:00 م", "13.5": "1:30 م",
-                "14": "2:00 م", "14.5": "2:30 م", "15": "3:00 م", "15.5": "3:30 م", "16": "4:00 م", "16.5": "4:30 م",
-                "17": "5:00 م", "17.5": "5:30 م", "18": "6:00 م", "18.5": "6:30 م", "19": "7:00 م", "19.5": "7:30 م",
-                "20": "8:00 م", "20.5": "8:30 م", "21": "9:00 م", "21.5": "9:30 م", "22": "10:00 م", "22.5": "10:30 م",
-                "23": "11:00 م", "23.5": "11:30 م"
+                "8": "8:00 ص", "8.5": "8:30 ص", "9": "9ص", "9.5": "9:30ص", "10": "10ص", "10.5": "10:30ص",
+                "11": "11ص", "11.5": "11:30ص", "12": "12م", "12.5": "12:30م", "13": "1م", "13.5": "1:30م",
+                "14": "2م", "14.5": "2:30م", "15": "3م", "15.5": "3:30م", "16": "4م", "16.5": "4:30م",
+                "17": "5م", "17.5": "5:30م", "18": "6م", "18.5": "6:30م", "19": "7م", "19.5": "7:30م",
+                "20": "8م", "20.5": "8:30م", "21": "9م", "21.5": "9:30م", "22": "10م", "22.5": "10:30م",
+                "23": "11م", "23.5": "11:30م"
             };
             return timesMap[String(val)] || val;
         }
 
         const standardDaysSequence = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 
+        // الصيغة المختصرة والمفهومة تماماً للأيام والدعوم
         function formatDaysSmart(daysArray) {
-            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "[كل الأيام]";
+            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "من السبت للجمعة";
             let presentIndices = daysArray.map(d => standardDaysSequence.indexOf(d)).filter(idx => idx !== -1).sort((a,b) => a - b);
-            if (presentIndices.length === 0) return `[${daysArray.join(',')}]`;
+            if (presentIndices.length === 0) return daysArray.join('، ');
 
             let isConsecutive = true;
             for (let i = 0; i < presentIndices.length - 1; i++) {
                 if (presentIndices[i+1] !== presentIndices[i] + 1) { isConsecutive = false; break; }
             }
 
-            if (isConsecutive && presentIndices.length >= 3) {
-                return `[${standardDaysSequence[presentIndices[0]]}-${standardDaysSequence[presentIndices[presentIndices.length - 1]]}]`;
+            if (isConsecutive && presentIndices.length >= 2) {
+                return `من ${standardDaysSequence[presentIndices[0]]} لل${standardDaysSequence[presentIndices[presentIndices.length - 1]]}`;
             } else {
-                return `[${daysArray.join(',')}]`;
+                return daysArray.join('، ');
             }
         }
 
-        // التعديل المختصر الذكي لجدول المواعيد لسرعة الرد على العميل
         function generateDoctorTimingFormatted(doc) {
             let lines = [];
             let s1Days = doc.shift1Days || [];
@@ -1725,7 +1731,7 @@
             let s1Shifts = doc.shifts1 || [];
             
             if (s1Shifts.length > 0) {
-                let shiftTexts = s1Shifts.map(sh => `${getTimeLabelText(sh.start)} ← ${getTimeLabelText(sh.end)}`).join(' | ');
+                let shiftTexts = s1Shifts.map(sh => `من ${getTimeLabelText(sh.start)} لـ ${getTimeLabelText(sh.end)}`).join(' ومن ');
                 lines.push(`${dayStr1} ${shiftTexts}`);
             }
 
@@ -1736,8 +1742,8 @@
                 let s2Shifts = doc.shifts2 || [];
                 
                 if (s2Shifts.length > 0) {
-                    let shiftTexts = s2Shifts.map(sh => `${getTimeLabelText(sh.start)} ← ${getTimeLabelText(sh.end)}`).join(' | ');
-                    lines.push(`${dayStr2} ${shiftTexts}`);
+                    let shiftTexts = s2Shifts.map(sh => `من ${getTimeLabelText(sh.start)} لـ ${getTimeLabelText(sh.end)}`).join(' ومن ');
+                    lines.push(`يوم ${dayStr2} ${shiftTexts}`);
                 }
             }
             return lines.join('\n');
@@ -2076,7 +2082,8 @@
             applyTickerSpeed();
 
             let alertsBuffer = "";
-            alertsData.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
+            // التعديل: التنبيهات الجديدة تظهر في الأعلى (الأحدث أولاً بعكس المصفوفة)
+            [...alertsData].reverse().filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
                 if (item.pdfUrl) {
                     mediaHtml += `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> PDF</a> `;
@@ -2130,6 +2137,19 @@
             }
         }
 
+        function clearAlertPdf() {
+            document.getElementById('alertPdfUrl').value = "";
+            playChirpSound();
+        }
+
+        function clearAlertImage() {
+            document.getElementById('alertImgFile').value = "";
+            document.getElementById('alertImgBase64').value = "";
+            document.getElementById('alertImgBase64').removeAttribute('data-existing');
+            document.getElementById('imgPreviewContainer').innerHTML = "";
+            playChirpSound();
+        }
+
         function openAlertModal() {
             document.getElementById('alertId').value = ""; 
             document.getElementById('alertContent').value = "";
@@ -2137,6 +2157,7 @@
             document.getElementById('alertPdfUrl').value = "";
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = "";
+            document.getElementById('alertImgBase64').removeAttribute('data-existing');
             document.getElementById('imgPreviewContainer').innerHTML = "";
             document.getElementById('alertModal').classList.add('active');
         }
@@ -2158,8 +2179,12 @@
                 time: new Date().toLocaleString('en-US') 
             };
             
-            if (id) alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; 
-            else alertsData.push(alertObj);
+            if (id) {
+                alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; 
+            } else {
+                // الجديد يضاف في النهاية لكي يعكسه الـ .reverse() في الأعلى
+                alertsData.push(alertObj);
+            }
             
             syncToCloud(); 
             closeModal('alertModal'); 
