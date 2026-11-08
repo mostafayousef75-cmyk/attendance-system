@@ -175,13 +175,21 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
-        .coordinators-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 0.4rem; 
-            align-items: flex-start !important;
-            grid-auto-rows: max-content !important;
-        }
+        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات (متعددة ومتقدمة) --- */
+        .cards-view-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: flex-start !important; grid-auto-rows: max-content !important; }
+        
+        /* 1. شبكة متساوية القياس (Grid Equal) */
+        .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; }
+        /* 2. تداخل مرن ومتراص (Masonry Dense) */
+        .cards-view-grid.view-mode-dense { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .cards-view-grid.view-mode-dense > div { flex: 1 1 240px; }
+        /* 3. عرض عمود واحد ممتد بالكامل (Row Stack) */
+        .cards-view-grid.view-mode-rowStack { display: flex; flex-direction: column; gap: 0.4rem; }
+        /* 4. عرض مكثف وصغير (Compact Cards) */
+        .cards-view-grid.view-mode-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.3rem; }
+        .cards-view-grid.view-mode-compact .doc-sheet-card { padding: 0.25rem 0.35rem; font-size: 0.62rem; }
+        /* 5. شبكة واسعة بثلاثة أعمدة (Grid Wide 3 Cols) */
+        .cards-view-grid.view-mode-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; }
 
         .doc-sheet-card {
             border-radius: 8px;
@@ -208,20 +216,15 @@
         .offer-tab-btn:hover { border-color: var(--primary-color); }
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
-        /* --- خيارات طرق العرض المتعددة والمتقدمة لقسم العروض والأسعار --- */
+        /* --- أنظمة العرض لقسم العروض والأسعار --- */
         .offers-grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 0.4rem; }
         
-        /* 1. عرض عمود واحد ممتد */
         .offers-grid-container.offers-mode-row1 { display: flex; flex-direction: column; gap: 0.4rem; }
-        /* 2. عرض عمودين قياسي */
         .offers-grid-container.offers-mode-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-        /* 3. عرض ثلاثي أعمدة واسع */
         .offers-grid-container.offers-mode-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; }
-        /* 4. بطاقات مركزية بارزة (سنتر) */
         .offers-grid-container.offers-mode-centered { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.5rem; text-align: center !important; }
         .offers-grid-container.offers-mode-centered .price-badge { margin: 0.3rem auto; font-size: 0.9rem; padding: 0.2rem 0.8rem; }
         .offers-grid-container.offers-mode-centered .offer-grid-card { align-items: center; }
-        /* 5. بطاقات مكثفة وصغيرة */
         .offers-grid-container.offers-mode-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.3rem; }
         .offers-grid-container.offers-mode-compact .offer-grid-card { padding: 0.3rem; font-size: 0.65rem; }
 
@@ -266,6 +269,7 @@
             .split-grid { grid-template-columns: 1fr; }
             .alerts-2col-grid { grid-template-columns: 1fr; }
             .offers-grid-container { grid-template-columns: 1fr !important; }
+            .cards-view-grid { grid-template-columns: 1fr !important; }
             .top-header { flex-direction: column; align-items: stretch; }
             .search-container { max-width: 100%; width: 100%; }
         }
@@ -292,9 +296,10 @@
             <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
             <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
             <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
-            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
+            <!-- الترتيب المطلوب للأخير: العروض والأسعار، ثم دليل الاستفسارات، ثم دليل المنسقين -->
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
+            <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
         </ul>
         
         <div class="sidebar-cloud-status" id="cloudStatusBadge" title="حالة الحفظ المحلي والسحابي">
@@ -565,26 +570,12 @@
                 </div>
             </section>
 
-            <!-- 4. دليل المنسقين -->
-            <section id="coordinators-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                    <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
-                    <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
-                </div>
-                <div class="page-local-search">
-                    <i class="fa-solid fa-filter"></i>
-                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين والوسوم..." oninput="renderCoordinators()">
-                </div>
-                <div class="coordinators-grid" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
-            </section>
-
-            <!-- 5. العروض والأسعار (مع قائمة واسعة لأوضاع العرض المتعددة والمحفوظة تماماً) -->
+            <!-- 4. العروض والأسعار -->
             <section id="offers-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.25rem;">
                     <h2>جدول العروض والأسعار المعتمدة بالعيادات</h2>
                     <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
                         
-                        <!-- قائمة أوضاع العرض المتعددة لقسم العروض والأسعار -->
                         <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                             <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
                             <select id="offersViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:150px;" onchange="changeOffersViewMode(this.value)">
@@ -623,11 +614,24 @@
                 <div class="offers-grid-container offers-mode-grid2" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
             </section>
 
-            <!-- 6. دليل الاستفسارات -->
+            <!-- 5. دليل الاستفسارات (مع زرار لتغيير طريقة العرض وثبات تام) -->
             <section id="inquiries-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
-                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
+                    
+                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
+                            <select id="inquiriesViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeInquiriesViewMode(this.value)">
+                                <option value="view-mode-gridEqual">1. شبكة متساوية (Grid Equal)</option>
+                                <option value="view-mode-dense">2. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
+                                <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
+                                <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
+                    </div>
                 </div>
                 
                 <div class="offers-tabs" id="inquiriesFilterTabs"></div>
@@ -636,7 +640,34 @@
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="inquirySearchInput" placeholder="بحث في الاستفسارات والوسوم..." oninput="renderInquiries()">
                 </div>
-                <div class="coordinators-grid" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
+                <div class="cards-view-grid view-mode-gridEqual" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
+            </section>
+
+            <!-- 6. دليل المنسقين (مع زرار لتغيير طريقة العرض وثبات تام) -->
+            <section id="coordinators-section" class="page-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
+                    <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
+                    
+                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
+                            <select id="coordinatorsViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeCoordinatorsViewMode(this.value)">
+                                <option value="view-mode-gridEqual">1. شبكة متساوية (Grid Equal)</option>
+                                <option value="view-mode-dense">2. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
+                                <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
+                                <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-green" onclick="openCoordinatorModal()"><i class="fa-solid fa-plus"></i> إضافة تعليمات</button>
+                    </div>
+                </div>
+                
+                <div class="page-local-search">
+                    <i class="fa-solid fa-filter"></i>
+                    <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين والوسوم..." oninput="renderCoordinators()">
+                </div>
+                <div class="cards-view-grid view-mode-gridEqual" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
             </section>
         </div>
     </main>
@@ -671,12 +702,12 @@
                 <input type="text" id="inputNav_alerts" class="form-control">
                 <label style="font-size:0.68rem;">الأقسام والأطباء:</label>
                 <input type="text" id="inputNav_depts-docs" class="form-control">
-                <label style="font-size:0.68rem;">دليل المنسقين:</label>
-                <input type="text" id="inputNav_coordinators" class="form-control">
                 <label style="font-size:0.68rem;">العروض والأسعار:</label>
                 <input type="text" id="inputNav_offers" class="form-control">
                 <label style="font-size:0.68rem;">دليل الاستفسارات:</label>
                 <input type="text" id="inputNav_inquiries" class="form-control">
+                <label style="font-size:0.68rem;">دليل المنسقين:</label>
+                <input type="text" id="inputNav_coordinators" class="form-control">
             </div>
             <button class="btn btn-green" style="margin-top:0.35rem;" onclick="saveSidebarNames()">حفظ التعديلات</button>
         </div>
@@ -1209,8 +1240,10 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // --- نظام حفظ واسترجاع أوضاع العرض المتعددة لقسم العروض والأسعار ---
+        // --- أوضاع العرض المحفوظة تماماً في LocalStorage ---
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
+        let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-gridEqual';
+        let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-gridEqual';
 
         function changeOffersViewMode(modeClass) {
             currentOffersViewMode = modeClass;
@@ -1223,15 +1256,41 @@
             const container = document.getElementById('offersGridContainerBox');
             const selectElem = document.getElementById('offersViewModeSelect');
             if (!container) return;
-            
-            // إزالة جميع كلاسات الأوضاع القديمة
             container.classList.remove('offers-mode-grid2', 'offers-mode-row1', 'offers-mode-centered', 'offers-mode-compact', 'offers-mode-grid3');
-            // إضافة الكلاس المختار حديثاً
             container.classList.add(currentOffersViewMode);
-            
-            if (selectElem) {
-                selectElem.value = currentOffersViewMode;
-            }
+            if (selectElem) selectElem.value = currentOffersViewMode;
+        }
+
+        function changeInquiriesViewMode(modeClass) {
+            currentInquiriesViewMode = modeClass;
+            localStorage.setItem('inquiries_view_mode_choice', modeClass);
+            applyInquiriesViewModeUI();
+            playChirpSound();
+        }
+
+        function applyInquiriesViewModeUI() {
+            const container = document.getElementById('inquiryCardsGrid');
+            const selectElem = document.getElementById('inquiriesViewModeSelect');
+            if (!container) return;
+            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
+            container.classList.add(currentInquiriesViewMode);
+            if (selectElem) selectElem.value = currentInquiriesViewMode;
+        }
+
+        function changeCoordinatorsViewMode(modeClass) {
+            currentCoordinatorsViewMode = modeClass;
+            localStorage.setItem('coordinators_view_mode_choice', modeClass);
+            applyCoordinatorsViewModeUI();
+            playChirpSound();
+        }
+
+        function applyCoordinatorsViewModeUI() {
+            const container = document.getElementById('coordinatorsGrid');
+            const selectElem = document.getElementById('coordinatorsViewModeSelect');
+            if (!container) return;
+            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
+            container.classList.add(currentCoordinatorsViewMode);
+            if (selectElem) selectElem.value = currentCoordinatorsViewMode;
         }
 
         let globalHoursOptionsHTML = "";
@@ -1399,6 +1458,8 @@
             if (isSidebarCollapsed) document.getElementById('appSidebar').classList.add('collapsed');
 
             applyOffersViewModeUI();
+            applyInquiriesViewModeUI();
+            applyCoordinatorsViewModeUI();
             populateHourSelectOptions();
 
             document.getElementById('shiftScratchpadText1').value = localStorage.getItem('shift_scratchpad_1') || '';
@@ -2446,9 +2507,12 @@
             if (confirm("حذف؟")) { deptNotesData.splice(idx, 1); syncToCloud(); playChirpSound(); }
         }
 
-        function renderCoordinators() {
+        function renderCoordinators(highlightId = null) {
             const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; grid.innerHTML = "";
+            const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; 
+            
+            // تطبيق وضع العرض المحفوظ لدليل المنسقين
+            applyCoordinatorsViewModeUI();
             
             let htmlBuffer = "";
             coordinatorsData.filter(c => (!search || (c.searchKey && c.searchKey.includes(search)))).forEach((item) => {
@@ -2462,7 +2526,7 @@
                 let escapedText = (item.name + "\n" + detailsText).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 htmlBuffer += `
-                    <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem; height: fit-content !important; min-height: 0 !important; align-self: flex-start !important;">
+                    <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
                         
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
@@ -2476,7 +2540,7 @@
                             </div>
                         </h3>
 
-                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: fit-content !important; min-height: 0 !important;">${detailsText.trim()}</div>
+                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${detailsText.trim()}</div>
 
                         ${tagsHtml}
 
@@ -2630,7 +2694,6 @@
             const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const gridContainer = document.getElementById('offersGridContainerBox'); if (!gridContainer) return;
 
-            // تطبيق وضع العرض الحالي المختار
             applyOffersViewModeUI();
 
             let sorted = [...offersData].sort((a, b) => (a.isPinned && !b.isPinned) ? -1 : (!a.isPinned && b.isPinned) ? 1 : 0);
@@ -2752,7 +2815,10 @@
 
         function renderInquiries(highlightId = null) {
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
+            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; 
+            
+            // تطبيق وضع العرض المحفوظ لدليل الاستفسارات
+            applyInquiriesViewModeUI();
             
             let inqBuffer = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
@@ -2761,7 +2827,7 @@
                 let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
-                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem; height: auto !important; min-height: unset !important; align-self: start;">
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
                         
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
@@ -2775,7 +2841,7 @@
                             </div>
                         </h3>
 
-                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: auto !important; min-height: unset !important;">${item.answer.trim()}</div>
+                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${item.answer.trim()}</div>
 
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.1rem;">
                             <span style="font-size: 0.58rem; color: #fde047; font-weight: 700;"><i class="fa-solid fa-folder-open"></i> ${item.category}</span>
@@ -3033,7 +3099,7 @@
 
         function jumpToSectionAndHighlightOffer(id, cat) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            switchTab('offers', document.querySelectorAll('.nav-link')[3]); // تم تحديث الترتيب
             selectedOfferTab = cat; renderOffersTabs();
             setTimeout(() => { 
                 renderOffers(id); 
@@ -3048,7 +3114,7 @@
 
         function jumpToSectionAndHighlightInquiry(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[4]); // تم تحديث الترتيب
             setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
@@ -3066,7 +3132,7 @@
 
         function jumpToSectionAndHighlightCoordinator(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[5]); // تم تحديث الترتيب
             setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
