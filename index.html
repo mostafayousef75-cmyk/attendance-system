@@ -177,7 +177,17 @@
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
         .coordinators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.35rem; align-items: start; }
-        .doc-sheet-card { border-radius: 8px; padding: 0.35rem 0.45rem; color: #fff; display: flex; flex-direction: column; gap: 0.12rem; font-size: 0.7rem; line-height: 1.2; box-shadow: 0 2px 6px rgba(0,0,0,0.2); position: relative; }
+        .doc-sheet-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    height: auto !important; /* إلغاء أي ارتفاع ثابت للكارت */
+    min-height: unset !important; /* إلغاء أي ارتفاع أدنى يحبس الفراغات */
+    justify-content: flex-start !important;
+    align-self: start !important; /* منع الكارت من التمدد في الـ Grid ليناسب طول جاره */
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
         .doc-sheet-card h3 { font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.12rem; margin-bottom: 0.08rem; display: flex; align-items: center; justify-content: space-between; }
 
         .card-teal { background-color: #0d47a1; }
@@ -2413,28 +2423,27 @@
             let htmlBuffer = "";
             coordinatorsData.filter(c => (!search || (c.searchKey && c.searchKey.includes(search)))).forEach((item) => {
                 
-                let detailsText = item.details || item.note || item.phone || '';
-                let tagsHtml = item.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.15rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.1rem;"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
+                // البحث عن نص التفاصيل بأي اسم حقل متوفر في بيانات المنسق
+                let detailsText = item.details || item.content || item.text || item.desc || item.note || item.phone || '';
+                let tagsHtml = item.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
                 let escapedText = (item.name + "\n" + detailsText).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 htmlBuffer += `
-                    <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'}" data-id="${item.id}" style="padding: 0.3rem 0.4rem; gap: 0.15rem;">
+                    <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem; height: auto !important; min-height: unset !important; align-self: start;">
                         
-                        <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.1rem; margin-bottom: 0.08rem;">
-                            <div style="display: flex; align-items: center; gap: 0.2rem; overflow: hidden;">
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'coordinator')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.65rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                <span style="font-size: 0.72rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</span>
+                        <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'coordinator')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</span>
                             </div>
                             <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedText}', 'تم نسخ بيانات المنسق:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 18px; height: 16px; font-size: 0.55rem;"><i class="fa-solid fa-copy"></i></button>
-                                <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${item.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 18px; height: 16px; font-size: 0.55rem;"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 18px; height: 16px; font-size: 0.55rem;"><i class="fa-solid fa-trash"></i></button>
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedText}', 'تم نسخ بيانات المنسق:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editCoordinator(${item.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
 
-                        <div style="font-size: 0.65rem; line-height: 1.25; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.2rem 0.3rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">
-                            ${detailsText.trim()}
-                        </div>
+                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: auto !important; min-height: unset !important;">${detailsText.trim()}</div>
 
                         ${tagsHtml}
 
@@ -2712,30 +2721,28 @@
             let inqBuffer = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
                 
-                let tagsHtml = item.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.15rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.1rem;"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
+                let tagsHtml = item.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
                 let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
-                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.3rem 0.4rem; gap: 0.15rem;">
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem; height: auto !important; min-height: unset !important; align-self: start;">
                         
-                        <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.1rem; margin-bottom: 0.08rem;">
-                            <div style="display: flex; align-items: center; gap: 0.2rem; overflow: hidden;">
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.65rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                <span style="font-size: 0.72rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.question}</span>
+                        <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.question}</span>
                             </div>
                             <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedInqText}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 18px; height: 16px; font-size: 0.55rem;"><i class="fa-solid fa-copy"></i></button>
-                                <button class="action-icon-btn btn-edit-ic" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 18px; height: 16px; font-size: 0.55rem;"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-icon-btn btn-del-ic" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 18px; height: 16px; font-size: 0.55rem;"><i class="fa-solid fa-trash"></i></button>
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedInqText}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
 
-                        <div style="font-size: 0.65rem; line-height: 1.25; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.2rem 0.3rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">
-                            ${item.answer.trim()}
-                        </div>
+                        <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); height: auto !important; min-height: unset !important;">${item.answer.trim()}</div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.02rem;">
-                            <span style="font-size: 0.55rem; color: #fde047; font-weight: 700;"><i class="fa-solid fa-folder-open"></i> ${item.category}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.1rem;">
+                            <span style="font-size: 0.58rem; color: #fde047; font-weight: 700;"><i class="fa-solid fa-folder-open"></i> ${item.category}</span>
                         </div>
                         ${tagsHtml}
 
