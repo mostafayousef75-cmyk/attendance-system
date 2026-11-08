@@ -2615,33 +2615,34 @@
         
         let devicesDisplay = "";
         if (item.device1 || item.device2) {
-            devicesDisplay += `<div class="offer-devices-box" style="margin: 0 auto; text-align: center; width: 100%;">`;
-            if (item.device1) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;"><span style="color:var(--text-main); font-weight:600;">• ${item.device1}</span><strong style="color:var(--primary-color); font-weight:700; font-size:0.72rem;">${item.price1 || ''}</strong></div>`;
-            if (item.device2) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;"><span style="color:var(--text-main); font-weight:600;">• ${item.device2}</span><strong style="color:var(--primary-color); font-weight:700; font-size:0.72rem;">${item.price2 || ''}</strong></div>`;
+            devicesDisplay += `<div class="offer-devices-box" style="margin: 0.2rem auto; text-align: center; width: 85%; display: flex; flex-direction: column; gap: 0.2rem;">`;
+            // الأجهزة وأسعارها أصبحت في منتصف الكارت وبشكل متناسق
+            if (item.device1) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; background: rgba(0,0,0,0.15); padding: 0.15rem 0.4rem; border-radius: 4px;"><span style="color:var(--text-main); font-weight:600;">• ${item.device1}</span><strong style="color:var(--primary-color); font-weight:700; font-size:0.72rem;">${item.price1 || ''}</strong></div>`;
+            if (item.device2) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; background: rgba(0,0,0,0.15); padding: 0.15rem 0.4rem; border-radius: 4px;"><span style="color:var(--text-main); font-weight:600;">• ${item.device2}</span><strong style="color:var(--primary-color); font-weight:700; font-size:0.72rem;">${item.price2 || ''}</strong></div>`;
             devicesDisplay += `</div>`;
         }
 
         const isHighlighted = (item.id === highlightOfferId) ? 'highlight-pulse' : '';
 
-        // تصميم الكارت المتناسق: خطوط أصغر، الوسوم والملحوظات في المنتصف تماماً
+        // التصميم النهائي: الأجهزة والوسوم في المنتصف، السعر النهائي متحرك شوية ناحية اليمين، مقاسات صغيرة وشياكة
         offersBuffer += `
             <div id="offer_card_${item.id}" class="offer-grid-card ${isHighlighted}" data-id="${item.id}" style="display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; gap: 0.35rem; align-items: center; padding: 0.55rem 0.7rem;">
                 
-                <!-- الصف الأول: اسم العرض يمين (بحجم أصغر ومتناسق) + السعر شمال (بحجم أصغر) -->
+                <!-- الصف الأول: اسم العرض يمين + السعر النهائي (متحرك شوية اتجاه اليمين) -->
                 <div style="grid-column: 1; display: flex; align-items: center; gap: 0.35rem;">
                     <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" title="اسحب لترتيب العرض"><i class="fa-solid fa-grip-vertical"></i></span>
                     <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)" style="width:13px; height:13px; accent-color:var(--primary-color);">
                     <span class="offer-title-box" style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">${pinnedBadge}${item.name}</span>
                 </div>
 
-                <div style="grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; justify-content: flex-end;">
+                <div style="grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; justify-content: flex-end; padding-left: 1.2rem;">
                     <span class="price-badge" style="font-size: 0.82rem; padding: 0.2rem 0.6rem; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 800; border-radius: 6px; box-shadow: 0 2px 6px rgba(37,99,235,0.3);">${item.price ? item.price : 'موضح'}</span>
                 </div>
 
-                <!-- الصف الثاني: الملاحظات والوسوم في منتصف الكارت -->
+                <!-- الصف الثاني: الأجهزة والملحوظات والوسوم في منتصف الكارت تماماً -->
                 <div style="grid-column: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.2rem; width: 100%;">
                     ${devicesDisplay}
-                    ${item.notes ? `<div class="offer-notes-box" style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; background: rgba(56, 189, 248, 0.08); padding: 0.2rem 0.4rem; border-radius: 4px; border-right: 2px solid #38bdf8; width: 100%; text-align: center;"><i class="fa-solid fa-info-circle"></i> ${item.notes}</div>` : ''}
+                    ${item.notes ? `<div class="offer-notes-box" style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; background: rgba(56, 189, 248, 0.08); padding: 0.2rem 0.4rem; border-radius: 4px; border-right: 2px solid #38bdf8; width: 85%; text-align: center;"><i class="fa-solid fa-info-circle"></i> ${item.notes}</div>` : ''}
                 </div>
 
                 <!-- الصف الثالث: القسم تحت يمين + أزرار الإدارة شمال -->
