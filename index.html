@@ -191,7 +191,7 @@
         .offer-tab-btn:hover { border-color: var(--primary-color); }
         .offer-tab-btn.active { background: var(--primary-color) !important; color: #000 !important; border-color: var(--primary-color) !important; font-weight: 800; }
 
-        /* التنسيق الجديد المحكم لكروت العروض لتجنب الفراغات الشاسعة */
+        /* تعديلات وتنسيق الكارت المحكم (تكبير اسم العرض، القسم، والسعر، وجعل الملاحظات في المنتصف وبدون فراغات) */
         .offers-grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 0.4rem; }
         .offers-grid-container.single-column { grid-template-columns: 1fr; }
         
@@ -199,21 +199,28 @@
             background: var(--bg-surface); 
             border: 1px solid var(--border-color); 
             border-radius: 8px; 
-            padding: 0.5rem; 
+            padding: 0.55rem 0.65rem; 
             display: flex; 
             flex-direction: column; 
-            gap: 0.3rem; 
+            gap: 0.35rem; 
             position: relative; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25); 
         }
         .offer-grid-card:hover { border-color: var(--primary-color); }
 
-        .offer-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; }
-        .offer-title-box { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
-        .offer-devices-box { background: var(--bg-card); padding: 0.3rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 0.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
-        .offer-footer-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 0.3rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 0.1rem; }
+        .offer-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem; }
+        .offer-title-box { font-size: 0.88rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.3px; }
         
-        .price-badge { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; padding: 0.15rem 0.55rem; border-radius: 6px; font-weight: 800; font-size: 0.75rem; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4); }
+        .offer-devices-box { background: var(--bg-card); padding: 0.4rem 0.55rem; border-radius: 6px; border: 1px solid var(--border-color); margin: 0.1rem 0; display: flex; flex-direction: column; gap: 0.25rem; }
+        
+        .offer-notes-box { font-size: 0.72rem; color: #38bdf8; font-weight: 700; background: rgba(56, 189, 248, 0.08); padding: 0.25rem 0.4rem; border-radius: 4px; border-right: 3px solid #38bdf8; }
+
+        .offer-footer-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.55rem; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 0.1rem; }
+        
+        .offer-category-text { font-size: 0.73rem; font-weight: 700; color: var(--text-muted); }
+        .offer-category-text strong { color: var(--primary-color); font-size: 0.76rem; }
+
+        .price-badge { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; padding: 0.2rem 0.65rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4); }
         
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
         .tag-badge { background: var(--accent-blue); color: #fff; padding: 0.04rem 0.18rem; border-radius: 4px; font-size: 0.52rem; display: inline-block; margin-top: 2px; }
@@ -2589,7 +2596,7 @@
 
         function clearMultiOffersSelection() { selectedOfferIds = []; document.querySelectorAll('.offer-select-chk').forEach(c => c.checked = false); updateFloatingOffersWindow(); }
 
-        /* التعديل الجوهري لدالة توليد كروت العروض لمنع الفراغات وتحديد الهيكل بدقة */
+        /* دالة رندر العروض بعد تكبير الأسماء، الأسعار، الأقسام، ووضع الملاحظات في المنتصف بدون فراغات */
         function renderOffers(highlightOfferId = null) {
             const searchInput = document.getElementById('offerSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const gridContainer = document.getElementById('offersGridContainerBox'); if (!gridContainer) return;
@@ -2609,8 +2616,8 @@
                 let devicesDisplay = "";
                 if (item.device1 || item.device2) {
                     devicesDisplay += `<div class="offer-devices-box">`;
-                    if (item.device1) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem;"><span style="color:var(--text-main);">• ${item.device1}</span><strong style="color:var(--primary-color); font-weight:800;">${item.price1 || ''}</strong></div>`;
-                    if (item.device2) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem;"><span style="color:var(--text-main);">• ${item.device2}</span><strong style="color:var(--primary-color); font-weight:800;">${item.price2 || ''}</strong></div>`;
+                    if (item.device1) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;"><span style="color:var(--text-main); font-weight:600;">• ${item.device1}</span><strong style="color:var(--primary-color); font-weight:800; font-size:0.78rem;">${item.price1 || ''}</strong></div>`;
+                    if (item.device2) devicesDisplay += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;"><span style="color:var(--text-main); font-weight:600;">• ${item.device2}</span><strong style="color:var(--primary-color); font-weight:800; font-size:0.78rem;">${item.price2 || ''}</strong></div>`;
                     devicesDisplay += `</div>`;
                 }
 
@@ -2618,6 +2625,7 @@
 
                 offersBuffer += `
                     <div id="offer_card_${item.id}" class="offer-grid-card ${isHighlighted}" data-id="${item.id}">
+                        <!-- رأس الكارت: اسم العرض مكبر -->
                         <div class="offer-header-row">
                             <div style="display:flex; align-items:center; gap:0.4rem;">
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" title="اسحب لترتيب العرض"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -2631,12 +2639,13 @@
                             </div>
                         </div>
 
+                        <!-- منتصف الكارت: الملاحظات والدعامات -->
                         ${devicesDisplay}
+                        ${item.notes ? `<div class="offer-notes-box"><i class="fa-solid fa-info-circle"></i> ${item.notes}</div>` : ''}
 
-                        ${item.notes ? `<div style="font-size:0.65rem; color:#38bdf8; font-weight:600;"><i class="fa-solid fa-info-circle"></i> ${item.notes}</div>` : ''}
-
+                        <!-- ذيل الكارت: القسم والسعر بارزين ومكبرين -->
                         <div class="offer-footer-row">
-                            <span style="font-size:0.65rem; color:var(--text-muted); font-weight:700;">القسم: <strong style="color:var(--primary-color);">${item.category}</strong></span>
+                            <span class="offer-category-text">القسم: <strong>${item.category}</strong></span>
                             <span class="price-badge">${item.price ? item.price : 'موضح في التفاصيل'}</span>
                         </div>
                     </div>`;
