@@ -91,9 +91,8 @@
         .header-date-text { color: var(--primary-color); font-weight: 800; }
 
         .kpi-bar { display: flex; gap: 0.35rem; align-items: center; }
-        /* زر المتواجدين الآن المعدل بشكل أنيق ومتناسق */
-        .kpi-card-unified { background: linear-gradient(135deg, var(--bg-card) 0%, rgba(59, 130, 246, 0.15) 100%); border: 1px solid var(--accent-blue); padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.7rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25); }
-        .kpi-card-unified:hover { transform: scale(1.02); border-color: var(--primary-color); background: rgba(59, 130, 246, 0.25); }
+        .kpi-card-unified { background: linear-gradient(135deg, #1d4ed8, #2563eb); border: 1px solid #3b82f6; padding: 0.25rem 0.8rem; border-radius: 8px; font-size: 0.72rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #ffffff; cursor: pointer; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4); transition: transform 0.15s, filter 0.15s; }
+        .kpi-card-unified:hover { transform: scale(1.02); filter: brightness(1.1); }
 
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
@@ -151,9 +150,9 @@
 
         .highlight-pulse { animation: pulseGlow 1.5s infinite; }
         @keyframes pulseGlow {
-            0% { background-color: rgba(234, 179, 8, 0.8); }
+            0% { background-color: rgba(234, 179, 8, 0.7); }
             50% { background-color: rgba(234, 179, 8, 0.1); }
-            100% { background-color: rgba(234, 179, 8, 0.8); }
+            100% { background-color: rgba(234, 179, 8, 0.7); }
         }
 
         .alerts-2col-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
@@ -290,11 +289,10 @@
                 </div>
 
                 <div class="kpi-bar">
-                    <!-- تم تلوين الأيقونة باللون الأزرق المنسق مع النص -->
                     <div class="kpi-card-unified" onclick="openActiveDoctorsUnifiedModal()" title="المتواجدين الآن مع التوقيت">
-                        <i class="fa-solid fa-user-doctor" style="color: var(--accent-blue);"></i> 
-                        <span style="color: var(--text-main);">المتواجدين الآن</span> 
-                        <span id="kpiActiveSummary" style="font-weight:800; color:var(--accent-blue);">(معشي: 0 | الوسام: 0)</span>
+                        <i class="fa-solid fa-user-doctor" style="color:#ffffff;"></i> 
+                        <span style="color: #fde047; font-weight: 800;">المتواجدين الآن</span> 
+                        <span id="kpiActiveSummary" style="font-weight:700; color:#ffffff;">(معشي: 0 | الوسام: 0)</span>
                     </div>
                 </div>
 
@@ -577,15 +575,7 @@
                     <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
                 </div>
                 
-                <div class="offers-tabs" id="inquiriesFilterTabs">
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الكل', this)">الكل</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأطباء وخدماتها', this)">الأطباء وخدماتها</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأجهزة', this)">الأجهزة</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأشعة والمختبر', this)">الأشعة والمختبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</button>
-                    <button class="offer-tab-btn" onclick="filterInquiryCategory('أخرى', this)">أخرى</button>
-                </div>
+                <div class="offers-tabs" id="inquiriesFilterTabs"></div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
@@ -1339,6 +1329,7 @@
             renderCoordinators();
             renderOffersTabs();
             renderOffers();
+            renderInquiriesFilters();
             renderInquiries();
             updateActiveDoctorsKPI();
         }
@@ -1660,15 +1651,26 @@
         }
 
         function saveFridayDutySchedule() {
-            const editId = document.getElementById('fridayEditId').value, dateVal = document.getElementById('fridayDate').value, branchVal = document.getElementById('fridayBranch').value, docVal = document.getElementById('fridayDocName').value;
+            const editId = document.getElementById('fridayEditId').value;
+            const dateVal = document.getElementById('fridayDate').value;
+            const branchVal = document.getElementById('fridayBranch').value;
+            const docVal = document.getElementById('fridayDocName').value;
+            
             if (!dateVal || !docVal) return alert("املأ التاريخ واسم الطبيب!");
+            
             if (editId) {
                 const item = fridaySchedules.find(f => f.id == editId);
                 if (item) { item.date = dateVal; item.branch = branchVal; item.doc = docVal; }
                 document.getElementById('fridayEditId').value = "";
-            } else { fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal }); }
-            syncToCloud(); document.getElementById('fridayDocName').value = ""; document.getElementById('fridayDate').value = "";
-            renderFridayScheduleTable(); renderDoctors(); playChirpSound();
+            } else { 
+                fridaySchedules.push({ id: Date.now(), date: dateVal, branch: branchVal, doc: docVal }); 
+            }
+            syncToCloud(); 
+            document.getElementById('fridayDocName').value = ""; 
+            document.getElementById('fridayDate').value = "";
+            renderFridayScheduleTable(); 
+            renderDoctors(); 
+            playChirpSound();
         }
 
         function editFridaySchedule(id) {
@@ -1714,19 +1716,24 @@
         const standardDaysSequence = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 
         function formatDaysSmart(daysArray) {
-            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "السبت للأربعاء";
-            let presentIndices = daysArray.map(d => standardDaysSequence.indexOf(d)).filter(idx => idx !== -1).sort((a,b) => a - b);
-            if (presentIndices.length === 0) return daysArray.join('، ');
-
+            if (!daysArray || daysArray.length === 0) return "";
+            if (daysArray.length === 7) return "طوال أيام الأسبوع (السبت للجمعة)";
+            
+            let sorted = [...daysArray].sort((a, b) => standardDaysSequence.indexOf(a) - standardDaysSequence.indexOf(b));
+            
             let isConsecutive = true;
-            for (let i = 0; i < presentIndices.length - 1; i++) {
-                if (presentIndices[i+1] !== presentIndices[i] + 1) { isConsecutive = false; break; }
+            let firstIdx = standardDaysSequence.indexOf(sorted[0]);
+            for (let i = 0; i < sorted.length; i++) {
+                if (standardDaysSequence.indexOf(sorted[i]) !== firstIdx + i) {
+                    isConsecutive = false;
+                    break;
+                }
             }
 
-            if (isConsecutive && presentIndices.length >= 2) {
-                return `${standardDaysSequence[presentIndices[0]]} للأربعاء`;
+            if (isConsecutive && sorted.length >= 2) {
+                return `${sorted[0]} إلى ${sorted[sorted.length - 1]}`;
             } else {
-                return daysArray.join('، ');
+                return sorted.join('، ');
             }
         }
 
@@ -1738,7 +1745,7 @@
             
             if (s1Shifts.length > 0) {
                 let shiftTexts = s1Shifts.map(sh => `${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`).join(' ومن ');
-                lines.push(`${dayStr1}: ${shiftTexts}`);
+                lines.push(dayStr1 ? `${dayStr1}: ${shiftTexts}` : shiftTexts);
             }
 
             let countShifts = doc.shiftsCount || "1";
@@ -1749,7 +1756,7 @@
                 
                 if (s2Shifts.length > 0) {
                     let shiftTexts = s2Shifts.map(sh => `${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`).join(' ومن ');
-                    lines.push(`يوم ${dayStr2}: ${shiftTexts}`);
+                    lines.push(dayStr2 ? `يوم ${dayStr2}: ${shiftTexts}` : shiftTexts);
                 }
             }
             return lines.join('\n');
@@ -1760,6 +1767,7 @@
             if (!doc) return;
             
             let timingLines = [];
+            
             let s1Days = doc.shift1Days || [];
             let dayStr1 = formatDaysSmart(s1Days);
             let s1Shifts = doc.shifts1 || [];
@@ -1895,11 +1903,12 @@
             let countM = 0, countW = 0;
             const todayStr = new Date().toISOString().split('T')[0];
             
-            // فرز تصاعدي للمواعيد حسب التاريخ وعرض الموعد القادم فقط (أو الموعد الحالي حسب التسلسل)
-            const sortedFridays = [...fridaySchedules].filter(f => f.date >= todayStr).sort((a, b) => new Date(a.date) - new Date(b.date));
+            // فلترة وتصنيف مناوبات الجمعة القادمة فقط حسب التسلسل الزمني
+            const sortedFridays = [...fridaySchedules].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const upcomingFridays = sortedFridays.filter(f => f.date >= todayStr);
             
-            const nextMashyFriday = sortedFridays.find(f => f.branch === "معشي");
-            const nextWissamFriday = sortedFridays.find(f => f.branch === "الوسام");
+            let nextMashyFriday = upcomingFridays.find(f => f.branch === "معشي");
+            let nextWissamFriday = upcomingFridays.find(f => f.branch === "الوسام");
 
             document.getElementById('fridayDocMashy').innerHTML = nextMashyFriday ? `<span>${nextMashyFriday.doc}</span> (${nextMashyFriday.date})` : '<span>لم يُحدد</span>';
             document.getElementById('fridayDocWissam').innerHTML = nextWissamFriday ? `<span>${nextWissamFriday.doc}</span> (${nextWissamFriday.date})` : '<span>لم يُحدد</span>';
@@ -2300,9 +2309,10 @@
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
                     const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
                     const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                    const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
 
                     notesBuffer += `
-                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'}" data-id="${idx}">
+                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}">
                             <h3>
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
                                 <span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span>
@@ -2833,6 +2843,32 @@
                         }
                     });
                 }
+                if (enabledCats.includes('inquiries')) {
+                    inquiriesData.forEach(i => {
+                        if (i.searchKey && i.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'inq_' + i.id, title: i.question, subtitle: i.answer, copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`, source: `الاستفسارات (${i.category})`, action: `jumpToSectionAndHighlightInquiry(${i.id})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('services')) {
+                    deptServicesData.forEach(s => {
+                        if (s.searchKey && s.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'srv_' + s.id, title: s.name, subtitle: `فرع ${s.branch}`, copyText: s.name, source: "الأقسام والخدمات", action: `jumpToSectionAndHighlightService(${s.id})` });
+                        }
+                    });
+                    deptNotesData.forEach((n, idx) => {
+                        if (n.searchKey && n.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'note_' + idx, title: n.text, subtitle: 'ملحوظة عامة', copyText: n.text, source: "ملحوظات الأقسام", action: `jumpToSectionAndHighlightNote(${idx})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('coordinators')) {
+                    coordinatorsData.forEach(c => {
+                        if (c.searchKey && c.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'coord_' + c.id, title: c.name, subtitle: 'تعليمات المنسقين', copyText: `${c.name}\n${c.rules.join('\n')}`, source: "دليل المنسقين", action: `jumpToSectionAndHighlightCoordinator(${c.id})` });
+                        }
+                    });
+                }
 
                 if (currentGlobalSearchResults.length === 0) {
                     resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
@@ -2901,6 +2937,30 @@
             switchTab('offers', document.querySelectorAll('.nav-link')[4]);
             selectedOfferTab = cat; renderOffersTabs();
             setTimeout(() => { renderOffers(id); document.getElementById('offer_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[5]);
+            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightNote(idx) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs('note_' + idx); document.getElementById('dept_note_card_' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[3]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function openLightbox(imgSrc) {
