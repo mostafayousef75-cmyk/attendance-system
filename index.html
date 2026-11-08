@@ -2794,8 +2794,29 @@
                     let sourceIndex = listRef.findIndex(x => x.id === draggedId);
                     if (sourceIndex !== -1) {
                         let moved = listRef.splice(sourceIndex, 1)[0];
-                        listRef.push(moved);
-                        syncToCloud(); playChirpSound();
+                        // تحديد المكان المستهدف بدقة لو تم الإفلات فوق كارت تاني
+                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card');
+                        if (targetCard && targetCard.getAttribute('data-id')) {
+                            let targetId = parseInt(targetCard.getAttribute('data-id'));
+                            let targetIndex = listRef.findIndex(x => x.id === targetId);
+                            if (targetIndex !== -1) {
+                                listRef.splice(targetIndex, 0, moved);
+                            } else {
+                                listRef.push(moved);
+                            }
+                        } else {
+                            listRef.push(moved);
+                        }
+                        syncToCloud(); 
+                        
+                        // إعادة رسم القسم المناسب بعد السحب والإفلات
+                        if (type === 'inquiry') renderInquiries();
+                        else if (type === 'offer') renderOffers();
+                        else if (type === 'coordinator') renderCoordinators();
+                        else if (type === 'alert') renderAlerts();
+                        else if (type === 'service') renderDeptsAndDocs();
+
+                        playChirpSound();
                     }
                 }
             }
