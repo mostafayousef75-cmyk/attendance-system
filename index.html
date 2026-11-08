@@ -830,7 +830,6 @@
         </div>
     </div>
 
-    <!-- نموذج التنبيهات المحدث مع خيار حذف الوسائط المرفوعة -->
     <div class="modal-overlay" id="alertModal">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1723,7 +1722,6 @@
             }
         }
 
-        // تنسيق عرض الدوام داخل الموقع (بدون أصفار ولا شرطة مائلة، وباستخدام كلمة "ومن")
         function generateDoctorTimingFormatted(doc) {
             let lines = [];
             let s1Days = doc.shift1Days || [];
@@ -1749,20 +1747,43 @@
             return lines.join('\n');
         }
 
-        // تنسيق النسخ المخصص والمريح للعميل في الواتساب
+        // دالة نسخ بيانات الدكتور للعميل (تدعم فترتين وتصنيف صباحي/مسائي سليم)
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
             
+            let timingLines = [];
+            
+            // الفترة الأولى
             let s1Days = doc.shift1Days || [];
             let dayStr1 = formatDaysSmart(s1Days);
             let s1Shifts = doc.shifts1 || [];
-            
-            let timingLines = [];
             if (s1Shifts.length > 0) {
-                timingLines.push(`• ${dayStr1}:`);
-                if (s1Shifts[0]) timingLines.push(`  - فترة صباحية: ${getTimeLabelText(s1Shifts[0].start)} - ${getTimeLabelText(s1Shifts[0].end)}`);
-                if (s1Shifts[1]) timingLines.push(`  - فترة مسائية: ${getTimeLabelText(s1Shifts[1].start)} - ${getTimeLabelText(s1Shifts[1].end)}`);
+                if (dayStr1) timingLines.push(`• ${dayStr1}:`);
+                s1Shifts.forEach(sh => {
+                    let startHour = parseFloat(sh.start);
+                    let shiftTypeLabel = (startHour < 12) ? "فترة صباحية" : "فترة مسائية";
+                    timingLines.push(`  - ${shiftTypeLabel}: ${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`);
+                });
+            }
+
+            // الفترة الثانية (لو موجودة مثل يوم الخميس)
+            if (doc.shiftsCount === "2") {
+                let s2Days = doc.shift2Days || [];
+                let dayStr2 = formatDaysSmart(s2Days);
+                let s2Shifts = doc.shifts2 || [];
+                if (s2Shifts.length > 0) {
+                    if (dayStr2) {
+                        timingLines.push(`• يوم ${dayStr2}:`);
+                    } else {
+                        timingLines.push(`• الفترة الثانية:`);
+                    }
+                    s2Shifts.forEach(sh => {
+                        let startHour = parseFloat(sh.start);
+                        let shiftTypeLabel = (startHour < 12) ? "فترة صباحية" : "فترة مسائية";
+                        timingLines.push(`  - ${shiftTypeLabel}: ${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`);
+                    });
+                }
             }
 
             let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\n\nمواعيد الدوام:\n` + timingLines.join('\n');
@@ -2859,32 +2880,6 @@
             document.getElementById('lightboxImg').src = imgSrc;
             document.getElementById('lightboxModal').classList.add('active');
         }
-
-        // التعديل الجديد لتصحيح المواعيد تلقائياً
-function copyDoctorForClient(id) {
-    const doc = doctorsData.find(d => d.id === id);
-    if (!doc) return;
-    
-    let s1Days = doc.shift1Days || [];
-    let dayStr1 = formatDaysSmart(s1Days);
-    let s1Shifts = doc.shifts1 || [];
-    
-    let timingLines = [];
-    if (s1Shifts.length > 0) {
-        timingLines.push(`• ${dayStr1}:`);
-        s1Shifts.forEach(sh => {
-            let startHour = parseFloat(sh.start);
-            let shiftTypeLabel = (startHour < 12) ? "فترة صباحية" : "فترة مسائية";
-            timingLines.push(`  - ${shiftTypeLabel}: ${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`);
-        });
-    }
-
-    let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\n\nمواعيد الدوام:\n` + timingLines.join('\n');
-    if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
-    
-    copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
-}
-
     </script>
 </body>
 </html>
