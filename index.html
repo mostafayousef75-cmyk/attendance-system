@@ -175,21 +175,35 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
-        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات (متعددة ومتقدمة) --- */
-        .cards-view-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: flex-start !important; grid-auto-rows: max-content !important; }
+        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات --- */
+        .cards-view-grid { width: 100%; transition: all 0.2s ease; }
         
         /* 1. شبكة متساوية القياس (Grid Equal) */
-        .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; }
-        /* 2. تداخل مرن ومتراص (Masonry Dense) */
-        .cards-view-grid.view-mode-dense { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .cards-view-grid.view-mode-dense > div { flex: 1 1 240px; }
+        .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: start; }
+        
+        /* 2. تداخل مرن ومتراص (Masonry Dense) - لتتكامل الكروت رأسياً بدون أي مساحات فارغة */
+        .cards-view-grid.view-mode-dense {
+            column-count: 3;
+            column-gap: 0.4rem;
+            display: block !important;
+        }
+        .cards-view-grid.view-mode-dense > div {
+            break-inside: avoid;
+            margin-bottom: 0.4rem;
+            width: 100%;
+            display: inline-block;
+        }
+
         /* 3. عرض عمود واحد ممتد بالكامل (Row Stack) */
         .cards-view-grid.view-mode-rowStack { display: flex; flex-direction: column; gap: 0.4rem; }
+        .cards-view-grid.view-mode-rowStack > div { width: 100%; }
+
         /* 4. عرض مكثف وصغير (Compact Cards) */
-        .cards-view-grid.view-mode-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.3rem; }
+        .cards-view-grid.view-mode-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.3rem; align-items: start; }
         .cards-view-grid.view-mode-compact .doc-sheet-card { padding: 0.25rem 0.35rem; font-size: 0.62rem; }
+
         /* 5. شبكة واسعة بثلاثة أعمدة (Grid Wide 3 Cols) */
-        .cards-view-grid.view-mode-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; }
+        .cards-view-grid.view-mode-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; align-items: start; }
 
         .doc-sheet-card {
             border-radius: 8px;
@@ -262,6 +276,10 @@
         .day-row { display: flex; align-items: center; justify-content: space-between; gap: 0.15rem; font-size: 0.7rem; cursor: pointer; }
         .lightbox-img { max-width: 90vw; max-height: 85vh; border-radius: 6px; }
 
+        @media (max-width: 1100px) {
+            .cards-view-grid.view-mode-dense { column-count: 2; }
+        }
+
         @media (max-width: 768px) {
             html, body { flex-direction: column; height: auto; overflow: auto; }
             .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border-color); }
@@ -270,6 +288,7 @@
             .alerts-2col-grid { grid-template-columns: 1fr; }
             .offers-grid-container { grid-template-columns: 1fr !important; }
             .cards-view-grid { grid-template-columns: 1fr !important; }
+            .cards-view-grid.view-mode-dense { column-count: 1; }
             .top-header { flex-direction: column; align-items: stretch; }
             .search-container { max-width: 100%; width: 100%; }
         }
@@ -296,7 +315,6 @@
             <li><a class="nav-link" data-tab="schedule" onclick="switchTab('schedule', this)"><i class="fa-solid fa-calendar-days"></i> <span data-nav-key="schedule">مواعيد الأطباء</span></a></li>
             <li><a class="nav-link" data-tab="alerts" onclick="switchTab('alerts', this)"><i class="fa-solid fa-bullhorn"></i> <span data-nav-key="alerts">التنبيهات والإشعارات</span></a></li>
             <li><a class="nav-link" data-tab="depts-docs" onclick="switchTab('depts-docs', this)"><i class="fa-solid fa-sitemap"></i> <span data-nav-key="depts-docs">الأقسام والأطباء</span></a></li>
-            <!-- الترتيب المطلوب للأخير: العروض والأسعار، ثم دليل الاستفسارات، ثم دليل المنسقين -->
             <li><a class="nav-link" data-tab="offers" onclick="switchTab('offers', this)"><i class="fa-solid fa-tags"></i> <span data-nav-key="offers">العروض والأسعار</span></a></li>
             <li><a class="nav-link" data-tab="inquiries" onclick="switchTab('inquiries', this)"><i class="fa-solid fa-circle-question"></i> <span data-nav-key="inquiries">دليل الاستفسارات</span></a></li>
             <li><a class="nav-link" data-tab="coordinators" onclick="switchTab('coordinators', this)"><i class="fa-solid fa-users-gear"></i> <span data-nav-key="coordinators">دليل المنسقين</span></a></li>
@@ -614,7 +632,7 @@
                 <div class="offers-grid-container offers-mode-grid2" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
             </section>
 
-            <!-- 5. دليل الاستفسارات (مع زرار لتغيير طريقة العرض وثبات تام) -->
+            <!-- 5. دليل الاستفسارات (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
@@ -623,8 +641,8 @@
                         <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                             <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
                             <select id="inquiriesViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeInquiriesViewMode(this.value)">
-                                <option value="view-mode-gridEqual">1. شبكة متساوية (Grid Equal)</option>
-                                <option value="view-mode-dense">2. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-dense" selected>1. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-gridEqual">2. شبكة متساوية (Grid Equal)</option>
                                 <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
                                 <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
                                 <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
@@ -640,10 +658,10 @@
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="inquirySearchInput" placeholder="بحث في الاستفسارات والوسوم..." oninput="renderInquiries()">
                 </div>
-                <div class="cards-view-grid view-mode-gridEqual" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
+                <div class="cards-view-grid view-mode-dense" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
             </section>
 
-            <!-- 6. دليل المنسقين (مع زرار لتغيير طريقة العرض وثبات تام) -->
+            <!-- 6. دليل المنسقين (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
@@ -652,8 +670,8 @@
                         <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                             <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
                             <select id="coordinatorsViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeCoordinatorsViewMode(this.value)">
-                                <option value="view-mode-gridEqual">1. شبكة متساوية (Grid Equal)</option>
-                                <option value="view-mode-dense">2. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-dense" selected>1. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-gridEqual">2. شبكة متساوية (Grid Equal)</option>
                                 <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
                                 <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
                                 <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
@@ -667,7 +685,7 @@
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="coordSearchInput" placeholder="بحث في تعليمات ودليل المنسقين والوسوم..." oninput="renderCoordinators()">
                 </div>
-                <div class="cards-view-grid view-mode-gridEqual" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
+                <div class="cards-view-grid view-mode-dense" id="coordinatorsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'coordinator')"></div>
             </section>
         </div>
     </main>
@@ -1240,10 +1258,10 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // --- أوضاع العرض المحفوظة تماماً في LocalStorage ---
+        // --- أوضاع العرض المحفوظة في LocalStorage (الافتراضي: Masonry Dense view-mode-dense) ---
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
-        let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-gridEqual';
-        let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-gridEqual';
+        let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-dense';
+        let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-dense';
 
         function changeOffersViewMode(modeClass) {
             currentOffersViewMode = modeClass;
@@ -3099,7 +3117,7 @@
 
         function jumpToSectionAndHighlightOffer(id, cat) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('offers', document.querySelectorAll('.nav-link')[3]); // تم تحديث الترتيب
+            switchTab('offers', document.querySelectorAll('.nav-link')[3]);
             selectedOfferTab = cat; renderOffersTabs();
             setTimeout(() => { 
                 renderOffers(id); 
@@ -3114,7 +3132,7 @@
 
         function jumpToSectionAndHighlightInquiry(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('inquiries', document.querySelectorAll('.nav-link')[4]); // تم تحديث الترتيب
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[4]);
             setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
@@ -3132,7 +3150,7 @@
 
         function jumpToSectionAndHighlightCoordinator(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('coordinators', document.querySelectorAll('.nav-link')[5]); // تم تحديث الترتيب
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[5]);
             setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
