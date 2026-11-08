@@ -2632,4 +2632,281 @@
             document.getElementById('offDevice1').value = item.device1 || ""; document.getElementById('offPrice1').value = item.price1 || "";
             document.getElementById('offDevice2').value = item.device2 || ""; document.getElementById('offPrice2').value = item.price2 || "";
             document.getElementById('offPrice').value = item.price || ""; document.getElementById('offNotes').value = item.notes || "";
-            document.getElementById('
+            document.getElementById('offIsPinned').checked = !!item.isPinned;
+            populateOfferCategoryDropdown(item.category);
+            document.getElementById('offerModal').classList.add('active');
+        }
+
+        function deleteOffer(id) {
+            if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); playChirpSound(); }
+        }
+
+        function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        
+        function renderInquiriesFilters() {
+            const container = document.getElementById('inquiriesFilterTabs');
+            if (!container) return;
+            
+            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر", "أخرى"];
+            const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
+            const allCategories = ["الكل", ...staticCategories, ...customCategories];
+
+            let html = "";
+            allCategories.forEach(cat => {
+                let count = cat === "الكل" ? inquiriesData.length : inquiriesData.filter(i => i.category === cat).length;
+                let activeClass = (selectedInquiryFilter === cat) ? "active" : "";
+                html += `<button class="offer-tab-btn ${activeClass}" onclick="filterInquiryCategory('${cat}', this)">${cat} (${count})</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function filterInquiryCategory(cat, btn) {
+            selectedInquiryFilter = cat;
+            localStorage.setItem('selectedInquiryFilter', cat);
+            document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderInquiries();
+        }
+
+        function renderInquiries(highlightId = null) {
+            renderInquiriesFilters();
+            const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+            const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
+            
+            let inqBuffer = "";
+            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
+                let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
+                let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
+                inqBuffer += `
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}">
+                        <h3>
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اسحب لتحريك الكارت" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span style="flex:1; margin:0 0.25rem;">${item.question}</span>
+                            <div class="actions-col-group" style="flex-direction:row;">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedInqText}', 'تم نسخ الاستفسار:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editInquiry(${item.id})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <p style="font-size:0.68rem; opacity:0.95;">${item.answer}</p>
+                        ${tagsHtml}
+                        <span style="font-size:0.55rem; color:#fde047;">🏷️ ${item.category}</span>
+                    </div>`;
+            });
+            grid.innerHTML = inqBuffer;
+        }
+
+        function openInquiryModal() {
+            document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
+            document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
+            document.getElementById('inqCategory').value = "الليزر"; document.getElementById('inqColor').value = "card-darkblue"; 
+            document.getElementById('inqCustomCatBox').style.display = "none";
+            document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function saveInquiry() {
+            const id = document.getElementById('inquiryId').value;
+            let cat = document.getElementById('inqCategory').value;
+            if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
+            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
+            if (!obj.question) return;
+            if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
+            syncToCloud(); closeModal('inquiryModal'); playChirpSound();
+        }
+
+        function editInquiry(id) {
+            const item = inquiriesData.find(i => i.id === id); if (!item) return;
+            document.getElementById('inquiryId').value = item.id; document.getElementById('inqQuestion').value = item.question;
+            document.getElementById('inqAnswer').value = item.answer; document.getElementById('inqTags').value = item.tags || "";
+            document.getElementById('inqCategory').value = item.category || "الليزر";
+            document.getElementById('inqColor').value = item.color || "card-darkblue"; document.getElementById('inquiryModal').classList.add('active');
+        }
+
+        function deleteInquiry(id) {
+            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); playChirpSound(); }
+        }
+
+        function toggleAllSearchCats(status) {
+            document.querySelectorAll('.search-cat-chk').forEach(c => c.checked = status);
+            triggerFilterChange();
+        }
+
+        let draggedItemInfo = null;
+        function dragStartRow(e, id, type) { draggedItemInfo = { id, type }; e.dataTransfer.effectAllowed = 'move'; }
+
+        function dropRow(e, containerType) {
+            e.preventDefault();
+            if (!draggedItemInfo) return;
+            const { id: draggedId, type } = draggedItemInfo;
+
+            if (type === 'doctor_mashy' && containerType === 'mashy') {
+                let currentList = getSortedDoctorsListForBranch('معشي').filter(d => d.branch === "معشي" || d.isJoint).map(d => d.id);
+                let sourceIdx = currentList.indexOf(draggedId); if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
+                const tr = e.target.closest('tr');
+                if (tr && tr.getAttribute('data-id')) {
+                    let targetIdx = currentList.indexOf(parseInt(tr.getAttribute('data-id')));
+                    if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId); else currentList.push(draggedId);
+                } else { currentList.push(draggedId); }
+                mashyCustomOrder = currentList; localStorage.setItem('mashy_custom_order', JSON.stringify(mashyCustomOrder));
+                renderDoctors(); playChirpSound();
+            } else if (type === 'doctor_wissam' && containerType === 'wissam') {
+                let currentList = getSortedDoctorsListForBranch('الوسام').filter(d => d.branch === "الوسام" || d.isJoint).map(d => d.id);
+                let sourceIdx = currentList.indexOf(draggedId); if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
+                const tr = e.target.closest('tr');
+                if (tr && tr.getAttribute('data-id')) {
+                    let targetIdx = currentList.indexOf(parseInt(tr.getAttribute('data-id')));
+                    if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId); else currentList.push(draggedId);
+                } else { currentList.push(draggedId); }
+                wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
+                renderDoctors(); playChirpSound();
+            } else {
+                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
+                if (listRef) {
+                    let sourceIndex = listRef.findIndex(x => x.id === draggedId);
+                    if (sourceIndex !== -1) {
+                        let moved = listRef.splice(sourceIndex, 1)[0];
+                        listRef.push(moved);
+                        syncToCloud(); playChirpSound();
+                    }
+                }
+            }
+            draggedItemInfo = null;
+        }
+
+        function initFloatingOffersDrag() {
+            const win = document.getElementById('floatingOffersWin'), header = document.getElementById('floatingOffersHeader');
+            if (!win || !header) return;
+            let isDragging = false, startX, startY, initialLeft, initialTop;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true; startX = e.clientX; startY = e.clientY;
+                const rect = win.getBoundingClientRect();
+                initialLeft = rect.left; initialTop = rect.top;
+                win.style.right = 'auto'; win.style.bottom = 'auto';
+                win.style.left = initialLeft + 'px'; win.style.top = initialTop + 'px';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                win.style.left = (initialLeft + (e.clientX - startX)) + 'px';
+                win.style.top = (initialTop + (e.clientY - startY)) + 'px';
+            });
+            document.addEventListener('mouseup', () => { isDragging = false; });
+        }
+
+        let globalSearchTimeout = null;
+        function handleSmartGlobalSearch(query) {
+            if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                let rawQ = query.trim();
+                if (!rawQ) {
+                    document.getElementById('globalSearchResultsSection').classList.remove('active');
+                    const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                    document.getElementById(activeTab + '-section').classList.add('active');
+                    currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+                    return;
+                }
+                let normQ = normalizeArabicText(rawQ);
+                const resultsSection = document.getElementById('globalSearchResultsSection'), resultsList = document.getElementById('globalSearchResultsList');
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                resultsSection.classList.add('active'); resultsList.innerHTML = ""; currentGlobalSearchResults = [];
+                const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+
+                if (enabledCats.includes('doctors')) {
+                    doctorsData.forEach(d => {
+                        if (d.searchKey && d.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'doc_' + d.id, title: `${d.name} (${d.specialty})`, subtitle: `الفرع: ${d.branch || 'مشترك'}`, copyText: `الطبيب: ${d.name}\nالتخصص: ${d.specialty}`, source: "الأطباء", action: `jumpToSectionAndHighlightDoc(${d.id})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('offers')) {
+                    offersData.forEach(o => {
+                        if (o.searchKey && o.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'offer_' + o.id, title: o.name, subtitle: o.price ? `السعر: ${o.price}` : '', copyText: formatOfferLineForClient(o), source: `العروض (${o.category})`, action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('alerts')) {
+                    alertsData.forEach(a => {
+                        if (a.searchKey && a.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'alert_' + a.id, title: a.content, subtitle: a.time, copyText: a.content, source: "التنبيهات", action: `jumpToAlertsTab(${a.id})` });
+                        }
+                    });
+                }
+
+                if (currentGlobalSearchResults.length === 0) {
+                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
+                    return;
+                }
+
+                resultsList.innerHTML = currentGlobalSearchResults.map(res => `
+                    <div class="search-result-card">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                            <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${selectedGlobalSearchIds.includes(res.id) ? 'checked' : ''} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                            <div><span class="source-badge">${res.source}</span><h4>${res.title}</h4><p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p></div>
+                        </div>
+                        <div style="display:flex; gap:0.25rem;">
+                            <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n')}', 'تم النسخ:')"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                        </div>
+                    </div>`).join('');
+                updateSelectedCountDisplay();
+            }, 30);
+        }
+
+        function handleSearchCheckboxChange(resId, chk) {
+            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
+            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
+            updateSelectedCountDisplay();
+        }
+
+        function toggleSelectAllGlobalSearch(masterChk) {
+            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
+            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
+            updateSelectedCountDisplay();
+        }
+
+        function updateSelectedCountDisplay() {
+            const countSpan = document.getElementById('selectedSearchCountNum');
+            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
+        }
+
+        function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("حدد نتيجة واحدة على الأقل!");
+            let blocks = currentGlobalSearchResults.filter(res => selectedGlobalSearchIds.includes(res.id)).map(res => res.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم النسخ!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults.length) return;
+            copyTextToClipboard(currentGlobalSearchResults.map(r => r.copyText).join('\n\n---\n\n'), "تم نسخ كل النتائج!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal'); document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[4]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { renderOffers(id); document.getElementById('offer_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
