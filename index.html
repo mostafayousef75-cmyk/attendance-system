@@ -1747,14 +1747,12 @@
             return lines.join('\n');
         }
 
-        // دالة نسخ بيانات الدكتور للعميل (تدعم فترتين وتصنيف صباحي/مسائي سليم)
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
             
             let timingLines = [];
             
-            // الفترة الأولى
             let s1Days = doc.shift1Days || [];
             let dayStr1 = formatDaysSmart(s1Days);
             let s1Shifts = doc.shifts1 || [];
@@ -1767,7 +1765,6 @@
                 });
             }
 
-            // الفترة الثانية (لو موجودة مثل يوم الخميس)
             if (doc.shiftsCount === "2") {
                 let s2Days = doc.shift2Days || [];
                 let dayStr2 = formatDaysSmart(s2Days);
@@ -2646,6 +2643,17 @@
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; grid.innerHTML = "";
             
+            // تحديث أزرار الفلتر العلوية لدليل الاستفسارات لتشمل الأقسام الجديدة المضافة ديناميكياً
+            const uniqueInqCats = [...new Set(inquiriesData.map(i => i.category).filter(Boolean))];
+            const filterTabsContainer = document.getElementById('inquiriesFilterTabs');
+            if (filterTabsContainer) {
+                let tabsHtml = `<button class="offer-tab-btn ${selectedInquiryFilter === 'الكل' ? 'active' : ''}" onclick="filterInquiryCategory('الكل', this)">الكل</button>`;
+                uniqueInqCats.forEach(c => {
+                    tabsHtml += `<button class="offer-tab-btn ${selectedInquiryFilter === c ? 'active' : ''}" onclick="filterInquiryCategory('${c}', this)">${c}</button>`;
+                });
+                filterTabsContainer.innerHTML = tabsHtml;
+            }
+
             let inqBuffer = "";
             inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
                 let tagsHtml = item.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${item.tags}</div>` : '';
@@ -2682,8 +2690,9 @@
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
+            if (!cat) return alert("حدد أو اكتب اسم القسم!");
             const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
-            if (!obj.question) return;
+            if (!obj.question) return alert("أدخل نص السؤال!");
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
             syncToCloud(); closeModal('inquiryModal'); playChirpSound();
         }
