@@ -566,15 +566,20 @@
 
             <!-- 6. دليل الاستفسارات -->
             <section id="inquiries-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
-                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
-                        <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="openManageInquiryCategoriesModal()"><i class="fa-solid fa-gear"></i> إدارة الأقسام ⚙️</button>
-                        <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
-                    </div>
+                    <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
                 </div>
                 
-                <div class="offers-tabs" id="inquiriesFilterTabs"></div>
+                <div class="offers-tabs" id="inquiriesFilterTabs">
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الكل', this)">الكل</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الليزر', this)">الليزر</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأطباء وخدماتها', this)">الأطباء وخدماتها</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأجهزة', this)">الأجهزة</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الأشعة والمختبر', this)">الأشعة والمختبر</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('الإبر', this)">الإبر</button>
+                    <button class="offer-tab-btn" onclick="filterInquiryCategory('أخرى', this)">أخرى</button>
+                </div>
 
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
@@ -668,16 +673,6 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageCategoriesModal')"></i>
             </div>
             <div id="manageCategoriesListContainer" style="max-height: 280px; overflow-y:auto; display:flex; flex-direction:column; gap:0.25rem; margin-top:0.25rem;"></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="manageInquiryCategoriesModal">
-        <div class="modal" style="max-width: 440px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3><i class="fa-solid fa-gear"></i> إدارة وتعديل أقسام الاستفسارات</h3>
-                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageInquiryCategoriesModal')"></i>
-            </div>
-            <div id="manageInquiryCategoriesListContainer" style="max-height: 280px; overflow-y:auto; display:flex; flex-direction:column; gap:0.25rem; margin-top:0.25rem;"></div>
         </div>
     </div>
 
@@ -1046,7 +1041,14 @@
             <input type="hidden" id="inquiryId">
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>القسم</label>
-                <select id="inqCategory" class="form-control" onchange="checkInquiryCustomCat(this.value)"></select>
+                <select id="inqCategory" class="form-control" onchange="checkInquiryCustomCat(this.value)">
+                    <option value="الليزر">الليزر</option>
+                    <option value="الأطباء وخدماتها">الأطباء وخدماتها</option>
+                    <option value="الأجهزة">الأجهزة</option>
+                    <option value="الأشعة والمختبر">الأشعة والمختبر</option>
+                    <option value="الإبر">الإبر</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
             </div>
             <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.2rem;">
                 <label>اسم القسم الجديد</label>
@@ -1331,7 +1333,6 @@
             renderCoordinators();
             renderOffersTabs();
             renderOffers();
-            renderInquiriesTabs();
             renderInquiries();
             updateActiveDoctorsKPI();
         }
@@ -1705,9 +1706,20 @@
         const standardDaysSequence = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 
         function formatDaysSmart(daysArray) {
-            if (!daysArray || daysArray.length === 0) return "لم يتم تحديد أيام";
-            if (daysArray.length === 7) return "طوال أيام الأسبوع";
-            return daysArray.join('، ');
+            if (!daysArray || daysArray.length === 0 || daysArray.length === 7) return "السبت للأربعاء";
+            let presentIndices = daysArray.map(d => standardDaysSequence.indexOf(d)).filter(idx => idx !== -1).sort((a,b) => a - b);
+            if (presentIndices.length === 0) return daysArray.join('، ');
+
+            let isConsecutive = true;
+            for (let i = 0; i < presentIndices.length - 1; i++) {
+                if (presentIndices[i+1] !== presentIndices[i] + 1) { isConsecutive = false; break; }
+            }
+
+            if (isConsecutive && presentIndices.length >= 2) {
+                return `${standardDaysSequence[presentIndices[0]]} للأربعاء`;
+            } else {
+                return daysArray.join('، ');
+            }
         }
 
         function generateDoctorTimingFormatted(doc) {
@@ -1735,12 +1747,14 @@
             return lines.join('\n');
         }
 
+        // دالة نسخ بيانات الدكتور للعميل (تدعم فترتين وتصنيف صباحي/مسائي سليم)
         function copyDoctorForClient(id) {
             const doc = doctorsData.find(d => d.id === id);
             if (!doc) return;
             
             let timingLines = [];
             
+            // الفترة الأولى
             let s1Days = doc.shift1Days || [];
             let dayStr1 = formatDaysSmart(s1Days);
             let s1Shifts = doc.shifts1 || [];
@@ -1753,6 +1767,7 @@
                 });
             }
 
+            // الفترة الثانية (لو موجودة مثل يوم الخميس)
             if (doc.shiftsCount === "2") {
                 let s2Days = doc.shift2Days || [];
                 let dayStr2 = formatDaysSmart(s2Days);
@@ -2619,59 +2634,12 @@
         }
 
         function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
-        
-        function renderInquiriesTabs() {
-            const container = document.getElementById('inquiriesFilterTabs');
-            if (!container) return;
-            container.innerHTML = "";
-            const cats = [...new Set(inquiriesData.map(i => i.category).filter(Boolean))];
-            let tabsHtml = `<button class="offer-tab-btn ${selectedInquiryFilter === 'الكل' ? 'active' : ''}" onclick="filterInquiryCategory('الكل', this)">الكل (${inquiriesData.length})</button>`;
-            cats.forEach(cat => {
-                const catCount = inquiriesData.filter(i => i.category === cat).length;
-                tabsHtml += `<button class="offer-tab-btn ${cat === selectedInquiryFilter ? 'active' : ''}" onclick="filterInquiryCategory('${cat}', this)">${cat} (${catCount})</button>`;
-            });
-            container.innerHTML = tabsHtml;
-        }
-
         function filterInquiryCategory(cat, btn) {
             selectedInquiryFilter = cat;
             localStorage.setItem('selectedInquiryFilter', cat);
             document.querySelectorAll('#inquiriesFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderInquiries();
-        }
-
-        function openManageInquiryCategoriesModal() {
-            const container = document.getElementById('manageInquiryCategoriesListContainer');
-            if (!container) return;
-            const cats = [...new Set(inquiriesData.map(i => i.category).filter(Boolean))];
-            container.innerHTML = cats.length === 0 ? `<div style="text-align:center; padding:1rem; color:var(--text-muted);">لا توجد أقسام استفسارات.</div>` :
-                cats.map(cat => `<div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center;"><strong style="color:var(--primary-color);">${cat}</strong><div style="display:flex; gap:0.2rem;"><button class="btn btn-secondary" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="editInquiryCategory('${cat}')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:0.12rem 0.3rem; font-size:0.58rem;" onclick="deleteInquiryCategory('${cat}')"><i class="fa-solid fa-trash"></i></button></div></div>`).join('');
-            document.getElementById('manageInquiryCategoriesModal').classList.add('active');
-        }
-
-        function editInquiryCategory(oldCat) {
-            const newName = prompt("اسم القسم الجديد للاستفسارات:", oldCat);
-            if (!newName || !newName.trim() || newName.trim() === oldCat) return;
-            const trimmed = newName.trim();
-            inquiriesData.forEach(i => { if (i.category === oldCat) i.category = trimmed; });
-            if (selectedInquiryFilter === oldCat) { selectedInquiryFilter = trimmed; localStorage.setItem('selectedInquiryFilter', trimmed); }
-            syncToCloud(); openManageInquiryCategoriesModal(); playChirpSound();
-        }
-
-        function deleteInquiryCategory(catName) {
-            if (confirm("حذف القسم واستفساراته؟")) {
-                inquiriesData = inquiriesData.filter(i => i.category !== catName);
-                if (selectedInquiryFilter === catName) { selectedInquiryFilter = "الكل"; localStorage.setItem('selectedInquiryFilter', selectedInquiryFilter); }
-                syncToCloud(); openManageInquiryCategoriesModal(); playChirpSound();
-            }
-        }
-
-        function populateInquiryCategoryDropdown(selectedCat = "") {
-            const selectEl = document.getElementById('inqCategory'); if (!selectEl) return;
-            const cats = [...new Set(inquiriesData.map(i => i.category).filter(Boolean))];
-            selectEl.innerHTML = cats.map(c => `<option value="${c}" ${c === selectedCat ? 'selected' : ''}>${c}</option>`).join('') + `<option value="أخرى" ${!cats.includes(selectedCat) && selectedCat ? 'selected' : ''}>+ قسم جديد (أخرى)</option>`;
-            checkInquiryCustomCat(selectEl.value);
         }
 
         function renderInquiries(highlightId = null) {
@@ -2705,9 +2673,8 @@
         function openInquiryModal() {
             document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
             document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
-            document.getElementById('inqColor').value = "card-darkblue"; 
-            let defaultCat = (selectedInquiryFilter && selectedInquiryFilter !== 'الكل') ? selectedInquiryFilter : (inquiriesData[0]?.category || "الليزر");
-            populateInquiryCategoryDropdown(defaultCat);
+            document.getElementById('inqCategory').value = "الليزر"; document.getElementById('inqColor').value = "card-darkblue"; 
+            document.getElementById('inqCustomCatBox').style.display = "none";
             document.getElementById('inquiryModal').classList.add('active');
         }
 
@@ -2715,7 +2682,6 @@
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
-            if (!cat) return alert("حدد القسم!");
             const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
             if (!obj.question) return;
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
@@ -2726,9 +2692,8 @@
             const item = inquiriesData.find(i => i.id === id); if (!item) return;
             document.getElementById('inquiryId').value = item.id; document.getElementById('inqQuestion').value = item.question;
             document.getElementById('inqAnswer').value = item.answer; document.getElementById('inqTags').value = item.tags || "";
-            document.getElementById('inqColor').value = item.color || "card-darkblue";
-            populateInquiryCategoryDropdown(item.category);
-            document.getElementById('inquiryModal').classList.add('active');
+            document.getElementById('inqCategory').value = item.category || "الليزر";
+            document.getElementById('inqColor').value = item.color || "card-darkblue"; document.getElementById('inquiryModal').classList.add('active');
         }
 
         function deleteInquiry(id) {
