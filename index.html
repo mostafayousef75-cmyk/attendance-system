@@ -2859,6 +2859,32 @@
             document.getElementById('lightboxImg').src = imgSrc;
             document.getElementById('lightboxModal').classList.add('active');
         }
+
+        // التعديل الجديد لتصحيح المواعيد تلقائياً
+function copyDoctorForClient(id) {
+    const doc = doctorsData.find(d => d.id === id);
+    if (!doc) return;
+    
+    let s1Days = doc.shift1Days || [];
+    let dayStr1 = formatDaysSmart(s1Days);
+    let s1Shifts = doc.shifts1 || [];
+    
+    let timingLines = [];
+    if (s1Shifts.length > 0) {
+        timingLines.push(`• ${dayStr1}:`);
+        s1Shifts.forEach(sh => {
+            let startHour = parseFloat(sh.start);
+            let shiftTypeLabel = (startHour < 12) ? "فترة صباحية" : "فترة مسائية";
+            timingLines.push(`  - ${shiftTypeLabel}: ${getTimeLabelText(sh.start)} - ${getTimeLabelText(sh.end)}`);
+        });
+    }
+
+    let clientText = `الدكتور: ${doc.name} ${doc.nationality || ''}\nالتخصص: ${doc.specialty}\nالكشفية: ${doc.fee || '75 ريال'}\n\nمواعيد الدوام:\n` + timingLines.join('\n');
+    if (doc.isLeave) clientText += `\n⚠️ تنبيه: غير متواجد (في إجازة).`;
+    
+    copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
+}
+
     </script>
 </body>
 </html>
