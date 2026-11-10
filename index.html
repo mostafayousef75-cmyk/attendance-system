@@ -2509,9 +2509,12 @@
 
                 tr.innerHTML = `
                     <td ${cellStyle}>
-                        <div style="display:flex; align-items:center; gap:0.25rem;">
+                        <div style="display:flex; align-items:flex-start; gap:0.25rem;">
                             <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
-                            <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
+                            <div style="flex:1;">
+                                <div style="font-size:0.76rem; font-weight:700; line-height:1.4;">${item.name} ${jointBadge}</div>
+                                ${tagsHtml}
+                            </div>
                         </div>
                     </td>
                     <td style="width:65px; text-align:center;">
@@ -2532,14 +2535,13 @@
             const notesContainer = document.getElementById('deptNotesContainer');
             if(!notesContainer) return; 
             
-            // تطبيق نظام العرض المرن والمتراص (Dense) أو الاختيار الحالي على ملاحظات الأقسام لتكون كروت متناسقة مثل دليل الاستفسارات
             applyDeptsViewModeUI();
 
             notesContainer.innerHTML = "";
             let notesBuffer = "";
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
-                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
+                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.55rem; color:#fde047; margin-top:0.3rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.2rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
                     const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
                     const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
 
@@ -2556,7 +2558,7 @@
                                     <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </h3>
-                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text.trim()}</div>
+                            <div style="font-size: 0.72rem; line-height: 1.4; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); font-weight: 700;">${noteObj.text.trim()}</div>
                             ${tagsHtml}
                         </div>`;
                 }
