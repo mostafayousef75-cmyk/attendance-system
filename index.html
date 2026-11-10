@@ -2958,6 +2958,229 @@
                 wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
                 renderDoctors(); playChirpSound();
             } else {
-                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'note') ? deptNotesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
+                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
                 if (listRef) {
-                    
+                    let sourceIndex = listRef.findIndex(x => x.id === draggedId);
+                    if (sourceIndex !== -1) {
+                        let moved = listRef.splice(sourceIndex, 1)[0];
+                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card');
+                        if (targetCard && targetCard.getAttribute('data-id')) {
+                            let targetId = parseInt(targetCard.getAttribute('data-id'));
+                            let targetIndex = listRef.findIndex(x => x.id === targetId);
+                            if (targetIndex !== -1) {
+                                listRef.splice(targetIndex, 0, moved);
+                            } else {
+                                listRef.push(moved);
+                            }
+                        } else {
+                            listRef.push(moved);
+                        }
+                        syncToCloud(); 
+                        
+                        if (type === 'inquiry') renderInquiries();
+                        else if (type === 'offer') renderOffers();
+                        else if (type === 'coordinator') renderCoordinators();
+                        else if (type === 'alert') renderAlerts();
+                        else if (type === 'service') renderDeptsAndDocs();
+
+                        playChirpSound();
+                    }
+                }
+            }
+            draggedItemInfo = null;
+        }
+
+        function initFloatingOffersDrag() {
+            const win = document.getElementById('floatingOffersWin'), header = document.getElementById('floatingOffersHeader');
+            if (!win || !header) return;
+            let isDragging = false, startX, startY, initialLeft, initialTop;
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true; startX = e.clientX; startY = e.clientY;
+                const rect = win.getBoundingClientRect();
+                initialLeft = rect.left; initialTop = rect.top;
+                win.style.right = 'auto'; win.style.bottom = 'auto';
+                win.style.left = initialLeft + 'px'; win.style.top = initialTop + 'px';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                win.style.left = (initialLeft + (e.clientX - startX)) + 'px';
+                win.style.top = (initialTop + (e.clientY - startY)) + 'px';
+            });
+            document.addEventListener('mouseup', () => { isDragging = false; });
+        }
+
+        let globalSearchTimeout = null;
+        function handleSmartGlobalSearch(query) {
+            if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                let rawQ = query.trim();
+                if (!rawQ) {
+                    document.getElementById('globalSearchResultsSection').classList.remove('active');
+                    const activeTab = localStorage.getItem('activeTab') || 'schedule';
+                    document.getElementById(activeTab + '-section').classList.add('active');
+                    currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+                    return;
+                }
+                let normQ = normalizeArabicText(rawQ);
+                const resultsSection = document.getElementById('globalSearchResultsSection'), resultsList = document.getElementById('globalSearchResultsList');
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                resultsSection.classList.add('active'); resultsList.innerHTML = ""; currentGlobalSearchResults = [];
+                const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
+
+                if (enabledCats.includes('doctors')) {
+                    doctorsData.forEach(d => {
+                        if (d.searchKey && d.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'doc_' + d.id, title: `${d.name} (${d.specialty})`, subtitle: `الفرع: ${d.branch || 'مشترك'}`, copyText: `الطبيب: ${d.name}\nالتخصص: ${d.specialty}`, source: "الأطباء", action: `jumpToSectionAndHighlightDoc(${d.id})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('offers')) {
+                    offersData.forEach(o => {
+                        if (o.searchKey && o.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'offer_' + o.id, title: o.name, subtitle: o.price ? `السعر: ${o.price}` : '', copyText: formatOfferLineForClient(o), source: `العروض (${o.category})`, action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('alerts')) {
+                    alertsData.forEach(a => {
+                        if (a.searchKey && a.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'alert_' + a.id, title: a.content, subtitle: a.time, copyText: a.content, source: "التنبيهات", action: `jumpToAlertsTab(${a.id})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('inquiries')) {
+                    inquiriesData.forEach(i => {
+                        if (i.searchKey && i.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'inq_' + i.id, title: i.question, subtitle: i.answer, copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`, source: `الاستفسارات (${i.category})`, action: `jumpToSectionAndHighlightInquiry(${i.id})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('services')) {
+                    deptServicesData.forEach(s => {
+                        if (s.searchKey && s.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'srv_' + s.id, title: s.name, subtitle: `فرع ${s.branch}`, copyText: s.name, source: "الأقسام والخدمات", action: `jumpToSectionAndHighlightService(${s.id})` });
+                        }
+                    });
+                    deptNotesData.forEach((n, idx) => {
+                        if (n.searchKey && n.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'note_' + idx, title: n.text, subtitle: 'ملحوظة عامة', copyText: n.text, source: "ملحوظات الأقسام", action: `jumpToSectionAndHighlightNote(${idx})` });
+                        }
+                    });
+                }
+                if (enabledCats.includes('coordinators')) {
+                    coordinatorsData.forEach(c => {
+                        if (c.searchKey && c.searchKey.includes(normQ)) {
+                            currentGlobalSearchResults.push({ id: 'coord_' + c.id, title: c.name, subtitle: 'تعليمات المنسقين', copyText: `${c.name}\n${c.rules.join('\n')}`, source: "دليل المنسقين", action: `jumpToSectionAndHighlightCoordinator(${c.id})` });
+                        }
+                    });
+                }
+
+                if (currentGlobalSearchResults.length === 0) {
+                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
+                    return;
+                }
+
+                resultsList.innerHTML = currentGlobalSearchResults.map(res => `
+                    <div class="search-result-card">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+                            <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${selectedGlobalSearchIds.includes(res.id) ? 'checked' : ''} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
+                            <div><span class="source-badge">${res.source}</span><h4>${res.title}</h4><p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p></div>
+                        </div>
+                        <div style="display:flex; gap:0.25rem;">
+                            <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n')}', 'تم النسخ:')"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn btn-blue" onclick="${res.action}">عرض</button>
+                        </div>
+                    </div>`).join('');
+                updateSelectedCountDisplay();
+            }, 30);
+        }
+
+        function handleSearchCheckboxChange(resId, chk) {
+            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
+            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
+            updateSelectedCountDisplay();
+        }
+
+        function toggleSelectAllGlobalSearch(masterChk) {
+            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
+            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
+            updateSelectedCountDisplay();
+        }
+
+        function updateSelectedCountDisplay() {
+            const countSpan = document.getElementById('selectedSearchCountNum');
+            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
+        }
+
+        function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("حدد نتيجة واحدة على الأقل!");
+            let blocks = currentGlobalSearchResults.filter(res => selectedGlobalSearchIds.includes(res.id)).map(res => res.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم النسخ!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults.length) return;
+            copyTextToClipboard(currentGlobalSearchResults.map(r => r.copyText).join('\n\n---\n\n'), "تم نسخ كل النتائج!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal'); document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[3]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { 
+                renderOffers(id); 
+                const cardEl = document.getElementById('offer_card_' + id);
+                if (cardEl) {
+                    cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+                    cardEl.classList.add('highlight-pulse'); 
+                    setTimeout(() => cardEl.classList.remove('highlight-pulse'), 3000);
+                }
+            }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('inquiries', document.querySelectorAll('.nav-link')[4]);
+            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightService(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightNote(idx) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
+            setTimeout(() => { renderDeptsAndDocs('note_' + idx); document.getElementById('dept_note_card_' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightCoordinator(id) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('coordinators', document.querySelectorAll('.nav-link')[5]);
+            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
