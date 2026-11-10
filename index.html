@@ -175,13 +175,13 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
-        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات والأقسام --- */
+        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات والأقسام والخدمات --- */
         .cards-view-grid { width: 100%; transition: all 0.2s ease; }
         
         /* 1. شبكة متساوية القياس (Grid Equal) */
         .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: start; }
         
-        /* 2. تداخل مرن ومتراص (Masonry Dense) - لتتكامل الكروت رأسياً بدون أي مساحات فارغة */
+        /* 2. تداخل مرن ومتراص (Masonry Dense) */
         .cards-view-grid.view-mode-dense {
             column-count: 3;
             column-gap: 0.4rem;
@@ -533,11 +533,10 @@
                 <div class="alerts-2col-grid" id="alertsGridList" ondragover="event.preventDefault()" ondrop="dropRow(event, 'alert')"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء (تم تحويلها إلى كروت متناسقة مع قائمة منسدلة لطرق العرض) -->
+            <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
-                    <h2>أقسام وفروع وخدمات العيادات</h2>
-                    
+                    <h2>أقسام وفروع وخدمات العيادات والملاحظات</h2>
                     <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
                             <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
@@ -553,20 +552,12 @@
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
                 </div>
-
-                <div class="offers-tabs" id="deptsFilterTabs">
-                    <button class="offer-tab-btn active" onclick="filterDeptsCategory('الكل', this)">⭐ كل الأقسام والخدمات والملاحظات</button>
-                    <button class="offer-tab-btn" onclick="filterDeptsCategory('معشي', this)">فرع معشي</button>
-                    <button class="offer-tab-btn" onclick="filterDeptsCategory('الوسام', this)">فرع الوسام</button>
-                    <button class="offer-tab-btn" onclick="filterDeptsCategory('ملاحظات', this)">الملاحظات والشروط</button>
-                </div>
-
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والخدمات والوسوم..." oninput="renderDeptsAndDocs()">
                 </div>
-
-                <div class="cards-view-grid view-mode-dense" id="deptsCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></div>
+                
+                <div class="cards-view-grid view-mode-dense" id="deptsCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'dept_card')"></div>
             </section>
 
             <!-- 4. العروض والأسعار -->
@@ -613,7 +604,7 @@
                 <div class="offers-grid-container offers-mode-grid2" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
             </section>
 
-            <!-- 5. دليل الاستفسارات -->
+            <!-- 5. دليل الاستفسارات (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
@@ -642,7 +633,7 @@
                 <div class="cards-view-grid view-mode-dense" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
             </section>
 
-            <!-- 6. دليل المنسقين -->
+            <!-- 6. دليل المنسقين (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
@@ -963,10 +954,8 @@
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
                 <label>القسم</label>
                 <select id="deptCategorySelect" class="form-control">
-                    <option value="derm">الجلدية</option>
-                    <option value="dent">الأسنان</option>
-                    <option value="laser">الليزر</option>
-                    <option value="other">أخرى</option>
+                    <option value="derm">الجلدية (عمود الجلدية)</option>
+                    <option value="dent">الأسنان (عمود الأسنان)</option>
                 </select>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
@@ -978,14 +967,14 @@
                 <input type="text" id="deptTags" class="form-control" placeholder="مثال: ليزر، أجهزة، تجميل">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem; margin-top:0.12rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون الكارت:</label>
+                <label style="font-weight:700; color:var(--primary-color);">لون التمييز:</label>
                 <select id="deptCustomColor" class="form-control">
-                    <option value="card-darkblue">أزرق داكن (افتراضي)</option>
+                    <option value="card-darkblue">أزرق داكن</option>
                     <option value="card-teal">أزرق ملكي</option>
-                    <option value="card-maroon">أحمر مارون</option>
-                    <option value="card-red">أحمر داكن</option>
                     <option value="card-gold">برتقالي ذهبي</option>
                     <option value="card-green">أخضر زيتي</option>
+                    <option value="card-maroon">أحمر مارون</option>
+                    <option value="card-red">أحمر داكن</option>
                 </select>
             </div>
             <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">
@@ -1234,8 +1223,6 @@
 
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
-        let selectedDeptsCategory = localStorage.getItem('selectedDeptsCategory') || "الكل";
-        
         let selectedOfferIds = [];
         let selectedGlobalSearchIds = [];
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
@@ -1246,7 +1233,7 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // --- أوضاع العرض المحفوظة ---
+        // --- أوضاع العرض المحفوظة في LocalStorage (الافتراضي: Masonry Dense view-mode-dense) ---
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
         let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-dense';
         let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-dense';
@@ -1453,7 +1440,7 @@
         function loadDefaultData() {
             doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
-            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "card-teal", isJoint: true }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "card-darkblue", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
             inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", tags: "رتوش، ليزر", color: "card-darkblue" }];
             offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "عرض نوفمبر. عروض", tags: "عروض، أسنان", isPinned: true }];
@@ -2403,96 +2390,72 @@
             if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
         }
 
-        function filterDeptsCategory(cat, btn) {
-            selectedDeptsCategory = cat;
-            localStorage.setItem('selectedDeptsCategory', cat);
-            document.querySelectorAll('#deptsFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderDeptsAndDocs();
-        }
-
-        function renderDeptsAndDocs(highlightId = null) {
+        function renderDeptsAndDocs(highlightServiceId = null) {
             const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('deptsCardsGrid');
-            if (!grid) return;
-
+            const container = document.getElementById('deptsCardsGrid');
+            if(!container) return; 
+            
             applyDeptsViewModeUI();
-            grid.innerHTML = "";
+            
+            let cardsBuffer = "";
 
-            let combinedItems = [];
+            // 1. عرض الخدمات والأجهزة في كروت أنيقة
+            deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search)))).forEach((item) => {
+                const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
+                const tagsHtml = item.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
+                const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
+                const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                const cardColor = item.customColor || 'card-darkblue';
+                const typeLabel = item.type === 'derm' ? 'الجلدية' : 'الأسنان';
 
-            // Add services
-            if (selectedDeptsCategory === 'الكل' || selectedDeptsCategory === 'معشي' || selectedDeptsCategory === 'الوسام') {
-                deptServicesData.forEach(s => {
-                    if (selectedDeptsCategory === 'الكل' || s.branch === selectedDeptsCategory) {
-                        if (!search || (s.searchKey && s.searchKey.includes(search))) {
-                            combinedItems.push({ kind: 'service', data: s, id: s.id });
-                        }
-                    }
-                });
-            }
+                cardsBuffer += `
+                    <div id="dept_service_row_${item.id}" class="doc-sheet-card ${cardColor} ${isHighlighted}" data-id="${item.id}" data-item-type="service" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                        <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</span>
+                            </div>
+                            <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedSrvName}', 'تم نسخ الخدمة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.62rem; color: #f4f4f5; background: rgba(0,0,0,0.2); padding: 0.2rem 0.35rem; border-radius: 4px;">
+                            <span><i class="fa-solid fa-clinic-medical"></i> فرع ${item.branch} (${typeLabel})</span>
+                            ${jointBadge}
+                        </div>
+                        ${tagsHtml}
+                    </div>`;
+            });
 
-            // Add notes
-            if (selectedDeptsCategory === 'الكل' || selectedDeptsCategory === 'ملاحظات') {
-                deptNotesData.forEach((n, idx) => {
-                    if (!search || (n.searchKey && n.searchKey.includes(search))) {
-                        combinedItems.push({ kind: 'note', data: n, id: 'note_' + idx, index: idx });
-                    }
-                });
-            }
+            // 2. عرض الملاحظات في كروت أنيقة متناسقة
+            deptNotesData.forEach((noteObj, idx) => {
+                if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
+                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
+                    const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                    const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
 
-            let htmlBuffer = "";
-            combinedItems.forEach(item => {
-                if (item.kind === 'service') {
-                    const s = item.data;
-                    const jointBadge = s.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                    const tagsHtml = s.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${s.tags}</div>` : '';
-                    const escapedName = s.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
-                    const cardColor = s.customColor || 'card-darkblue';
-                    const isHighlighted = (s.id === highlightId) ? 'highlight-pulse' : '';
-
-                    htmlBuffer += `
-                        <div id="dept_service_card_${s.id}" class="doc-sheet-card ${cardColor} ${isHighlighted}" data-id="${s.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
-                            <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
-                                <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
-                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${s.id}, 'service')" title="اسحب لتحريك الخدمة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${s.name} ${jointBadge}</span>
-                                </div>
-                                <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedName}', 'تم نسخ الخدمة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
-                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${s.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${s.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </h3>
-                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">فرع ${s.branch} - ${s.type === 'derm' ? 'الجلدية' : s.type === 'dent' ? 'الأسنان' : 'قسم عام'}</div>
-                            ${tagsHtml}
-                        </div>`;
-                } else if (item.kind === 'note') {
-                    const n = item.data;
-                    const idx = item.index;
-                    const tagsHtml = n.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${n.tags}</div>` : '';
-                    const escapedText = n.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
-                    const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
-
-                    htmlBuffer += `
-                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${n.color || 'card-gold'} ${isHighlighted}" data-id="${idx}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                    cardsBuffer += `
+                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}" data-item-type="note" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
                             <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                                 <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
                                     <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">ملحوظة #${idx + 1}</span>
+                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">ملحوظة #${idx + 1}</span>
                                 </div>
                                 <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
                                     <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
                                     <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </h3>
-                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${n.text}</div>
+                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text.trim()}</div>
                             ${tagsHtml}
                         </div>`;
                 }
             });
-            grid.innerHTML = htmlBuffer;
+
+            container.innerHTML = cardsBuffer;
         }
 
         function openDeptServiceModal() {
@@ -2559,6 +2522,7 @@
             const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; 
             
+            // تطبيق وضع العرض المحفوظ لدليل المنسقين
             applyCoordinatorsViewModeUI();
             
             let htmlBuffer = "";
@@ -2574,6 +2538,7 @@
 
                 htmlBuffer += `
                     <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                        
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'coordinator')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -2585,8 +2550,11 @@
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
+
                         <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${detailsText.trim()}</div>
+
                         ${tagsHtml}
+
                     </div>`;
             });
             grid.innerHTML = htmlBuffer;
@@ -2860,6 +2828,7 @@
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; 
             
+            // تطبيق وضع العرض المحفوظ لدليل الاستفسارات
             applyInquiriesViewModeUI();
             
             let inqBuffer = "";
@@ -2870,6 +2839,7 @@
 
                 inqBuffer += `
                     <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                        
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -2881,11 +2851,14 @@
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
+
                         <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${item.answer.trim()}</div>
+
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.1rem;">
                             <span style="font-size: 0.58rem; color: #fde047; font-weight: 700;"><i class="fa-solid fa-folder-open"></i> ${item.category}</span>
                         </div>
                         ${tagsHtml}
+
                     </div>`;
             });
             grid.innerHTML = inqBuffer;
@@ -2929,7 +2902,10 @@
         let draggedItemInfo = null;
         function dragStartRow(e, id, type) { 
             draggedItemInfo = { id, type }; 
-            e.dataTransfer.effectAllowed = 'move'; 
+            e.dataTransfer.effectAllowed = 'move';
+            if (e.target) {
+                e.dataTransfer.setData('text/plain', id);
+            }
         }
 
         function dropRow(e, containerType) {
@@ -2957,6 +2933,35 @@
                 } else { currentList.push(draggedId); }
                 wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
                 renderDoctors(); playChirpSound();
+            } else if ((type === 'service' || type === 'note') && containerType === 'dept_card') {
+                const targetCard = e.target.closest('.doc-sheet-card');
+                if (type === 'service') {
+                    let sourceIdx = deptServicesData.findIndex(s => s.id === draggedId);
+                    if (sourceIdx !== -1) {
+                        let moved = deptServicesData.splice(sourceIdx, 1)[0];
+                        if (targetCard && targetCard.getAttribute('data-item-type') === 'service') {
+                            let targetId = parseInt(targetCard.getAttribute('data-id'));
+                            let targetIdx = deptServicesData.findIndex(s => s.id === targetId);
+                            if (targetIdx !== -1) deptServicesData.splice(targetIdx, 0, moved);
+                            else deptServicesData.push(moved);
+                        } else {
+                            deptServicesData.push(moved);
+                        }
+                    }
+                } else if (type === 'note') {
+                    let sourceIdx = parseInt(draggedId);
+                    if (sourceIdx >= 0 && sourceIdx < deptNotesData.length) {
+                        let moved = deptNotesData.splice(sourceIdx, 1)[0];
+                        if (targetCard && targetCard.getAttribute('data-item-type') === 'note') {
+                            let targetIdx = parseInt(targetCard.getAttribute('data-id'));
+                            if (targetIdx >= 0) deptNotesData.splice(targetIdx, 0, moved);
+                            else deptNotesData.push(moved);
+                        } else {
+                            deptNotesData.push(moved);
+                        }
+                    }
+                }
+                syncToCloud(); renderDeptsAndDocs(); playChirpSound();
             } else {
                 let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
                 if (listRef) {
