@@ -2397,11 +2397,24 @@
             if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
         }
 
-        function renderDeptsAndDocs(highlightServiceId = null) {
-            const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
-            if(bodies.some(b => !b)) return;
-            bodies.forEach(b => b.innerHTML = "");
+        // حفظ واسترجاع وضع العرض لقسم الملاحظات والأقسام
+let currentDeptNotesViewMode = localStorage.getItem('dept_notes_view_mode_choice') || 'view-mode-dense';
+
+function changeDeptNotesViewMode(modeClass) {
+    currentDeptNotesViewMode = modeClass;
+    localStorage.setItem('dept_notes_view_mode_choice', modeClass);
+    applyDeptNotesViewModeUI();
+    playChirpSound();
+}
+
+function applyDeptNotesViewModeUI() {
+    const container = document.getElementById('deptNotesContainer');
+    const selectElem = document.getElementById('deptNotesViewModeSelect');
+    if (!container) return;
+    container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
+    container.classList.add(currentDeptNotesViewMode);
+    if (selectElem) selectElem.value = currentDeptNotesViewMode;
+}
 
             deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search)))).forEach((item) => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
@@ -3147,6 +3160,178 @@
             switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
             setTimeout(() => { renderDeptsAndDocs('note_' + idx); document.getElementById('dept_note_card_' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
+
+        function renderDeptsAndDocs(highlightServiceId = null) {
+    const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
+    const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
+    if(bodies.some(b => !b)) return;
+    bodies.forEach(b => b.innerHTML = "");
+
+    // 1. عرض الخدمات والأجهزة داخل الجداول الأصلية للفرعين
+    deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search)))).forEach((item) => {
+        const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
+        const tagsHtml = item.tags ? `<br><span class="tag-badge">🏷️ ${item.tags}</span>` : '';
+        const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
+        const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
+        const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
+        const tr = document.createElement('tr');
+        tr.id = `dept_service_row_${item.id}`;
+        tr.className = isHighlighted;
+        tr.setAttribute('data-id', item.id);
+
+        tr.innerHTML = `
+            <td ${cellStyle}>
+                <div style="display:flex; align-items:center; gap:0.25rem;">
+                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
+                    <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
+                </div>
+            </td>
+            <td style="width:65px; text-align:center;">
+                <div class="actions-col-group" style="flex-direction:row;">
+                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedSrvName}', 'تم نسخ الخدمة:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </td>`;
+
+        if (item.branch === "معشي") {
+            if (item.type === "derm") bodies[0].appendChild(tr); else bodies[1].appendChild(tr);
+        } else {
+            if (item.type === "derm") bodies[2].appendChild(tr); else bodies[3].appendChild(tr);
+        }
+    });
+
+    // 2. عرض الملاحظات فقط بتصميم الكروت مثل دليل الاستفسارات والمنسقين
+    const notesContainer = document.getElementById('deptNotesContainer');
+    if(!notesContainer) return; 
+    
+    applyDeptNotesViewModeUI(); // تطبيق نمط العرض المحدد
+    
+    let notesBuffer = "";
+    deptNotesData.forEach((noteObj, idx) => {
+        if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
+            const tagsHtml = noteObj.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
+            const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
+
+            notesBuffer += `
+                <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                    <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
+                        <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">ملحوظة #${idx + 1}</span>
+                        </div>
+                        <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
+                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                            <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </h3>
+                    <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text.trim()}</div>
+                    ${tagsHtml}
+                </div>`;
+        }
+    });
+    notesContainer.innerHTML = notesBuffer;
+}
+
+        let draggedItemInfo = null;
+
+function dragStartRow(e, id, type) { 
+    draggedItemInfo = { id, type }; 
+    e.dataTransfer.effectAllowed = 'move'; 
+}
+
+function dropRow(e, containerType) {
+    e.preventDefault();
+    if (!draggedItemInfo) return;
+    const { id: draggedId, type } = draggedItemInfo;
+
+    // 1. ترتيب أطباء فرع معشي
+    if (type === 'doctor_mashy' && containerType === 'mashy') {
+        let currentList = getSortedDoctorsListForBranch('معشي').filter(d => d.branch === "معشي" || d.isJoint).map(d => d.id);
+        let sourceIdx = currentList.indexOf(draggedId); 
+        if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
+        const tr = e.target.closest('tr');
+        if (tr && tr.getAttribute('data-id')) {
+            let targetIdx = currentList.indexOf(parseInt(tr.getAttribute('data-id')));
+            if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId); else currentList.push(draggedId);
+        } else { currentList.push(draggedId); }
+        mashyCustomOrder = currentList; 
+        localStorage.setItem('mashy_custom_order', JSON.stringify(mashyCustomOrder));
+        renderDoctors(); 
+        playChirpSound();
+    } 
+    // 2. ترتيب أطباء فرع الوسام
+    else if (type === 'doctor_wissam' && containerType === 'wissam') {
+        let currentList = getSortedDoctorsListForBranch('الوسام').filter(d => d.branch === "الوسام" || d.isJoint).map(d => d.id);
+        let sourceIdx = currentList.indexOf(draggedId); 
+        if (sourceIdx !== -1) currentList.splice(sourceIdx, 1);
+        const tr = e.target.closest('tr');
+        if (tr && tr.getAttribute('data-id')) {
+            let targetIdx = currentList.indexOf(parseInt(tr.getAttribute('data-id')));
+            if (targetIdx !== -1) currentList.splice(targetIdx, 0, draggedId); else currentList.push(draggedId);
+        } else { currentList.push(draggedId); }
+        wissamCustomOrder = currentList; 
+        localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
+        renderDoctors(); 
+        playChirpSound();
+    } 
+    // 3. ترتيب كروت الملاحظات
+    else if (type === 'note' && containerType === 'note') {
+        let sourceIndex = parseInt(draggedId);
+        if (!isNaN(sourceIndex) && sourceIndex >= 0 && sourceIndex < deptNotesData.length) {
+            let movedNote = deptNotesData.splice(sourceIndex, 1)[0];
+            const targetCard = e.target.closest('.doc-sheet-card');
+            if (targetCard && targetCard.getAttribute('data-id') !== null) {
+                let targetIndex = parseInt(targetCard.getAttribute('data-id'));
+                if (!isNaN(targetIndex)) {
+                    deptNotesData.splice(targetIndex, 0, movedNote);
+                } else {
+                    deptNotesData.push(movedNote);
+                }
+            } else {
+                deptNotesData.push(movedNote);
+            }
+            syncToCloud();
+            renderDeptsAndDocs();
+            playChirpSound();
+        }
+    }
+    // 4. ترتيب العروض والاستفسارات والمنسقين والتنبيهات والخدمات
+    else {
+        let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
+        if (listRef) {
+            let sourceIndex = listRef.findIndex(x => x.id === draggedId);
+            if (sourceIndex !== -1) {
+                let moved = listRef.splice(sourceIndex, 1)[0];
+                const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card, tr');
+                if (targetCard && targetCard.getAttribute('data-id')) {
+                    let targetId = parseInt(targetCard.getAttribute('data-id'));
+                    let targetIndex = listRef.findIndex(x => x.id === targetId);
+                    if (targetIndex !== -1) {
+                        listRef.splice(targetIndex, 0, moved);
+                    } else {
+                        listRef.push(moved);
+                    }
+                } else {
+                    listRef.push(moved);
+                }
+                syncToCloud(); 
+                
+                if (type === 'inquiry') renderInquiries();
+                else if (type === 'offer') renderOffers();
+                else if (type === 'coordinator') renderCoordinators();
+                else if (type === 'alert') renderAlerts();
+                else if (type === 'service') renderDeptsAndDocs();
+
+                playChirpSound();
+            }
+        }
+    }
+    draggedItemInfo = null;
+}
 
         function jumpToSectionAndHighlightCoordinator(id) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
