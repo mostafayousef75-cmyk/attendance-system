@@ -2085,7 +2085,7 @@
             document.getElementById('fridayDocMashy').innerHTML = nextMashyFriday ? `<span>${nextMashyFriday.doc}</span> (${nextMashyFriday.date})` : '<span>لم يُحدد</span>';
             document.getElementById('fridayDocWissam').innerHTML = nextWissamFriday ? `<span>${nextWissamFriday.doc}</span> (${nextWissamFriday.date})` : '<span>لم يُحدد</span>';
             
-            const currentDay = getArabicDayName();
+            const currentDay = getArabicDayName(); // يوم الأربعاء مثلاً
             document.getElementById('todayDayName').innerText = currentDay;
 
             let todayMashyDocs = [], todayWissamDocs = [];
@@ -2093,9 +2093,25 @@
             const mashyList = getSortedDoctorsListForBranch('معشي').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "معشي" || d.isJoint));
             const wissamList = getSortedDoctorsListForBranch('الوسام').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "الوسام" || d.isJoint));
 
+            // دالة مساعدة للتحقق مما إذا كان الطبيب متاحاً في اليوم الحالي (بغض النظر عن الساعة، أو حسب الأيام المحددة)
+            function isDoctorAvailableToday(doc, targetDay) {
+                if (doc.isLeave) return false;
+                let checkDays = (daysArr) => {
+                    if (!daysArr || daysArr.length === 0) return true; // إذا لم تُحدد أيام يعتبر متاحاً طوال الأسبوع
+                    return daysArr.includes(targetDay);
+                };
+                let match1 = checkDays(doc.shift1Days);
+                let match2 = (doc.shiftsCount === "2") ? checkDays(doc.shift2Days) : false;
+                return match1 || match2;
+            }
+
             let mashyHtmlBuffer = "";
             mashyList.forEach((doc) => {
-                if (checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24())) todayMashyDocs.push(doc.name);
+                // التحقق من تواجد الطبيب اليوم بغض النظر عن الوقت لكي يظهر في قائمة المتواجدين اليوم بدقة
+                if (isDoctorAvailableToday(doc, currentDay)) {
+                    todayMashyDocs.push(doc.name);
+                }
+
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
@@ -2135,7 +2151,10 @@
 
             let wissamHtmlBuffer = "";
             wissamList.forEach((doc) => {
-                if (checkDocActiveForTimeAndDay(doc, currentDay, getModifiedTimeHour24())) todayWissamDocs.push(doc.name);
+                if (isDoctorAvailableToday(doc, currentDay)) {
+                    todayWissamDocs.push(doc.name);
+                }
+
                 const jointBadge = doc.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const pinnedBadge = doc.isPinned ? `<span style="color:#facc15;">📌</span>` : '';
                 const leaveBadge = doc.isLeave ? `<span style="color:#ef4444; font-weight:bold; font-size:0.58rem;">⚠️ غير متواجد (إجازة)</span>` : '';
