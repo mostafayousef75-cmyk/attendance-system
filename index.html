@@ -175,7 +175,7 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
-        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات --- */
+        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات والأقسام --- */
         .cards-view-grid { width: 100%; transition: all 0.2s ease; }
         
         /* 1. شبكة متساوية القياس (Grid Equal) */
@@ -533,59 +533,40 @@
                 <div class="alerts-2col-grid" id="alertsGridList" ondragover="event.preventDefault()" ondrop="dropRow(event, 'alert')"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء -->
+            <!-- 3. الأقسام والأطباء (تم تحويلها إلى كروت متناسقة مع قائمة منسدلة لطرق العرض) -->
             <section id="depts-docs-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
-                    <div style="display:flex; gap:0.2rem;">
+                    
+                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
+                            <select id="deptsViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeDeptsViewMode(this.value)">
+                                <option value="view-mode-dense" selected>1. تداخل مرن ومتراص (Dense)</option>
+                                <option value="view-mode-gridEqual">2. شبكة متساوية (Grid Equal)</option>
+                                <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
+                                <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
+                                <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
+                            </select>
+                        </div>
                         <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
                 </div>
+
+                <div class="offers-tabs" id="deptsFilterTabs">
+                    <button class="offer-tab-btn active" onclick="filterDeptsCategory('الكل', this)">⭐ كل الأقسام والخدمات والملاحظات</button>
+                    <button class="offer-tab-btn" onclick="filterDeptsCategory('معشي', this)">فرع معشي</button>
+                    <button class="offer-tab-btn" onclick="filterDeptsCategory('الوسام', this)">فرع الوسام</button>
+                    <button class="offer-tab-btn" onclick="filterDeptsCategory('ملاحظات', this)">الملاحظات والشروط</button>
+                </div>
+
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والخدمات والوسوم..." oninput="renderDeptsAndDocs()">
                 </div>
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;">
-                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span></div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الجلدية</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="mashyDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الأسنان</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="mashyDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span></div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الجلدية</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="wissamDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الأسنان</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="wissamDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.35rem;" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
-                </div>
+                <div class="cards-view-grid view-mode-dense" id="deptsCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></div>
             </section>
 
             <!-- 4. العروض والأسعار -->
@@ -632,7 +613,7 @@
                 <div class="offers-grid-container offers-mode-grid2" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
             </section>
 
-            <!-- 5. دليل الاستفسارات (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
+            <!-- 5. دليل الاستفسارات -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
@@ -661,7 +642,7 @@
                 <div class="cards-view-grid view-mode-dense" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
             </section>
 
-            <!-- 6. دليل المنسقين (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
+            <!-- 6. دليل المنسقين -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
@@ -982,8 +963,10 @@
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
                 <label>القسم</label>
                 <select id="deptCategorySelect" class="form-control">
-                    <option value="derm">الجلدية (عمود الجلدية)</option>
-                    <option value="dent">الأسنان (عمود الأسنان)</option>
+                    <option value="derm">الجلدية</option>
+                    <option value="dent">الأسنان</option>
+                    <option value="laser">الليزر</option>
+                    <option value="other">أخرى</option>
                 </select>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem;">
@@ -995,11 +978,14 @@
                 <input type="text" id="deptTags" class="form-control" placeholder="مثال: ليزر، أجهزة، تجميل">
             </div>
             <div style="display:flex; flex-direction:column; gap:0.12rem; margin-top:0.12rem;">
-                <label style="font-weight:700; color:var(--primary-color);">لون التمييز:</label>
+                <label style="font-weight:700; color:var(--primary-color);">لون الكارت:</label>
                 <select id="deptCustomColor" class="form-control">
-                    <option value="">بدون تمييز (افتراضي)</option>
-                    <option value="background-color: rgba(234, 179, 8, 0.25); color: #fef08a;">أصفر مميز</option>
-                    <option value="background-color: rgba(22, 163, 74, 0.25); color: #86efac;">أخضر مميز</option>
+                    <option value="card-darkblue">أزرق داكن (افتراضي)</option>
+                    <option value="card-teal">أزرق ملكي</option>
+                    <option value="card-maroon">أحمر مارون</option>
+                    <option value="card-red">أحمر داكن</option>
+                    <option value="card-gold">برتقالي ذهبي</option>
+                    <option value="card-green">أخضر زيتي</option>
                 </select>
             </div>
             <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">
@@ -1248,6 +1234,8 @@
 
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
+        let selectedDeptsCategory = localStorage.getItem('selectedDeptsCategory') || "الكل";
+        
         let selectedOfferIds = [];
         let selectedGlobalSearchIds = [];
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
@@ -1258,10 +1246,11 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // --- أوضاع العرض المحفوظة في LocalStorage (الافتراضي: Masonry Dense view-mode-dense) ---
+        // --- أوضاع العرض المحفوظة ---
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
         let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-dense';
         let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-dense';
+        let currentDeptsViewMode = localStorage.getItem('depts_view_mode_choice') || 'view-mode-dense';
 
         function changeOffersViewMode(modeClass) {
             currentOffersViewMode = modeClass;
@@ -1309,6 +1298,22 @@
             container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
             container.classList.add(currentCoordinatorsViewMode);
             if (selectElem) selectElem.value = currentCoordinatorsViewMode;
+        }
+
+        function changeDeptsViewMode(modeClass) {
+            currentDeptsViewMode = modeClass;
+            localStorage.setItem('depts_view_mode_choice', modeClass);
+            applyDeptsViewModeUI();
+            playChirpSound();
+        }
+
+        function applyDeptsViewModeUI() {
+            const container = document.getElementById('deptsCardsGrid');
+            const selectElem = document.getElementById('deptsViewModeSelect');
+            if (!container) return;
+            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
+            container.classList.add(currentDeptsViewMode);
+            if (selectElem) selectElem.value = currentDeptsViewMode;
         }
 
         let globalHoursOptionsHTML = "";
@@ -1448,7 +1453,7 @@
         function loadDefaultData() {
             doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
-            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "card-teal", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
             inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", tags: "رتوش، ليزر", color: "card-darkblue" }];
             offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "عرض نوفمبر. عروض", tags: "عروض، أسنان", isPinned: true }];
@@ -1478,6 +1483,7 @@
             applyOffersViewModeUI();
             applyInquiriesViewModeUI();
             applyCoordinatorsViewModeUI();
+            applyDeptsViewModeUI();
             populateHourSelectOptions();
 
             document.getElementById('shiftScratchpadText1').value = localStorage.getItem('shift_scratchpad_1') || '';
@@ -2397,78 +2403,102 @@
             if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
         }
 
-        function renderDeptsAndDocs(highlightServiceId = null) {
+        function filterDeptsCategory(cat, btn) {
+            selectedDeptsCategory = cat;
+            localStorage.setItem('selectedDeptsCategory', cat);
+            document.querySelectorAll('#deptsFilterTabs .offer-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderDeptsAndDocs();
+        }
+
+        function renderDeptsAndDocs(highlightId = null) {
             const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
-            if(bodies.some(b => !b)) return;
-            bodies.forEach(b => b.innerHTML = "");
+            const grid = document.getElementById('deptsCardsGrid');
+            if (!grid) return;
 
-            deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search)))).forEach((item) => {
-                const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                const tagsHtml = item.tags ? `<br><span class="tag-badge">🏷️ ${item.tags}</span>` : '';
-                const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
-                const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
-                const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            applyDeptsViewModeUI();
+            grid.innerHTML = "";
 
-                const tr = document.createElement('tr');
-                tr.id = `dept_service_row_${item.id}`;
-                tr.className = isHighlighted;
-                tr.setAttribute('data-id', item.id);
+            let combinedItems = [];
 
-                tr.innerHTML = `
-                    <td ${cellStyle}>
-                        <div style="display:flex; align-items:center; gap:0.25rem;">
-                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
-                            <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
-                        </div>
-                    </td>
-                    <td style="width:65px; text-align:center;">
-                        <div class="actions-col-group" style="flex-direction:row;">
-                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedSrvName}', 'تم نسخ الخدمة:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
-                            <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>`;
+            // Add services
+            if (selectedDeptsCategory === 'الكل' || selectedDeptsCategory === 'معشي' || selectedDeptsCategory === 'الوسام') {
+                deptServicesData.forEach(s => {
+                    if (selectedDeptsCategory === 'الكل' || s.branch === selectedDeptsCategory) {
+                        if (!search || (s.searchKey && s.searchKey.includes(search))) {
+                            combinedItems.push({ kind: 'service', data: s, id: s.id });
+                        }
+                    }
+                });
+            }
 
-                if (item.branch === "معشي") {
-                    if (item.type === "derm") bodies[0].appendChild(tr); else bodies[1].appendChild(tr);
-                } else {
-                    if (item.type === "derm") bodies[2].appendChild(tr); else bodies[3].appendChild(tr);
-                }
-            });
+            // Add notes
+            if (selectedDeptsCategory === 'الكل' || selectedDeptsCategory === 'ملاحظات') {
+                deptNotesData.forEach((n, idx) => {
+                    if (!search || (n.searchKey && n.searchKey.includes(search))) {
+                        combinedItems.push({ kind: 'note', data: n, id: 'note_' + idx, index: idx });
+                    }
+                });
+            }
 
-            const notesContainer = document.getElementById('deptNotesContainer');
-            if(!notesContainer) return; notesContainer.innerHTML = "";
-            let notesBuffer = "";
-            deptNotesData.forEach((noteObj, idx) => {
-                if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
-                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
-                    const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
-                    const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
+            let htmlBuffer = "";
+            combinedItems.forEach(item => {
+                if (item.kind === 'service') {
+                    const s = item.data;
+                    const jointBadge = s.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
+                    const tagsHtml = s.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${s.tags}</div>` : '';
+                    const escapedName = s.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                    const cardColor = s.customColor || 'card-darkblue';
+                    const isHighlighted = (s.id === highlightId) ? 'highlight-pulse' : '';
 
-                    notesBuffer += `
-                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}">
-                            <h3>
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                <span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span>
-                                <div class="actions-col-group" style="flex-direction:row;">
-                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
-                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
+                    htmlBuffer += `
+                        <div id="dept_service_card_${s.id}" class="doc-sheet-card ${cardColor} ${isHighlighted}" data-id="${s.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                            <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
+                                <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
+                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${s.id}, 'service')" title="اسحب لتحريك الخدمة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${s.name} ${jointBadge}</span>
+                                </div>
+                                <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
+                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedName}', 'تم نسخ الخدمة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${s.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${s.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </h3>
-                            <p>${noteObj.text}</p>
+                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">فرع ${s.branch} - ${s.type === 'derm' ? 'الجلدية' : s.type === 'dent' ? 'الأسنان' : 'قسم عام'}</div>
+                            ${tagsHtml}
+                        </div>`;
+                } else if (item.kind === 'note') {
+                    const n = item.data;
+                    const idx = item.index;
+                    const tagsHtml = n.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${n.tags}</div>` : '';
+                    const escapedText = n.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                    const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
+
+                    htmlBuffer += `
+                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${n.color || 'card-gold'} ${isHighlighted}" data-id="${idx}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                            <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
+                                <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
+                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">ملحوظة #${idx + 1}</span>
+                                </div>
+                                <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
+                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
+                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </h3>
+                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${n.text}</div>
                             ${tagsHtml}
                         </div>`;
                 }
             });
-            notesContainer.innerHTML = notesBuffer;
+            grid.innerHTML = htmlBuffer;
         }
 
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = ""; document.getElementById('deptBranchSelect').value = "معشي";
             document.getElementById('deptCategorySelect').value = "derm"; document.getElementById('deptItemName').value = "";
-            document.getElementById('deptTags').value = ""; document.getElementById('deptCustomColor').value = ""; 
+            document.getElementById('deptTags').value = ""; document.getElementById('deptCustomColor').value = "card-darkblue"; 
             document.getElementById('deptIsJoint').checked = false; document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز";
             document.getElementById('deptServiceModal').classList.add('active');
         }
@@ -2491,7 +2521,7 @@
             document.getElementById('deptRowId').value = item.id; document.getElementById('deptBranchSelect').value = item.branch || "معشي";
             document.getElementById('deptCategorySelect').value = item.type || "derm"; document.getElementById('deptItemName').value = item.name || "";
             document.getElementById('deptTags').value = item.tags || "";
-            document.getElementById('deptCustomColor').value = item.customColor || ""; document.getElementById('deptIsJoint').checked = !!item.isJoint;
+            document.getElementById('deptCustomColor').value = item.customColor || "card-darkblue"; document.getElementById('deptIsJoint').checked = !!item.isJoint;
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
@@ -2529,7 +2559,6 @@
             const searchInput = document.getElementById('coordSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('coordinatorsGrid'); if(!grid) return; 
             
-            // تطبيق وضع العرض المحفوظ لدليل المنسقين
             applyCoordinatorsViewModeUI();
             
             let htmlBuffer = "";
@@ -2545,7 +2574,6 @@
 
                 htmlBuffer += `
                     <div id="coordinator_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
-                        
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'coordinator')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -2557,11 +2585,8 @@
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteCoordinator(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
-
                         <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${detailsText.trim()}</div>
-
                         ${tagsHtml}
-
                     </div>`;
             });
             grid.innerHTML = htmlBuffer;
@@ -2835,7 +2860,6 @@
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; 
             
-            // تطبيق وضع العرض المحفوظ لدليل الاستفسارات
             applyInquiriesViewModeUI();
             
             let inqBuffer = "";
@@ -2846,7 +2870,6 @@
 
                 inqBuffer += `
                     <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
-                        
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
                                 <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'inquiry')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -2858,14 +2881,11 @@
                                 <button class="action-icon-btn btn-del-ic" onclick="deleteInquiry(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </h3>
-
                         <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${item.answer.trim()}</div>
-
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.1rem;">
                             <span style="font-size: 0.58rem; color: #fde047; font-weight: 700;"><i class="fa-solid fa-folder-open"></i> ${item.category}</span>
                         </div>
                         ${tagsHtml}
-
                     </div>`;
             });
             grid.innerHTML = inqBuffer;
@@ -2907,7 +2927,10 @@
         }
 
         let draggedItemInfo = null;
-        function dragStartRow(e, id, type) { draggedItemInfo = { id, type }; e.dataTransfer.effectAllowed = 'move'; }
+        function dragStartRow(e, id, type) { 
+            draggedItemInfo = { id, type }; 
+            e.dataTransfer.effectAllowed = 'move'; 
+        }
 
         function dropRow(e, containerType) {
             e.preventDefault();
@@ -2935,229 +2958,6 @@
                 wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
                 renderDoctors(); playChirpSound();
             } else {
-                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
+                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'note') ? deptNotesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
                 if (listRef) {
-                    let sourceIndex = listRef.findIndex(x => x.id === draggedId);
-                    if (sourceIndex !== -1) {
-                        let moved = listRef.splice(sourceIndex, 1)[0];
-                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card');
-                        if (targetCard && targetCard.getAttribute('data-id')) {
-                            let targetId = parseInt(targetCard.getAttribute('data-id'));
-                            let targetIndex = listRef.findIndex(x => x.id === targetId);
-                            if (targetIndex !== -1) {
-                                listRef.splice(targetIndex, 0, moved);
-                            } else {
-                                listRef.push(moved);
-                            }
-                        } else {
-                            listRef.push(moved);
-                        }
-                        syncToCloud(); 
-                        
-                        if (type === 'inquiry') renderInquiries();
-                        else if (type === 'offer') renderOffers();
-                        else if (type === 'coordinator') renderCoordinators();
-                        else if (type === 'alert') renderAlerts();
-                        else if (type === 'service') renderDeptsAndDocs();
-
-                        playChirpSound();
-                    }
-                }
-            }
-            draggedItemInfo = null;
-        }
-
-        function initFloatingOffersDrag() {
-            const win = document.getElementById('floatingOffersWin'), header = document.getElementById('floatingOffersHeader');
-            if (!win || !header) return;
-            let isDragging = false, startX, startY, initialLeft, initialTop;
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true; startX = e.clientX; startY = e.clientY;
-                const rect = win.getBoundingClientRect();
-                initialLeft = rect.left; initialTop = rect.top;
-                win.style.right = 'auto'; win.style.bottom = 'auto';
-                win.style.left = initialLeft + 'px'; win.style.top = initialTop + 'px';
-                e.preventDefault();
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                win.style.left = (initialLeft + (e.clientX - startX)) + 'px';
-                win.style.top = (initialTop + (e.clientY - startY)) + 'px';
-            });
-            document.addEventListener('mouseup', () => { isDragging = false; });
-        }
-
-        let globalSearchTimeout = null;
-        function handleSmartGlobalSearch(query) {
-            if (globalSearchTimeout) clearTimeout(globalSearchTimeout);
-            globalSearchTimeout = setTimeout(() => {
-                let rawQ = query.trim();
-                if (!rawQ) {
-                    document.getElementById('globalSearchResultsSection').classList.remove('active');
-                    const activeTab = localStorage.getItem('activeTab') || 'schedule';
-                    document.getElementById(activeTab + '-section').classList.add('active');
-                    currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
-                    return;
-                }
-                let normQ = normalizeArabicText(rawQ);
-                const resultsSection = document.getElementById('globalSearchResultsSection'), resultsList = document.getElementById('globalSearchResultsList');
-                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-                resultsSection.classList.add('active'); resultsList.innerHTML = ""; currentGlobalSearchResults = [];
-                const enabledCats = Array.from(document.querySelectorAll('.search-cat-chk:checked')).map(c => c.value);
-
-                if (enabledCats.includes('doctors')) {
-                    doctorsData.forEach(d => {
-                        if (d.searchKey && d.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'doc_' + d.id, title: `${d.name} (${d.specialty})`, subtitle: `الفرع: ${d.branch || 'مشترك'}`, copyText: `الطبيب: ${d.name}\nالتخصص: ${d.specialty}`, source: "الأطباء", action: `jumpToSectionAndHighlightDoc(${d.id})` });
-                        }
-                    });
-                }
-                if (enabledCats.includes('offers')) {
-                    offersData.forEach(o => {
-                        if (o.searchKey && o.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'offer_' + o.id, title: o.name, subtitle: o.price ? `السعر: ${o.price}` : '', copyText: formatOfferLineForClient(o), source: `العروض (${o.category})`, action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')` });
-                        }
-                    });
-                }
-                if (enabledCats.includes('alerts')) {
-                    alertsData.forEach(a => {
-                        if (a.searchKey && a.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'alert_' + a.id, title: a.content, subtitle: a.time, copyText: a.content, source: "التنبيهات", action: `jumpToAlertsTab(${a.id})` });
-                        }
-                    });
-                }
-                if (enabledCats.includes('inquiries')) {
-                    inquiriesData.forEach(i => {
-                        if (i.searchKey && i.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'inq_' + i.id, title: i.question, subtitle: i.answer, copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`, source: `الاستفسارات (${i.category})`, action: `jumpToSectionAndHighlightInquiry(${i.id})` });
-                        }
-                    });
-                }
-                if (enabledCats.includes('services')) {
-                    deptServicesData.forEach(s => {
-                        if (s.searchKey && s.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'srv_' + s.id, title: s.name, subtitle: `فرع ${s.branch}`, copyText: s.name, source: "الأقسام والخدمات", action: `jumpToSectionAndHighlightService(${s.id})` });
-                        }
-                    });
-                    deptNotesData.forEach((n, idx) => {
-                        if (n.searchKey && n.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'note_' + idx, title: n.text, subtitle: 'ملحوظة عامة', copyText: n.text, source: "ملحوظات الأقسام", action: `jumpToSectionAndHighlightNote(${idx})` });
-                        }
-                    });
-                }
-                if (enabledCats.includes('coordinators')) {
-                    coordinatorsData.forEach(c => {
-                        if (c.searchKey && c.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'coord_' + c.id, title: c.name, subtitle: 'تعليمات المنسقين', copyText: `${c.name}\n${c.rules.join('\n')}`, source: "دليل المنسقين", action: `jumpToSectionAndHighlightCoordinator(${c.id})` });
-                        }
-                    });
-                }
-
-                if (currentGlobalSearchResults.length === 0) {
-                    resultsList.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted);">لا توجد نتائج مطابقة لـ "${query}".</div>`;
-                    return;
-                }
-
-                resultsList.innerHTML = currentGlobalSearchResults.map(res => `
-                    <div class="search-result-card">
-                        <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
-                            <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${selectedGlobalSearchIds.includes(res.id) ? 'checked' : ''} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
-                            <div><span class="source-badge">${res.source}</span><h4>${res.title}</h4><p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p></div>
-                        </div>
-                        <div style="display:flex; gap:0.25rem;">
-                            <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n')}', 'تم النسخ:')"><i class="fa-solid fa-copy"></i></button>
-                            <button class="btn btn-blue" onclick="${res.action}">عرض</button>
-                        </div>
-                    </div>`).join('');
-                updateSelectedCountDisplay();
-            }, 30);
-        }
-
-        function handleSearchCheckboxChange(resId, chk) {
-            if (chk.checked) { if (!selectedGlobalSearchIds.includes(resId)) selectedGlobalSearchIds.push(resId); }
-            else { selectedGlobalSearchIds = selectedGlobalSearchIds.filter(id => id !== resId); }
-            updateSelectedCountDisplay();
-        }
-
-        function toggleSelectAllGlobalSearch(masterChk) {
-            selectedGlobalSearchIds = masterChk.checked ? currentGlobalSearchResults.map(r => r.id) : [];
-            document.querySelectorAll('.search-result-chk').forEach(c => c.checked = masterChk.checked);
-            updateSelectedCountDisplay();
-        }
-
-        function updateSelectedCountDisplay() {
-            const countSpan = document.getElementById('selectedSearchCountNum');
-            if (countSpan) countSpan.innerText = selectedGlobalSearchIds.length;
-        }
-
-        function copySelectedGlobalSearchResults() {
-            if (selectedGlobalSearchIds.length === 0) return alert("حدد نتيجة واحدة على الأقل!");
-            let blocks = currentGlobalSearchResults.filter(res => selectedGlobalSearchIds.includes(res.id)).map(res => res.copyText);
-            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم النسخ!");
-        }
-
-        function copyAllGlobalSearchResults() {
-            if (!currentGlobalSearchResults.length) return;
-            copyTextToClipboard(currentGlobalSearchResults.map(r => r.copyText).join('\n\n---\n\n'), "تم نسخ كل النتائج!");
-        }
-
-        function clearGlobalSearch() {
-            document.getElementById('globalSearchInput').value = "";
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
-            const activeTab = localStorage.getItem('activeTab') || 'schedule';
-            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
-        }
-
-        function jumpToSectionAndHighlightDoc(id) {
-            closeModal('activeDoctorsModal'); document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
-            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightOffer(id, cat) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('offers', document.querySelectorAll('.nav-link')[3]);
-            selectedOfferTab = cat; renderOffersTabs();
-            setTimeout(() => { 
-                renderOffers(id); 
-                const cardEl = document.getElementById('offer_card_' + id);
-                if (cardEl) {
-                    cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-                    cardEl.classList.add('highlight-pulse'); 
-                    setTimeout(() => cardEl.classList.remove('highlight-pulse'), 3000);
-                }
-            }, 100);
-        }
-
-        function jumpToSectionAndHighlightInquiry(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('inquiries', document.querySelectorAll('.nav-link')[4]);
-            setTimeout(() => { renderInquiries(id); document.getElementById('inquiry_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightService(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
-            setTimeout(() => { renderDeptsAndDocs(id); document.getElementById('dept_service_row_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightNote(idx) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('depts-docs', document.querySelectorAll('.nav-link')[2]);
-            setTimeout(() => { renderDeptsAndDocs('note_' + idx); document.getElementById('dept_note_card_' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function jumpToSectionAndHighlightCoordinator(id) {
-            document.getElementById('globalSearchResultsSection').classList.remove('active');
-            switchTab('coordinators', document.querySelectorAll('.nav-link')[5]);
-            setTimeout(() => { renderCoordinators(id); document.getElementById('coord_card_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function openLightbox(imgSrc) {
-            document.getElementById('lightboxImg').src = imgSrc;
-            document.getElementById('lightboxModal').classList.add('active');
-        }
-    </script>
-</body>
-</html>
+                    
