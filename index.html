@@ -2352,6 +2352,45 @@
             grid.innerHTML = alertsBuffer;
         }
 
+        function resetTickerToStart() {
+            const track = document.getElementById('tickerTrackContainer');
+            if (track) { track.style.animation = 'none'; track.offsetHeight; applyTickerSpeed(); }
+        }
+
+        function jumpToAlertsTab(alertId) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            if (alertId) {
+                setTimeout(() => {
+                    const el = document.getElementById('alert_card_' + alertId);
+                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); }
+                }, 100);
+            }
+        }
+
+        function previewUploadedImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Val = e.target.result;
+                    document.getElementById('alertImgBase64').value = base64Val;
+                    document.getElementById('imgPreviewContainer').innerHTML = `<img src="${base64Val}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearAlertPdf() {
+            document.getElementById('alertPdfUrl').value = "";
+            playChirpSound();
+        }
+
+        function clearAlertImage() {
+            document.getElementById('alertImgFile').value = "";
+            document.getElementById('alertImgBase64').value = "";
+            document.getElementById('imgPreviewContainer').innerHTML = "";
+            playChirpSound();
+        }
+
         function openAlertModal() {
             document.getElementById('alertId').value = ""; 
             document.getElementById('alertContent').value = "";
@@ -2359,7 +2398,6 @@
             document.getElementById('alertPdfUrl').value = "";
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = "";
-            document.getElementById('alertImgBase64').removeAttribute('data-existing');
             document.getElementById('imgPreviewContainer').innerHTML = "";
             document.getElementById('alertModal').classList.add('active');
         }
@@ -2369,13 +2407,15 @@
             const content = document.getElementById('alertContent').value;
             const tags = document.getElementById('alertTags').value.trim();
             const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
+            const imgBase64 = document.getElementById('alertImgBase64').value.trim();
             
-            // جلب الصورة الجديدة أو الاحتفاظ بالصورة القديمة عند التعديل
-            const newImgBase64 = document.getElementById('alertImgBase64').value;
-            const existingImg = document.getElementById('alertImgBase64').getAttribute('data-existing') || "";
-            const finalImg = newImgBase64 ? newImgBase64 : existingImg;
-
             if (!content) return alert("أدخل نص التنبيه!");
+            
+            let finalImg = imgBase64;
+            if (!finalImg && id) {
+                const existingItem = alertsData.find(a => a.id == id);
+                if (existingItem) finalImg = existingItem.imgBase64 || "";
+            }
             
             const alertObj = { 
                 id: id ? parseInt(id) : Date.now(), 
@@ -2387,53 +2427,8 @@
             };
             
             if (id) {
-                alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; 
-            } else {
-                alertsData.push(alertObj);
-            }
-            
-            syncToCloud(); 
-            closeModal('alertModal'); 
-            playChirpSound();
-        }
-
-        function editAlert(id) {
-            const item = alertsData.find(a => a.id === id); if (!item) return;
-            document.getElementById('alertId').value = item.id; 
-            document.getElementById('alertContent').value = item.content;
-            document.getElementById('alertTags').value = item.tags || "";
-            document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
-            document.getElementById('alertImgFile').value = "";
-            document.getElementById('alertImgBase64').value = "";
-            document.getElementById('alertImgBase64').setAttribute('data-existing', item.imgBase64 || "");
-            
-            if (item.imgBase64) {
-                document.getElementById('imgPreviewContainer').innerHTML = `<img src="${item.imgBase64}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);">`;
-            } else {
-                document.getElementById('imgPreviewContainer').innerHTML = "";
-            }
-            document.getElementById('alertModal').classList.add('active');
-        }
-
-        function saveAlertSmart() {
-            const id = document.getElementById('alertId').value;
-            const content = document.getElementById('alertContent').value;
-            const tags = document.getElementById('alertTags').value.trim();
-            const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
-            const imgBase64 = document.getElementById('alertImgBase64').value;
-            if (!content) return alert("أدخل نص التنبيه!");
-            
-            const alertObj = { 
-                id: id ? parseInt(id) : Date.now(), 
-                content, 
-                tags, 
-                pdfUrl, 
-                imgBase64: imgBase64 || document.getElementById('alertImgBase64').getAttribute('data-existing') || "", 
-                time: new Date().toLocaleString('en-US') 
-            };
-            
-            if (id) {
-                alertsData[alertsData.findIndex(a => a.id == id)] = alertObj; 
+                const idx = alertsData.findIndex(a => a.id == id);
+                if (idx !== -1) alertsData[idx] = alertObj; 
             } else {
                 alertsData.push(alertObj);
             }
@@ -2451,7 +2446,6 @@
             document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = item.imgBase64 || "";
-            document.getElementById('alertImgBase64').setAttribute('data-existing', item.imgBase64 || "");
             
             if (item.imgBase64) {
                 document.getElementById('imgPreviewContainer').innerHTML = `<img src="${item.imgBase64}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);">`;
@@ -2462,7 +2456,11 @@
         }
 
         function deleteAlert(id) {
-            if (confirm("حذف؟")) { alertsData = alertsData.filter(a => a.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف التنبيه؟")) { 
+                alertsData = alertsData.filter(a => a.id !== id); 
+                syncToCloud(); 
+                playChirpSound(); 
+            }
         }
 
         function renderDeptsAndDocs(highlightServiceId = null) {
