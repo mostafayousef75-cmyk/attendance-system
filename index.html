@@ -175,13 +175,13 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
-        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات والأقسام والخدمات --- */
+        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات --- */
         .cards-view-grid { width: 100%; transition: all 0.2s ease; }
         
         /* 1. شبكة متساوية القياس (Grid Equal) */
         .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: start; }
         
-        /* 2. تداخل مرن ومتراص (Masonry Dense) */
+        /* 2. تداخل مرن ومتراص (Masonry Dense) - لتتكامل الكروت رأسياً بدون أي مساحات فارغة */
         .cards-view-grid.view-mode-dense {
             column-count: 3;
             column-gap: 0.4rem;
@@ -535,19 +535,9 @@
 
             <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
-                    <h2>أقسام وفروع وخدمات العيادات والملاحظات</h2>
-                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
-                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
-                            <select id="deptsViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeDeptsViewMode(this.value)">
-                                <option value="view-mode-dense" selected>1. تداخل مرن ومتراص (Dense)</option>
-                                <option value="view-mode-gridEqual">2. شبكة متساوية (Grid Equal)</option>
-                                <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
-                                <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
-                                <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
-                            </select>
-                        </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                    <h2>أقسام وفروع وخدمات العيادات</h2>
+                    <div style="display:flex; gap:0.2rem;">
                         <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
@@ -556,8 +546,46 @@
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والخدمات والوسوم..." oninput="renderDeptsAndDocs()">
                 </div>
-                
-                <div class="cards-view-grid view-mode-dense" id="deptsCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'dept_card')"></div>
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;">
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <div class="branch-box">
+                            <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
+                                <div class="table-responsive">
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الجلدية</span><span>إدارة</span></div>
+                                    <table style="margin-top:0;">
+                                        <tbody id="mashyDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                    </table>
+                                </div>
+                                <div class="table-responsive">
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الأسنان</span><span>إدارة</span></div>
+                                    <table style="margin-top:0;">
+                                        <tbody id="mashyDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="branch-box">
+                            <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span></div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
+                                <div class="table-responsive">
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الجلدية</span><span>إدارة</span></div>
+                                    <table style="margin-top:0;">
+                                        <tbody id="wissamDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                    </table>
+                                </div>
+                                <div class="table-responsive">
+                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الأسنان</span><span>إدارة</span></div>
+                                    <table style="margin-top:0;">
+                                        <tbody id="wissamDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.35rem;" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
+                </div>
             </section>
 
             <!-- 4. العروض والأسعار -->
@@ -969,12 +997,9 @@
             <div style="display:flex; flex-direction:column; gap:0.12rem; margin-top:0.12rem;">
                 <label style="font-weight:700; color:var(--primary-color);">لون التمييز:</label>
                 <select id="deptCustomColor" class="form-control">
-                    <option value="card-darkblue">أزرق داكن</option>
-                    <option value="card-teal">أزرق ملكي</option>
-                    <option value="card-gold">برتقالي ذهبي</option>
-                    <option value="card-green">أخضر زيتي</option>
-                    <option value="card-maroon">أحمر مارون</option>
-                    <option value="card-red">أحمر داكن</option>
+                    <option value="">بدون تمييز (افتراضي)</option>
+                    <option value="background-color: rgba(234, 179, 8, 0.25); color: #fef08a;">أصفر مميز</option>
+                    <option value="background-color: rgba(22, 163, 74, 0.25); color: #86efac;">أخضر مميز</option>
                 </select>
             </div>
             <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">
@@ -1237,7 +1262,6 @@
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
         let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-dense';
         let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-dense';
-        let currentDeptsViewMode = localStorage.getItem('depts_view_mode_choice') || 'view-mode-dense';
 
         function changeOffersViewMode(modeClass) {
             currentOffersViewMode = modeClass;
@@ -1285,22 +1309,6 @@
             container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
             container.classList.add(currentCoordinatorsViewMode);
             if (selectElem) selectElem.value = currentCoordinatorsViewMode;
-        }
-
-        function changeDeptsViewMode(modeClass) {
-            currentDeptsViewMode = modeClass;
-            localStorage.setItem('depts_view_mode_choice', modeClass);
-            applyDeptsViewModeUI();
-            playChirpSound();
-        }
-
-        function applyDeptsViewModeUI() {
-            const container = document.getElementById('deptsCardsGrid');
-            const selectElem = document.getElementById('deptsViewModeSelect');
-            if (!container) return;
-            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
-            container.classList.add(currentDeptsViewMode);
-            if (selectElem) selectElem.value = currentDeptsViewMode;
         }
 
         let globalHoursOptionsHTML = "";
@@ -1440,7 +1448,7 @@
         function loadDefaultData() {
             doctorsData = [{ id: 1, name: "د. أبان ابراهيم يونس", nationality: "(سعودي)", specialty: "طبيب عام اسنان", fee: "75 ريال", branch: "الوسام", tags: "أسنان، عام", isJoint: false, isLeave: false, isPinned: true, shiftsCount: "1", shift1Days: ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], shifts1: [{start: "12.5", end: "20.5"}], shifts2: [], timing: "", notes: "", customColor: "" }];
             fridaySchedules = [{ id: 1, date: "2026-11-06", branch: "معشي", doc: "د. أبان ابراهيم" }];
-            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "card-darkblue", isJoint: true }];
+            deptServicesData = [{ id: 1, branch: "معشي", type: "derm", name: "جنتل ماكس برو", tags: "ليزر، أجهزة", customColor: "", isJoint: true }];
             deptNotesData = [{ text: "مجمع ماجستي الطبي والدوام ( 920031480 )", tags: "إداري", color: "card-gold" }];
             inquiriesData = [{ id: 1, category: "الليزر", question: "الرتوش", answer: "بتاخد 14 يوم بعد الجلسه", tags: "رتوش، ليزر", color: "card-darkblue" }];
             offersData = [{ id: 1, category: "عروض اسنان", name: "زراعة الاسنان", price: "1950 ريال", notes: "عرض نوفمبر. عروض", tags: "عروض، أسنان", isPinned: true }];
@@ -1470,7 +1478,6 @@
             applyOffersViewModeUI();
             applyInquiriesViewModeUI();
             applyCoordinatorsViewModeUI();
-            applyDeptsViewModeUI();
             populateHourSelectOptions();
 
             document.getElementById('shiftScratchpadText1').value = localStorage.getItem('shift_scratchpad_1') || '';
@@ -2392,76 +2399,76 @@
 
         function renderDeptsAndDocs(highlightServiceId = null) {
             const searchInput = document.getElementById('deptSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const container = document.getElementById('deptsCardsGrid');
-            if(!container) return; 
-            
-            applyDeptsViewModeUI();
-            
-            let cardsBuffer = "";
+            const bodies = ['mashyDermTableBody', 'mashyDentTableBody', 'wissamDermTableBody', 'wissamDentTableBody'].map(id => document.getElementById(id));
+            if(bodies.some(b => !b)) return;
+            bodies.forEach(b => b.innerHTML = "");
 
-            // 1. عرض الخدمات والأجهزة في كروت أنيقة
             deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search)))).forEach((item) => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
-                const tagsHtml = item.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
+                const tagsHtml = item.tags ? `<br><span class="tag-badge">🏷️ ${item.tags}</span>` : '';
+                const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
                 const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
-                const cardColor = item.customColor || 'card-darkblue';
-                const typeLabel = item.type === 'derm' ? 'الجلدية' : 'الأسنان';
 
-                cardsBuffer += `
-                    <div id="dept_service_row_${item.id}" class="doc-sheet-card ${cardColor} ${isHighlighted}" data-id="${item.id}" data-item-type="service" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
-                        <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
-                            <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
-                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الكارت" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.name}</span>
-                            </div>
-                            <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedSrvName}', 'تم نسخ الخدمة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
-                                <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </h3>
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.62rem; color: #f4f4f5; background: rgba(0,0,0,0.2); padding: 0.2rem 0.35rem; border-radius: 4px;">
-                            <span><i class="fa-solid fa-clinic-medical"></i> فرع ${item.branch} (${typeLabel})</span>
-                            ${jointBadge}
+                const tr = document.createElement('tr');
+                tr.id = `dept_service_row_${item.id}`;
+                tr.className = isHighlighted;
+                tr.setAttribute('data-id', item.id);
+
+                tr.innerHTML = `
+                    <td ${cellStyle}>
+                        <div style="display:flex; align-items:center; gap:0.25rem;">
+                            <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'service')" title="اسحب لتحريك الخدمة"><i class="fa-solid fa-grip-vertical"></i></span>
+                            <div style="flex:1;">${item.name} ${jointBadge} ${tagsHtml}</div>
                         </div>
-                        ${tagsHtml}
-                    </div>`;
+                    </td>
+                    <td style="width:65px; text-align:center;">
+                        <div class="actions-col-group" style="flex-direction:row;">
+                            <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedSrvName}', 'تم نسخ الخدمة:')" title="نسخ"><i class="fa-solid fa-copy"></i></button>
+                            <button class="action-icon-btn btn-edit-ic" onclick="editDeptService(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-icon-btn btn-del-ic" onclick="deleteDeptService(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>`;
+
+                if (item.branch === "معشي") {
+                    if (item.type === "derm") bodies[0].appendChild(tr); else bodies[1].appendChild(tr);
+                } else {
+                    if (item.type === "derm") bodies[2].appendChild(tr); else bodies[3].appendChild(tr);
+                }
             });
 
-            // 2. عرض الملاحظات في كروت أنيقة متناسقة
+            const notesContainer = document.getElementById('deptNotesContainer');
+            if(!notesContainer) return; notesContainer.innerHTML = "";
+            let notesBuffer = "";
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
-                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
+                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
                     const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
                     const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
 
-                    cardsBuffer += `
-                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}" data-item-type="note" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
-                            <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
-                                <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
-                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">ملحوظة #${idx + 1}</span>
-                                </div>
-                                <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
-                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
+                    notesBuffer += `
+                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}">
+                            <h3>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span>
+                                <div class="actions-col-group" style="flex-direction:row;">
+                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </h3>
-                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text.trim()}</div>
+                            <p>${noteObj.text}</p>
                             ${tagsHtml}
                         </div>`;
                 }
             });
-
-            container.innerHTML = cardsBuffer;
+            notesContainer.innerHTML = notesBuffer;
         }
 
         function openDeptServiceModal() {
             document.getElementById('deptRowId').value = ""; document.getElementById('deptBranchSelect').value = "معشي";
             document.getElementById('deptCategorySelect').value = "derm"; document.getElementById('deptItemName').value = "";
-            document.getElementById('deptTags').value = ""; document.getElementById('deptCustomColor').value = "card-darkblue"; 
+            document.getElementById('deptTags').value = ""; document.getElementById('deptCustomColor').value = ""; 
             document.getElementById('deptIsJoint').checked = false; document.getElementById('deptModalTitle').innerText = "إضافة خدمة / جهاز";
             document.getElementById('deptServiceModal').classList.add('active');
         }
@@ -2484,7 +2491,7 @@
             document.getElementById('deptRowId').value = item.id; document.getElementById('deptBranchSelect').value = item.branch || "معشي";
             document.getElementById('deptCategorySelect').value = item.type || "derm"; document.getElementById('deptItemName').value = item.name || "";
             document.getElementById('deptTags').value = item.tags || "";
-            document.getElementById('deptCustomColor').value = item.customColor || "card-darkblue"; document.getElementById('deptIsJoint').checked = !!item.isJoint;
+            document.getElementById('deptCustomColor').value = item.customColor || ""; document.getElementById('deptIsJoint').checked = !!item.isJoint;
             document.getElementById('deptServiceModal').classList.add('active');
         }
 
@@ -2900,13 +2907,7 @@
         }
 
         let draggedItemInfo = null;
-        function dragStartRow(e, id, type) { 
-            draggedItemInfo = { id, type }; 
-            e.dataTransfer.effectAllowed = 'move';
-            if (e.target) {
-                e.dataTransfer.setData('text/plain', id);
-            }
-        }
+        function dragStartRow(e, id, type) { draggedItemInfo = { id, type }; e.dataTransfer.effectAllowed = 'move'; }
 
         function dropRow(e, containerType) {
             e.preventDefault();
@@ -2933,35 +2934,6 @@
                 } else { currentList.push(draggedId); }
                 wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
                 renderDoctors(); playChirpSound();
-            } else if ((type === 'service' || type === 'note') && containerType === 'dept_card') {
-                const targetCard = e.target.closest('.doc-sheet-card');
-                if (type === 'service') {
-                    let sourceIdx = deptServicesData.findIndex(s => s.id === draggedId);
-                    if (sourceIdx !== -1) {
-                        let moved = deptServicesData.splice(sourceIdx, 1)[0];
-                        if (targetCard && targetCard.getAttribute('data-item-type') === 'service') {
-                            let targetId = parseInt(targetCard.getAttribute('data-id'));
-                            let targetIdx = deptServicesData.findIndex(s => s.id === targetId);
-                            if (targetIdx !== -1) deptServicesData.splice(targetIdx, 0, moved);
-                            else deptServicesData.push(moved);
-                        } else {
-                            deptServicesData.push(moved);
-                        }
-                    }
-                } else if (type === 'note') {
-                    let sourceIdx = parseInt(draggedId);
-                    if (sourceIdx >= 0 && sourceIdx < deptNotesData.length) {
-                        let moved = deptNotesData.splice(sourceIdx, 1)[0];
-                        if (targetCard && targetCard.getAttribute('data-item-type') === 'note') {
-                            let targetIdx = parseInt(targetCard.getAttribute('data-id'));
-                            if (targetIdx >= 0) deptNotesData.splice(targetIdx, 0, moved);
-                            else deptNotesData.push(moved);
-                        } else {
-                            deptNotesData.push(moved);
-                        }
-                    }
-                }
-                syncToCloud(); renderDeptsAndDocs(); playChirpSound();
             } else {
                 let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
                 if (listRef) {
