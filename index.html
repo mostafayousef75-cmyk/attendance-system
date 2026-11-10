@@ -175,13 +175,13 @@
         .alert-thumb-side { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid var(--border-color); }
         .pdf-file-badge { background: var(--danger-color); color: #fff; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.1rem; cursor: pointer; border: none; }
 
-        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات وملاحظات الأقسام --- */
+        /* --- أنظمة العرض لـ دليل المنسقين ودليل الاستفسارات --- */
         .cards-view-grid { width: 100%; transition: all 0.2s ease; }
         
         /* 1. شبكة متساوية القياس (Grid Equal) */
         .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: start; }
         
-        /* 2. تداخل مرن ومتراص (Masonry Dense) */
+        /* 2. تداخل مرن ومتراص (Masonry Dense) - لتتكامل الكروت رأسياً بدون أي مساحات فارغة */
         .cards-view-grid.view-mode-dense {
             column-count: 3;
             column-gap: 0.4rem;
@@ -535,19 +535,9 @@
 
             <!-- 3. الأقسام والأطباء -->
             <section id="depts-docs-section" class="page-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
-                    <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
-                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
-                            <select id="deptNotesViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeDeptNotesViewMode(this.value)">
-                                <option value="view-mode-dense" selected>1. تداخل مرن ومتراص (Dense)</option>
-                                <option value="view-mode-gridEqual">2. شبكة متساوية (Grid Equal)</option>
-                                <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
-                                <option value="view-mode-compact">4. بطاقات مكثفة وصغيرة (Compact)</option>
-                                <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
-                            </select>
-                        </div>
+                    <div style="display:flex; gap:0.2rem;">
                         <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
                         <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
@@ -556,7 +546,7 @@
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والخدمات والوسوم..." oninput="renderDeptsAndDocs()">
                 </div>
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;" id="deptsMainGridContainer">
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;">
                     <div style="display:flex; flex-direction:column; gap:0.5rem;">
                         <div class="branch-box">
                             <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span></div>
@@ -594,7 +584,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="deptNotesContainer" class="cards-view-grid view-mode-dense" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
+                    <div id="deptNotesContainer" style="display:flex; flex-direction:column; gap:0.35rem;" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
                 </div>
             </section>
 
@@ -642,7 +632,7 @@
                 <div class="offers-grid-container offers-mode-grid2" id="offersGridContainerBox" ondragover="event.preventDefault()" ondrop="dropRow(event, 'offer')"></div>
             </section>
 
-            <!-- 5. دليل الاستفسارات -->
+            <!-- 5. دليل الاستفسارات (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
             <section id="inquiries-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل الاستفسارات والأسئلة الشائعة</h2>
@@ -671,7 +661,7 @@
                 <div class="cards-view-grid view-mode-dense" id="inquiryCardsGrid" ondragover="event.preventDefault()" ondrop="dropRow(event, 'inquiry')"></div>
             </section>
 
-            <!-- 6. دليل المنسقين -->
+            <!-- 6. دليل المنسقين (الافتراضي: التداخل المرن والمتراص Masonry Dense) -->
             <section id="coordinators-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>دليل وقوانين تسليم المنسقين التفصيلي</h2>
@@ -700,7 +690,7 @@
         </div>
     </main>
 
-    <!-- سلة العروض المتحركة وثابتة -->
+    <!-- سلة العروض المتحركة والثابتة -->
     <div class="floating-offers-window active" id="floatingOffersWin">
         <div class="floating-offers-header" id="floatingOffersHeader">
             <span><i class="fa-solid fa-basket-shopping"></i> سلة العروض المحددة</span>
@@ -1268,11 +1258,10 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // --- أوضاع العرض المحفوظة في LocalStorage ---
+        // --- أوضاع العرض المحفوظة في LocalStorage (الافتراضي: Masonry Dense view-mode-dense) ---
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
         let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-dense';
         let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-dense';
-        let currentDeptNotesViewMode = localStorage.getItem('dept_notes_view_mode_choice') || 'view-mode-dense';
 
         function changeOffersViewMode(modeClass) {
             currentOffersViewMode = modeClass;
@@ -1320,22 +1309,6 @@
             container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
             container.classList.add(currentCoordinatorsViewMode);
             if (selectElem) selectElem.value = currentCoordinatorsViewMode;
-        }
-
-        function changeDeptNotesViewMode(modeClass) {
-            currentDeptNotesViewMode = modeClass;
-            localStorage.setItem('dept_notes_view_mode_choice', modeClass);
-            applyDeptNotesViewModeUI();
-            playChirpSound();
-        }
-
-        function applyDeptNotesViewModeUI() {
-            const container = document.getElementById('deptNotesContainer');
-            const selectElem = document.getElementById('deptNotesViewModeSelect');
-            if (!container) return;
-            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
-            container.classList.add(currentDeptNotesViewMode);
-            if (selectElem) selectElem.value = currentDeptNotesViewMode;
         }
 
         let globalHoursOptionsHTML = "";
@@ -1505,7 +1478,6 @@
             applyOffersViewModeUI();
             applyInquiriesViewModeUI();
             applyCoordinatorsViewModeUI();
-            applyDeptNotesViewModeUI();
             populateHourSelectOptions();
 
             document.getElementById('shiftScratchpadText1').value = localStorage.getItem('shift_scratchpad_1') || '';
@@ -2466,32 +2438,26 @@
             });
 
             const notesContainer = document.getElementById('deptNotesContainer');
-            if(!notesContainer) return; 
-            
-            // تطبيق وضع العرض لملاحظات الأقسام
-            applyDeptNotesViewModeUI();
-            
+            if(!notesContainer) return; notesContainer.innerHTML = "";
             let notesBuffer = "";
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
-                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
+                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
                     const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
                     const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
 
                     notesBuffer += `
-                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
-                            <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
-                                <div style="display: flex; align-items: center; gap: 0.25rem;">
-                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">ملحوظة #${idx + 1}</span>
-                                </div>
-                                <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
-                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
-                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
+                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${idx}">
+                            <h3>
+                                <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${idx}, 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                <span style="flex:1; margin:0 0.25rem;">ملحوظة #${idx + 1}</span>
+                                <div class="actions-col-group" style="flex-direction:row;">
+                                    <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff;"><i class="fa-solid fa-copy"></i></button>
+                                    <button class="action-icon-btn btn-edit-ic" onclick="editDeptNote(${idx})" title="تعديل" style="color:#fff;"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </h3>
-                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text.trim()}</div>
+                            <p>${noteObj.text}</p>
                             ${tagsHtml}
                         </div>`;
                 }
@@ -2941,13 +2907,7 @@
         }
 
         let draggedItemInfo = null;
-        function dragStartRow(e, id, type) { 
-            draggedItemInfo = { id: parseInt(id), type }; 
-            e.dataTransfer.effectAllowed = 'move'; 
-            try {
-                e.dataTransfer.setData('text/plain', JSON.stringify({ id, type }));
-            } catch(err){}
-        }
+        function dragStartRow(e, id, type) { draggedItemInfo = { id, type }; e.dataTransfer.effectAllowed = 'move'; }
 
         function dropRow(e, containerType) {
             e.preventDefault();
@@ -2975,16 +2935,15 @@
                 wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
                 renderDoctors(); playChirpSound();
             } else {
-                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : (type === 'note') ? deptNotesData : null;
-                
+                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
                 if (listRef) {
-                    let sourceIndex = (type === 'note') ? draggedId : listRef.findIndex(x => x.id === draggedId);
-                    if (sourceIndex !== -1 && sourceIndex < listRef.length) {
+                    let sourceIndex = listRef.findIndex(x => x.id === draggedId);
+                    if (sourceIndex !== -1) {
                         let moved = listRef.splice(sourceIndex, 1)[0];
-                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card, tr[data-id]');
-                        if (targetCard && targetCard.getAttribute('data-id') !== null) {
+                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card');
+                        if (targetCard && targetCard.getAttribute('data-id')) {
                             let targetId = parseInt(targetCard.getAttribute('data-id'));
-                            let targetIndex = (type === 'note') ? targetId : listRef.findIndex(x => x.id === targetId);
+                            let targetIndex = listRef.findIndex(x => x.id === targetId);
                             if (targetIndex !== -1) {
                                 listRef.splice(targetIndex, 0, moved);
                             } else {
@@ -2999,7 +2958,7 @@
                         else if (type === 'offer') renderOffers();
                         else if (type === 'coordinator') renderCoordinators();
                         else if (type === 'alert') renderAlerts();
-                        else if (type === 'service' || type === 'note') renderDeptsAndDocs();
+                        else if (type === 'service') renderDeptsAndDocs();
 
                         playChirpSound();
                     }
