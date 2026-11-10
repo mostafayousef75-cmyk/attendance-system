@@ -181,7 +181,7 @@
         /* 1. شبكة متساوية القياس (Grid Equal) */
         .cards-view-grid.view-mode-gridEqual { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem; align-items: start; }
         
-        /* 2. تداخل مرن ومتراص (Masonry Dense) - لتتكامل الكروت رأسياً بدون أي مساحات فارغة */
+        /* 2. تداخل مرن ومتراص (Masonry Dense) */
         .cards-view-grid.view-mode-dense {
             column-count: 3;
             column-gap: 0.4rem;
@@ -533,15 +533,15 @@
                 <div class="alerts-2col-grid" id="alertsGridList" ondragover="event.preventDefault()" ondrop="dropRow(event, 'alert')"></div>
             </section>
 
-            <!-- 3. الأقسام والأطباء -->
+            <!-- 3. الأقسام والأطباء (تم تزويدها بقائمة منسدلة لطرق العرض وتنسيق الكروت بدقة) -->
             <section id="depts-docs-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.3rem;">
                     <h2>أقسام وفروع وخدمات العيادات</h2>
                     
                     <div style="display:flex; gap:0.25rem; align-items:center; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:0.2rem; background:var(--bg-card); padding:0.15rem 0.35rem; border-radius:6px; border:1px solid var(--border-color);">
-                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> عرض الملاحظات:</span>
-                            <select id="deptNotesViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeDeptNotesViewMode(this.value)">
+                            <span style="font-size:0.65rem; color:var(--primary-color); font-weight:700;"><i class="fa-solid fa-eye"></i> طريقة العرض:</span>
+                            <select id="deptsViewModeSelect" class="form-control" style="font-size:0.65rem; padding:0.1rem; width:160px;" onchange="changeDeptsViewMode(this.value)">
                                 <option value="view-mode-dense" selected>1. تداخل مرن ومتراص (Dense)</option>
                                 <option value="view-mode-gridEqual">2. شبكة متساوية (Grid Equal)</option>
                                 <option value="view-mode-rowStack">3. صفوف أفقية ممتدة (Row Stack)</option>
@@ -549,57 +549,60 @@
                                 <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
                             </select>
                         </div>
-                        <div style="display:flex; gap:0.2rem;">
-                            <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
-                            <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
-                        </div>
+                        <button class="btn btn-green" onclick="openDeptServiceModal()"><i class="fa-solid fa-plus"></i> خدمة/جهاز جديد</button>
+                        <button class="btn btn-blue" onclick="openDeptNoteModal()"><i class="fa-solid fa-plus"></i> إضافة ملحوظة</button>
                     </div>
                 </div>
-                
+
                 <div class="page-local-search">
                     <i class="fa-solid fa-filter"></i>
                     <input type="text" id="deptSearchInput" placeholder="بحث داخل الأقسام والخدمات والوسوم..." oninput="renderDeptsAndDocs()">
                 </div>
-                
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem;" id="deptMainLayoutGrid">
-                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span></div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الجلدية</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="mashyDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الأسنان</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="mashyDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="branch-box">
-                            <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span></div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الجلدية</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="wissamDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
-                                <div class="table-responsive">
-                                    <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الأسنان</span><span>إدارة</span></div>
-                                    <table style="margin-top:0;">
-                                        <tbody id="wissamDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
-                                    </table>
-                                </div>
+                <!-- تقسيم متناسق ومستقل لفرع معشي وفرع الوسام والملاحظات بنظام Cards View Grid المتناسق -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.4rem; margin-bottom: 0.4rem;">
+                    <!-- فرع معشي -->
+                    <div class="branch-box">
+                        <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-clinic-medical"></i> فرع معشي (الخدمات والأجهزة)</span></div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
+                            <div class="table-responsive">
+                                <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الجلدية</span><span>إدارة</span></div>
+                                <table style="margin-top:0;">
+                                    <tbody id="mashyDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive">
+                                <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع معشي - الأسنان</span><span>إدارة</span></div>
+                                <table style="margin-top:0;">
+                                    <tbody id="mashyDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-                    
+
+                    <!-- فرع الوسام -->
+                    <div class="branch-box">
+                        <div class="branch-title"><span style="color: var(--primary-color);"><i class="fa-solid fa-hospital-user"></i> فرع الوسام (الخدمات والأجهزة)</span></div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.3rem;">
+                            <div class="table-responsive">
+                                <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الجلدية</span><span>إدارة</span></div>
+                                <table style="margin-top:0;">
+                                    <tbody id="wissamDermTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive">
+                                <div style="background:var(--bg-card); padding:0.25rem 0.4rem; font-weight:700; color:#38bdf8; font-size:0.7rem; border-radius:6px 6px 0 0; border:1px solid var(--border-color); display:flex; justify-content:space-between;"><span>فرع الوسام - الأسنان</span><span>إدارة</span></div>
+                                <table style="margin-top:0;">
+                                    <tbody id="wissamDentTableBody" ondragover="event.preventDefault()" ondrop="dropRow(event, 'service')"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- حاوية كروت الملاحظات والأقسام بنفس تنسيق دليل الاستفسارات وبدون تكدس -->
+                <div style="margin-top: 0.4rem;">
+                    <h3 style="font-size: 0.78rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.3rem;"><i class="fa-solid fa-clipboard-list"></i> ملاحظات الأقسام والعيادات الإضافية</h3>
                     <div class="cards-view-grid view-mode-dense" id="deptNotesContainer" ondragover="event.preventDefault()" ondrop="dropRow(event, 'note')"></div>
                 </div>
             </section>
@@ -1274,27 +1277,11 @@
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
 
-        // --- أنظمة العرض المحفوظة في LocalStorage ---
+        // --- أنظمة العرض المحفوظة في LocalStorage (الافتراضي: Masonry Dense view-mode-dense) ---
         let currentOffersViewMode = localStorage.getItem('offers_view_mode_choice') || 'offers-mode-grid2';
         let currentInquiriesViewMode = localStorage.getItem('inquiries_view_mode_choice') || 'view-mode-dense';
         let currentCoordinatorsViewMode = localStorage.getItem('coordinators_view_mode_choice') || 'view-mode-dense';
-        let currentDeptNotesViewMode = localStorage.getItem('dept_notes_view_mode_choice') || 'view-mode-dense';
-
-        function changeDeptNotesViewMode(modeClass) {
-            currentDeptNotesViewMode = modeClass;
-            localStorage.setItem('dept_notes_view_mode_choice', modeClass);
-            applyDeptNotesViewModeUI();
-            playChirpSound();
-        }
-
-        function applyDeptNotesViewModeUI() {
-            const container = document.getElementById('deptNotesContainer');
-            const selectElem = document.getElementById('deptNotesViewModeSelect');
-            if (!container) return;
-            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
-            container.classList.add(currentDeptNotesViewMode);
-            if (selectElem) selectElem.value = currentDeptNotesViewMode;
-        }
+        let currentDeptsViewMode = localStorage.getItem('depts_view_mode_choice') || 'view-mode-dense';
 
         function changeOffersViewMode(modeClass) {
             currentOffersViewMode = modeClass;
@@ -1342,6 +1329,22 @@
             container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
             container.classList.add(currentCoordinatorsViewMode);
             if (selectElem) selectElem.value = currentCoordinatorsViewMode;
+        }
+
+        function changeDeptsViewMode(modeClass) {
+            currentDeptsViewMode = modeClass;
+            localStorage.setItem('depts_view_mode_choice', modeClass);
+            applyDeptsViewModeUI();
+            playChirpSound();
+        }
+
+        function applyDeptsViewModeUI() {
+            const container = document.getElementById('deptNotesContainer');
+            const selectElem = document.getElementById('deptsViewModeSelect');
+            if (!container) return;
+            container.classList.remove('view-mode-gridEqual', 'view-mode-dense', 'view-mode-rowStack', 'view-mode-compact', 'view-mode-grid3');
+            container.classList.add(currentDeptsViewMode);
+            if (selectElem) selectElem.value = currentDeptsViewMode;
         }
 
         let globalHoursOptionsHTML = "";
@@ -1511,7 +1514,7 @@
             applyOffersViewModeUI();
             applyInquiriesViewModeUI();
             applyCoordinatorsViewModeUI();
-            applyDeptNotesViewModeUI();
+            applyDeptsViewModeUI();
             populateHourSelectOptions();
 
             document.getElementById('shiftScratchpadText1').value = localStorage.getItem('shift_scratchpad_1') || '';
@@ -2474,24 +2477,23 @@
             const notesContainer = document.getElementById('deptNotesContainer');
             if(!notesContainer) return; 
             
-            // تطبيق وضع العرض المختار لملاحظات الأقسام
-            applyDeptNotesViewModeUI();
-            
+            // تطبيق نظام العرض المرن والمتراص (Dense) أو الاختيار الحالي على ملاحظات الأقسام لتكون كروت متناسقة مثل دليل الاستفسارات
+            applyDeptsViewModeUI();
+
             notesContainer.innerHTML = "";
             let notesBuffer = "";
             deptNotesData.forEach((noteObj, idx) => {
                 if (!search || (noteObj.searchKey && noteObj.searchKey.includes(search))) {
-                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.6rem; color:#fde047; margin-top:2px;">🏷️ ${noteObj.tags}</div>` : '';
+                    const tagsHtml = noteObj.tags ? `<div style="font-size:0.58rem; color:#fde047; margin-top:0.2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top:0.15rem;"><i class="fa-solid fa-tags"></i> ${noteObj.tags}</div>` : '';
                     const escapedNoteText = noteObj.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
                     const isHighlighted = (highlightServiceId === 'note_' + idx) ? 'highlight-pulse' : '';
-                    const uniqueNoteId = noteObj.id || ('note_idx_' + idx);
 
                     notesBuffer += `
-                        <div id="dept_note_card_${uniqueNoteId}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="${uniqueNoteId}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                        <div id="dept_note_card_${idx}" class="doc-sheet-card ${noteObj.color || 'card-gold'} ${isHighlighted}" data-id="note_${idx}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
                             <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                                 <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
-                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, '${uniqueNoteId}', 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">ملحوظة #${idx + 1}</span>
+                                    <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, 'note_${idx}', 'note')" title="اسحب لتحريك الملحوظة" style="color:#fff; cursor:grab; font-size: 0.7rem;"><i class="fa-solid fa-grip-vertical"></i></span>
+                                    <span style="font-size: 0.75rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">ملحوظة #${idx + 1}</span>
                                 </div>
                                 <div class="actions-col-group" style="flex-direction:row; gap: 0.1rem; flex-shrink: 0;">
                                     <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedNoteText}', 'تم نسخ الملحوظة:')" title="نسخ" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-copy"></i></button>
@@ -2499,7 +2501,7 @@
                                     <button class="action-icon-btn btn-del-ic" onclick="deleteDeptNote(${idx})" title="حذف" style="color:#fff; background: rgba(255,255,255,0.15); width: 20px; height: 18px; font-size: 0.6rem;"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </h3>
-                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text}</div>
+                            <div style="font-size: 0.68rem; line-height: 1.35; color: #f4f4f5; white-space: pre-line; word-break: break-word; background: rgba(0,0,0,0.2); padding: 0.25rem 0.35rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06);">${noteObj.text.trim()}</div>
                             ${tagsHtml}
                         </div>`;
                 }
@@ -2551,13 +2553,8 @@
             const idx = document.getElementById('noteIndex').value, text = document.getElementById('deptNoteText').value.trim();
             const tags = document.getElementById('deptNoteTags').value.trim(), color = document.getElementById('deptNoteColor').value;
             if (!text) return;
-            const noteObj = { id: Date.now(), text, tags, color };
-            if (idx !== "") {
-                noteObj.id = deptNotesData[parseInt(idx)].id || Date.now();
-                deptNotesData[parseInt(idx)] = noteObj; 
-            } else { 
-                deptNotesData.push(noteObj); 
-            }
+            const noteObj = { text, tags, color };
+            if (idx !== "") deptNotesData[parseInt(idx)] = noteObj; else deptNotesData.push(noteObj);
             syncToCloud(); closeModal('deptNoteModal'); playChirpSound();
         }
 
@@ -2979,56 +2976,33 @@
                 } else { currentList.push(draggedId); }
                 wissamCustomOrder = currentList; localStorage.setItem('wissam_custom_order', JSON.stringify(wissamCustomOrder));
                 renderDoctors(); playChirpSound();
-            } else if (type === 'service' && containerType === 'service') {
-                let sourceIndex = deptServicesData.findIndex(x => x.id === parseInt(draggedId));
-                if (sourceIndex !== -1) {
-                    let moved = deptServicesData.splice(sourceIndex, 1)[0];
-                    const targetTr = e.target.closest('tr');
-                    if (targetTr && targetTr.getAttribute('data-id')) {
-                        let targetId = parseInt(targetTr.getAttribute('data-id'));
-                        let targetIndex = deptServicesData.findIndex(x => x.id === targetId);
-                        if (targetIndex !== -1) {
-                            deptServicesData.splice(targetIndex, 0, moved);
-                        } else {
-                            deptServicesData.push(moved);
-                        }
-                    } else {
-                        deptServicesData.push(moved);
-                    }
-                    syncToCloud();
-                    renderDeptsAndDocs();
-                    playChirpSound();
-                }
-            } else if (type === 'note' && containerType === 'note') {
-                let sourceIndex = deptNotesData.findIndex((x, idx) => (x.id === draggedId || ('note_idx_' + idx) === draggedId));
-                if (sourceIndex !== -1) {
-                    let moved = deptNotesData.splice(sourceIndex, 1)[0];
-                    const targetCard = e.target.closest('.doc-sheet-card');
-                    if (targetCard && targetCard.getAttribute('data-id')) {
-                        let targetCardId = targetCard.getAttribute('data-id');
-                        let targetIndex = deptNotesData.findIndex((x, idx) => (x.id == targetCardId || ('note_idx_' + idx) === targetCardId));
-                        if (targetIndex !== -1) {
-                            deptNotesData.splice(targetIndex, 0, moved);
+            } else {
+                // معالجة السحب والإفلات لخدمات الأقسام والملاحظات ودليل المنسقين وغيرها بدقة وثبات
+                let listRef = (type === 'alert') ? alertsData : (type === 'service') ? deptServicesData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : (type === 'note') ? deptNotesData : null;
+                
+                if (type === 'note') {
+                    let sourceIdx = typeof draggedId === 'string' && draggedId.startsWith('note_') ? parseInt(draggedId.replace('note_', '')) : deptNotesData.findIndex((_, i) => 'note_' + i === draggedId);
+                    if (sourceIdx !== -1) {
+                        let moved = deptNotesData.splice(sourceIdx, 1)[0];
+                        const targetCard = e.target.closest('.doc-sheet-card');
+                        if (targetCard && targetCard.id && targetCard.id.startsWith('dept_note_card_')) {
+                            let targetIdx = parseInt(targetCard.id.replace('dept_note_card_', ''));
+                            deptNotesData.splice(targetIdx, 0, moved);
                         } else {
                             deptNotesData.push(moved);
                         }
-                    } else {
-                        deptNotesData.push(moved);
+                        syncToCloud();
+                        renderDeptsAndDocs();
+                        playChirpSound();
                     }
-                    syncToCloud();
-                    renderDeptsAndDocs();
-                    playChirpSound();
-                }
-            } else {
-                let listRef = (type === 'alert') ? alertsData : (type === 'coordinator') ? coordinatorsData : (type === 'offer') ? offersData : (type === 'inquiry') ? inquiriesData : null;
-                if (listRef) {
-                    let sourceIndex = listRef.findIndex(x => x.id === parseInt(draggedId) || x.id === draggedId);
+                } else if (listRef) {
+                    let sourceIndex = listRef.findIndex(x => x.id === draggedId);
                     if (sourceIndex !== -1) {
                         let moved = listRef.splice(sourceIndex, 1)[0];
-                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card');
+                        const targetCard = e.target.closest('.doc-sheet-card, .alert-card-item-compact, .offer-grid-card, tr');
                         if (targetCard && targetCard.getAttribute('data-id')) {
                             let targetId = targetCard.getAttribute('data-id');
-                            let targetIndex = listRef.findIndex(x => x.id == targetId || x.id === targetId);
+                            let targetIndex = listRef.findIndex(x => x.id == targetId || x.id === parseInt(targetId));
                             if (targetIndex !== -1) {
                                 listRef.splice(targetIndex, 0, moved);
                             } else {
@@ -3043,6 +3017,7 @@
                         else if (type === 'offer') renderOffers();
                         else if (type === 'coordinator') renderCoordinators();
                         else if (type === 'alert') renderAlerts();
+                        else if (type === 'service') renderDeptsAndDocs();
 
                         playChirpSound();
                     }
@@ -3175,6 +3150,58 @@
         }
 
         function copySelectedGlobalSearchResults() {
+            if (selectedGlobalSearchIds.length === 0) return alert("حدد نتيجة واحدة على الأقل!");
+            let blocks = currentGlobalSearchResults.filter(res => selectedGlobalSearchIds.includes(res.id)).map(res => res.copyText);
+            copyTextToClipboard(blocks.join('\n\n---\n\n'), "تم النسخ!");
+        }
+
+        function copyAllGlobalSearchResults() {
+            if (!currentGlobalSearchResults.length) return;
+            copyTextToClipboard(currentGlobalSearchResults.map(r => r.copyText).join('\n\n---\n\n'), "تم نسخ كل النتائج!");
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('globalSearchInput').value = "";
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            currentGlobalSearchResults = []; selectedGlobalSearchIds = [];
+            const activeTab = localStorage.getItem('activeTab') || 'schedule';
+            switchTab(activeTab, document.querySelector('.nav-link[data-tab="' + activeTab + '"]'));
+        }
+
+        function jumpToSectionAndHighlightDoc(id) {
+            closeModal('activeDoctorsModal'); document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('schedule', document.querySelector('.nav-link[data-tab="schedule"]'));
+            setTimeout(() => { renderDoctors(id); document.getElementById('doc_row_mashy_' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function jumpToSectionAndHighlightOffer(id, cat) {
+            document.getElementById('globalSearchResultsSection').classList.remove('active');
+            switchTab('offers', document.querySelectorAll('.nav-link')[3]);
+            selectedOfferTab = cat; renderOffersTabs();
+            setTimeout(() => { 
+                renderOffers(id); 
+                const cardEl = document.getElementById('offer_card_' + id);
+                if (cardEl) {
+                    cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+                    cardEl.classList.add('highlight-pulse'); 
+                    setTimeout(() => cardEl.classList.remove('highlight-pulse'), 3000);
+                }
+            }, 100);
+        }
+
+        function jumpToSectionAndHighlightInquiry(id) {
+    const targetElement = document.getElementById(id);
+    if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetElement.classList.add('highlight-flash');
+        setTimeout(() => {
+            targetElement.classList.remove('highlight-flash');
+        }, 2000);
+    }
+}
+
+// دالة نسخ العناصر المحددة من نتائج البحث الشامل
+function copySelectedGlobalSearchResults() {
     const checkboxes = document.querySelectorAll('.global-search-checkbox:checked');
     if (checkboxes.length === 0) {
         showToast('برجاء تحديد عناصر أولاً للنسخ', 'warning');
@@ -3183,7 +3210,7 @@
     
     let textToCopy = '';
     checkboxes.forEach(cb => {
-        const row = cb.closest('tr') || cb.closest('.card');
+        const row = cb.closest('tr') || cb.closest('.card') || cb.closest('.note-card-unified');
         if (row) {
             textToCopy += row.innerText.trim() + '\n---\n';
         }
@@ -3197,7 +3224,7 @@
     });
 }
 
-// دالة إغلاق النافذة المنشورة أو البحث الشامل
+// دالة إغلاق نافذة البحث الشامل
 function closeGlobalSearchModal() {
     const modal = document.getElementById('globalSearchModal');
     if (modal) {
@@ -3244,7 +3271,6 @@ function showToast(message, type = 'info') {
 
 // تهيئة الأحداث العامة عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    // تفعيل البحث الفوري عند الكتابة
     const globalSearchInput = document.getElementById('globalSearchInput');
     if (globalSearchInput) {
         globalSearchInput.addEventListener('input', (e) => {
@@ -3257,7 +3283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // إغلاق النوافذ المنبثقة عند النقر خارجها
     window.addEventListener('click', (event) => {
         const modal = document.getElementById('globalSearchModal');
         if (modal && event.target === modal) {
@@ -3265,10 +3290,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // استدعاء الدوال التمهيدية الأساسية إن وجدت
     if (typeof initApp === 'function') {
         initApp();
     }
 });
 </script>
 </body>
+</html>
