@@ -2388,9 +2388,16 @@
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = "";
             document.getElementById('imgPreviewContainer').innerHTML = "";
+            
+            // إذا كنا في وضع التعديل، نقوم بتفريغ الصورة فوراً من الكائن الحالي إن وجد
+            const id = document.getElementById('alertId').value;
+            if (id) {
+                const item = alertsData.find(a => a.id == id);
+                if (item) item.imgBase64 = "";
+            }
             playChirpSound();
         }
-
+        
         function openAlertModal() {
             document.getElementById('alertId').value = ""; 
             document.getElementById('alertContent').value = "";
@@ -2402,19 +2409,29 @@
             document.getElementById('alertModal').classList.add('active');
         }
 
-        function saveAlertSmart() {
+       function saveAlertSmart() {
             const id = document.getElementById('alertId').value;
             const content = document.getElementById('alertContent').value;
             const tags = document.getElementById('alertTags').value.trim();
             const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
-            const imgBase64 = document.getElementById('alertImgBase64').value.trim();
+            const imgBase64Input = document.getElementById('alertImgBase64').value.trim();
             
             if (!content) return alert("أدخل نص التنبيه!");
             
-            let finalImg = imgBase64;
-            if (!finalImg && id) {
-                const existingItem = alertsData.find(a => a.id == id);
-                if (existingItem) finalImg = existingItem.imgBase64 || "";
+            let finalImg = "";
+            if (imgBase64Input !== "") {
+                // إذا تم رفع أو وضع صورة جديدة
+                finalImg = imgBase64Input;
+            } else if (id) {
+                // إذا لم يتم اختيار صورة جديدة، نتحقق هل تم حذفها تماماً أم يتم الاحتفاظ بالقديمة
+                // بما أننا أفرغنا الحقل في clearAlertImage، سنجعل الحذف نهائياً إذا كانت المعاينة فارغة
+                const previewHtml = document.getElementById('imgPreviewContainer').innerHTML;
+                if (previewHtml.trim() !== "") {
+                    const existingItem = alertsData.find(a => a.id == id);
+                    finalImg = existingItem ? (existingItem.imgBase64 || "") : "";
+                } else {
+                    finalImg = ""; // تم حذف الصورة عمداس
+                }
             }
             
             const alertObj = { 
