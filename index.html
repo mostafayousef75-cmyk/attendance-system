@@ -150,7 +150,6 @@
 
         .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; align-items: start; }
         .branch-box { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.35rem; display: flex; flex-direction: column; width: 100%; position: relative; }
-        .branch-box td td div, .branch-box td div > div > div { font-size: 0.74rem !important; }
         .branch-title { font-size: 0.78rem; font-weight: 700; padding-bottom: 0.2rem; margin-bottom: 0.25rem; border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: space-between; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
@@ -183,7 +182,6 @@
         .cards-view-grid.view-mode-dense > div { break-inside: avoid; margin-bottom: 0.4rem; width: 100%; display: inline-block; }
         .cards-view-grid.view-mode-rowStack { display: flex; flex-direction: column; gap: 0.4rem; }
         .cards-view-grid.view-mode-rowStack > div { width: 100%; }
-        .doc-sheet-card div:nth-child(2), .doc-sheet-card div[style*="font-size: 0.68rem"] { font-size: 0.72rem !important; }
         .cards-view-grid.view-mode-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.3rem; align-items: start; }
         .cards-view-grid.view-mode-compact .doc-sheet-card { padding: 0.25rem 0.35rem; font-size: 0.62rem; }
         .cards-view-grid.view-mode-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; align-items: start; }
@@ -229,8 +227,8 @@
         .price-badge { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.75rem; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4); }
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
         
-        /* --- تخصيص أزرار إظهار وإخفاء الوسوم بشكل احترافي وصغير --- */
-        .tags-toggle-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: var(--primary-color); cursor: pointer; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.58rem; display: inline-flex; align-items: center; gap: 0.2rem; transition: all 0.2s; }
+        /* --- أنظمة إظهار وإخفاء الوسوم الآمنة --- */
+        .tags-toggle-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: var(--primary-color); cursor: pointer; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.58rem; display: inline-flex; align-items: center; gap: 0.2rem; transition: all 0.2s; margin-top: 2px; }
         .tags-toggle-btn:hover { background: var(--primary-color); color: #000; }
         .hidden-tags-container { display: none; margin-top: 0.2rem; padding-top: 0.15rem; border-top: 1px dashed rgba(255,255,255,0.15); font-size: 0.58rem; color: #fde047; }
         .hidden-tags-container.show { display: block; }
@@ -1215,7 +1213,7 @@
             } catch(e){}
         }
 
-        // دالة عامة لتبديل عرض وإخفاء الوسوم عند الضغط على العلامة الصغيرة
+        // دالة آمنة لإظهار وإخفاء الوسوم
         function toggleTagsVisibility(btnElem) {
             const container = btnElem.nextElementSibling;
             if (container) {
@@ -1839,6 +1837,13 @@
             playChirpSound();
         }
 
+        function renderFridayScheduleTable() {
+            const tbody = document.getElementById('fridayScheduleTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = fridaySchedules.length === 0 ? `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">لا توجد مناوبات مسجلة.</td></tr>` :
+                fridaySchedules.map(f => `<tr><td>${f.date}</td><td>${f.branch}</td><td>${f.doc}</td><td><button class="action-icon-btn btn-edit-ic" onclick="editFridaySchedule(${f.id})"><i class="fa-solid fa-pen"></i></button> <button class="action-icon-btn btn-del-ic" onclick="deleteFridaySchedule(${f.id})"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+        }
+
         function editFridaySchedule(id) {
             const item = fridaySchedules.find(f => f.id === id);
             if (!item) return;
@@ -2101,7 +2106,6 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 
-                // إضافة زر إظهار الوسوم بدلاً من عرضها بشكل دائم لتوفير المساحة
                 let tagsHtml = doc.tags ? `<br><button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container">🏷️ ${doc.tags}</div>` : '';
                 
                 let formattedDocName = doc.name.trim();
@@ -2187,7 +2191,7 @@
             updateActiveDoctorsKPI();
         }
 
-        function openDoctorModal() {
+                function openDoctorModal() {
             document.getElementById('docId').value = ""; document.getElementById('docName').value = "";
             document.getElementById('docNationality').value = ""; document.getElementById('docSpecialty').value = "";
             document.getElementById('docFee').value = ""; document.getElementById('docNotes').value = "";
@@ -2205,7 +2209,7 @@
             document.getElementById('doctorModal').classList.add('active');
         }
 
-        function saveDoctor() {
+        function saveDoctor ) {
             const id = document.getElementById('docId').value;
             const shiftsCount = document.getElementById('docShiftsCount').value;
             const shift1Days = Array.from(document.querySelectorAll('.shift1-days:checked')).map(c => c.value);
@@ -3285,3 +3289,5 @@
     </script>
 </body>
 </html>
+
+        
