@@ -3291,7 +3291,22 @@
                 if (enabledCats.includes('offers')) {
                     offersData.forEach(o => {
                         if (o.searchKey && o.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'offer_' + o.id, title: o.name, subtitle: o.price ? `السعر: ${o.price}` : '', copyText: formatOfferLineForClient(o), source: `العروض (${o.category})`, action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')` });
+                            // تجهيز تفاصيل الأجهزة والأسعار لتظهر بوضوح في نتيجة البحث
+                            let devicesSubText = "";
+                            let copyDetailsText = formatOfferLineForClient(o);
+                            
+                            if (o.device1) devicesSubText += `• ${o.device1}: ${o.price1 || ''} `;
+                            if (o.device2) devicesSubText += `| • ${o.device2}: ${o.price2 || ''} `;
+                            if (o.price) devicesSubText += `| السعر العام: ${o.price}`;
+
+                            currentGlobalSearchResults.push({ 
+                                id: 'offer_' + o.id, 
+                                title: o.name, 
+                                subtitle: devicesSubText || (o.price ? `السعر: ${o.price}` : ''), 
+                                copyText: copyDetailsText, 
+                                source: `العروض (${o.category})`, 
+                                action: `jumpToSectionAndHighlightOffer(${o.id}, '${o.category}')` 
+                            });
                         }
                     });
                 }
@@ -3338,7 +3353,7 @@
                     <div class="search-result-card">
                         <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
                             <input type="checkbox" class="search-result-chk" data-res-id="${res.id}" ${selectedGlobalSearchIds.includes(res.id) ? 'checked' : ''} onchange="handleSearchCheckboxChange('${res.id}', this)" style="width:14px; height:14px; accent-color:var(--primary-color);">
-                            <div><span class="source-badge">${res.source}</span><h4>${res.title}</h4><p style="font-size:0.68rem; color:var(--text-muted);">${res.subtitle}</p></div>
+                            <div><span class="source-badge">${res.source}</span><h4>${res.title}</h4><p style="font-size:0.68rem; color:var(--primary-color); font-weight:700; margin-top:2px;">${res.subtitle}</p></div>
                         </div>
                         <div style="display:flex; gap:0.25rem;">
                             <button class="btn btn-green" onclick="copyTextToClipboard('${res.copyText.replace(/'/g, "\\'").replace(/\n/g, '\\n')}', 'تم النسخ:')"><i class="fa-solid fa-copy"></i></button>
