@@ -113,11 +113,11 @@
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
         
-        /* حركة شريط التنبيهات من اليمين للشمال تماماً */
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollRight 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
+        /* حركة شريط التنبيهات من الشمال لليمين تماماً */
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
-        @keyframes smoothTickerScrollRight { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
 
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
@@ -1174,10 +1174,10 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>لون الكارت الافتراضي للقسم (ينطبق على كل القسم)</label>
+                <label>لون الكارت الافتراضي (مرتبط بالقسم أوتوماتيكياً وقابل للتعديل)</label>
                 <select id="inqColor" class="form-control">
-                    <option value="card-darkblue">أزرق داكن (افتراضي الليزر)</option>
-                    <option value="card-green">أخضر زيتي (افتراضي الأجهزة والمختبر)</option>
+                    <option value="card-darkblue">أزرق داكن</option>
+                    <option value="card-green">أخضر زيتي</option>
                     <option value="card-teal">أزرق ملكي</option>
                     <option value="card-maroon">أحمر مارون</option>
                     <option value="card-red">أحمر داكن</option>
@@ -2300,7 +2300,7 @@
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
             let calculatedDuration = 40 / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollRight ${calculatedDuration}s linear infinite`;
+            track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
             if (tickerIsPaused) track.classList.add('paused');
         }
 
@@ -2922,7 +2922,10 @@
         function getDefaultColorForInquiryCategory(cat) {
             let n = normalizeArabicText(cat);
             if (n.includes('ليزر')) return 'card-darkblue'; 
-            if (n.includes('مختبر') || n.includes('اشعه') || n.includes('أجهزة') || n.includes('الاجهزة')) return 'card-green'; 
+            if (n.includes('أطباء') || n.includes('اطباء')) return 'card-teal';
+            if (n.includes('أجهزة') || n.includes('الاجهزة')) return 'card-green'; 
+            if (n.includes('مختبر') || n.includes('اشعه') || n.includes('أشعة')) return 'card-maroon'; 
+            if (n.includes('إبر') || n.includes('ابر')) return 'card-gold'; 
             return 'card-darkblue'; 
         }
 
