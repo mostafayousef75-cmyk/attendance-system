@@ -113,7 +113,7 @@
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
         
-        /* حركة شريط التنبيهات من الشمال لليمين تماماً */
+        /* حركة شريط التنبيهات من الشمال لليمين تماماً وبحيث يبدأ بأحدث إشعار أولاً */
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
@@ -383,7 +383,7 @@
 
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
-                <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
+                <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار أولاً"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
                 <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
                 <div class="ticker-speed-controls">
                     <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
@@ -664,6 +664,7 @@
                                 <option value="view-mode-grid3">5. شبكة واسعة 3 أعمدة (Grid 3)</option>
                             </select>
                         </div>
+                        <button class="btn btn-secondary" style="border-color:var(--primary-color); color:var(--primary-color);" onclick="openManageInquiryColorsModal()"><i class="fa-solid fa-palette"></i> ربط ألوان الأقسام 🎨</button>
                         <button class="btn" onclick="openInquiryModal()"><i class="fa-solid fa-plus"></i> إضافة استفسار</button>
                     </div>
                 </div>
@@ -744,6 +745,19 @@
                 <input type="text" id="inputNav_coordinators" class="form-control">
             </div>
             <button class="btn btn-green" style="margin-top:0.35rem;" onclick="saveSidebarNames()">حفظ التعديلات</button>
+        </div>
+    </div>
+
+    <!-- مودال إدارة ألوان الأقسام المربوطة للاستفسارات -->
+    <div class="modal-overlay" id="manageInquiryColorsModal">
+        <div class="modal" style="max-width: 440px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-palette"></i> ربط ألوان الأقسام الافتراضية</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('manageInquiryColorsModal')"></i>
+            </div>
+            <p style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.15rem;">حدد اللون الافتراضي لكل قسم، وعند إضافة أو تعديل أي استفسار واختيار القسم سيتم تطبيق اللون أوتوماتيكياً:</p>
+            <div id="inquiryCategoryColorsList" style="max-height: 280px; overflow-y:auto; display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem;"></div>
+            <button class="btn btn-green" style="margin-top:0.35rem;" onclick="saveInquiryCategoryColors()">حفظ الإعدادات</button>
         </div>
     </div>
 
@@ -1174,7 +1188,7 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>لون الكارت الافتراضي (مرتبط بالقسم أوتوماتيكياً وقابل للتعديل)</label>
+                <label>لون الكارت الافتراضي (يرتبط بالقسم أوتوماتيكياً وقابل للتعديل)</label>
                 <select id="inqColor" class="form-control">
                     <option value="card-darkblue">أزرق داكن</option>
                     <option value="card-green">أخضر زيتي</option>
@@ -1272,6 +1286,13 @@
         
         let mashyCustomOrder = JSON.parse(localStorage.getItem('mashy_custom_order') || '[]');
         let wissamCustomOrder = JSON.parse(localStorage.getItem('wissam_custom_order') || '[]');
+        let inquiryCategoryColorMapping = JSON.parse(localStorage.getItem('inquiry_category_color_mapping_v2') || JSON.stringify({
+            "الليزر": "card-darkblue",
+            "الأطباء وخدماتها": "card-teal",
+            "الأجهزة": "card-green",
+            "الأشعة والمختبر": "card-maroon",
+            "الإبر": "card-gold"
+        }));
 
         let selectedOfferTab = localStorage.getItem('selectedOfferTab') || "⭐ كل العروض والأسعار";
         let selectedInquiryFilter = localStorage.getItem('selectedInquiryFilter') || "الكل";
@@ -1795,7 +1816,7 @@
         }
 
         function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ doctorsData, fridaySchedules, alertsData, coordinatorsData, deptServicesData, deptNotesData, offersData, inquiriesData, inquiryCategoryColorMapping }, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", 'backup_' + Date.now() + '.json');
             document.body.appendChild(dl); dl.click(); dl.remove();
         }
@@ -1814,6 +1835,10 @@
                         if (data.deptNotesData) deptNotesData = data.deptNotesData;
                         if (data.offersData) offersData = data.offersData;
                         if (data.inquiriesData) inquiriesData = data.inquiriesData;
+                        if (data.inquiryCategoryColorMapping) {
+                            inquiryCategoryColorMapping = data.inquiryCategoryColorMapping;
+                            localStorage.setItem('inquiry_category_color_mapping_v2', JSON.stringify(inquiryCategoryColorMapping));
+                        }
                         
                         syncToCloud();
                         refreshAllViews();
@@ -2328,6 +2353,7 @@
             orderedAlerts.forEach(item => {
                 alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
+            // تكرار العناصر لضمان استمرارية الحركة السلسة للشريط من الشمال لليمين
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
             applyTickerSpeed();
 
@@ -2920,6 +2946,9 @@
         }
         
         function getDefaultColorForInquiryCategory(cat) {
+            if (inquiryCategoryColorMapping[cat]) {
+                return inquiryCategoryColorMapping[cat];
+            }
             let n = normalizeArabicText(cat);
             if (n.includes('ليزر')) return 'card-darkblue'; 
             if (n.includes('أطباء') || n.includes('اطباء')) return 'card-teal';
@@ -2935,6 +2964,55 @@
                 const colorSel = document.getElementById('inqColor');
                 if (colorSel) colorSel.value = getDefaultColorForInquiryCategory(val);
             }
+        }
+
+        function openManageInquiryColorsModal() {
+            const container = document.getElementById('inquiryCategoryColorsList');
+            if (!container) return;
+            
+            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر"];
+            const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
+            const allCats = [...staticCategories, ...customCategories];
+
+            let html = "";
+            allCats.forEach(cat => {
+                let currentColor = inquiryCategoryColorMapping[cat] || getDefaultColorForInquiryCategory(cat);
+                html += `
+                    <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:0.35rem 0.5rem; border-radius:6px; display:flex; justify-content:space-between; align-items:center; gap:0.3rem;">
+                        <strong style="color:var(--primary-color); font-size:0.72rem; flex:1;">${cat}</strong>
+                        <select class="form-control inquiry-cat-color-sel" data-cat-name="${cat}" style="width:140px; font-size:0.65rem;">
+                            <option value="card-darkblue" ${currentColor === 'card-darkblue' ? 'selected' : ''}>أزرق داكن</option>
+                            <option value="card-green" ${currentColor === 'card-green' ? 'selected' : ''}>أخضر زيتي</option>
+                            <option value="card-teal" ${currentColor === 'card-teal' ? 'selected' : ''}>أزرق ملكي</option>
+                            <option value="card-maroon" ${currentColor === 'card-maroon' ? 'selected' : ''}>أحمر مارون</option>
+                            <option value="card-red" ${currentColor === 'card-red' ? 'selected' : ''}>أحمر داكن</option>
+                            <option value="card-gold" ${currentColor === 'card-gold' ? 'selected' : ''}>برتقالي ذهبي</option>
+                        </select>
+                    </div>`;
+            });
+            container.innerHTML = html;
+            document.getElementById('manageInquiryColorsModal').classList.add('active');
+        }
+
+        function saveInquiryCategoryColors() {
+            document.querySelectorAll('.inquiry-cat-color-sel').forEach(sel => {
+                const catName = sel.getAttribute('data-cat-name');
+                const chosenColor = sel.value;
+                inquiryCategoryColorMapping[catName] = chosenColor;
+            });
+            localStorage.setItem('inquiry_category_color_mapping_v2', JSON.stringify(inquiryCategoryColorMapping));
+            
+            // تحديث ألوان الاستفسارات الحالية أوتوماتيكياً بناءً على القسم
+            inquiriesData.forEach(i => {
+                if (inquiryCategoryColorMapping[i.category]) {
+                    i.color = inquiryCategoryColorMapping[i.category];
+                }
+            });
+            syncToCloud();
+            closeModal('manageInquiryColorsModal');
+            renderInquiries();
+            playChirpSound();
+            alert("تم ربط ألوان الأقسام وحفظها بنجاح وتطبيقها أوتوماتيكياً!");
         }
 
         function renderInquiriesFilters() {
@@ -2982,11 +3060,12 @@
 
             let inqBuffer = "";
             filteredList.forEach((item) => {
+                let cardColor = item.color || inquiryCategoryColorMapping[item.category] || getDefaultColorForInquiryCategory(item.category);
                 let tagsHtml = item.tags ? `<button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
                 let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
-                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || getDefaultColorForInquiryCategory(item.category)} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${cardColor} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
                         
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
@@ -3024,7 +3103,7 @@
             catSelect.innerHTML = allCats.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="أخرى">+ قسم جديد (أخرى)</option>`;
             catSelect.value = "الليزر";
 
-            document.getElementById('inqColor').value = getDefaultColorForInquiryCategory("الليزر"); 
+            document.getElementById('inqColor').value = inquiryCategoryColorMapping["الليزر"] || getDefaultColorForInquiryCategory("الليزر"); 
             document.getElementById('inqCustomCatBox').style.display = "none";
             document.getElementById('inqCustomCategoryText').value = "";
             document.getElementById('inquiryModal').classList.add('active');
@@ -3036,7 +3115,15 @@
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
             if (!cat) return alert("حدد القسم!");
             
-            let chosenColor = document.getElementById('inqColor').value || getDefaultColorForInquiryCategory(cat);
+            let chosenColor = document.getElementById('inqColor').value;
+            if (!chosenColor) {
+                chosenColor = inquiryCategoryColorMapping[cat] || getDefaultColorForInquiryCategory(cat);
+            }
+            
+            // حفظ اللون المرتبط بالقسم أوتوماتيكياً في الخريطة العامة
+                        // حفظ اللون المرتبط بالقسم أوتوماتيكياً في الخريطة العامة
+            inquiryCategoryColorMapping[cat] = chosenColor;
+            localStorage.setItem('inquiry_category_color_mapping_v2', JSON.stringify(inquiryCategoryColorMapping));
 
             const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: chosenColor };
             if (!obj.question) return alert("أدخل السؤال!");
@@ -3066,7 +3153,7 @@
                 document.getElementById('inqCustomCategoryText').value = item.category;
             }
 
-            document.getElementById('inqColor').value = item.color || getDefaultColorForInquiryCategory(item.category); 
+            document.getElementById('inqColor').value = item.color || inquiryCategoryColorMapping[item.category] || getDefaultColorForInquiryCategory(item.category); 
             document.getElementById('inquiryModal').classList.add('active');
         }
 
