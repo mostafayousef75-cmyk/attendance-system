@@ -1161,7 +1161,6 @@
                     <option value="الأجهزة">الأجهزة</option>
                     <option value="الأشعة والمختبر">الأشعة والمختبر</option>
                     <option value="الإبر">الإبر</option>
-                    <option value="أخرى">أخرى</option>
                 </select>
             </div>
             <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.2rem;">
@@ -1171,7 +1170,7 @@
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>لون الكارت</label>
                 <select id="inqColor" class="form-control">
-                    <option value="card-darkblue">أزرق داكن (افتراضي)</option>
+                    <option value="card-darkblue">أزرق داكن</option>
                     <option value="card-teal">أزرق ملكي</option>
                     <option value="card-maroon">أحمر مارون</option>
                     <option value="card-red">أحمر داكن</option>
@@ -2316,18 +2315,18 @@
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
 
-            // ترتيب الإشعارات بحيث يكون الأحدث مضافاً في البداية
-            let reversedAlerts = [...alertsData].reverse();
+            // ترتيب الإشعارات بحيث يكون الأحدث مضافاً في البداية تماماً
+            let orderedAlerts = [...alertsData].reverse();
 
             let alertCardsHtml = "";
-            reversedAlerts.forEach(item => {
+            orderedAlerts.forEach(item => {
                 alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
             applyTickerSpeed();
 
             let alertsBuffer = "";
-            reversedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
+            orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
                 if (item.pdfUrl) {
                     mediaHtml += `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> PDF</a> `;
@@ -2696,10 +2695,14 @@
             if (!container) return;
             container.innerHTML = "";
             const cats = [...new Set(offersData.map(o => o.category).filter(Boolean))];
+            
+            // إخفاء العناصر التي تحتوي على 0 كروت عدا الكل
             let tabsHtml = `<button class="offer-tab-btn ${selectedOfferTab === '⭐ كل العروض والأسعار' ? 'active' : ''}" onclick="filterOfferCategory('⭐ كل العروض والأسعار', this)">⭐ كل العروض والأسعار (${offersData.length})</button>`;
             cats.forEach(cat => {
                 const catCount = offersData.filter(o => o.category === cat).length;
-                tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat} (${catCount})</button>`;
+                if (catCount > 0) {
+                    tabsHtml += `<button class="offer-tab-btn ${cat === selectedOfferTab ? 'active' : ''}" onclick="filterOfferCategory('${cat}', this)">${cat} (${catCount})</button>`;
+                }
             });
             container.innerHTML = tabsHtml;
             updateQuickMoveDropdown();
@@ -2907,15 +2910,20 @@
             const container = document.getElementById('inquiriesFilterTabs');
             if (!container) return;
             
-            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر", "أخرى"];
+            // تم الحذف النهائي لقسم "أخرى" بناءً على طلبك
+            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر"];
             const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
             const allCategories = ["الكل", ...staticCategories, ...customCategories];
 
             let html = "";
             allCategories.forEach(cat => {
                 let count = cat === "الكل" ? inquiriesData.length : inquiriesData.filter(i => i.category === cat).length;
-                let activeClass = (selectedInquiryFilter === cat) ? "active" : "";
-                html += `<button class="offer-tab-btn ${activeClass}" onclick="filterInquiryCategory('${cat}', this)">${cat} (${count})</button>`;
+                
+                // إخفاء التبويبات التي تحتوي على 0 كروت (عدا "الكل")
+                if (cat === "الكل" || count > 0) {
+                    let activeClass = (selectedInquiryFilter === cat) ? "active" : "";
+                    html += `<button class="offer-tab-btn ${activeClass}" onclick="filterInquiryCategory('${cat}', this)">${cat} (${count})</button>`;
+                }
             });
             container.innerHTML = html;
         }
@@ -2928,20 +2936,36 @@
             renderInquiries();
         }
 
+        function getDefaultColorForInquiryCategory(cat) {
+            let n = normalizeArabicText(cat);
+            if (n.includes('ليزر')) return 'card-darkblue'; // الليزر أزرق
+            if (n.includes('مختبر') || n.includes('اشعه') || n.includes('أجهزة') || n.includes('الاجهزة')) return 'card-green'; // المختبر والأجهزة اخضر
+            return 'card-darkblue'; // افتراضي
+        }
+
         function renderInquiries(highlightId = null) {
             const searchInput = document.getElementById('inquirySearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('inquiryCardsGrid'); if(!grid) return; 
             
             applyInquiriesViewModeUI();
             
+            let filteredList = inquiriesData.filter(i => {
+                let matchesCat = (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter);
+                let matchesSearch = !search || (i.searchKey && i.searchKey.includes(search));
+                // إذا كان المستخدم يبحث بكلمة وليست ضمن التبويب الحالي، ابحث في الكل لضمان إيجادها والانتقال إليها
+                if (search && !matchesCat && matchesSearch) {
+                    return true;
+                }
+                return matchesCat && matchesSearch;
+            });
+
             let inqBuffer = "";
-            inquiriesData.filter(i => (selectedInquiryFilter === 'الكل' || i.category === selectedInquiryFilter) && (!search || (i.searchKey && i.searchKey.includes(search)))).forEach((item) => {
-                
+            filteredList.forEach((item) => {
                 let tagsHtml = item.tags ? `<button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><i class="fa-solid fa-tags"></i> ${item.tags}</div>` : '';
                 let escapedInqText = ("سؤال: " + item.question + "\nإجابة: " + item.answer).replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 inqBuffer += `
-                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || 'card-darkblue'} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
+                    <div id="inquiry_card_${item.id}" class="doc-sheet-card ${item.color || getDefaultColorForInquiryCategory(item.category)} ${item.id === highlightId ? 'highlight-pulse' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.45rem; gap: 0.2rem;">
                         
                         <h3 style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 0.15rem; margin: 0 0 0.15rem 0;">
                             <div style="display: flex; align-items: center; gap: 0.25rem; overflow: hidden;">
@@ -2970,7 +2994,8 @@
         function openInquiryModal() {
             document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
             document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
-            document.getElementById('inqCategory').value = "الليزر"; document.getElementById('inqColor').value = "card-darkblue"; 
+            document.getElementById('inqCategory').value = "الليزر"; 
+            document.getElementById('inqColor').value = getDefaultColorForInquiryCategory("الليزر"); 
             document.getElementById('inqCustomCatBox').style.display = "none";
             document.getElementById('inquiryModal').classList.add('active');
         }
@@ -2979,7 +3004,12 @@
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
-            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: document.getElementById('inqColor').value };
+            
+            // تعيين اللون الافتراضي حسب القسم إذا لم يقم المستخدم بتغييره يدوياً
+            let defaultColor = getDefaultColorForInquiryCategory(cat);
+            let chosenColor = document.getElementById('inqColor').value || defaultColor;
+
+            const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: chosenColor };
             if (!obj.question) return;
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
             syncToCloud(); closeModal('inquiryModal'); playChirpSound();
@@ -2990,7 +3020,8 @@
             document.getElementById('inquiryId').value = item.id; document.getElementById('inqQuestion').value = item.question;
             document.getElementById('inqAnswer').value = item.answer; document.getElementById('inqTags').value = item.tags || "";
             document.getElementById('inqCategory').value = item.category || "الليزر";
-            document.getElementById('inqColor').value = item.color || "card-darkblue"; document.getElementById('inquiryModal').classList.add('active');
+            document.getElementById('inqColor').value = item.color || getDefaultColorForInquiryCategory(item.category); 
+            document.getElementById('inquiryModal').classList.add('active');
         }
 
         function deleteInquiry(id) {
@@ -3141,7 +3172,7 @@
                 if (enabledCats.includes('inquiries')) {
                     inquiriesData.forEach(i => {
                         if (i.searchKey && i.searchKey.includes(normQ)) {
-                            currentGlobalSearchResults.push({ id: 'inq_' + i.id, title: i.question, subtitle: i.answer, copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`, source: `الاستفسارات (${i.category})`, action: `jumpToSectionAndHighlightInquiry(${i.id})` });
+                            currentGlobalSearchResults.push({ id: 'inq_' + i.id, title: i.question, subtitle: i.answer, copyText: `سؤال: ${i.question}\nإجابة: ${i.answer}`, source: `الاستفسارات (${i.category})`, action: `jumpToSectionAndHighlightInquiry(${i.id}, '${i.category}')` });
                         }
                     });
                 }
@@ -3242,9 +3273,14 @@
             }, 100);
         }
 
-        function jumpToSectionAndHighlightInquiry(id) {
+        function jumpToSectionAndHighlightInquiry(id, cat) {
             document.getElementById('globalSearchResultsSection').classList.remove('active');
             switchTab('inquiries', document.querySelectorAll('.nav-link')[4]);
+            if (cat) {
+                selectedInquiryFilter = cat;
+                localStorage.setItem('selectedInquiryFilter', cat);
+                renderInquiriesFilters();
+            }
             setTimeout(() => {
                 renderInquiries(id);
                 const cardEl = document.getElementById('inquiry_card_' + id);
