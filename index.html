@@ -2317,7 +2317,6 @@
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
 
-            // الأحدث مضافاً في البداية تماماً
             let orderedAlerts = [...alertsData].reverse();
 
             let alertCardsHtml = "";
@@ -2356,14 +2355,23 @@
             grid.innerHTML = alertsBuffer;
         }
 
+        // تم إصلاح زر "أحدث" ليلغي حالة الإيقاف المؤقت ويعيد الشريط للوضع الافتراضي من أحدث تنبيه
         function resetTickerToStart() {
+            tickerIsPaused = false;
             const track = document.getElementById('tickerTrackContainer');
-            if (track) { 
-                track.style.animation = 'none'; 
-                track.offsetHeight; 
-                applyTickerSpeed(); 
-                playChirpSound();
+            const playBtn = document.getElementById('tickerTogglePlayBtn');
+            if (track) {
+                track.classList.remove('paused');
+                track.style.animation = 'none';
+                track.offsetHeight;
+                applyTickerSpeed();
             }
+            if (playBtn) {
+                playBtn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
+                playBtn.style.color = '';
+                playBtn.style.borderColor = '';
+            }
+            playChirpSound();
         }
 
         function jumpToAlertsTab(alertId) {
@@ -2878,7 +2886,7 @@
             document.getElementById('offerModal').classList.add('active');
         }
 
-        function saveOffer() {
+                function saveOffer() {
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
             if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
