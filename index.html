@@ -113,11 +113,11 @@
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
         
-        /* حركة الشريط من الشمال لليمين كما طلبت */
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
+        /* حركة شريط التنبيهات من اليمين للشمال تماماً */
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollRight 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
-        @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
+        @keyframes smoothTickerScrollRight { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
 
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
@@ -1155,6 +1155,7 @@
                 <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal('inquiryModal')"></i>
             </div>
             <input type="hidden" id="inquiryId">
+            
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>القسم</label>
                 <select id="inqCategory" class="form-control" onchange="onInquiryCategoryChange(this.value)">
@@ -1163,23 +1164,27 @@
                     <option value="الأجهزة">الأجهزة</option>
                     <option value="الأشعة والمختبر">الأشعة والمختبر</option>
                     <option value="الإبر">الإبر</option>
+                    <option value="أخرى">+ قسم جديد (أخرى)</option>
                 </select>
             </div>
+
             <div id="inqCustomCatBox" style="display:none; flex-direction:column; gap:0.2rem;">
                 <label>اسم القسم الجديد</label>
-                <input type="text" id="inqCustomCategoryText" class="form-control">
+                <input type="text" id="inqCustomCategoryText" class="form-control" placeholder="اكتب اسم القسم الجديد هنا...">
             </div>
+
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
-                <label>لون الكارت</label>
+                <label>لون الكارت الافتراضي للقسم (ينطبق على كل القسم)</label>
                 <select id="inqColor" class="form-control">
-                    <option value="card-darkblue">أزرق داكن</option>
+                    <option value="card-darkblue">أزرق داكن (افتراضي الليزر)</option>
+                    <option value="card-green">أخضر زيتي (افتراضي الأجهزة والمختبر)</option>
                     <option value="card-teal">أزرق ملكي</option>
                     <option value="card-maroon">أحمر مارون</option>
                     <option value="card-red">أحمر داكن</option>
                     <option value="card-gold">برتقالي ذهبي</option>
-                    <option value="card-green">أخضر زيتي</option>
                 </select>
             </div>
+
             <div style="display:flex; flex-direction:column; gap:0.2rem;">
                 <label>السؤال / الشروط</label>
                 <input type="text" id="inqQuestion" class="form-control">
@@ -2295,7 +2300,7 @@
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
             let calculatedDuration = 40 / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
+            track.style.animation = `smoothTickerScrollRight ${calculatedDuration}s linear infinite`;
             if (tickerIsPaused) track.classList.add('paused');
         }
 
@@ -2355,23 +2360,14 @@
             grid.innerHTML = alertsBuffer;
         }
 
-        // تم إصلاح زر "أحدث" ليلغي حالة الإيقاف المؤقت ويعيد الشريط للوضع الافتراضي من أحدث تنبيه
         function resetTickerToStart() {
-            tickerIsPaused = false;
             const track = document.getElementById('tickerTrackContainer');
-            const playBtn = document.getElementById('tickerTogglePlayBtn');
-            if (track) {
-                track.classList.remove('paused');
-                track.style.animation = 'none';
-                track.offsetHeight;
-                applyTickerSpeed();
+            if (track) { 
+                track.style.animation = 'none'; 
+                track.offsetHeight; 
+                applyTickerSpeed(); 
+                playChirpSound();
             }
-            if (playBtn) {
-                playBtn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف`;
-                playBtn.style.color = '';
-                playBtn.style.borderColor = '';
-            }
-            playChirpSound();
         }
 
         function jumpToAlertsTab(alertId) {
@@ -2886,7 +2882,7 @@
             document.getElementById('offerModal').classList.add('active');
         }
 
-                function saveOffer() {
+        function saveOffer() {
             const id = document.getElementById('offerId').value;
             let cat = document.getElementById('offCategory').value;
             if (cat === "أخرى") cat = document.getElementById('offCustomCategory').value.trim();
@@ -2918,19 +2914,23 @@
             if (confirm("حذف؟")) { offersData = offersData.filter(o => o.id !== id); syncToCloud(); playChirpSound(); }
         }
 
-        function checkInquiryCustomCat(val) { document.getElementById('inqCustomCatBox').style.display = (val === "أخرى") ? "flex" : "none"; }
+        function checkInquiryCustomCat(val) { 
+            const customBox = document.getElementById('inqCustomCatBox');
+            if (customBox) customBox.style.display = (val === "أخرى") ? "flex" : "none"; 
+        }
         
         function getDefaultColorForInquiryCategory(cat) {
             let n = normalizeArabicText(cat);
-            if (n.includes('ليزر')) return 'card-darkblue'; // الليزر أزرق
-            if (n.includes('مختبر') || n.includes('اشعه') || n.includes('أجهزة') || n.includes('الاجهزة')) return 'card-green'; // المختبر والأجهزة اخضر
-            return 'card-darkblue'; // افتراضي
+            if (n.includes('ليزر')) return 'card-darkblue'; 
+            if (n.includes('مختبر') || n.includes('اشعه') || n.includes('أجهزة') || n.includes('الاجهزة')) return 'card-green'; 
+            return 'card-darkblue'; 
         }
 
         function onInquiryCategoryChange(val) {
             checkInquiryCustomCat(val);
             if (val !== "أخرى") {
-                document.getElementById('inqColor').value = getDefaultColorForInquiryCategory(val);
+                const colorSel = document.getElementById('inqColor');
+                if (colorSel) colorSel.value = getDefaultColorForInquiryCategory(val);
             }
         }
 
@@ -2938,7 +2938,6 @@
             const container = document.getElementById('inquiriesFilterTabs');
             if (!container) return;
             
-            // تم الحذف النهائي لقسم "أخرى" من التابات بناءً على طلبك
             const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر"];
             const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
             const allCategories = ["الكل", ...staticCategories, ...customCategories];
@@ -2947,7 +2946,6 @@
             allCategories.forEach(cat => {
                 let count = cat === "الكل" ? inquiriesData.length : inquiriesData.filter(i => i.category === cat).length;
                 
-                // إخفاء التبويبات التي تحتوي على 0 كروت تلقائياً (عدا "الكل")
                 if (cat === "الكل" || count > 0) {
                     let activeClass = (selectedInquiryFilter === cat) ? "active" : "";
                     html += `<button class="offer-tab-btn ${activeClass}" onclick="filterInquiryCategory('${cat}', this)">${cat} (${count})</button>`;
@@ -3014,9 +3012,18 @@
         function openInquiryModal() {
             document.getElementById('inquiryId').value = ""; document.getElementById('inqQuestion').value = "";
             document.getElementById('inqAnswer').value = ""; document.getElementById('inqTags').value = "";
-            document.getElementById('inqCategory').value = "الليزر"; 
+            
+            const catSelect = document.getElementById('inqCategory');
+            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر"];
+            const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
+            const allCats = [...staticCategories, ...customCategories];
+            
+            catSelect.innerHTML = allCats.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="أخرى">+ قسم جديد (أخرى)</option>`;
+            catSelect.value = "الليزر";
+
             document.getElementById('inqColor').value = getDefaultColorForInquiryCategory("الليزر"); 
             document.getElementById('inqCustomCatBox').style.display = "none";
+            document.getElementById('inqCustomCategoryText').value = "";
             document.getElementById('inquiryModal').classList.add('active');
         }
 
@@ -3024,27 +3031,44 @@
             const id = document.getElementById('inquiryId').value;
             let cat = document.getElementById('inqCategory').value;
             if (cat === "أخرى") cat = document.getElementById('inqCustomCategoryText').value.trim();
+            if (!cat) return alert("حدد القسم!");
             
-            let defaultColor = getDefaultColorForInquiryCategory(cat);
-            let chosenColor = document.getElementById('inqColor').value || defaultColor;
+            let chosenColor = document.getElementById('inqColor').value || getDefaultColorForInquiryCategory(cat);
 
             const obj = { id: id ? parseInt(id) : Date.now(), category: cat, question: document.getElementById('inqQuestion').value, answer: document.getElementById('inqAnswer').value, tags: document.getElementById('inqTags').value.trim(), color: chosenColor };
-            if (!obj.question) return;
+            if (!obj.question) return alert("أدخل السؤال!");
+            
             if (id) inquiriesData[inquiriesData.findIndex(i => i.id == id)] = obj; else inquiriesData.push(obj);
-            syncToCloud(); closeModal('inquiryModal'); playChirpSound();
+            syncToCloud(); closeModal('inquiryModal'); renderInquiriesFilters(); playChirpSound();
         }
 
         function editInquiry(id) {
             const item = inquiriesData.find(i => i.id === id); if (!item) return;
             document.getElementById('inquiryId').value = item.id; document.getElementById('inqQuestion').value = item.question;
             document.getElementById('inqAnswer').value = item.answer; document.getElementById('inqTags').value = item.tags || "";
-            document.getElementById('inqCategory').value = item.category || "الليزر";
+            
+            const catSelect = document.getElementById('inqCategory');
+            const staticCategories = ["الليزر", "الأطباء وخدماتها", "الأجهزة", "الأشعة والمختبر", "الإبر"];
+            const customCategories = [...new Set(inquiriesData.map(i => i.category).filter(c => !staticCategories.includes(c)))];
+            const allCats = [...staticCategories, ...customCategories];
+            
+            catSelect.innerHTML = allCats.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="أخرى">+ قسم جديد (أخرى)</option>`;
+            
+            if (allCats.includes(item.category)) {
+                catSelect.value = item.category;
+                document.getElementById('inqCustomCatBox').style.display = "none";
+            } else {
+                catSelect.value = "أخرى";
+                document.getElementById('inqCustomCatBox').style.display = "flex";
+                document.getElementById('inqCustomCategoryText').value = item.category;
+            }
+
             document.getElementById('inqColor').value = item.color || getDefaultColorForInquiryCategory(item.category); 
             document.getElementById('inquiryModal').classList.add('active');
         }
 
         function deleteInquiry(id) {
-            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); playChirpSound(); }
+            if (confirm("حذف؟")) { inquiriesData = inquiriesData.filter(i => i.id !== id); syncToCloud(); renderInquiriesFilters(); playChirpSound(); }
         }
 
         function toggleAllSearchCats(status) {
