@@ -2137,7 +2137,7 @@
             }
 
             let mashyHtmlBuffer = "";
-            mashyList.forEach((doc) => {
+            mashyList.forEach((doc, index, arr) => {
                 if (isDoctorAvailableToday(doc, currentDay)) {
                     todayMashyDocs.push(doc.name);
                 }
@@ -2148,12 +2148,15 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 
-                // زر الوسوم مكان زر الحذف (فتح النافذة باتجاه اليسار/الداخل لكي تظهر بوضوح)
+                // لو العنصر في آخر الجدول، نخلي صندوق الوسوم يفتح لفوق (bottom: 0) عشان ميخرجش بره حدود الكارت
+                const isNearBottom = index >= arr.length - 2;
+                const verticalPosStyle = isNearBottom ? "bottom: 0; top: auto;" : "top: 0; bottom: auto;";
+
                 const tagsHeaderHtml = doc.tags ? `
                     <div style="position:relative; display:inline-block;">
                         <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                        <div class="hidden-tags-container" style="position:absolute; left:22px; top:0; z-index:999; min-width:160px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.4rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                            <span style="color:#fde047; font-size:0.7rem; font-weight:700;">🏷️ ${doc.tags}</span>
+                        <div class="hidden-tags-container" style="position:absolute; right:22px; ${verticalPosStyle} z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
+                            <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${doc.tags}</span>
                         </div>
                     </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
 
@@ -2190,7 +2193,7 @@
             mashyBody.innerHTML = mashyHtmlBuffer;
 
             let wissamHtmlBuffer = "";
-            wissamList.forEach((doc) => {
+            wissamList.forEach((doc, index, arr) => {
                 if (isDoctorAvailableToday(doc, currentDay)) {
                     todayWissamDocs.push(doc.name);
                 }
@@ -2201,11 +2204,14 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 
+                const isNearBottom = index >= arr.length - 2;
+                const verticalPosStyle = isNearBottom ? "bottom: 0; top: auto;" : "top: 0; bottom: auto;";
+
                 const tagsHeaderHtml = doc.tags ? `
                     <div style="position:relative; display:inline-block;">
                         <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                        <div class="hidden-tags-container" style="position:absolute; left:22px; top:0; z-index:999; min-width:160px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.4rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                            <span style="color:#fde047; font-size:0.7rem; font-weight:700;">🏷️ ${doc.tags}</span>
+                        <div class="hidden-tags-container" style="position:absolute; right:22px; ${verticalPosStyle} z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
+                            <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${doc.tags}</span>
                         </div>
                     </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
 
@@ -2376,7 +2382,8 @@
             applyTickerSpeed();
 
             let alertsBuffer = "";
-            orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
+            let filteredAlerts = orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search)));
+            filteredAlerts.forEach((item, index, arr) => {
                 let mediaHtml = "";
                 if (item.pdfUrl) {
                     mediaHtml += `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> PDF</a> `;
@@ -2388,11 +2395,14 @@
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
                 const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
+                const isNearBottom = index >= arr.length - 2;
+                const verticalPosStyle = isNearBottom ? "bottom: 0; top: auto;" : "top: 0; bottom: auto;";
+
                 const tagsHeaderHtml = item.tags ? `
                     <div style="position:relative; display:inline-block;">
                         <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                        <div class="hidden-tags-container" style="position:absolute; left:22px; top:0; z-index:999; min-width:160px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.4rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                            <span style="color:#fde047; font-size:0.7rem; font-weight:700;">🏷️ ${item.tags}</span>
+                        <div class="hidden-tags-container" style="position:absolute; right:22px; ${verticalPosStyle} z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
+                            <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${item.tags}</span>
                         </div>
                     </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
 
@@ -2556,17 +2566,21 @@
             if(bodies.some(b => !b)) return;
             bodies.forEach(b => b.innerHTML = "");
 
-            deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search)))).forEach((item) => {
+            let filteredServices = deptServicesData.filter(s => s.name && (!search || (s.searchKey && s.searchKey.includes(search))));
+            filteredServices.forEach((item, index, arr) => {
                 const jointBadge = item.isJoint ? `<span class="tag-joint">⭐ مشترك</span>` : '';
                 const cellStyle = item.customColor ? `style="${item.customColor}"` : '';
                 const isHighlighted = (item.id === highlightServiceId) ? 'highlight-pulse' : '';
                 const escapedSrvName = item.name.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
+                const isNearBottom = index >= arr.length - 2;
+                const verticalPosStyle = isNearBottom ? "bottom: 0; top: auto;" : "top: 0; bottom: auto;";
+
                 const tagsHeaderHtml = item.tags ? `
                     <div style="position:relative; display:inline-block;">
                         <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                        <div class="hidden-tags-container" style="position:absolute; left:22px; top:0; z-index:999; min-width:160px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.4rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                            <span style="color:#fde047; font-size:0.7rem; font-weight:700;">🏷️ ${item.tags}</span>
+                        <div class="hidden-tags-container" style="position:absolute; right:22px; ${verticalPosStyle} z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
+                            <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${item.tags}</span>
                         </div>
                     </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
 
@@ -2613,8 +2627,8 @@
                     const tagsHeaderHtml = noteObj.tags ? `
                         <div style="position:relative; display:inline-block;">
                             <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:#fff; background:rgba(255,255,255,0.2); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                            <div class="hidden-tags-container" style="position:absolute; left:22px; top:0; z-index:999; min-width:160px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.4rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                                <span style="color:#fde047; font-size:0.7rem; font-weight:700;">🏷️ ${noteObj.tags}</span>
+                            <div class="hidden-tags-container" style="position:absolute; right:22px; top:0; z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
+                                <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${noteObj.tags}</span>
                             </div>
                         </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
 
