@@ -2137,7 +2137,7 @@
             }
 
             let mashyHtmlBuffer = "";
-            mashyList.forEach((doc, index, arr) => {
+            mashyList.forEach((doc) => {
                 if (isDoctorAvailableToday(doc, currentDay)) {
                     todayMashyDocs.push(doc.name);
                 }
@@ -2148,17 +2148,7 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 
-                // لو العنصر في آخر الجدول، نخلي صندوق الوسوم يفتح لفوق (bottom: 0) عشان ميخرجش بره حدود الكارت
-                const isNearBottom = index >= arr.length - 2;
-                const verticalPosStyle = isNearBottom ? "bottom: 0; top: auto;" : "top: 0; bottom: auto;";
-
-                const tagsHeaderHtml = doc.tags ? `
-                    <div style="position:relative; display:inline-block;">
-                        <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                        <div class="hidden-tags-container" style="position:absolute; right:22px; ${verticalPosStyle} z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                            <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${doc.tags}</span>
-                        </div>
-                    </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
+                const tagsHtml = doc.tags ? `<div style="margin-top:2px;"><button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><span class="tag-badge">${doc.tags}</span></div></div>` : '';
 
                 let formattedDocName = doc.name.trim();
                 if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) formattedDocName = "د. " + formattedDocName;
@@ -2172,6 +2162,7 @@
                                 <div style="flex:1;">
                                     <span class="doc-name-box">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                                     <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                                    ${tagsHtml}
                                 </div>
                             </div>
                         </td>
@@ -2179,12 +2170,11 @@
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.62rem; font-weight:700; white-space:pre-line;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${timingFormatted}</div></td>
                         <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center; width:50px;">
-                            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:2px; justify-items:center; align-items:center;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ بيانات العميل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
-                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
-                                ${tagsHeaderHtml}
+                        <td style="text-align:center;">
+                            <div class="actions-col-group" style="flex-direction:row; gap:0.15rem; align-items:center; justify-content:center;">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ بيانات العميل"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>`;
@@ -2193,7 +2183,7 @@
             mashyBody.innerHTML = mashyHtmlBuffer;
 
             let wissamHtmlBuffer = "";
-            wissamList.forEach((doc, index, arr) => {
+            wissamList.forEach((doc) => {
                 if (isDoctorAvailableToday(doc, currentDay)) {
                     todayWissamDocs.push(doc.name);
                 }
@@ -2204,16 +2194,7 @@
                 const customBgStyle = doc.isLeave ? "background-color: rgba(220, 38, 38, 0.25) !important;" : (doc.customColor || "");
                 const isHighlighted = (doc.id === highlightId) ? 'highlight-pulse' : '';
                 
-                const isNearBottom = index >= arr.length - 2;
-                const verticalPosStyle = isNearBottom ? "bottom: 0; top: auto;" : "top: 0; bottom: auto;";
-
-                const tagsHeaderHtml = doc.tags ? `
-                    <div style="position:relative; display:inline-block;">
-                        <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-tags"></i></button>
-                        <div class="hidden-tags-container" style="position:absolute; right:22px; ${verticalPosStyle} z-index:999; min-width:150px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.35rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
-                            <span style="color:#fde047; font-size:0.68rem; font-weight:700;">🏷️ ${doc.tags}</span>
-                        </div>
-                    </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
+                const tagsHtml = doc.tags ? `<div style="margin-top:2px;"><button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><span class="tag-badge">${doc.tags}</span></div></div>` : '';
 
                 let formattedDocName = doc.name.trim();
                 if (!formattedDocName.startsWith("د.") && !formattedDocName.startsWith("الدكتور")) formattedDocName = "د. " + formattedDocName;
@@ -2227,6 +2208,7 @@
                                 <div style="flex:1;">
                                     <span class="doc-name-box">${formattedDocName} ${pinnedBadge} ${jointBadge} ${leaveBadge}</span>
                                     <span class="doc-nat-badge">${doc.nationality || ''}</span>
+                                    ${tagsHtml}
                                 </div>
                             </div>
                         </td>
@@ -2234,12 +2216,11 @@
                         <td><strong style="color:var(--primary-color);">${doc.fee || '75 ريال'}</strong></td>
                         <td><div style="font-size:0.62rem; font-weight:700; white-space:pre-line;"><i class="fa-solid fa-clock" style="color:var(--primary-color);"></i> ${timingFormatted}</div></td>
                         <td><div style="font-size:0.62rem; color:#fef08a;">${doc.notes || '-'}</div></td>
-                        <td style="text-align:center; width:50px;">
-                            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:2px; justify-items:center; align-items:center;">
-                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ بيانات العميل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
-                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
-                                ${tagsHeaderHtml}
+                        <td style="text-align:center;">
+                            <div class="actions-col-group" style="flex-direction:row; gap:0.15rem; align-items:center; justify-content:center;">
+                                <button class="action-icon-btn btn-copy-ic" onclick="copyDoctorForClient(${doc.id})" title="نسخ بيانات العميل"><i class="fa-solid fa-copy"></i></button>
+                                <button class="action-icon-btn btn-edit-ic" onclick="editDoctor(${doc.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-icon-btn btn-del-ic" onclick="deleteDoctor(${doc.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>`;
