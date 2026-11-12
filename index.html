@@ -236,8 +236,8 @@
         .offers-grid-container.offers-mode-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.3rem; }
         .offers-grid-container.offers-mode-compact .offer-grid-card { padding: 0.3rem; font-size: 0.65rem; }
 
-        .offer-grid-card { background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-card) 100%); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.5rem 0.65rem; display: flex; flex-direction: column; gap: 0.3rem; position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.25); transition: transform 0.15s, border-color 0.15s; }
-        .offer-grid-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
+        .offer-grid-card { ... transition: transform 0.15s, border-color 0.15s; }
+.offer-grid-card:hover { border-color: var(--primary-color); transform: translateY(-2px); }
         
         .price-badge { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; font-size: 0.75rem; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4); }
         .tag-joint { background: linear-gradient(45deg, #eab308, #ca8a04); color: #000; font-weight: 800; font-size: 0.48rem; padding: 0.02rem 0.12rem; border-radius: 3px; }
@@ -1246,33 +1246,43 @@
             } catch(e){}
         }
 
+        let activeFloatingTagBox = null;
+        let activeFloatingTagOrigin = null;
+
+        function closeFloatingTags() {
+            if (activeFloatingTagBox && activeFloatingTagOrigin) {
+                activeFloatingTagBox.classList.remove('show');
+                activeFloatingTagOrigin.appendChild(activeFloatingTagBox);
+            }
+            activeFloatingTagBox = null;
+            activeFloatingTagOrigin = null;
+        }
+
         function toggleTagsVisibility(btnEl) {
-            const container = btnEl.nextElementSibling;
-            if (!container) return;
+            const existingBox = btnEl.parentElement.querySelector('.hidden-tags-container');
+            const isSameBox = (activeFloatingTagBox && !existingBox);
 
-            const isAlreadyShown = container.classList.contains('show');
-            
-            // إغلاق أي صندوق وسوم مفتوح آخر في الصفحة بالكامل
-            document.querySelectorAll('.hidden-tags-container.show').forEach(el => {
-                el.classList.remove('show');
-            });
+            closeFloatingTags();
+            if (isSameBox || !existingBox) return;
 
-            if (isAlreadyShown) return;
+            activeFloatingTagOrigin = btnEl.parentElement;
+            activeFloatingTagBox = existingBox;
 
-            // إظهار الصندوق كـ fixed وترتيب طبقات عالي جداً ليخرج فوق الكروت والجداول تماماً
-            container.style.position = 'fixed';
-            container.style.zIndex = '99999999';
-            container.style.right = 'auto';
-            container.style.left = 'auto';
-            container.style.top = 'auto';
-            container.style.bottom = 'auto';
-            container.classList.add('show');
+            // نقل الصندوق إلى الـ body مباشرة ليخرج من أي transform أو overflow نهائياً
+            document.body.appendChild(existingBox);
+
+            existingBox.style.position = 'fixed';
+            existingBox.style.zIndex = '99999999';
+            existingBox.style.right = 'auto';
+            existingBox.style.left = 'auto';
+            existingBox.style.top = 'auto';
+            existingBox.style.bottom = 'auto';
+            existingBox.classList.add('show');
 
             const btnRect = btnEl.getBoundingClientRect();
-            const boxRect = container.getBoundingClientRect();
+            const boxRect = existingBox.getBoundingClientRect();
             const padding = 8;
 
-            // حساب المكان الأفقي بذكاء (يمين أو يسار زر الوسوم حسب المساحة المتاحة)
             let leftPos = btnRect.right + 6;
             if (leftPos + boxRect.width > window.innerWidth - padding) {
                 leftPos = btnRect.left - boxRect.width - 6;
@@ -1281,7 +1291,6 @@
                 leftPos = padding;
             }
 
-            // حساب المكان الرأسي (إذا كان الكارت في أسفل الشاشة، يفتح الصندوق للأعلى تلقائياً)
             let topPos = btnRect.top;
             if (topPos + boxRect.height > window.innerHeight - padding) {
                 topPos = btnRect.bottom - boxRect.height;
@@ -1290,18 +1299,17 @@
                 topPos = padding;
             }
 
-            container.style.left = leftPos + 'px';
-            container.style.top = topPos + 'px';
+            existingBox.style.left = leftPos + 'px';
+            existingBox.style.top = topPos + 'px';
         }
 
-        // إغلاق الوسوم تلقائياً عند الضغط في أي مكان فارغ أو عند التمرير (Scroll)
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.hidden-tags-container') && !e.target.closest('[onclick*="toggleTagsVisibility"]')) {
-                document.querySelectorAll('.hidden-tags-container.show').forEach(el => el.classList.remove('show'));
+                closeFloatingTags();
             }
         });
         document.addEventListener('scroll', () => {
-            document.querySelectorAll('.hidden-tags-container.show').forEach(el => el.classList.remove('show'));
+            closeFloatingTags();
         }, true);
 
         function setCloudStatusUI(status, message) {
