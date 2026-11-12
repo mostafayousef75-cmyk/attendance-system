@@ -1252,16 +1252,16 @@
 
             const isAlreadyShown = container.classList.contains('show');
             
-            // إغلاق أي صندوق وسوم مفتوح آخر
+            // إغلاق أي صندوق وسوم مفتوح آخر في الصفحة بالكامل
             document.querySelectorAll('.hidden-tags-container.show').forEach(el => {
                 el.classList.remove('show');
             });
 
             if (isAlreadyShown) return;
 
-            // إظهار الصندوق كـ fixed ليخرج خارج حدود الفريم والجدول تماماً
+            // إظهار الصندوق كـ fixed وترتيب طبقات عالي جداً ليخرج فوق الكروت والجداول تماماً
             container.style.position = 'fixed';
-            container.style.zIndex = '999999';
+            container.style.zIndex = '99999999';
             container.style.right = 'auto';
             container.style.left = 'auto';
             container.style.top = 'auto';
@@ -1272,7 +1272,7 @@
             const boxRect = container.getBoundingClientRect();
             const padding = 8;
 
-            // حساب المكان الأفقي (يمين الزر أو يساره حسب المساحة المتاحة في الشاشة)
+            // حساب المكان الأفقي بذكاء (يمين أو يسار زر الوسوم حسب المساحة المتاحة)
             let leftPos = btnRect.right + 6;
             if (leftPos + boxRect.width > window.innerWidth - padding) {
                 leftPos = btnRect.left - boxRect.width - 6;
@@ -1281,7 +1281,7 @@
                 leftPos = padding;
             }
 
-            // حساب المكان الرأسي (لو العنصر في آخر الشاشة يفتح لفوق تلقائياً)
+            // حساب المكان الرأسي (إذا كان الكارت في أسفل الشاشة، يفتح الصندوق للأعلى تلقائياً)
             let topPos = btnRect.top;
             if (topPos + boxRect.height > window.innerHeight - padding) {
                 topPos = btnRect.bottom - boxRect.height;
