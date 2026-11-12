@@ -2862,33 +2862,39 @@
                 const pinnedBadge = item.isPinned ? `<span style="color:#facc15; margin-left:4px;">📌</span> ` : '';
                 
                 let priceContentHtml = "";
+                let devRows = "";
 
-                if (item.device1 || item.device2) {
-                    let devRows = "";
-                    if (item.device1) {
-                        devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.3rem 0.55rem; border-radius: 6px; margin-bottom: 0.2rem;"><span style="color:#e4e4e7; font-size:0.7rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%;">• ${item.device1}</span><span style="color:#fde047; font-size:0.75rem; font-weight:700;">${item.price1 || ''}</span></div>`;
-                    }
-                    if (item.device2) {
-                        devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.3rem 0.55rem; border-radius: 6px;"><span style="color:#e4e4e7; font-size:0.7rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%;">• ${item.device2}</span><span style="color:#fde047; font-size:0.75rem; font-weight:700;">${item.price2 || ''}</span></div>`;
-                    }
+                if (item.device1) {
+                    devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.25rem 0.5rem; border-radius: 5px; margin-bottom: 0.15rem;"><span style="color:#e4e4e7; font-size:0.68rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%;">• ${item.device1}</span><span style="color:#fde047; font-size:0.72rem; font-weight:700;">${item.price1 || ''}</span></div>`;
+                }
+                if (item.device2) {
+                    devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.25rem 0.5rem; border-radius: 5px; margin-bottom: 0.15rem;"><span style="color:#e4e4e7; font-size:0.68rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%;">• ${item.device2}</span><span style="color:#fde047; font-size:0.72rem; font-weight:700;">${item.price2 || ''}</span></div>`;
+                }
+
+                // لو فيه أجهزة + السعر النهائي موجود، هنعرض الاتنين جوة الصندوق بانسجام
+                if (devRows !== "" && item.price && item.price.trim() !== "") {
+                    devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); padding: 0.25rem 0.5rem; border-radius: 5px;"><span style="color:#93c5fd; font-size:0.68rem; font-weight:700;">السعر النهائي</span><span style="color:#fde047; font-size:0.72rem; font-weight:800;">${item.price}</span></div>`;
+                }
+
+                if (devRows !== "") {
                     priceContentHtml = `<div style="margin:auto 0; display:flex; flex-direction:column; width:100%;">${devRows}</div>`;
                 } else if (item.price && item.price.trim() !== "") {
                     priceContentHtml = `
                         <div style="margin:auto 0; display:flex; flex-direction:column; width:100%;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.4rem 0.7rem; border-radius: 6px;">
-                                <span style="color:#93c5fd; font-size:0.72rem; font-weight:600;">السعر النهائي</span>
-                                <span style="color:#fde047; font-size:0.95rem; font-weight:800; letter-spacing:0.3px;">${item.price}</span>
+                            <div style="display:flex; justify-content:space-between; align-items:center; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                <span style="color:#93c5fd; font-size:0.7rem; font-weight:600;">السعر النهائي</span>
+                                <span style="color:#fde047; font-size:0.85rem; font-weight:800; letter-spacing:0.3px;">${item.price}</span>
                             </div>
                         </div>`;
                 }
 
                 const isHighlighted = (item.id === highlightOfferId) ? 'highlight-pulse' : '';
-                const tagsHtml = item.notes ? `<div style="margin-top:3px;"><button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><span class="tag-badge">${item.notes}</span></div></div>` : '';
+                const tagsHtml = item.notes ? `<div style="margin-top:2px;"><button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><span class="tag-badge">${item.notes}</span></div></div>` : '';
 
                 offersBuffer += `
                     <div id="offer_card_${item.id}" class="offer-grid-card ${isHighlighted}" data-id="${item.id}" style="display:flex; flex-direction:column; justify-content:space-between; height:100%; min-height:135px; background: linear-gradient(145deg, rgba(26,26,34,0.95), rgba(20,20,26,0.98)); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
                         <div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.18rem; margin-bottom:0.25rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.18rem; margin-bottom:0.2rem;">
                                 <div style="display:flex; align-items:center; gap:0.3rem;">
                                     <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'offer')" title="اسحب لتحريك العرض"><i class="fa-solid fa-grip-vertical"></i></span>
                                     <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)" style="width:13px; height:13px; accent-color:var(--primary-color);">
