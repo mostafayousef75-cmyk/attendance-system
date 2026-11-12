@@ -1268,15 +1268,30 @@
             activeFloatingTagOrigin = btnEl.parentElement;
             activeFloatingTagBox = existingBox;
 
-            // نقل الصندوق إلى الـ body مباشرة ليخرج من أي transform أو overflow نهائياً
             document.body.appendChild(existingBox);
 
+            // ضبط الحجم والشكل ليكون ملموم ومناسب
             existingBox.style.position = 'fixed';
             existingBox.style.zIndex = '99999999';
             existingBox.style.right = 'auto';
             existingBox.style.left = 'auto';
             existingBox.style.top = 'auto';
             existingBox.style.bottom = 'auto';
+            existingBox.style.minWidth = '110px';
+            existingBox.style.maxWidth = '210px';
+            existingBox.style.width = 'max-content';
+            existingBox.style.padding = '0.25rem 0.45rem';
+            existingBox.style.borderRadius = '6px';
+            existingBox.style.lineHeight = '1.35';
+            existingBox.style.whiteSpace = 'normal';
+            existingBox.style.wordBreak = 'break-word';
+            existingBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.65)';
+
+            const innerSpan = existingBox.querySelector('span');
+            if (innerSpan) {
+                innerSpan.style.fontSize = '0.62rem';
+            }
+
             existingBox.classList.add('show');
 
             const btnRect = btnEl.getBoundingClientRect();
@@ -1302,7 +1317,7 @@
             existingBox.style.left = leftPos + 'px';
             existingBox.style.top = topPos + 'px';
         }
-
+        
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.hidden-tags-container') && !e.target.closest('[onclick*="toggleTagsVisibility"]')) {
                 closeFloatingTags();
