@@ -2871,7 +2871,6 @@
                     devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.25rem 0.5rem; border-radius: 5px; margin-bottom: 0.15rem;"><span style="color:#e4e4e7; font-size:0.68rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%;">• ${item.device2}</span><span style="color:#fde047; font-size:0.72rem; font-weight:700;">${item.price2 || ''}</span></div>`;
                 }
 
-                // لو فيه أجهزة + السعر النهائي موجود، هنعرض الاتنين جوة الصندوق بانسجام
                 if (devRows !== "" && item.price && item.price.trim() !== "") {
                     devRows += `<div style="display:flex; justify-content:space-between; align-items:center; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); padding: 0.25rem 0.5rem; border-radius: 5px;"><span style="color:#93c5fd; font-size:0.68rem; font-weight:700;">السعر النهائي</span><span style="color:#fde047; font-size:0.72rem; font-weight:800;">${item.price}</span></div>`;
                 }
@@ -2889,7 +2888,15 @@
                 }
 
                 const isHighlighted = (item.id === highlightOfferId) ? 'highlight-pulse' : '';
-                const tagsHtml = item.notes ? `<div style="margin-top:2px;"><button class="tags-toggle-btn" onclick="toggleTagsVisibility(this)" title="إظهار/إخفاء الوسوم"><i class="fa-solid fa-tags"></i> الوسوم</button><div class="hidden-tags-container"><span class="tag-badge">${item.notes}</span></div></div>` : '';
+                
+                // زر الأيقونة فوق بجانب أزرار الإدارة مع صندوق منسدل للوسوم
+                const tagsHeaderHtml = item.notes ? `
+                    <div style="position:relative; display:inline-block;">
+                        <button class="action-icon-btn" onclick="toggleTagsVisibility(this)" title="عرض الوسوم" style="color:var(--primary-color); background:rgba(234,179,8,0.15); width:20px; height:18px; font-size:0.6rem;"><i class="fa-solid fa-tags"></i></button>
+                        <div class="hidden-tags-container" style="position:absolute; left:0; top:24px; z-index:100; min-width:140px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.3rem; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+                            <span style="color:#fde047; font-size:0.65rem; font-weight:700;">🏷️ ${item.notes}</span>
+                        </div>
+                    </div>` : '';
 
                 offersBuffer += `
                     <div id="offer_card_${item.id}" class="offer-grid-card ${isHighlighted}" data-id="${item.id}" style="display:flex; flex-direction:column; justify-content:space-between; height:100%; min-height:135px; background: linear-gradient(145deg, rgba(26,26,34,0.95), rgba(20,20,26,0.98)); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
@@ -2900,13 +2907,14 @@
                                     <input type="checkbox" class="offer-select-chk" data-offer-id="${item.id}" ${isChecked} onchange="handleOfferCheckboxChange(${item.id}, this)" style="width:13px; height:13px; accent-color:var(--primary-color);">
                                     <span style="font-size:0.6rem; color:var(--primary-color); font-weight:700; background:rgba(234,179,8,0.1); padding:0.05rem 0.3rem; border-radius:4px;">${item.category}</span>
                                 </div>
-                                <div class="actions-col-group" style="flex-direction:row; gap:0.15rem;">
+                                <div class="actions-col-group" style="flex-direction:row; gap:0.15rem; align-items:center;">
+                                    ${tagsHeaderHtml}
                                     <button class="action-icon-btn btn-copy-ic" onclick="copySingleOffer(${item.id})" title="نسخ العرض"><i class="fa-solid fa-copy"></i></button>
                                     <button class="action-icon-btn btn-edit-ic" onclick="editOffer(${item.id})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                                     <button class="action-icon-btn btn-del-ic" onclick="deleteOffer(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
-                            <div>${pinnedBadge}<strong style="font-size:0.8rem; color:#f4f4f5; font-weight:700; line-height:1.3; display:block;">${item.name}</strong>${tagsHtml}</div>
+                            <div style="margin-top:0.2rem;">${pinnedBadge}<strong style="font-size:0.8rem; color:#f4f4f5; font-weight:700; line-height:1.3; display:block;">${item.name}</strong></div>
                         </div>
                         ${priceContentHtml}
                     </div>`;
