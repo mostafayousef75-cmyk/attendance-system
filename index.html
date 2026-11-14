@@ -381,16 +381,17 @@
             <button class="btn btn-secondary" style="padding:0.08rem 0.2rem; font-size:0.58rem;" onclick="toggleAllSearchCats(false)">إلغاء الكل</button>
         </div>
 
-        <div class="professional-ticker-bar" id="professionalTickerBarContainer">
-            <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
-                <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار أولاً"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
-                <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <div class="ticker-speed-controls">
-                    <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
-                    <button class="speed-btn active" onclick="setTickerSpeed(0.25, this)">0.25x</button>
-                    <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">0.5x</button>
-                </div>
-            </div>
+        <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
+    <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار أولاً"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
+    <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
+    <!-- مسطرة التحريك اليدوي التي تظهر عند الإيقاف -->
+    <input type="range" id="tickerManualSlider" min="0" max="100" value="0" step="0.1" style="display:none; width:70px; accent-color:var(--primary-color); cursor:pointer;" oninput="onTickerSliderInput(this.value)" title="تحريك الشريط يدوياً">
+    <div class="ticker-speed-controls">
+        <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
+        <button class="speed-btn active" onclick="setTickerSpeed(0.25, this)">0.25x</button>
+        <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">0.5x</button>
+    </div>
+</div>
             
             <div class="ticker-wrapper-outer">
                 <div class="ticker-container" id="tickerContainerBox">
@@ -1375,7 +1376,7 @@
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '0.25');
-        let tickerIsPaused = false;
+        let tickerIsPaused = localStorage.getItem('ticker_is_paused') === 'true';
         let currentGlobalSearchResults = [];
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
@@ -2424,14 +2425,31 @@
 
         function toggleTickerPlayState() {
             tickerIsPaused = !tickerIsPaused;
+            localStorage.setItem('ticker_is_paused', tickerIsPaused);
             const track = document.getElementById('tickerTrackContainer');
             const btn = document.getElementById('tickerTogglePlayBtn');
-            if (track) track.classList.toggle('paused', tickerIsPaused);
+            const slider = document.getElementById('tickerManualSlider');
+            
+            if (track) {
+                track.classList.toggle('paused', tickerIsPaused);
+            }
             if (btn) {
                 btn.innerHTML = tickerIsPaused ? `<i class="fa-solid fa-play"></i> تشغيل` : `<i class="fa-solid fa-pause"></i> إيقاف`;
                 btn.style.color = tickerIsPaused ? 'var(--accent-green)' : '';
                 btn.style.borderColor = tickerIsPaused ? 'var(--accent-green)' : '';
             }
+            if (slider) {
+                slider.style.display = tickerIsPaused ? 'inline-block' : 'none';
+            }
+        }
+
+        function onTickerSliderInput(val) {
+            const track = document.getElementById('tickerTrackContainer');
+            if (!track) return;
+            // تحويل قيمة المسطرة (0 إلى 100) إلى حركة أفقية (من -50% إلى 0%)
+            let translateVal = -50 + (val / 100) * 50;
+            track.style.animation = 'none';
+            track.style.transform = `translateX(${translateVal}%)`;
         }
 
         function renderAlerts(highlightId = null) {
@@ -2442,12 +2460,34 @@
 
             let orderedAlerts = [...alertsData].reverse();
 
-            let alertCardsHtml = "";
+            // دمج التنبيهات مع العروض المثبتة (Pinned Offers) في شريط التنبيهات
+            let tickerItemsHtml = "";
+            
+            if (typeof offersData !== 'undefined') {
+                offersData.filter(o => o.isPinned).forEach(o => {
+                    tickerItemsHtml += `<div class="ticker-card-item" onclick="jumpToOffersTabFromTicker(${o.id}, '${o.category}')"><i class="fa-solid fa-tag" style="color:var(--primary-color);"></i><span>⭐ ${o.name}: ${o.price || ''}</span></div>`;
+                });
+            }
+
             orderedAlerts.forEach(item => {
-                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
+                tickerItemsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
-            tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
+
+            tickerTrack.innerHTML = tickerItemsHtml + tickerItemsHtml + tickerItemsHtml;
             applyTickerSpeed();
+
+            // تطبيق حالة الإيقاف المحفوظة عند إعادة التحميل
+            if (tickerIsPaused) {
+                tickerTrack.classList.add('paused');
+                const btn = document.getElementById('tickerTogglePlayBtn');
+                const slider = document.getElementById('tickerManualSlider');
+                if (btn) {
+                    btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
+                    btn.style.color = 'var(--accent-green)';
+                    btn.style.borderColor = 'var(--accent-green)';
+                }
+                if (slider) slider.style.display = 'inline-block';
+            }
 
             let alertsBuffer = "";
             orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
@@ -2485,25 +2525,22 @@
             });
             grid.innerHTML = alertsBuffer;
         }
-        
-        function resetTickerToStart() {
-            const track = document.getElementById('tickerTrackContainer');
-            if (track) { 
-                track.style.animation = 'none'; 
-                track.offsetHeight; 
-                applyTickerSpeed(); 
-                playChirpSound();
-            }
-        }
 
-        function jumpToAlertsTab(alertId) {
-            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
-            if (alertId) {
-                setTimeout(() => {
-                    const el = document.getElementById('alert_card_' + alertId);
-                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); }
-                }, 100);
+        function jumpToOffersTabFromTicker(offerId, cat) {
+            switchTab('offers', document.querySelectorAll('.nav-link')[3]);
+            if (cat) {
+                selectedOfferTab = cat;
+                renderOffersTabs();
             }
+            setTimeout(() => {
+                renderOffers(offerId);
+                const el = document.getElementById('offer_card_' + offerId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('highlight-pulse');
+                    setTimeout(() => el.classList.remove('highlight-pulse'), 3000);
+                }
+            }, 100);
         }
 
         function previewUploadedImage(input) {
