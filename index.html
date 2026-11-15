@@ -114,7 +114,7 @@
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
         
         /* حركة شريط التنبيهات من الشمال لليمين تماماً وبحيث يبدأ بأحدث إشعار أولاً */
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
+        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center;  direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
         @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
@@ -385,7 +385,6 @@
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
                 <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار أولاً"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
                 <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <!-- مسطرة التحريك اليدوي التي تظهر عند الإيقاف فقط -->
                 <input type="range" id="tickerManualSlider" min="0" max="100" value="0" step="0.1" style="display:none; width:75px; accent-color:var(--primary-color); cursor:pointer;" oninput="onTickerSliderInput(this.value)" title="تحريك الشريط يدوياً">
                 <div class="ticker-speed-controls">
                     <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
@@ -1377,6 +1376,8 @@
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '0.25');
+        let tickerIsPaused = localStorage.getItem('ticker_is_paused') === 'true';
+        let tickerAnimation = null;
         let currentGlobalSearchResults = [];
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
@@ -2407,26 +2408,6 @@
             if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); playChirpSound(); }
         }
 
-        function setTickerSpeed(mult, btnEl) {
-            tickerSpeedMultiplier = mult;
-            localStorage.setItem('ticker_speed_mult', mult);
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl) btnEl.classList.add('active');
-            applyTickerSpeed();
-        }
-
-        function applyTickerSpeed() {
-            const track = document.getElementById('tickerTrackContainer');
-            if (!track) return;
-            let calculatedDuration = 40 / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
-            if (tickerIsPaused) track.classList.add('paused');
-        }
-
-        let tickerAnimation = null;
-        let tickerIsPaused = localStorage.getItem('ticker_is_paused') === 'true';
-        let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '0.25');
-
         function initTickerAnimation() {
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
@@ -2462,6 +2443,33 @@
                     } catch(e) {}
                 }
             }
+        }
+
+        function setTickerSpeed(mult, btnEl) {
+            tickerSpeedMultiplier = mult;
+            localStorage.setItem('ticker_speed_mult', mult);
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            
+            if (tickerAnimation) {
+                let currentProgress = 0;
+                try {
+                    let duration = tickerAnimation.effect.getTiming().duration;
+                    currentProgress = (tickerAnimation.currentTime || 0) / duration;
+                } catch(e){}
+                
+                initTickerAnimation();
+                
+                try {
+                    let newDuration = tickerAnimation.effect.getTiming().duration;
+                    tickerAnimation.currentTime = currentProgress * newDuration;
+                    if (tickerIsPaused) tickerAnimation.pause();
+                } catch(e){}
+            }
+        }
+
+        function applyTickerSpeed() {
+            initTickerAnimation();
         }
 
         function toggleTickerPlayState() {
@@ -2510,39 +2518,6 @@
             } catch(e) {}
         }
 
-        function setTickerSpeed(mult, btnEl) {
-            tickerSpeedMultiplier = mult;
-            localStorage.setItem('ticker_speed_mult', mult);
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl) btnEl.classList.add('active');
-            
-            if (tickerAnimation) {
-                let currentProgress = 0;
-                try {
-                    let duration = tickerAnimation.effect.getTiming().duration;
-                    currentProgress = (tickerAnimation.currentTime || 0) / duration;
-                } catch(e){}
-                
-                initTickerAnimation();
-                
-                try {
-                    let newDuration = tickerAnimation.effect.getTiming().duration;
-                    tickerAnimation.currentTime = currentProgress * newDuration;
-                    if (tickerIsPaused) tickerAnimation.pause();
-                } catch(e){}
-            }
-        }
-
-        function resetTickerToStart() {
-            if (tickerAnimation) {
-                tickerAnimation.currentTime = 0;
-                if (!tickerIsPaused) {
-                    tickerAnimation.play();
-                }
-                playChirpSound();
-            }
-        }
-
         function renderAlerts(highlightId = null) {
             const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
@@ -2551,7 +2526,6 @@
 
             let orderedAlerts = [...alertsData].reverse();
 
-            // دمج العروض المثبتة (Pinned Offers) مع التنبيهات في شريط المتحرك
             let tickerItemsHtml = "";
             if (typeof offersData !== 'undefined') {
                 offersData.filter(o => o.isPinned).forEach(o => {
@@ -2562,10 +2536,7 @@
             orderedAlerts.forEach(item => {
                 tickerItemsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
-
             tickerTrack.innerHTML = tickerItemsHtml + tickerItemsHtml + tickerItemsHtml;
-            
-            // تهيئة وتشغيل حركة الشريط
             initTickerAnimation();
 
             let alertsBuffer = "";
@@ -2579,7 +2550,8 @@
                 }
 
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
-                const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                const escapedContent = item.content.replace(/'/g, "\'").replace(/
+/g, '\n');
 
                 const tagsHeaderHtml = item.tags ? `
                     <div style="position:relative; display:inline-block;">
@@ -2620,6 +2592,26 @@
                     setTimeout(() => el.classList.remove('highlight-pulse'), 3000);
                 }
             }, 100);
+        }
+        
+        function resetTickerToStart() {
+            if (tickerAnimation) {
+                tickerAnimation.currentTime = 0;
+                if (!tickerIsPaused) {
+                    tickerAnimation.play();
+                }
+                playChirpSound();
+            }
+        }
+
+        function jumpToAlertsTab(alertId) {
+            switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
+            if (alertId) {
+                setTimeout(() => {
+                    const el = document.getElementById('alert_card_' + alertId);
+                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-pulse'); setTimeout(() => el.classList.remove('highlight-pulse'), 3000); }
+                }, 100);
+            }
         }
 
         function previewUploadedImage(input) {
