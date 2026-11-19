@@ -109,18 +109,33 @@
         }
         .kpi-card-unified:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6); }
 
-        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
-        .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
+        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         
-        /* حركة شريط التنبيهات من الشمال لليمين تماماً وبحيث يبدأ بأحدث إشعار أولاً */
+        /* حاوية الإشعارات المثبتة على اليمين */
+        .pinned-ticker-zone { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; max-width: 45%; overflow-x: auto; padding-bottom: 2px; }
+        .pinned-ticker-zone:empty { display: none; }
+        .pinned-ticker-zone::-webkit-scrollbar { height: 4px; }
+        .pinned-ticker-zone::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+
+        .ticker-card-pinned { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(234, 179, 8, 0.16); border: 1.5px solid var(--primary-color); padding: 0.28rem 0.7rem; border-radius: 18px; font-weight: 800; color: #fef08a; cursor: pointer; font-size: 0.73rem; flex-shrink: 0; box-shadow: 0 0 8px rgba(234, 179, 8, 0.25); transition: transform 0.15s; }
+        .ticker-card-pinned:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
+
+        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; min-width: 0; }
+        .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; transition: padding 0.2s; }
+        
+        /* تفعيل المسطرة عند الإيقاف */
+        .ticker-container.manual-scroll-mode { overflow-x: auto !important; direction: rtl !important; padding-bottom: 6px; scrollbar-width: thin !important; scrollbar-color: var(--primary-color) var(--bg-surface) !important; }
+        .ticker-container.manual-scroll-mode::-webkit-scrollbar { height: 6px !important; display: block !important; }
+        .ticker-container.manual-scroll-mode::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 10px; }
+        .ticker-container.manual-scroll-mode::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
-        .ticker-track.paused { animation-play-state: paused !important; }
+        .ticker-track.paused { animation: none !important; transform: none !important; }
 
         @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
 
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
-        .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
+        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.28rem 0.85rem; border-radius: 18px; font-weight: 700; color: #f4f4f5; cursor: pointer; font-size: 0.74rem; transition: transform 0.15s, border-color 0.15s; flex-shrink: 0; }
+        .ticker-card-item:hover { background: var(--primary-color); color: #000; border-color: var(--primary-color); transform: scale(1.02); }
 
         .ticker-speed-controls { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
         .speed-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; cursor: pointer; }
@@ -383,7 +398,7 @@
 
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
             <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
-                <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار أولاً"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
+                <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="الرجوع لأحدث إشعار"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
                 <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
                 <div class="ticker-speed-controls">
                     <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
@@ -391,6 +406,9 @@
                     <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">0.5x</button>
                 </div>
             </div>
+
+            <!-- منطقة الإشعارات المثبتة في أول الشريط جهة اليمين -->
+            <div class="pinned-ticker-zone" id="pinnedTickerZone"></div>
             
             <div class="ticker-wrapper-outer">
                 <div class="ticker-container" id="tickerContainerBox">
@@ -519,6 +537,11 @@
                 </div>
             </section>
 
+            <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">
+                <input type="checkbox" id="alertIsPinned" style="width:13px; height:13px; accent-color:var(--primary-color);">
+                <label for="alertIsPinned" style="font-weight:700; color:var(--primary-color);">📌 تثبيت هذا التنبيه في بداية الشريط العلوي (جهة اليمين)</label>
+            </div>
+            
             <!-- 2. التنبيهات والإشعارات -->
             <section id="alerts-section" class="page-section">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
@@ -2414,19 +2437,16 @@
             applyTickerSpeed();
         }
 
-        function applyTickerSpeed() {
-            const track = document.getElementById('tickerTrackContainer');
-            if (!track) return;
-            let calculatedDuration = 40 / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
-            if (tickerIsPaused) track.classList.add('paused');
-        }
+        let tickerIsPaused = localStorage.getItem('ticker_is_paused') === 'true';
 
-        function toggleTickerPlayState() {
-            tickerIsPaused = !tickerIsPaused;
+        function applyTickerStateUI() {
             const track = document.getElementById('tickerTrackContainer');
+            const container = document.getElementById('tickerContainerBox');
             const btn = document.getElementById('tickerTogglePlayBtn');
+            
             if (track) track.classList.toggle('paused', tickerIsPaused);
+            if (container) container.classList.toggle('manual-scroll-mode', tickerIsPaused);
+            
             if (btn) {
                 btn.innerHTML = tickerIsPaused ? `<i class="fa-solid fa-play"></i> تشغيل` : `<i class="fa-solid fa-pause"></i> إيقاف`;
                 btn.style.color = tickerIsPaused ? 'var(--accent-green)' : '';
@@ -2434,23 +2454,83 @@
             }
         }
 
+        function applyTickerSpeed() {
+            const track = document.getElementById('tickerTrackContainer');
+            if (!track) return;
+            if (tickerIsPaused) {
+                track.style.animation = 'none';
+            } else {
+                let calculatedDuration = 40 / tickerSpeedMultiplier;
+                track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
+            }
+            applyTickerStateUI();
+        }
+
+        function toggleTickerPlayState() {
+            tickerIsPaused = !tickerIsPaused;
+            localStorage.setItem('ticker_is_paused', tickerIsPaused);
+            renderAlerts(); // إعادة بناء الشريط ليناسب وضع التمرير اليدوي أو الحركة اللانهائية
+            playChirpSound();
+        }
+
+        function toggleAlertPin(id) {
+            const item = alertsData.find(a => a.id === id);
+            if (!item) return;
+            item.isPinned = !item.isPinned;
+            syncToCloud();
+            playChirpSound();
+        }
+
         function renderAlerts(highlightId = null) {
             const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
+            const grid = document.getElementById('alertsGridList');
+            const tickerTrack = document.getElementById('tickerTrackContainer');
+            const pinnedZone = document.getElementById('pinnedTickerZone');
             if(!grid || !tickerTrack) return;
-            grid.innerHTML = ""; tickerTrack.innerHTML = "";
+            
+            grid.innerHTML = ""; 
+            tickerTrack.innerHTML = "";
+            if (pinnedZone) pinnedZone.innerHTML = "";
 
+            // ترتيب التنبيهات من الأحدث للأقدم
             let orderedAlerts = [...alertsData].reverse();
+            
+            // فصل المثبت عن المتحرك
+            let pinnedAlerts = orderedAlerts.filter(a => a.isPinned);
+            let unpinnedAlerts = orderedAlerts.filter(a => !a.isPinned);
 
-            let alertCardsHtml = "";
-            orderedAlerts.forEach(item => {
-                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
-            });
-            tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
+            // 1. عرض المثبت في بداية الشريط على اليمين
+            if (pinnedZone) {
+                pinnedZone.innerHTML = pinnedAlerts.map(item => `
+                    <div class="ticker-card-pinned" onclick="jumpToAlertsTab(${item.id})" title="إشعار مثبت - اضغط للعرض">
+                        <span>📌</span>
+                        <span>${item.content}</span>
+                    </div>
+                `).join('');
+            }
+
+            // 2. عرض الباقي في الشريط المتحرك
+            let unpinnedHtml = unpinnedAlerts.map(item => `
+                <div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})">
+                    <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>
+                    <span>${item.content}</span>
+                </div>
+            `).join('');
+
+            // إذا كان متوقفاً نعرض النسخة مرة واحدة لسهولة التمرير بالمسطرة، وإذا كان يعمل نكررها للحركة المستمرة
+            if (tickerIsPaused) {
+                tickerTrack.innerHTML = unpinnedHtml || `<span style="color:var(--text-muted); font-size:0.7rem;">لا توجد إشعارات إضافية متحركة</span>`;
+            } else {
+                tickerTrack.innerHTML = unpinnedHtml ? (unpinnedHtml + unpinnedHtml + unpinnedHtml) : '';
+            }
+            
             applyTickerSpeed();
 
+            // 3. عرض البطاقات في صفحة التنبيهات (المثبت يظهر أولاً)
+            let displayAlertsInPage = [...pinnedAlerts, ...unpinnedAlerts];
             let alertsBuffer = "";
-            orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
+            
+            displayAlertsInPage.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
                 let mediaHtml = "";
                 if (item.pdfUrl) {
                     mediaHtml += `<a href="${item.pdfUrl}" target="_blank" class="pdf-file-badge"><i class="fa-solid fa-file-pdf"></i> PDF</a> `;
@@ -2460,6 +2540,7 @@
                 }
 
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
+                const pinnedCardStyle = item.isPinned ? 'border-color: var(--primary-color); background: rgba(234, 179, 8, 0.06);' : '';
                 const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 const tagsHeaderHtml = item.tags ? `
@@ -2471,11 +2552,15 @@
                     </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
 
                 alertsBuffer += `
-                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" data-id="${item.id}">
+                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" style="${pinnedCardStyle}" data-id="${item.id}">
                         <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اسحب لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
-                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
+                        <div style="flex:1;">
+                            <p>${item.isPinned ? '<span style="color:var(--primary-color);">📌</span> ' : ''}${item.content}</p>
+                            <span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span>
+                        </div>
                         <div style="display:flex; align-items:center; gap:0.2rem;">${mediaHtml}</div>
-                        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:2px; justify-items:center; align-items:center; width:42px;">
+                        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; justify-items:center; align-items:center; width:62px;">
+                            <button class="action-icon-btn" onclick="toggleAlertPin(${item.id})" title="${item.isPinned ? 'إلغاء التثبيت' : 'تثبيت في الشريط'}" style="color:${item.isPinned ? '#000' : 'var(--primary-color)'}; background:${item.isPinned ? 'var(--primary-color)' : 'rgba(234,179,8,0.15)'}; width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-thumbtack"></i></button>
                             <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
@@ -2488,14 +2573,94 @@
         
         function resetTickerToStart() {
             const track = document.getElementById('tickerTrackContainer');
-            if (track) { 
+            const container = document.getElementById('tickerContainerBox');
+            const pinnedZone = document.getElementById('pinnedTickerZone');
+            
+            if (pinnedZone) pinnedZone.scrollTo({ left: 0, behavior: 'smooth' });
+            
+            if (tickerIsPaused && container) {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else if (track) { 
                 track.style.animation = 'none'; 
                 track.offsetHeight; 
                 applyTickerSpeed(); 
-                playChirpSound();
             }
+            playChirpSound();
         }
 
+        function openAlertModal() {
+            document.getElementById('alertId').value = ""; 
+            document.getElementById('alertContent').value = "";
+            document.getElementById('alertTags').value = ""; 
+            document.getElementById('alertPdfUrl').value = "";
+            document.getElementById('alertImgFile').value = "";
+            document.getElementById('alertImgBase64').value = "";
+            document.getElementById('imgPreviewContainer').innerHTML = "";
+            document.getElementById('alertIsPinned').checked = false;
+            document.getElementById('alertModal').classList.add('active');
+        }
+
+        function saveAlertSmart() {
+            const id = document.getElementById('alertId').value;
+            const content = document.getElementById('alertContent').value;
+            const tags = document.getElementById('alertTags').value.trim();
+            const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
+            const imgBase64Input = document.getElementById('alertImgBase64').value.trim();
+            const isPinned = document.getElementById('alertIsPinned').checked;
+            
+            if (!content) return alert("أدخل نص التنبيه!");
+            
+            let finalImg = "";
+            if (imgBase64Input !== "") {
+                finalImg = imgBase64Input;
+            } else if (id) {
+                const previewHtml = document.getElementById('imgPreviewContainer').innerHTML;
+                if (previewHtml.trim() !== "") {
+                    const existingItem = alertsData.find(a => a.id == id);
+                    finalImg = existingItem ? (existingItem.imgBase64 || "") : "";
+                }
+            }
+            
+            const alertObj = { 
+                id: id ? parseInt(id) : Date.now(), 
+                content, 
+                tags, 
+                pdfUrl, 
+                imgBase64: finalImg, 
+                isPinned,
+                time: new Date().toLocaleString('en-US') 
+            };
+            
+            if (id) {
+                const idx = alertsData.findIndex(a => a.id == id);
+                if (idx !== -1) alertsData[idx] = alertObj; 
+            } else {
+                alertsData.push(alertObj);
+            }
+            
+            syncToCloud(); 
+            closeModal('alertModal'); 
+            playChirpSound();
+        }
+
+        function editAlert(id) {
+            const item = alertsData.find(a => a.id === id); if (!item) return;
+            document.getElementById('alertId').value = item.id; 
+            document.getElementById('alertContent').value = item.content;
+            document.getElementById('alertTags').value = item.tags || "";
+            document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
+            document.getElementById('alertImgFile').value = "";
+            document.getElementById('alertImgBase64').value = item.imgBase64 || "";
+            document.getElementById('alertIsPinned').checked = !!item.isPinned;
+            
+            if (item.imgBase64) {
+                document.getElementById('imgPreviewContainer').innerHTML = `<img src="${item.imgBase64}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);">`;
+            } else {
+                document.getElementById('imgPreviewContainer').innerHTML = "";
+            }
+            document.getElementById('alertModal').classList.add('active');
+        }
+                                
         function jumpToAlertsTab(alertId) {
             switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
             if (alertId) {
@@ -2535,78 +2700,7 @@
             }
             playChirpSound();
         }
-
-        function openAlertModal() {
-            document.getElementById('alertId').value = ""; 
-            document.getElementById('alertContent').value = "";
-            document.getElementById('alertTags').value = ""; 
-            document.getElementById('alertPdfUrl').value = "";
-            document.getElementById('alertImgFile').value = "";
-            document.getElementById('alertImgBase64').value = "";
-            document.getElementById('imgPreviewContainer').innerHTML = "";
-            document.getElementById('alertModal').classList.add('active');
-        }
-
-        function saveAlertSmart() {
-            const id = document.getElementById('alertId').value;
-            const content = document.getElementById('alertContent').value;
-            const tags = document.getElementById('alertTags').value.trim();
-            const pdfUrl = document.getElementById('alertPdfUrl').value.trim();
-            const imgBase64Input = document.getElementById('alertImgBase64').value.trim();
-            
-            if (!content) return alert("أدخل نص التنبيه!");
-            
-            let finalImg = "";
-            if (imgBase64Input !== "") {
-                finalImg = imgBase64Input;
-            } else if (id) {
-                const previewHtml = document.getElementById('imgPreviewContainer').innerHTML;
-                if (previewHtml.trim() !== "") {
-                    const existingItem = alertsData.find(a => a.id == id);
-                    finalImg = existingItem ? (existingItem.imgBase64 || "") : "";
-                } else {
-                    finalImg = "";
-                }
-            }
-            
-            const alertObj = { 
-                id: id ? parseInt(id) : Date.now(), 
-                content, 
-                tags, 
-                pdfUrl, 
-                imgBase64: finalImg, 
-                time: new Date().toLocaleString('en-US') 
-            };
-            
-            if (id) {
-                const idx = alertsData.findIndex(a => a.id == id);
-                if (idx !== -1) alertsData[idx] = alertObj; 
-            } else {
-                alertsData.push(alertObj);
-            }
-            
-            syncToCloud(); 
-            closeModal('alertModal'); 
-            playChirpSound();
-        }
-
-        function editAlert(id) {
-            const item = alertsData.find(a => a.id === id); if (!item) return;
-            document.getElementById('alertId').value = item.id; 
-            document.getElementById('alertContent').value = item.content;
-            document.getElementById('alertTags').value = item.tags || "";
-            document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
-            document.getElementById('alertImgFile').value = "";
-            document.getElementById('alertImgBase64').value = item.imgBase64 || "";
-            
-            if (item.imgBase64) {
-                document.getElementById('imgPreviewContainer').innerHTML = `<img src="${item.imgBase64}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);">`;
-            } else {
-                document.getElementById('imgPreviewContainer').innerHTML = "";
-            }
-            document.getElementById('alertModal').classList.add('active');
-        }
-
+                   
         function deleteAlert(id) {
             if (confirm("حذف التنبيه؟")) { 
                 alertsData = alertsData.filter(a => a.id !== id); 
