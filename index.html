@@ -111,28 +111,46 @@
 
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
-        .pinned-alert-pill {
+        .pinned-alerts-strip {
     display: none;
     align-items: center;
-    gap: 0.35rem;
-    background: rgba(234, 179, 8, 0.14);
+    gap: 0.3rem;
+    max-width: 380px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    flex-shrink: 0;
+    padding: 0.1rem 0;
+}
+.pinned-alerts-strip.active {
+    display: inline-flex;
+}
+.pinned-alerts-strip::-webkit-scrollbar {
+    height: 4px;
+    display: block;
+}
+.pinned-alerts-strip::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+.pinned-alert-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(234, 179, 8, 0.15);
     border: 1px solid var(--primary-color);
     color: #fef08a;
-    padding: 0.18rem 0.45rem;
+    padding: 0.16rem 0.42rem;
     border-radius: 8px;
-    font-size: 0.66rem;
+    font-size: 0.65rem;
     font-weight: 700;
-    max-width: 240px;
+    max-width: 200px;
     flex-shrink: 0;
-}
-.pinned-alert-pill.active {
-    display: inline-flex;
 }
 .pinned-alert-pill-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 175px;
+    max-width: 145px;
     cursor: pointer;
 }
 .pinned-alert-unpin-btn {
@@ -140,7 +158,7 @@
     color: #fca5a5;
     border: none;
     border-radius: 4px;
-    padding: 0.05rem 0.28rem;
+    padding: 0.04rem 0.26rem;
     font-size: 0.6rem;
     cursor: pointer;
     line-height: 1.2;
@@ -159,6 +177,26 @@
     border-radius: 20px;
     padding: 0.22rem 0.6rem;
     direction: rtl;
+}
+
+.ticker-container.manual-scroll-mode {
+    overflow-x: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--primary-color) rgba(255,255,255,0.08) !important;
+    padding-bottom: 0.3rem;
+    border-color: var(--primary-color);
+}
+.ticker-container.manual-scroll-mode::-webkit-scrollbar {
+    height: 7px !important;
+    display: block !important;
+}
+.ticker-container.manual-scroll-mode::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+}
+.ticker-container.manual-scroll-mode::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 6px;
 }
 
 .ticker-track {
@@ -452,11 +490,7 @@
         </div>
     </div>
 
-    <div id="pinnedAlertCompactBar" class="pinned-alert-pill" title="إشعار مثبت (مختصر)">
-        <i class="fa-solid fa-thumbtack" style="color:var(--primary-color); font-size:0.62rem;"></i>
-        <span id="pinnedAlertCompactText" class="pinned-alert-pill-text" onclick="jumpToPinnedAlert()"></span>
-        <button type="button" class="pinned-alert-unpin-btn" onclick="unpinAlert()" title="إلغاء التثبيت">×</button>
-    </div>
+    <div id="pinnedAlertsCompactBar" class="pinned-alerts-strip" title="الإشعارات المثبتة"></div>
 
     <div class="ticker-wrapper-outer">
         <div class="ticker-container" id="tickerContainerBox">
@@ -1449,7 +1483,7 @@
         let customSidebarNames = JSON.parse(localStorage.getItem('custom_sidebar_names') || '{}');
         let topBarsVisible = JSON.parse(localStorage.getItem('top_bars_visible') ?? 'true');
         let tickerSpeedMultiplier = parseFloat(localStorage.getItem('ticker_speed_mult') || '0.25');
-        let tickerIsPaused = false;
+        let tickerIsPaused = localStorage.getItem('ticker_is_paused') === 'true';
         let currentGlobalSearchResults = [];
         let timezoneOffsetHours = parseInt(localStorage.getItem('saudi_timezone_offset') || '0');
         let tableWidthsBackup = null;
@@ -1684,6 +1718,7 @@
             updateActiveDoctorsKPI();
         }
 
+        window.addEventListener('beforeunload', saveTickerPositionState);
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('appTheme') || 'theme-gray';
             changeTheme(savedTheme);
@@ -2557,14 +2592,60 @@
 
 
 
-        function toggleTickerPlayState() {
-            tickerIsPaused = !tickerIsPaused;
+        function updateTickerPlayButtonUI() {
             const btn = document.getElementById('tickerTogglePlayBtn');
+            const box = document.getElementById('tickerContainerBox');
+            const track = document.getElementById('tickerTrackContainer');
             if (btn) {
                 btn.innerHTML = tickerIsPaused ? `<i class="fa-solid fa-play"></i> تشغيل` : `<i class="fa-solid fa-pause"></i> إيقاف`;
                 btn.style.color = tickerIsPaused ? 'var(--accent-green)' : '';
                 btn.style.borderColor = tickerIsPaused ? 'var(--accent-green)' : '';
             }
+            if (box) {
+                box.classList.toggle('manual-scroll-mode', tickerIsPaused);
+            }
+            if (track) {
+                track.style.transform = `translateX(${tickerCurrentOffset}px)`;
+            }
+        }
+
+        function saveTickerPositionState() {
+            const box = document.getElementById('tickerContainerBox');
+            localStorage.setItem('ticker_is_paused', tickerIsPaused ? 'true' : 'false');
+            localStorage.setItem('ticker_saved_offset', String(tickerCurrentOffset));
+            if (box) {
+                localStorage.setItem('ticker_saved_scroll_left', String(box.scrollLeft));
+            }
+        }
+
+        function toggleTickerPlayState() {
+            const box = document.getElementById('tickerContainerBox');
+            const track = document.getElementById('tickerTrackContainer');
+            if (!tickerIsPaused) {
+                // الانتقال لوضع الإيقاف: تثبيت مكان العنصر الحالي وتحويله إلى تمرير حقيقي بمسطرة التمرير
+                tickerIsPaused = true;
+                updateTickerPlayButtonUI();
+                if (box && track) {
+                    const currentVisualOffset = tickerCurrentOffset;
+                    tickerCurrentOffset = 0;
+                    track.style.transform = 'translateX(0px)';
+                    // في وضع RTL يكون scrollLeft سالباً لليسار، لذا نضبطه ليطابق نفس النقطة التي توقف عندها
+                    box.scrollLeft = -currentVisualOffset;
+                }
+            } else {
+                // الانتقال لوضع التشغيل: استكمال الحركة من نفس المكان الذي وصل إليه المستخدم بالمسطرة
+                if (box && track) {
+                    const currentScroll = box.scrollLeft;
+                    tickerCurrentOffset = Math.max(0, -currentScroll);
+                    box.scrollLeft = 0;
+                    track.style.transform = `translateX(${tickerCurrentOffset}px)`;
+                }
+                tickerIsPaused = false;
+                tickerLastTimestamp = null;
+                updateTickerPlayButtonUI();
+            }
+            saveTickerPositionState();
+            playChirpSound();
         }
 
         function renderAlerts(highlightId = null) {
@@ -2586,7 +2667,7 @@ orderedAlerts.forEach((item, idx) => {
 
 // تكرار مرة واحدة فقط لضمان دورة سلسة تبدأ من العنصر الأول في أقصى اليمين
 tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml;
-resetTickerToStart();
+restoreTickerSavedPosition();
 
             let alertsBuffer = "";
             orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
@@ -2615,7 +2696,7 @@ resetTickerToStart();
                         <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         <div style="display:flex; align-items:center; gap:0.2rem;">${mediaHtml}</div>
                         <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; justify-items:center; align-items:center; width:62px;">
-                            <button type="button" class="action-icon-btn" onclick="pinAlert(${item.id})" title="${pinnedAlertId === item.id ? 'مثبت في الشريط' : 'تثبيت في الشريط'}" style="width:18px; height:18px; font-size:0.58rem; color:${pinnedAlertId === item.id ? '#000' : 'var(--primary-color)'}; background:${pinnedAlertId === item.id ? 'var(--primary-color)' : 'rgba(234,179,8,0.15)'};"><i class="fa-solid fa-thumbtack"></i></button>
+                            <button type="button" class="action-icon-btn" onclick="togglePinAlert(${item.id})" title="${pinnedAlertIds.includes(item.id) ? 'إلغاء التثبيت من الشريط' : 'تثبيت في الشريط'}" style="width:18px; height:18px; font-size:0.58rem; color:${pinnedAlertIds.includes(item.id) ? '#000' : 'var(--primary-color)'}; background:${pinnedAlertIds.includes(item.id) ? 'var(--primary-color)' : 'rgba(234,179,8,0.15)'};"><i class="fa-solid fa-thumbtack"></i></button>
                             <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
@@ -2626,105 +2707,169 @@ resetTickerToStart();
             grid.innerHTML = alertsBuffer;
         }
         
-        let pinnedAlertId = localStorage.getItem('pinned_alert_id') ? parseInt(localStorage.getItem('pinned_alert_id')) : null;
-let tickerAnimFrameId = null;
-let tickerCurrentOffset = 0;
-let tickerLastTimestamp = null;
-
-function getOrderedAlertsNewestFirst() {
-    // الأحدث مضافاً يكون في نهاية المصفوفة عند الإضافة، لذا نعكسه ليظهر الأحدث أولاً
-    return [...alertsData].reverse();
-}
-
-function pinAlert(id) {
-    const numId = parseInt(id);
-    if (pinnedAlertId === numId) {
-        unpinAlert();
-        return;
-    }
-    pinnedAlertId = numId;
-    localStorage.setItem('pinned_alert_id', pinnedAlertId);
-    renderAlerts();
-    playChirpSound();
-}
-
-function unpinAlert() {
-    pinnedAlertId = null;
-    localStorage.removeItem('pinned_alert_id');
-    renderAlerts();
-    playChirpSound();
-}
-
-function jumpToPinnedAlert() {
-    if (pinnedAlertId) jumpToAlertsTab(pinnedAlertId);
-}
-
-function renderPinnedAlertCompactBar() {
-    const bar = document.getElementById('pinnedAlertCompactBar');
-    const txt = document.getElementById('pinnedAlertCompactText');
-    if (!bar || !txt) return;
-    if (!pinnedAlertId) {
-        bar.classList.remove('active');
-        txt.textContent = '';
-        return;
-    }
-    const found = alertsData.find(a => a.id === pinnedAlertId);
-    if (!found) {
-        unpinAlert();
-        return;
-    }
-    // عرض مختصر في سطر واحد فقط لعدم استهلاك مساحة الشريط
-    const singleLine = found.content.replace(/\s+/g, ' ').trim();
-    txt.textContent = singleLine;
-    txt.title = `${singleLine} (اضغط للانتقال إلى التنبيه)`;
-    bar.classList.add('active');
-}
-
-function startTickerMotionLoop() {
-    if (tickerAnimFrameId) cancelAnimationFrame(tickerAnimFrameId);
-    tickerLastTimestamp = null;
-
-    function step(timestamp) {
-        const track = document.getElementById('tickerTrackContainer');
-        const box = document.getElementById('tickerContainerBox');
-        if (track && box) {
-            if (!tickerLastTimestamp) tickerLastTimestamp = timestamp;
-            const dt = Math.min((timestamp - tickerLastTimestamp) / 1000, 0.1);
-            tickerLastTimestamp = timestamp;
-
-            const loopWidth = track.scrollWidth / 2;
-            const pxPerSec = 45 * (tickerSpeedMultiplier / 0.25);
-
-            if (!tickerIsPaused && loopWidth > 10) {
-                tickerCurrentOffset += pxPerSec * dt;
-                if (tickerCurrentOffset >= loopWidth) {
-                    tickerCurrentOffset = 0;
-                }
+        let pinnedAlertIds = (() => {
+            try {
+                const raw = localStorage.getItem('pinned_alert_ids');
+                if (raw) return JSON.parse(raw).map(Number);
+                const legacy = localStorage.getItem('pinned_alert_id');
+                return legacy ? [parseInt(legacy)] : [];
+            } catch (e) {
+                return [];
             }
-            track.style.transform = `translateX(${tickerCurrentOffset}px)`;
+        })();
+        let tickerAnimFrameId = null;
+        let tickerCurrentOffset = parseFloat(localStorage.getItem('ticker_saved_offset') || '0') || 0;
+        let tickerLastTimestamp = null;
+        let tickerLastSaveTime = 0;
+        let tickerScrollListenerAttached = false;
+
+        function getOrderedAlertsNewestFirst() {
+            return [...alertsData].reverse();
         }
-        tickerAnimFrameId = requestAnimationFrame(step);
-    }
-    tickerAnimFrameId = requestAnimationFrame(step);
-}
 
-function resetTickerToStart() {
-    const track = document.getElementById('tickerTrackContainer');
-    const box = document.getElementById('tickerContainerBox');
-    tickerCurrentOffset = 0;
-    tickerLastTimestamp = null;
-    if (track) {
-        track.style.transform = 'translateX(0px)';
-    }
-    if (box) {
-        box.scrollLeft = 0;
-    }
-    playChirpSound();
-}
+        function savePinnedAlertIds() {
+            localStorage.setItem('pinned_alert_ids', JSON.stringify(pinnedAlertIds));
+        }
 
-function applyTickerSpeed() {
-    startTickerMotionLoop();
-}
+        function togglePinAlert(id) {
+            const numId = parseInt(id);
+            const idx = pinnedAlertIds.indexOf(numId);
+            if (idx !== -1) {
+                pinnedAlertIds.splice(idx, 1);
+            } else {
+                pinnedAlertIds.push(numId);
+            }
+            savePinnedAlertIds();
+            renderAlerts();
+            playChirpSound();
+        }
+
+        function unpinSingleAlert(id) {
+            const numId = parseInt(id);
+            pinnedAlertIds = pinnedAlertIds.filter(x => x !== numId);
+            savePinnedAlertIds();
+            renderAlerts();
+            playChirpSound();
+        }
+
+        function renderPinnedAlertCompactBar() {
+            const bar = document.getElementById('pinnedAlertsCompactBar');
+            if (!bar) return;
+
+            const validIds = pinnedAlertIds.filter(pid => alertsData.some(a => a.id === pid));
+            if (validIds.length !== pinnedAlertIds.length) {
+                pinnedAlertIds = validIds;
+                savePinnedAlertIds();
+            }
+
+            if (pinnedAlertIds.length === 0) {
+                bar.classList.remove('active');
+                bar.innerHTML = '';
+                return;
+            }
+
+            let pillsHtml = '';
+            pinnedAlertIds.forEach(pid => {
+                const found = alertsData.find(a => a.id === pid);
+                if (!found) return;
+                const singleLine = found.content.replace(/\s+/g, ' ').trim();
+                const safeTitle = singleLine.replace(/"/g, '&quot;');
+                pillsHtml += `
+                    <div class="pinned-alert-pill" title="${safeTitle} (اضغط للانتقال إلى التنبيه)">
+                        <i class="fa-solid fa-thumbtack" style="color:var(--primary-color); font-size:0.6rem; flex-shrink:0;"></i>
+                        <span class="pinned-alert-pill-text" onclick="jumpToAlertsTab(${found.id})">${singleLine}</span>
+                        <button type="button" class="pinned-alert-unpin-btn" onclick="unpinSingleAlert(${found.id})" title="إلغاء التثبيت">×</button>
+                    </div>`;
+            });
+            bar.innerHTML = pillsHtml;
+            bar.classList.add('active');
+        }
+
+        function restoreTickerSavedPosition() {
+            const box = document.getElementById('tickerContainerBox');
+            const track = document.getElementById('tickerTrackContainer');
+            if (!box || !track) return;
+
+            if (!tickerScrollListenerAttached) {
+                box.addEventListener('scroll', () => {
+                    if (tickerIsPaused) {
+                        localStorage.setItem('ticker_saved_scroll_left', String(box.scrollLeft));
+                    }
+                });
+                tickerScrollListenerAttached = true;
+            }
+
+            updateTickerPlayButtonUI();
+
+            if (tickerIsPaused) {
+                tickerCurrentOffset = 0;
+                track.style.transform = 'translateX(0px)';
+                const savedScroll = parseFloat(localStorage.getItem('ticker_saved_scroll_left') || '0');
+                requestAnimationFrame(() => {
+                    box.scrollLeft = savedScroll;
+                });
+            } else {
+                const savedOffset = parseFloat(localStorage.getItem('ticker_saved_offset') || '0') || 0;
+                const loopWidth = track.scrollWidth / 2;
+                tickerCurrentOffset = (loopWidth > 10 && savedOffset < loopWidth) ? savedOffset : 0;
+                box.scrollLeft = 0;
+                track.style.transform = `translateX(${tickerCurrentOffset}px)`;
+            }
+            startTickerMotionLoop();
+        }
+
+        function startTickerMotionLoop() {
+            if (tickerAnimFrameId) cancelAnimationFrame(tickerAnimFrameId);
+            tickerLastTimestamp = null;
+
+            function step(timestamp) {
+                const track = document.getElementById('tickerTrackContainer');
+                const box = document.getElementById('tickerContainerBox');
+                if (track && box) {
+                    if (!tickerLastTimestamp) tickerLastTimestamp = timestamp;
+                    const dt = Math.min((timestamp - tickerLastTimestamp) / 1000, 0.1);
+                    tickerLastTimestamp = timestamp;
+
+                    if (!tickerIsPaused) {
+                        const loopWidth = track.scrollWidth / 2;
+                        const pxPerSec = 45 * (tickerSpeedMultiplier / 0.25);
+                        if (loopWidth > 10) {
+                            tickerCurrentOffset += pxPerSec * dt;
+                            if (tickerCurrentOffset >= loopWidth) {
+                                tickerCurrentOffset = 0;
+                            }
+                        }
+                        track.style.transform = `translateX(${tickerCurrentOffset}px)`;
+
+                        if (timestamp - tickerLastSaveTime > 400) {
+                            localStorage.setItem('ticker_saved_offset', String(tickerCurrentOffset));
+                            tickerLastSaveTime = timestamp;
+                        }
+                    }
+                }
+                tickerAnimFrameId = requestAnimationFrame(step);
+            }
+            tickerAnimFrameId = requestAnimationFrame(step);
+        }
+
+        function resetTickerToStart() {
+            const track = document.getElementById('tickerTrackContainer');
+            const box = document.getElementById('tickerContainerBox');
+            tickerCurrentOffset = 0;
+            tickerLastTimestamp = null;
+            if (track) {
+                track.style.transform = 'translateX(0px)';
+            }
+            if (box) {
+                box.scrollLeft = 0;
+            }
+            saveTickerPositionState();
+            playChirpSound();
+        }
+
+        function applyTickerSpeed() {
+            startTickerMotionLoop();
+        }
 
         function jumpToAlertsTab(alertId) {
             switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
