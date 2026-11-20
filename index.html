@@ -2581,14 +2581,20 @@
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
 
-            let orderedAlerts = [...alertsData].reverse();
+            renderPinnedAlertCompactBar();
+let orderedAlerts = getOrderedAlertsNewestFirst();
 
-            let alertCardsHtml = "";
-            orderedAlerts.forEach(item => {
-                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
-            });
-            tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
-            applyTickerSpeed();
+let alertCardsHtml = "";
+orderedAlerts.forEach((item, idx) => {
+    const badge = idx === 0
+        ? `<span style="background:var(--primary-color);color:#000;font-size:0.55rem;font-weight:800;padding:0.02rem 0.32rem;border-radius:999px;">أحدث</span>`
+        : '';
+    alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>${badge}<span>${item.content}</span></div>`;
+});
+
+// تكرار مرة واحدة فقط لضمان دورة سلسة تبدأ من العنصر الأول في أقصى اليمين
+tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml;
+resetTickerToStart();
 
             let alertsBuffer = "";
             orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
@@ -2627,15 +2633,104 @@
             grid.innerHTML = alertsBuffer;
         }
         
-        function resetTickerToStart() {
-            const track = document.getElementById('tickerTrackContainer');
-            if (track) { 
-                track.style.animation = 'none'; 
-                track.offsetHeight; 
-                applyTickerSpeed(); 
-                playChirpSound();
+        let pinnedAlertId = localStorage.getItem('pinned_alert_id') ? parseInt(localStorage.getItem('pinned_alert_id')) : null;
+let tickerAnimFrameId = null;
+let tickerCurrentOffset = 0;
+let tickerLastTimestamp = null;
+
+function getOrderedAlertsNewestFirst() {
+    // الأحدث مضافاً يكون في نهاية المصفوفة عند الإضافة، لذا نعكسه ليظهر الأحدث أولاً
+    return [...alertsData].reverse();
+}
+
+function pinAlert(id) {
+    pinnedAlertId = parseInt(id);
+    localStorage.setItem('pinned_alert_id', pinnedAlertId);
+    renderAlerts();
+    playChirpSound();
+}
+
+function unpinAlert() {
+    pinnedAlertId = null;
+    localStorage.removeItem('pinned_alert_id');
+    renderAlerts();
+    playChirpSound();
+}
+
+function jumpToPinnedAlert() {
+    if (pinnedAlertId) jumpToAlertsTab(pinnedAlertId);
+}
+
+function renderPinnedAlertCompactBar() {
+    const bar = document.getElementById('pinnedAlertCompactBar');
+    const txt = document.getElementById('pinnedAlertCompactText');
+    if (!bar || !txt) return;
+    if (!pinnedAlertId) {
+        bar.classList.remove('active');
+        txt.textContent = '';
+        return;
+    }
+    const found = alertsData.find(a => a.id === pinnedAlertId);
+    if (!found) {
+        unpinAlert();
+        return;
+    }
+    // عرض مختصر في سطر واحد فقط لعدم استهلاك مساحة الشريط
+    const singleLine = found.content.replace(/\s+/g, ' ').trim();
+    txt.textContent = singleLine;
+    txt.title = `${singleLine} (اضغط للانتقال إلى التنبيه)`;
+    bar.classList.add('active');
+}
+
+function startTickerMotionLoop() {
+    if (tickerAnimFrameId) cancelAnimationFrame(tickerAnimFrameId);
+    tickerLastTimestamp = null;
+
+    function step(timestamp) {
+        const track = document.getElementById('tickerTrackContainer');
+        const box = document.getElementById('tickerContainerBox');
+        if (track && box && !tickerIsPaused) {
+            if (!tickerLastTimestamp) tickerLastTimestamp = timestamp;
+            const dt = (timestamp - tickerLastTimestamp) / 1000;
+            tickerLastTimestamp = timestamp;
+
+            const halfWidth = track.scrollWidth / 2;
+            const pxPerSec = 35 * (tickerSpeedMultiplier / 0.25);
+
+            if (halfWidth > box.clientWidth) {
+                tickerCurrentOffset += pxPerSec * dt;
+                if (tickerCurrentOffset >= halfWidth) {
+                    tickerCurrentOffset = 0;
+                }
+                track.style.transform = `translateX(${tickerCurrentOffset}px)`;
+            } else {
+                track.style.transform = `translateX(0px)`;
             }
+        } else {
+            tickerLastTimestamp = timestamp;
         }
+        tickerAnimFrameId = requestAnimationFrame(step);
+    }
+    tickerAnimFrameId = requestAnimationFrame(step);
+}
+
+function resetTickerToStart() {
+    const track = document.getElementById('tickerTrackContainer');
+    const box = document.getElementById('tickerContainerBox');
+    tickerCurrentOffset = 0;
+    tickerLastTimestamp = null;
+    if (track) {
+        track.style.transform = 'translateX(0px)';
+    }
+    if (box) {
+        box.scrollLeft = 0;
+    }
+    playChirpSound();
+}
+
+function applyTickerSpeed() {
+    startTickerMotionLoop();
+}
 
         function jumpToAlertsTab(alertId) {
             switchTab('alerts', document.querySelectorAll('.nav-link')[1]);
