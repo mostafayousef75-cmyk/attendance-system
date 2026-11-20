@@ -120,7 +120,112 @@
         .ticker-card-pinned { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(234, 179, 8, 0.16); border: 1.5px solid var(--primary-color); padding: 0.28rem 0.7rem; border-radius: 18px; font-weight: 800; color: #fef08a; cursor: pointer; font-size: 0.73rem; flex-shrink: 0; box-shadow: 0 0 8px rgba(234, 179, 8, 0.25); transition: transform 0.15s; }
         .ticker-card-pinned:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
 
-        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; min-width: 0; }
+        .ticker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background: #141821;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 6px 10px;
+  color: #f1f5f9;
+  box-sizing: border-box;
+}
+
+/* الإشعار المثبت: حجم مضغوط ومحدد حتى لا يبتلع الشريط */
+.ticker-pinned {
+  display: none; /* يظهر فقط عند وجود إشعار مثبت */
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  max-width: 230px;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fde68a;
+  padding: 4px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.ticker-pinned.is-active {
+  display: inline-flex;
+}
+
+.ticker-pinned-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticker-unpin-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.ticker-unpin-btn:hover {
+  opacity: 1;
+}
+
+/* منطقة الإشعارات المتحركة بدون فراغات زائدة على اليمين */
+.ticker-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0; /* مهم جداً لمنع تمدد الفليكس وخروج مساحة فارغة */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  cursor: grab;
+}
+
+.ticker-viewport:active {
+  cursor: grabbing;
+}
+
+.ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  will-change: transform;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-size: 12.5px;
+}
+
+.ticker-pin-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #cbd5e1;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ticker-pin-btn:hover {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fde68a;
+}
+        
         .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; transition: padding 0.2s; }
         
         /* تفعيل المسطرة عند الإيقاف */
@@ -129,7 +234,6 @@
         .ticker-container.manual-scroll-mode::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 10px; }
         .ticker-container.manual-scroll-mode::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
 
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
         @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
@@ -1729,12 +1833,97 @@
                 modalClockInterval = null;
             }
         }
-        function getArabicDayName() { return ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][new Date().getDay()]; }
+      
+        // توحيد النصوص لتجنب مشاكل الهمزات والمسافات وحالة الأحرف
+function normalizeText(str = "") {
+  return String(str)
+    .trim()
+    .toLowerCase()
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/\s+/g, " ");
+}
+
+// تحديد اسم اليوم الحالي بالعربي (الجمعة، السبت، ...)
+function getTodayArabicName(date = new Date()) {
+  const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  return days[date.getDay()];
+}
+
+// حساب عدد الأطباء/المناوبات لفرع معين اليوم
+function getBranchTodayCount(shiftsOrDoctors = [], targetBranchName = "", date = new Date()) {
+  const todayAr = normalizeText(getTodayArabicName(date));
+  const targetBranch = normalizeText(targetBranchName);
+
+  if (!Array.isArray(shiftsOrDoctors)) return 0;
+
+  const matched = shiftsOrDoctors.filter((item) => {
+    if (!item) return false;
+
+    // 1. مطابقة الفرع (سواء كان الحقل branch أو branchName أو فرع)
+    const itemBranch = normalizeText(
+      item.branch || item.branchName || item.clinic || item.فرع || ""
+    );
+    const branchMatch =
+      itemBranch === targetBranch ||
+      itemBranch.includes(targetBranch) ||
+      targetBranch.includes(itemBranch);
+
+    if (!branchMatch) return false;
+
+    // 2. مطابقة اليوم (يدعم مصفوفة أيام days أو حقل day أو يوم أو تاريخ محدد)
+    const rawDays = item.days || item.workDays || item.day || item.يوم || "";
+    const daysList = Array.isArray(rawDays)
+      ? rawDays.map(normalizeText)
+      : String(rawDays)
+          .split(/[,،/|]+/)
+          .map(normalizeText)
+          .filter(Boolean);
+
+    const dayMatch = daysList.some(
+      (d) => d === todayAr || d.includes("الجمعه") && todayAr.includes("الجمعه") || d === "friday" && date.getDay() === 5
+    );
+
+    // دعم أيضاً لو المسجل تاريخ محدد بنفس يوم/شهر/سنة اليوم
+    let dateMatch = false;
+    if (item.date) {
+      const dObj = new Date(item.date);
+      if (!isNaN(dObj)) {
+        dateMatch =
+          dObj.getFullYear() === date.getFullYear() &&
+          dObj.getMonth() === date.getMonth() &&
+          dObj.getDate() === date.getDate();
+      }
+    }
+
+    return dayMatch || dateMatch;
+  });
+
+  // منع تكرار نفس الدكتور لو متسجل بأكتر من سجل في نفس اليوم والفرع
+  const uniqueDoctors = new Set(
+    matched.map((item, idx) =>
+      normalizeText(item.doctorId || item.doctorName || item.name || item.دكتور || `row-${idx}`)
+    )
+  );
+
+  return uniqueDoctors.size;
+}
+
+// دالة تحديث أرقام الهيدر لفروع الطائف (معشي والوسام)
+function updateHeaderBranchesCount(allData = []) {
+  const maashiCount = getBranchTodayCount(allData, "معشي");
+  const wisamCount = getBranchTodayCount(allData, "الوسام");
+
+  const maashiEl = document.getElementById("maashi-count") || document.querySelector("[data-branch-count='maashi']");
+  const wisamEl = document.getElementById("wisam-count") || document.querySelector("[data-branch-count='wisam']");
+
+  if (maashiEl) maashiEl.textContent = maashiCount;
+  if (wisamEl) wisamEl.textContent = wisamCount;
+
+  return { maashiCount, wisamCount };
+}
         
-        function normalizeArabicText(str) {
-            if (!str) return "";
-            return str.toString().toLowerCase().replace(/[\u064b-\u0652]/g, '').replace(/[إأآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim();
-        }
         function cleanSearchText(str) { return normalizeArabicText(str); }
 
         function toggleTopBarsVisibility() {
@@ -1994,6 +2183,150 @@
             navigator.clipboard.writeText(text).then(() => { alert(`📋 ${msg}\n\n${text}`); });
         }
 
+        function createNotificationTicker({
+  viewportEl,
+  trackEl,
+  pinnedBoxEl,
+  pinnedTextEl,
+  unpinBtnEl,
+  notifications = [],
+  pinnedId = null,
+  onPinChange = () => {},
+  autoScrollSpeed = 0.45 // بكسل لكل فريم - 0 لإيقاف الحركة التلقائية
+}) {
+  let items = Array.isArray(notifications) ? notifications : [];
+  let currentPinnedId = pinnedId;
+  let isHovered = false;
+  let isDragging = false;
+  let startX = 0;
+  let startScrollLeft = 0;
+  let rafId = null;
+
+  function renderPinned() {
+    const pinnedItem = items.find((n) => String(n.id) === String(currentPinnedId));
+    if (!pinnedItem) {
+      pinnedBoxEl.classList.remove("is-active");
+      pinnedTextEl.textContent = "";
+      pinnedTextEl.removeAttribute("title");
+      return;
+    }
+
+    const text = pinnedItem.text || pinnedItem.title || "";
+    pinnedBoxEl.classList.add("is-active");
+    pinnedTextEl.textContent = text;
+    pinnedTextEl.title = text; // لعرض النص كاملاً عند الوقوف بالماوس فقط
+  }
+
+  function renderItems() {
+    trackEl.innerHTML = "";
+    const movableItems = items.filter((n) => String(n.id) !== String(currentPinnedId));
+
+    movableItems.forEach((item) => {
+      const el = document.createElement("div");
+      el.className = "ticker-item";
+
+      const label = document.createElement("span");
+      label.textContent = item.text || item.title || "";
+
+      const pinBtn = document.createElement("button");
+      pinBtn.type = "button";
+      pinBtn.className = "ticker-pin-btn";
+      pinBtn.textContent = "تثبيت";
+      pinBtn.title = "تثبيت الإشعار";
+      pinBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setPinned(item.id);
+      });
+
+      el.append(label, pinBtn);
+      trackEl.appendChild(el);
+    });
+
+    // إعادة ضبط السكرول لو تجاوز نهاية المحتوى الفعلي لمنع المساحة الفاضية
+    clampScroll();
+  }
+
+  function clampScroll() {
+    const maxScroll = Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
+    if (viewportEl.scrollLeft > maxScroll) {
+      viewportEl.scrollLeft = maxScroll;
+    }
+  }
+
+  function setPinned(id) {
+    currentPinnedId = id;
+    renderPinned();
+    renderItems();
+    onPinChange(currentPinnedId);
+  }
+
+  function step() {
+    const maxScroll = Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
+    if (!isHovered && !isDragging && autoScrollSpeed > 0 && maxScroll > 0) {
+      if (viewportEl.scrollLeft >= maxScroll - 1) {
+        viewportEl.scrollLeft = 0;
+      } else {
+        viewportEl.scrollLeft += autoScrollSpeed;
+      }
+    }
+    rafId = requestAnimationFrame(step);
+  }
+
+  // سحب سلس بالماوس بدون ترك مسافات فارغة
+  viewportEl.addEventListener("mousedown", (e) => {
+    if (e.target.closest("button")) return;
+    isDragging = true;
+    startX = e.pageX - viewportEl.offsetLeft;
+    startScrollLeft = viewportEl.scrollLeft;
+  });
+
+  window.addEventListener("mouseup", () => {
+    isDragging = false;
+  });
+
+  viewportEl.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - viewportEl.offsetLeft;
+    const walk = (x - startX) * 1.3;
+    viewportEl.scrollLeft = Math.max(
+      0,
+      Math.min(startScrollLeft - walk, trackEl.scrollWidth - viewportEl.clientWidth)
+    );
+  });
+
+  viewportEl.addEventListener("mouseenter", () => {
+    isHovered = true;
+  });
+
+  viewportEl.addEventListener("mouseleave", () => {
+    isHovered = false;
+  });
+
+  window.addEventListener("resize", clampScroll);
+
+  if (unpinBtnEl) {
+    unpinBtnEl.addEventListener("click", () => setPinned(null));
+  }
+
+  renderPinned();
+  renderItems();
+  rafId = requestAnimationFrame(step);
+
+  return {
+    update(newNotifications, newPinnedId = currentPinnedId) {
+      items = Array.isArray(newNotifications) ? newNotifications : [];
+      currentPinnedId = newPinnedId;
+      renderPinned();
+      renderItems();
+    },
+    destroy() {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", clampScroll);
+    }
+  };
+}
+        
         function getTimeLabelText(val) {
             let timesMap = {
                 "24": "24 ساعة", "0": "12:00 ص", "0.5": "12:30 ص", "1": "1:00 ص", "1.5": "1:30 ص",
