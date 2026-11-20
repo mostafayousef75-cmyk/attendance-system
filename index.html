@@ -1624,6 +1624,17 @@
             if (shift2Box) shift2Box.style.display = (count === "2") ? "block" : "none";
         }
 
+        function normalizeArabicText(str = "") {
+    return String(str)
+        .trim()
+        .toLowerCase()
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ى/g, "ي")
+        .replace(/ة/g, "ه")
+        .replace(/[\u064B-\u065F]/g, "") // إزالة التشكيل إن وُجد
+        .replace(/\s+/g, " ");
+}
+
         function buildPreNormalizedSearchKeys() {
             doctorsData.forEach(d => { d.searchKey = normalizeArabicText(`${d.name} ${d.nationality} ${d.specialty} ${d.fee} ${d.timing} ${d.notes} ${d.tags} ${d.branch}`); });
             offersData.forEach(o => { o.searchKey = normalizeArabicText(`${o.name} ${o.category} ${o.price} ${o.device1} ${o.price1} ${o.device2} ${o.price2} ${o.notes} ${o.tags}`); });
