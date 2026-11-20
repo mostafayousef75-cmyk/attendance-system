@@ -111,62 +111,6 @@
 
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
-        .pinned-alerts-strip {
-    display: none;
-    align-items: center;
-    gap: 0.3rem;
-    max-width: 380px;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    flex-shrink: 0;
-    padding: 0.1rem 0;
-}
-.pinned-alerts-strip.active {
-    display: inline-flex;
-}
-.pinned-alerts-strip::-webkit-scrollbar {
-    height: 4px;
-    display: block;
-}
-.pinned-alerts-strip::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-.pinned-alert-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: rgba(234, 179, 8, 0.15);
-    border: 1px solid var(--primary-color);
-    color: #fef08a;
-    padding: 0.16rem 0.42rem;
-    border-radius: 8px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    max-width: 200px;
-    flex-shrink: 0;
-}
-.pinned-alert-pill-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 145px;
-    cursor: pointer;
-}
-.pinned-alert-unpin-btn {
-    background: rgba(220, 38, 38, 0.25);
-    color: #fca5a5;
-    border: none;
-    border-radius: 4px;
-    padding: 0.04rem 0.26rem;
-    font-size: 0.6rem;
-    cursor: pointer;
-    line-height: 1.2;
-}
-.pinned-alert-unpin-btn:hover {
-    background: var(--danger-color);
-    color: #fff;
-}
 
 .ticker-container {
     width: 100%;
@@ -489,8 +433,6 @@
             <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">0.5x</button>
         </div>
     </div>
-
-    <div id="pinnedAlertsCompactBar" class="pinned-alerts-strip" title="الإشعارات المثبتة"></div>
 
     <div class="ticker-wrapper-outer">
         <div class="ticker-container" id="tickerContainerBox">
@@ -1720,6 +1662,8 @@
 
         window.addEventListener('beforeunload', saveTickerPositionState);
         window.addEventListener('DOMContentLoaded', () => {
+            localStorage.removeItem('pinned_alert_ids');
+            localStorage.removeItem('pinned_alert_id');
             const savedTheme = localStorage.getItem('appTheme') || 'theme-gray';
             changeTheme(savedTheme);
 
@@ -2653,8 +2597,6 @@
             const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
-
-            renderPinnedAlertCompactBar();
 let orderedAlerts = getOrderedAlertsNewestFirst();
 
 let alertCardsHtml = "";
@@ -2696,7 +2638,6 @@ restoreTickerSavedPosition();
                         <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         <div style="display:flex; align-items:center; gap:0.2rem;">${mediaHtml}</div>
                         <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; justify-items:center; align-items:center; width:62px;">
-                            <button type="button" class="action-icon-btn" onclick="togglePinAlert(${item.id})" title="${pinnedAlertIds.includes(item.id) ? 'إلغاء التثبيت من الشريط' : 'تثبيت في الشريط'}" style="width:18px; height:18px; font-size:0.58rem; color:${pinnedAlertIds.includes(item.id) ? '#000' : 'var(--primary-color)'}; background:${pinnedAlertIds.includes(item.id) ? 'var(--primary-color)' : 'rgba(234,179,8,0.15)'};"><i class="fa-solid fa-thumbtack"></i></button>
                             <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
@@ -2706,17 +2647,6 @@ restoreTickerSavedPosition();
             });
             grid.innerHTML = alertsBuffer;
         }
-        
-        let pinnedAlertIds = (() => {
-            try {
-                const raw = localStorage.getItem('pinned_alert_ids');
-                if (raw) return JSON.parse(raw).map(Number);
-                const legacy = localStorage.getItem('pinned_alert_id');
-                return legacy ? [parseInt(legacy)] : [];
-            } catch (e) {
-                return [];
-            }
-        })();
         let tickerAnimFrameId = null;
         let tickerCurrentOffset = parseFloat(localStorage.getItem('ticker_saved_offset') || '0') || 0;
         let tickerLastTimestamp = null;
@@ -2725,64 +2655,6 @@ restoreTickerSavedPosition();
 
         function getOrderedAlertsNewestFirst() {
             return [...alertsData].reverse();
-        }
-
-        function savePinnedAlertIds() {
-            localStorage.setItem('pinned_alert_ids', JSON.stringify(pinnedAlertIds));
-        }
-
-        function togglePinAlert(id) {
-            const numId = parseInt(id);
-            const idx = pinnedAlertIds.indexOf(numId);
-            if (idx !== -1) {
-                pinnedAlertIds.splice(idx, 1);
-            } else {
-                pinnedAlertIds.push(numId);
-            }
-            savePinnedAlertIds();
-            renderAlerts();
-            playChirpSound();
-        }
-
-        function unpinSingleAlert(id) {
-            const numId = parseInt(id);
-            pinnedAlertIds = pinnedAlertIds.filter(x => x !== numId);
-            savePinnedAlertIds();
-            renderAlerts();
-            playChirpSound();
-        }
-
-        function renderPinnedAlertCompactBar() {
-            const bar = document.getElementById('pinnedAlertsCompactBar');
-            if (!bar) return;
-
-            const validIds = pinnedAlertIds.filter(pid => alertsData.some(a => a.id === pid));
-            if (validIds.length !== pinnedAlertIds.length) {
-                pinnedAlertIds = validIds;
-                savePinnedAlertIds();
-            }
-
-            if (pinnedAlertIds.length === 0) {
-                bar.classList.remove('active');
-                bar.innerHTML = '';
-                return;
-            }
-
-            let pillsHtml = '';
-            pinnedAlertIds.forEach(pid => {
-                const found = alertsData.find(a => a.id === pid);
-                if (!found) return;
-                const singleLine = found.content.replace(/\s+/g, ' ').trim();
-                const safeTitle = singleLine.replace(/"/g, '&quot;');
-                pillsHtml += `
-                    <div class="pinned-alert-pill" title="${safeTitle} (اضغط للانتقال إلى التنبيه)">
-                        <i class="fa-solid fa-thumbtack" style="color:var(--primary-color); font-size:0.6rem; flex-shrink:0;"></i>
-                        <span class="pinned-alert-pill-text" onclick="jumpToAlertsTab(${found.id})">${singleLine}</span>
-                        <button type="button" class="pinned-alert-unpin-btn" onclick="unpinSingleAlert(${found.id})" title="إلغاء التثبيت">×</button>
-                    </div>`;
-            });
-            bar.innerHTML = pillsHtml;
-            bar.classList.add('active');
         }
 
         function restoreTickerSavedPosition() {
