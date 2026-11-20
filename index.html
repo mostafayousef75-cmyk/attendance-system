@@ -2450,10 +2450,38 @@ function updateHeaderBranchesCount(allData = []) {
             copyTextToClipboard(clientText, "تم نسخ بيانات الدكتور للعميل:");
         }
 
+        function getModifiedDateStr() {
+            const now = new Date();
+            const shifted = new Date(now.getTime() + (timezoneOffsetHours * 3600000));
+            const y = shifted.getFullYear();
+            const m = String(shifted.getMonth() + 1).padStart(2, '0');
+            const d = String(shifted.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function isDoctorOnFridayDuty(doc, branchName = null, targetDateStr = getModifiedDateStr()) {
+            if (!doc || doc.isLeave || !Array.isArray(fridaySchedules)) return false;
+            const normDocName = normalizeArabicText(doc.name || '');
+            if (!normDocName) return false;
+
+            return fridaySchedules.some(item => {
+                if (!item || item.date !== targetDateStr) return false;
+                const normDutyDoc = normalizeArabicText(item.doc || '');
+                if (!normDutyDoc) return false;
+                const nameMatches = normDocName.includes(normDutyDoc) || normDutyDoc.includes(normDocName);
+                if (!nameMatches) return false;
+
+                if (!branchName) return true;
+                return item.branch === branchName || doc.isJoint;
+            });
+        }
+
         function checkDocActiveForTimeAndDay(doc, currentDay, currentHour24) {
             if (doc.isLeave) return false;
+            const todayDateStr = getModifiedDateStr();
+            const onFridayDutyToday = (currentDay === "الجمعة") && isDoctorOnFridayDuty(doc, null, todayDateStr);
             let checkShiftsList = (daysArr, shiftsArr) => {
-                if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay)) {
+                if (!daysArr || daysArr.length === 0 || daysArr.includes(currentDay) || onFridayDutyToday) {
                     if (!shiftsArr || shiftsArr.length === 0) return true;
                     for (let sh of shiftsArr) {
                         if (sh.start === "24" || sh.end === "24") return true;
@@ -2479,10 +2507,11 @@ function updateHeaderBranchesCount(allData = []) {
         function updateActiveDoctorsKPI() {
             const currentDay = getArabicDayName();
             const currentHour24 = getModifiedTimeHour24();
+            const todayDateStr = getModifiedDateStr();
             let todayMashyCount = 0, todayWissamCount = 0;
             doctorsData.forEach(d => {
-                let isMashy = (d.branch === "معشي" || d.isJoint);
-                let isWissam = (d.branch === "الوسام" || d.isJoint);
+                let isMashy = (d.branch === "معشي" || d.isJoint || isDoctorOnFridayDuty(d, "معشي", todayDateStr));
+                let isWissam = (d.branch === "الوسام" || d.isJoint || isDoctorOnFridayDuty(d, "الوسام", todayDateStr));
                 if (checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) {
                     if (isMashy) todayMashyCount++;
                     if (isWissam) todayWissamCount++;
@@ -2496,13 +2525,14 @@ function updateHeaderBranchesCount(allData = []) {
             document.getElementById('timezoneOffsetSelect').value = timezoneOffsetHours.toString();
             const currentDay = getArabicDayName();
             const currentHour24 = getModifiedTimeHour24();
+            const todayDateStr = getModifiedDateStr();
             let mashyActive = [], wissamActive = [];
             
             getSortedDoctorsListForBranch('معشي').forEach(d => {
-                if ((d.branch === "معشي" || d.isJoint) && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) mashyActive.push(d);
+                if ((d.branch === "معشي" || d.isJoint || isDoctorOnFridayDuty(d, "معشي", todayDateStr)) && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) mashyActive.push(d);
             });
             getSortedDoctorsListForBranch('الوسام').forEach(d => {
-                if ((d.branch === "الوسام" || d.isJoint) && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) wissamActive.push(d);
+                if ((d.branch === "الوسام" || d.isJoint || isDoctorOnFridayDuty(d, "الوسام", todayDateStr)) && checkDocActiveForTimeAndDay(d, currentDay, currentHour24)) wissamActive.push(d);
             });
 
             const mashyContainer = document.getElementById('activeMashyListContainer');
@@ -2547,7 +2577,7 @@ function updateHeaderBranchesCount(allData = []) {
             if(!mashyBody || !wissamBody) return;
             
             let countM = 0, countW = 0;
-            const todayStr = new Date().toISOString().split('T')[0];
+            const todayStr = getModifiedDateStr();
             
             const sortedFridays = [...fridaySchedules].sort((a, b) => new Date(a.date) - new Date(b.date));
             const upcomingFridays = sortedFridays.filter(f => f.date >= todayStr);
@@ -2563,11 +2593,12 @@ function updateHeaderBranchesCount(allData = []) {
 
             let todayMashyDocs = [], todayWissamDocs = [];
 
-            const mashyList = getSortedDoctorsListForBranch('معشي').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "معشي" || d.isJoint));
-            const wissamList = getSortedDoctorsListForBranch('الوسام').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "الوسام" || d.isJoint));
+            const mashyList = getSortedDoctorsListForBranch('معشي').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "معشي" || d.isJoint || (currentDay === "الجمعة" && isDoctorOnFridayDuty(d, "معشي", todayStr))));
+            const wissamList = getSortedDoctorsListForBranch('الوسام').filter(d => (!search || (d.searchKey && d.searchKey.includes(search))) && (!selectedSpecialty || d.specialty === selectedSpecialty) && (d.branch === "الوسام" || d.isJoint || (currentDay === "الجمعة" && isDoctorOnFridayDuty(d, "الوسام", todayStr))));
 
             function isDoctorAvailableToday(doc, targetDay) {
                 if (doc.isLeave) return false;
+                if (targetDay === "الجمعة" && isDoctorOnFridayDuty(doc, null, todayStr)) return true;
                 let checkDays = (daysArr) => {
                     if (!daysArr || daysArr.length === 0) return true;
                     return daysArr.includes(targetDay);
@@ -2892,11 +2923,14 @@ function updateHeaderBranchesCount(allData = []) {
                 </div>
             `).join('');
 
+            const tickerWrapper = document.querySelector('.ticker-wrapper-outer');
             if (unpinnedHtml) {
+                if (tickerWrapper) tickerWrapper.style.display = 'flex';
                 const repeatCount = unpinnedAlerts.length <= 3 ? 6 : 3;
                 tickerTrack.innerHTML = unpinnedHtml.repeat(repeatCount);
             } else {
                 tickerTrack.innerHTML = '';
+                if (tickerWrapper) tickerWrapper.style.display = 'none';
             }
             
             applyTickerSpeed();
