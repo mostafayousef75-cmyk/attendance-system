@@ -111,23 +111,72 @@
 
         .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
         .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
-        .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
+        .pinned-alert-pill {
+    display: none;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(234, 179, 8, 0.14);
+    border: 1px solid var(--primary-color);
+    color: #fef08a;
+    padding: 0.18rem 0.45rem;
+    border-radius: 8px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    max-width: 240px;
+    flex-shrink: 0;
+}
+.pinned-alert-pill.active {
+    display: inline-flex;
+}
+.pinned-alert-pill-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 175px;
+    cursor: pointer;
+}
+.pinned-alert-unpin-btn {
+    background: rgba(220, 38, 38, 0.25);
+    color: #fca5a5;
+    border: none;
+    border-radius: 4px;
+    padding: 0.05rem 0.28rem;
+    font-size: 0.6rem;
+    cursor: pointer;
+    line-height: 1.2;
+}
+.pinned-alert-unpin-btn:hover {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+.ticker-container {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.22rem 0.6rem;
+    direction: rtl;
+}
+
+.ticker-track {
+    display: inline-flex;
+    white-space: nowrap;
+    gap: 0.8rem;
+    align-items: center;
+    direction: rtl;
+    width: max-content;
+    will-change: transform;
+}
         
-        /* حركة شريط التنبيهات من الشمال لليمين تماماً وبحيث يبدأ بأحدث إشعار أولاً */
-        .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
         @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
 
         .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
-
-        
-        .pinned-alert-strip { display: none; align-items: center; justify-content: space-between; gap: 0.4rem; background: rgba(234, 179, 8, 0.12); border: 1px solid var(--primary-color); border-radius: 6px; padding: 0.18rem 0.5rem; font-size: 0.66rem; color: #fef08a; margin-left: 0.4rem; max-width: 340px; flex-shrink: 0; }
-        .pinned-alert-strip.active { display: inline-flex; }
-        .pinned-alert-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; font-weight: 700; cursor: pointer; }
-        .ticker-scrubber-wrap { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.6rem; color: var(--text-muted); flex-shrink: 0; }
-        .ticker-scrubber-wrap input[type="range"] { width: 70px; accent-color: var(--primary-color); cursor: pointer; direction: ltr; height: 12px; }
 
         .ticker-speed-controls { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
         .speed-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; cursor: pointer; }
@@ -389,32 +438,32 @@
         </div>
 
         <div class="professional-ticker-bar" id="professionalTickerBarContainer">
-            <div style="display:flex; align-items:center; gap:0.3rem; flex-shrink:0;">
-                <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="أحدث إشعار أولاً"><i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث</button>
-                <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة"><i class="fa-solid fa-pause"></i> إيقاف</button>
-                <div class="ticker-speed-controls">
-                    <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
-                    <button class="speed-btn active" onclick="setTickerSpeed(0.25, this)">0.25x</button>
-                    <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">0.5x</button>
-                </div>
-                <div class="ticker-scrubber-wrap" title="مسطرة الإيقاف والتنقل">
-                    <input type="range" id="tickerScrubberInput" min="0" max="100" step="1" value="0" oninput="scrubTickerPosition(this.value)">
-                    <span id="tickerScrubberVal">0%</span>
-                </div>
-                <div class="pinned-alert-strip" id="pinnedAlertStripBox">
-                    <span id="pinnedAlertCounterBadge" style="background:var(--primary-color); color:#000; font-weight:800; padding:0.05rem 0.35rem; border-radius:999px; font-size:0.58rem; white-space:nowrap;">📌 مثبت</span>
-                    <span class="pinned-alert-text" id="pinnedAlertPreviewSpan" onclick="jumpToPinnedAlert()"></span>
-                    <button type="button" class="btn btn-secondary" id="cyclePinnedAlertBtn" style="display:none; padding:0.04rem 0.25rem; font-size:0.55rem;" onclick="cyclePinnedAlert()">التالي</button>
-                    <button type="button" class="btn btn-danger" id="unpinCurrentAlertBtn" style="padding:0.04rem 0.25rem; font-size:0.55rem;" onclick="unpinCurrentAlert()">×</button>
-                </div>
-            </div>
-            
-            <div class="ticker-wrapper-outer">
-                <div class="ticker-container" id="tickerContainerBox">
-                    <div class="ticker-track" id="tickerTrackContainer"></div>
-                </div>
-            </div>
+    <div style="display:flex; align-items:center; gap:0.25rem; flex-shrink:0;">
+        <button class="btn" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="resetTickerToStart()" title="الانتقال لأحدث إشعار على اليمين">
+            <i class="fa-solid fa-bolt" style="color:#000;"></i> أحدث
+        </button>
+        <button id="tickerTogglePlayBtn" class="btn btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.62rem; border-radius:6px; font-weight:700;" onclick="toggleTickerPlayState()" title="إيقاف / تشغيل الحركة">
+            <i class="fa-solid fa-pause"></i> إيقاف
+        </button>
+        <div class="ticker-speed-controls">
+            <button class="speed-btn" onclick="setTickerSpeed(0.1, this)">0.1x</button>
+            <button class="speed-btn active" onclick="setTickerSpeed(0.25, this)">0.25x</button>
+            <button class="speed-btn" onclick="setTickerSpeed(0.5, this)">0.5x</button>
         </div>
+    </div>
+
+    <div id="pinnedAlertCompactBar" class="pinned-alert-pill" title="إشعار مثبت (مختصر)">
+        <i class="fa-solid fa-thumbtack" style="color:var(--primary-color); font-size:0.62rem;"></i>
+        <span id="pinnedAlertCompactText" class="pinned-alert-pill-text" onclick="jumpToPinnedAlert()"></span>
+        <button type="button" class="pinned-alert-unpin-btn" onclick="unpinAlert()" title="إلغاء التثبيت">×</button>
+    </div>
+
+    <div class="ticker-wrapper-outer">
+        <div class="ticker-container" id="tickerContainerBox">
+            <div class="ticker-track" id="tickerTrackContainer"></div>
+        </div>
+    </div>
+</div>
 
         <div class="shift-scratchpad-box" id="shiftScratchpadContainer">
             <div class="scratchpad-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.2rem;">
@@ -1015,10 +1064,6 @@
                 <input type="file" id="alertImgFile" class="form-control" accept="image/*" onchange="previewUploadedImage(this)">
                 <input type="hidden" id="alertImgBase64">
                 <div id="imgPreviewContainer" style="margin-top:0.2rem;"></div>
-            </div>
-                        <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.15rem;">
-                <input type="checkbox" id="alertIsPinned" style="width:13px; height:13px;">
-                <label for="alertIsPinned" style="font-weight:700; color:var(--primary-color);">📌 تثبيت في شريط التثبيت المدمج (بدون إخفاء الشريط)</label>
             </div>
             <button class="btn btn-green" onclick="saveAlertSmart()">نشر التنبيه بالوسائط الذكية</button>
         </div>
@@ -2536,13 +2581,11 @@
             if(!grid || !tickerTrack) return;
             grid.innerHTML = ""; tickerTrack.innerHTML = "";
 
-            let orderedAlerts = getOrderedAlertsNewestFirst();
-            renderPinnedAlertStrip();
+            let orderedAlerts = [...alertsData].reverse();
 
             let alertCardsHtml = "";
-            orderedAlerts.forEach((item, idx) => {
-                const newestBadge = idx === 0 ? `<span style="background:var(--primary-color); color:#000; font-size:0.55rem; font-weight:800; padding:0.02rem 0.3rem; border-radius:999px;">أحدث</span>` : '';
-                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i>${newestBadge}<span>${item.content}</span></div>`;
+            orderedAlerts.forEach(item => {
+                alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
             applyTickerSpeed();
@@ -2585,11 +2628,6 @@
         }
         
         function resetTickerToStart() {
-            renderAlerts();
-            const scrub = document.getElementById('tickerScrubberInput');
-            const scrubVal = document.getElementById('tickerScrubberVal');
-            if (scrub) scrub.value = 0;
-            if (scrubVal) scrubVal.innerText = "0%";
             const track = document.getElementById('tickerTrackContainer');
             if (track) { 
                 track.style.animation = 'none'; 
@@ -2639,85 +2677,6 @@
             playChirpSound();
         }
 
-        let activePinnedAlertIdx = 0;
-
-        function getOrderedAlertsNewestFirst() {
-            return [...alertsData].sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
-        }
-
-        function renderPinnedAlertStrip() {
-            const strip = document.getElementById('pinnedAlertStripBox');
-            const badge = document.getElementById('pinnedAlertCounterBadge');
-            const preview = document.getElementById('pinnedAlertPreviewSpan');
-            const cycleBtn = document.getElementById('cyclePinnedAlertBtn');
-            if (!strip || !badge || !preview) return;
-
-            const pinnedList = getOrderedAlertsNewestFirst().filter(a => !!a.isPinned);
-            if (!pinnedList.length) {
-                strip.classList.remove('active');
-                activePinnedAlertIdx = 0;
-                return;
-            }
-            if (activePinnedAlertIdx >= pinnedList.length) activePinnedAlertIdx = 0;
-            const current = pinnedList[activePinnedAlertIdx];
-
-            strip.classList.add('active');
-            badge.innerText = pinnedList.length > 1 ? `📌 (${activePinnedAlertIdx + 1}/${pinnedList.length})` : "📌 مثبت";
-            preview.innerText = current.content;
-            preview.title = current.content;
-            if (cycleBtn) cycleBtn.style.display = pinnedList.length > 1 ? 'inline-flex' : 'none';
-        }
-
-        function cyclePinnedAlert() {
-            const pinnedList = getOrderedAlertsNewestFirst().filter(a => !!a.isPinned);
-            if (pinnedList.length > 1) {
-                activePinnedAlertIdx = (activePinnedAlertIdx + 1) % pinnedList.length;
-                renderPinnedAlertStrip();
-            }
-        }
-
-        function unpinCurrentAlert() {
-            const pinnedList = getOrderedAlertsNewestFirst().filter(a => !!a.isPinned);
-            if (!pinnedList.length) return;
-            if (activePinnedAlertIdx >= pinnedList.length) activePinnedAlertIdx = 0;
-            const target = pinnedList[activePinnedAlertIdx];
-            togglePinAlertItem(target.id);
-        }
-
-        function togglePinAlertItem(id) {
-            const item = alertsData.find(a => a.id == id);
-            if (!item) return;
-            item.isPinned = !item.isPinned;
-            syncToCloud();
-            playChirpSound();
-        }
-
-        function jumpToPinnedAlert() {
-            const pinnedList = getOrderedAlertsNewestFirst().filter(a => !!a.isPinned);
-            if (!pinnedList.length) return;
-            if (activePinnedAlertIdx >= pinnedList.length) activePinnedAlertIdx = 0;
-            jumpToAlertsTab(pinnedList[activePinnedAlertIdx].id);
-        }
-
-        function scrubTickerPosition(pctVal) {
-            const pct = parseFloat(pctVal) || 0;
-            const label = document.getElementById('tickerScrubberVal');
-            if (label) label.innerText = Math.round(pct) + '%';
-
-            const track = document.getElementById('tickerTrackContainer');
-            if (!track) return;
-
-            if (!tickerIsPaused) {
-                toggleTickerPlayState();
-            }
-            const durationSec = 40 / tickerSpeedMultiplier;
-            const delaySec = -(pct / 100) * durationSec;
-            track.style.animation = 'none';
-            track.offsetHeight;
-            track.style.animation = `smoothTickerScrollLeft ${durationSec}s linear infinite ${delaySec}s`;
-            track.classList.add('paused');
-        }
-
         function openAlertModal() {
             document.getElementById('alertId').value = ""; 
             document.getElementById('alertContent').value = "";
@@ -2726,8 +2685,6 @@
             document.getElementById('alertImgFile').value = "";
             document.getElementById('alertImgBase64').value = "";
             document.getElementById('imgPreviewContainer').innerHTML = "";
-            const pinChk = document.getElementById('alertIsPinned');
-            if (pinChk) pinChk.checked = false;
             document.getElementById('alertModal').classList.add('active');
         }
 
@@ -2753,15 +2710,12 @@
                 }
             }
             
-            const pinChk = document.getElementById('alertIsPinned');
-            const isPinnedVal = pinChk ? !!pinChk.checked : false;
             const alertObj = { 
                 id: id ? parseInt(id) : Date.now(), 
                 content, 
                 tags, 
                 pdfUrl, 
-                imgBase64: finalImg,
-                isPinned: isPinnedVal,
+                imgBase64: finalImg, 
                 time: new Date().toLocaleString('en-US') 
             };
             
@@ -2781,8 +2735,6 @@
             const item = alertsData.find(a => a.id === id); if (!item) return;
             document.getElementById('alertId').value = item.id; 
             document.getElementById('alertContent').value = item.content;
-            const pinChk = document.getElementById('alertIsPinned');
-            if (pinChk) pinChk.checked = !!item.isPinned;
             document.getElementById('alertTags').value = item.tags || "";
             document.getElementById('alertPdfUrl').value = item.pdfUrl || "";
             document.getElementById('alertImgFile').value = "";
