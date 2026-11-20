@@ -109,18 +109,32 @@
         }
         .kpi-card-unified:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6); }
 
-        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-        .ticker-wrapper-outer { flex: 1; overflow: hidden; position: relative; display: flex; align-items: center; direction: ltr; }
-        .ticker-container { width: 100%; overflow: hidden; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.25rem 0.6rem; direction: ltr; }
+        .professional-ticker-bar { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 0.35rem 1rem; display: flex; align-items: center; gap: 0.55rem; font-size: 0.75rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+        .ticker-wrapper-outer { flex: 1; min-width: 0; overflow: hidden; position: relative; display: flex; flex-direction: column; gap: 0.2rem; direction: rtl; }
+        .ticker-main-row { width: 100%; display: flex; align-items: center; gap: 0.4rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 0.22rem 0.5rem; overflow: hidden; }
+        .ticker-pinned-zone { display: inline-flex; align-items: center; gap: 0.35rem; flex-shrink: 0; z-index: 5; }
+        .ticker-pinned-zone:empty { display: none; }
+        .ticker-pinned-divider { width: 2px; height: 18px; background: var(--primary-color); opacity: 0.65; border-radius: 2px; flex-shrink: 0; }
+        .ticker-pinned-zone:empty + .ticker-pinned-divider { display: none; }
+        .ticker-container { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; direction: ltr; position: relative; }
         
-        /* حركة شريط التنبيهات من الشمال لليمين تماماً وبحيث يبدأ بأحدث إشعار أولاً */
+        /* حركة شريط التنبيهات من الشمال لليمين */
         .ticker-track { display: inline-flex; white-space: nowrap; gap: 1.5rem; align-items: center; animation: smoothTickerScrollLeft 60s linear infinite; direction: rtl; width: max-content; will-change: transform; }
         .ticker-track.paused { animation-play-state: paused !important; }
 
         @keyframes smoothTickerScrollLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
 
-        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.3rem 0.85rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.75rem; transition: transform 0.15s; flex-shrink: 0; }
+        .ticker-card-item { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-surface); border: 1px solid var(--primary-color); padding: 0.25rem 0.75rem; border-radius: 18px; font-weight: 700; color: #fef08a; cursor: pointer; font-size: 0.73rem; transition: transform 0.15s, background 0.15s; flex-shrink: 0; }
         .ticker-card-item:hover { background: var(--primary-color); color: #000; transform: scale(1.02); }
+        .ticker-card-item.pinned-ticker-card { background: rgba(234, 179, 8, 0.16); border: 1px solid #facc15; color: #fde047; }
+        .ticker-card-item.pinned-ticker-card:hover { background: #facc15; color: #000; }
+        .ticker-unpin-x { font-size: 0.65rem; opacity: 0.8; padding: 0 2px; border-radius: 50%; }
+        .ticker-unpin-x:hover { opacity: 1; color: #ef4444; }
+
+        .ticker-ruler-wrap { display: none; align-items: center; gap: 0.4rem; padding: 0 0.4rem; }
+        .ticker-ruler-wrap.visible { display: flex; }
+        .ticker-ruler-slider { flex: 1; height: 5px; accent-color: var(--primary-color); cursor: pointer; border-radius: 4px; }
+        .ticker-ruler-label { font-size: 0.6rem; font-weight: 700; color: var(--primary-color); white-space: nowrap; }
 
         .ticker-speed-controls { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
         .speed-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.6rem; font-weight: 700; cursor: pointer; }
@@ -393,8 +407,16 @@
             </div>
             
             <div class="ticker-wrapper-outer">
-                <div class="ticker-container" id="tickerContainerBox">
-                    <div class="ticker-track" id="tickerTrackContainer"></div>
+                <div class="ticker-main-row">
+                    <div class="ticker-pinned-zone" id="tickerPinnedZone"></div>
+                    <div class="ticker-pinned-divider" id="tickerPinnedDivider"></div>
+                    <div class="ticker-container" id="tickerContainerBox">
+                        <div class="ticker-track" id="tickerTrackContainer"></div>
+                    </div>
+                </div>
+                <div class="ticker-ruler-wrap" id="tickerRulerWrap">
+                    <span class="ticker-ruler-label"><i class="fa-solid fa-ruler-horizontal"></i> مسطرة الإيقاف:</span>
+                    <input type="range" id="tickerRulerSlider" class="ticker-ruler-slider" min="-50" max="0" step="0.1" value="-50" oninput="scrubTickerWithRuler(this.value)">
                 </div>
             </div>
         </div>
@@ -1639,6 +1661,12 @@
                 document.getElementById('shiftScratchpadContainer').classList.add('show');
             }
 
+            tickerIsPaused = (localStorage.getItem('ticker_is_paused') === 'true');
+            const savedTickerPct = parseFloat(localStorage.getItem('ticker_saved_pct'));
+            if (!isNaN(savedTickerPct)) {
+                window._savedTickerPct = savedTickerPct;
+            }
+            applyTickerPauseButtonUI();
             applyTopBarsVisibilityState(topBarsVisible);
             loadTableWidths();
 
@@ -2481,48 +2509,154 @@
             if (confirm("حذف؟")) { doctorsData = doctorsData.filter(d => d.id !== id); syncToCloud(); playChirpSound(); }
         }
 
-        function setTickerSpeed(mult, btnEl) {
-            tickerSpeedMultiplier = mult;
-            localStorage.setItem('ticker_speed_mult', mult);
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl) btnEl.classList.add('active');
-            applyTickerSpeed();
+        function getTickerDurationSec() {
+            return 40 / tickerSpeedMultiplier;
         }
 
-        function applyTickerSpeed() {
+        function getCurrentTickerTranslatePct(track) {
+            if (!track) return -50;
+            const st = window.getComputedStyle(track);
+            const tr = st.transform;
+            if (tr && tr !== 'none') {
+                try {
+                    const m = new DOMMatrix(tr);
+                    const halfWidth = track.scrollWidth / 2;
+                    if (halfWidth > 0) {
+                        let pct = (m.m41 / halfWidth) * 50;
+                        return Math.max(-50, Math.min(0, pct));
+                    }
+                } catch (e) {}
+            }
+            const savedPct = parseFloat(localStorage.getItem('ticker_saved_pct'));
+            return !isNaN(savedPct) ? Math.max(-50, Math.min(0, savedPct)) : -50;
+        }
+
+        function setTickerPositionByPct(pct, savePct = true) {
             const track = document.getElementById('tickerTrackContainer');
             if (!track) return;
-            let calculatedDuration = 40 / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
-            if (tickerIsPaused) track.classList.add('paused');
+            const clamped = Math.max(-50, Math.min(0, parseFloat(pct)));
+            const duration = getTickerDurationSec();
+            const progress = (clamped + 50) / 50;
+            const delaySec = -(progress * duration);
+
+            track.style.animation = 'none';
+            track.style.transform = `translateX(${clamped}%)`;
+            track.offsetHeight;
+            track.style.animation = `smoothTickerScrollLeft ${duration}s linear infinite`;
+            track.style.animationDelay = `${delaySec}s`;
+
+            if (tickerIsPaused) {
+                track.classList.add('paused');
+            } else {
+                track.classList.remove('paused');
+            }
+
+            const slider = document.getElementById('tickerRulerSlider');
+            if (slider && document.activeElement !== slider) {
+                slider.value = clamped.toFixed(1);
+            }
+            if (savePct) {
+                localStorage.setItem('ticker_saved_pct', clamped.toFixed(2));
+            }
         }
 
-        function toggleTickerPlayState() {
-            tickerIsPaused = !tickerIsPaused;
-            const track = document.getElementById('tickerTrackContainer');
+        function applyTickerPauseButtonUI() {
             const btn = document.getElementById('tickerTogglePlayBtn');
-            if (track) track.classList.toggle('paused', tickerIsPaused);
+            const rulerWrap = document.getElementById('tickerRulerWrap');
             if (btn) {
                 btn.innerHTML = tickerIsPaused ? `<i class="fa-solid fa-play"></i> تشغيل` : `<i class="fa-solid fa-pause"></i> إيقاف`;
                 btn.style.color = tickerIsPaused ? 'var(--accent-green)' : '';
                 btn.style.borderColor = tickerIsPaused ? 'var(--accent-green)' : '';
             }
+            if (rulerWrap) {
+                rulerWrap.classList.toggle('visible', tickerIsPaused);
+            }
+        }
+
+        function setTickerSpeed(mult, btnEl) {
+            const track = document.getElementById('tickerTrackContainer');
+            const currentPct = track ? getCurrentTickerTranslatePct(track) : -50;
+            tickerSpeedMultiplier = mult;
+            localStorage.setItem('ticker_speed_mult', mult);
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            setTickerPositionByPct(currentPct, true);
+        }
+
+        function applyTickerSpeed() {
+            const track = document.getElementById('tickerTrackContainer');
+            if (!track) return;
+            let targetPct = parseFloat(localStorage.getItem('ticker_saved_pct'));
+            if (isNaN(targetPct)) targetPct = -50;
+            setTickerPositionByPct(targetPct, false);
+            applyTickerPauseButtonUI();
+        }
+
+        function toggleTickerPlayState() {
+            const track = document.getElementById('tickerTrackContainer');
+            if (!tickerIsPaused) {
+                const currentPct = track ? getCurrentTickerTranslatePct(track) : -50;
+                tickerIsPaused = true;
+                localStorage.setItem('ticker_is_paused', 'true');
+                setTickerPositionByPct(currentPct, true);
+            } else {
+                const currentPct = track ? getCurrentTickerTranslatePct(track) : -50;
+                tickerIsPaused = false;
+                localStorage.setItem('ticker_is_paused', 'false');
+                setTickerPositionByPct(currentPct, true);
+            }
+            applyTickerPauseButtonUI();
+        }
+
+        function scrubTickerWithRuler(val) {
+            const pct = parseFloat(val);
+            if (isNaN(pct)) return;
+            setTickerPositionByPct(pct, true);
+        }
+
+        function togglePinAlert(id) {
+            const item = alertsData.find(a => a.id === id);
+            if (!item) return;
+            item.isPinned = !item.isPinned;
+            syncToCloud();
+            playChirpSound();
         }
 
         function renderAlerts(highlightId = null) {
             const searchInput = document.getElementById('alertSearchInput'), search = searchInput ? cleanSearchText(searchInput.value) : "";
-            const grid = document.getElementById('alertsGridList'), tickerTrack = document.getElementById('tickerTrackContainer');
+            const grid = document.getElementById('alertsGridList');
+            const tickerTrack = document.getElementById('tickerTrackContainer');
+            const pinnedZone = document.getElementById('tickerPinnedZone');
             if(!grid || !tickerTrack) return;
-            grid.innerHTML = ""; tickerTrack.innerHTML = "";
+
+            const prevPct = getCurrentTickerTranslatePct(tickerTrack);
+
+            grid.innerHTML = "";
+            tickerTrack.innerHTML = "";
+            if (pinnedZone) pinnedZone.innerHTML = "";
 
             let orderedAlerts = [...alertsData].reverse();
+            let pinnedAlerts = orderedAlerts.filter(a => !!a.isPinned);
+            let scrollingAlerts = orderedAlerts.filter(a => !a.isPinned);
 
+            if (pinnedZone) {
+                pinnedZone.innerHTML = pinnedAlerts.map(item => `
+                    <div class="ticker-card-item pinned-ticker-card" onclick="jumpToAlertsTab(${item.id})" title="مثبت في بداية الشريط (يمين) - اضغط للعرض">
+                        <i class="fa-solid fa-thumbtack" style="color:#facc15; font-size:0.65rem;"></i>
+                        <span>${item.content}</span>
+                        <span class="ticker-unpin-x" onclick="event.stopPropagation(); togglePinAlert(${item.id});" title="إلغاء التثبيت"><i class="fa-solid fa-xmark"></i></span>
+                    </div>
+                `).join('');
+            }
+
+            const activeScrollList = scrollingAlerts.length > 0 ? scrollingAlerts : orderedAlerts;
             let alertCardsHtml = "";
-            orderedAlerts.forEach(item => {
+            activeScrollList.forEach(item => {
                 alertCardsHtml += `<div class="ticker-card-item" onclick="jumpToAlertsTab(${item.id})"><i class="fa-solid fa-circle-exclamation" style="color:var(--primary-color);"></i><span>${item.content}</span></div>`;
             });
             tickerTrack.innerHTML = alertCardsHtml + alertCardsHtml + alertCardsHtml;
-            applyTickerSpeed();
+            setTickerPositionByPct(prevPct, false);
+            applyTickerPauseButtonUI();
 
             let alertsBuffer = "";
             orderedAlerts.filter(a => !search || (a.searchKey && a.searchKey.includes(search))).forEach(item => {
@@ -2535,7 +2669,8 @@
                 }
 
                 const isHighlighted = (item.id === highlightId) ? 'highlight-pulse' : '';
-                const escapedContent = item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                const isPinned = !!item.isPinned;
+                const escapedContent = item.content.replace(/'/g, "\'").replace(/\n/g, '\\n').replace(/\n/g, '\\n');
 
                 const tagsHeaderHtml = item.tags ? `
                     <div style="position:relative; display:inline-block;">
@@ -2543,18 +2678,21 @@
                         <div class="hidden-tags-container" style="position:absolute; left:22px; top:0; z-index:999; min-width:160px; background:var(--bg-surface); border:1px solid var(--primary-color); padding:0.4rem; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.6);">
                             <span style="color:#fde047; font-size:0.7rem; font-weight:700;">🏷️ ${item.tags}</span>
                         </div>
-                    </div>` : `<button class="action-icon-btn" style="opacity:0.2; width:18px; height:18px; font-size:0.58rem;" disabled><i class="fa-solid fa-tags"></i></button>`;
+                    </div>` : `<button class="action-icon-btn" onclick="togglePinAlert(${item.id})" title="${isPinned ? 'إلغاء تثبيت الإشعار' : 'تثبيت في بداية الشريط (يمين)'}" style="color:${isPinned ? '#facc15' : 'var(--text-muted)'}; background:${isPinned ? 'rgba(250,204,21,0.2)' : 'rgba(255,255,255,0.06)'}; width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-thumbtack"></i></button>`;
+
+                const pinBtnExtra = item.tags ? `<button class="action-icon-btn" onclick="togglePinAlert(${item.id})" title="${isPinned ? 'إلغاء تثبيت الإشعار' : 'تثبيت في بداية الشريط (يمين)'}" style="color:${isPinned ? '#facc15' : 'var(--text-muted)'}; background:${isPinned ? 'rgba(250,204,21,0.2)' : 'rgba(255,255,255,0.06)'}; width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-thumbtack"></i></button>` : '';
 
                 alertsBuffer += `
-                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" data-id="${item.id}">
+                    <div id="alert_card_${item.id}" class="alert-card-item-compact ${isHighlighted}" style="${isPinned ? 'border-color:#facc15;' : ''}" data-id="${item.id}">
                         <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اسحب لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
-                        <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
+                        <div style="flex:1;"><p>${isPinned ? '<span style="color:#facc15; font-weight:800;">📌 مثبت: </span>' : ''}${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         <div style="display:flex; align-items:center; gap:0.2rem;">${mediaHtml}</div>
                         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:2px; justify-items:center; align-items:center; width:42px;">
                             <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
                             ${tagsHeaderHtml}
+                            ${pinBtnExtra}
                         </div>
                     </div>`;
             });
@@ -2563,12 +2701,9 @@
         
         function resetTickerToStart() {
             const track = document.getElementById('tickerTrackContainer');
-            if (track) { 
-                track.style.animation = 'none'; 
-                track.offsetHeight; 
-                applyTickerSpeed(); 
-                playChirpSound();
-            }
+            if (!track) return;
+            setTickerPositionByPct(-50, true);
+            playChirpSound();
         }
 
         function jumpToAlertsTab(alertId) {
