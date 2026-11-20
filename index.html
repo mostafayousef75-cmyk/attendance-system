@@ -2555,19 +2555,11 @@
             applyTickerSpeed();
         }
 
-        function applyTickerSpeed() {
-            const track = document.getElementById('tickerTrackContainer');
-            if (!track) return;
-            let calculatedDuration = 40 / tickerSpeedMultiplier;
-            track.style.animation = `smoothTickerScrollLeft ${calculatedDuration}s linear infinite`;
-            if (tickerIsPaused) track.classList.add('paused');
-        }
+
 
         function toggleTickerPlayState() {
             tickerIsPaused = !tickerIsPaused;
-            const track = document.getElementById('tickerTrackContainer');
             const btn = document.getElementById('tickerTogglePlayBtn');
-            if (track) track.classList.toggle('paused', tickerIsPaused);
             if (btn) {
                 btn.innerHTML = tickerIsPaused ? `<i class="fa-solid fa-play"></i> تشغيل` : `<i class="fa-solid fa-pause"></i> إيقاف`;
                 btn.style.color = tickerIsPaused ? 'var(--accent-green)' : '';
@@ -2622,7 +2614,8 @@ resetTickerToStart();
                         <span class="drag-handle" draggable="true" ondragstart="dragStartRow(event, ${item.id}, 'alert')" title="اسحب لتحريك التنبيه"><i class="fa-solid fa-grip-vertical"></i></span>
                         <div style="flex:1;"><p>${item.content}</p><span style="font-size:0.55rem; color:var(--text-muted);">${item.time}</span></div>
                         <div style="display:flex; align-items:center; gap:0.2rem;">${mediaHtml}</div>
-                        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:2px; justify-items:center; align-items:center; width:42px;">
+                        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; justify-items:center; align-items:center; width:62px;">
+                            <button type="button" class="action-icon-btn" onclick="pinAlert(${item.id})" title="${pinnedAlertId === item.id ? 'مثبت في الشريط' : 'تثبيت في الشريط'}" style="width:18px; height:18px; font-size:0.58rem; color:${pinnedAlertId === item.id ? '#000' : 'var(--primary-color)'}; background:${pinnedAlertId === item.id ? 'var(--primary-color)' : 'rgba(234,179,8,0.15)'};"><i class="fa-solid fa-thumbtack"></i></button>
                             <button class="action-icon-btn btn-copy-ic" onclick="copyTextToClipboard('${escapedContent}', 'تم نسخ التنبيه:')" title="نسخ" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-copy"></i></button>
                             <button class="action-icon-btn btn-edit-ic" onclick="editAlert(${item.id})" title="تعديل" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-icon-btn btn-del-ic" onclick="deleteAlert(${item.id})" title="حذف" style="width:18px; height:18px; font-size:0.58rem;"><i class="fa-solid fa-trash"></i></button>
@@ -2644,7 +2637,12 @@ function getOrderedAlertsNewestFirst() {
 }
 
 function pinAlert(id) {
-    pinnedAlertId = parseInt(id);
+    const numId = parseInt(id);
+    if (pinnedAlertId === numId) {
+        unpinAlert();
+        return;
+    }
+    pinnedAlertId = numId;
     localStorage.setItem('pinned_alert_id', pinnedAlertId);
     renderAlerts();
     playChirpSound();
@@ -2689,25 +2687,21 @@ function startTickerMotionLoop() {
     function step(timestamp) {
         const track = document.getElementById('tickerTrackContainer');
         const box = document.getElementById('tickerContainerBox');
-        if (track && box && !tickerIsPaused) {
+        if (track && box) {
             if (!tickerLastTimestamp) tickerLastTimestamp = timestamp;
-            const dt = (timestamp - tickerLastTimestamp) / 1000;
+            const dt = Math.min((timestamp - tickerLastTimestamp) / 1000, 0.1);
             tickerLastTimestamp = timestamp;
 
-            const halfWidth = track.scrollWidth / 2;
-            const pxPerSec = 35 * (tickerSpeedMultiplier / 0.25);
+            const loopWidth = track.scrollWidth / 2;
+            const pxPerSec = 45 * (tickerSpeedMultiplier / 0.25);
 
-            if (halfWidth > box.clientWidth) {
+            if (!tickerIsPaused && loopWidth > 10) {
                 tickerCurrentOffset += pxPerSec * dt;
-                if (tickerCurrentOffset >= halfWidth) {
+                if (tickerCurrentOffset >= loopWidth) {
                     tickerCurrentOffset = 0;
                 }
-                track.style.transform = `translateX(${tickerCurrentOffset}px)`;
-            } else {
-                track.style.transform = `translateX(0px)`;
             }
-        } else {
-            tickerLastTimestamp = timestamp;
+            track.style.transform = `translateX(${tickerCurrentOffset}px)`;
         }
         tickerAnimFrameId = requestAnimationFrame(step);
     }
